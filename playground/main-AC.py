@@ -29,7 +29,7 @@ tf.random.set_random_seed(41)
 # ************************ Parameters Setting Start ************************
 machines_number = 5
 jobs_len = 10
-n_iter = 100
+n_iter = 50 # Original code was 100
 n_episode = 12
 jobs_csv = './jobs.csv'
 
@@ -56,12 +56,14 @@ tic = time.time()
 algorithm = RandomAlgorithm()
 episode = Episode(machine_configs, jobs_configs, algorithm, None)
 episode.run()
+print("Randome Algorithm")
 print(episode.env.now, time.time() - tic, average_completion(episode), average_slowdown(episode))
 
 tic = time.time()
 algorithm = FirstFitAlgorithm()
 episode = Episode(machine_configs, jobs_configs, algorithm, None)
 episode.run()
+print("First Fit Algorithm")
 print(episode.env.now, time.time() - tic, average_completion(episode), average_slowdown(episode))
 
 tic = time.time()

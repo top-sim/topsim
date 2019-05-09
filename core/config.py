@@ -21,3 +21,6 @@ class JobConfig(object):
         self.submit_time = submit_time
         self.task_configs = task_configs
         self.id = idx
+
+    def __repr__(self):
+        return str(self.id)

@@ -35,15 +35,15 @@ class RLAlgorithm(object):
         for machine in machines:
             for task in tasks:
                 if machine.accommodate(task):
-                    all_candidates.append((machine, task))
+                    all_candidates.append((machine, task))  
         if len(all_candidates) == 0:
             self.current_trajectory.append(Node(None, None, self.reward_giver.get_reward(), clock))
             return None, None
-        else:
+        else: # This is where the magic happens (myxie)
             features = self.extract_features(all_candidates)
             features = tf.convert_to_tensor(features, dtype=np.float32)
             logits = self.agent.brain(features)
-            pair_index = tf.squeeze(tf.multinomial(logits, num_samples=1), axis=1).numpy()[0]
+            pair_index = tf.squeeze(tf.random.categorical(logits, num_samples=1), axis=1).numpy()[0]
 
             node = Node(features, pair_index, 0, clock)
             self.current_trajectory.append(node)

@@ -36,7 +36,7 @@ class CSVReader(object):
         for job_id, task_configs in job_task_map.items():
             job_configs.append(JobConfig(job_id, job_submit_time_map[job_id], task_configs))
         job_configs.sort(key=attrgetter('submit_time'))
-
+        print(job_configs)
         self.job_configs = job_configs
 
     def generate(self, offset, number):

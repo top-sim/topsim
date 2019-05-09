@@ -91,6 +91,9 @@ class Job(object):
         for task_index, task_config in enumerate(job_config.task_configs):
             self.tasks.append(Task(env, self, task_config))
 
+    def __repr__(self):
+        return str(self.id)
+
     @property
     def unfinished_tasks(self):
         ls = []

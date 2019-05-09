@@ -20,3 +20,4 @@ class Episode(object):
     def run(self):
         self.simulation.run()
         self.env.run()
+        

@@ -211,7 +211,7 @@ class Agent(object):
                 self.optimize(grads_by_trajectory)
 
         self.log('loss', np.mean(loss_values), self.global_step)
-        self.log('adv', np.mean(advantages__), self.global_step)
+        self.log('adv', np.mean(avdantages__), self.global_step)
 
     def optimize(self, grads_by_trajectory):
         average_grads = []

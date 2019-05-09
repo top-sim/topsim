@@ -88,7 +88,9 @@ class Cluster(object):
         return {
             'arrived_jobs': len(self.jobs),
             'unfinished_jobs': len(self.unfinished_jobs),
+            'unfinished_job_ids': str(self.unfinished_jobs),
             'finished_jobs': len(self.finished_jobs),
+            'finished_job_ids': str(self.finished_jobs),
             'unfinished_tasks': len(self.unfinished_tasks),
             'finished_tasks': len(self.finished_tasks),
             'running_task_instances': len(self.running_task_instances),
