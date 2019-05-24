@@ -26,10 +26,9 @@ sys.path.append('..')
 
 machines_number = 5
 jobs_len = 5
-n_iter = 50 # Original code was 100
+n_iter = 50  # Original code was 100
 n_episode = 12
-jobs_csv = "experiments/jobs.csv"
-
+jobs_csv = "jobs.csv"
 
 machine_configs = [MachineConfig(64, 1, 1) for i in range(machines_number)]
 csv_reader = CSVReader(jobs_csv)
@@ -39,5 +38,5 @@ tic = time.time()
 algorithm = RandomAlgorithm()
 episode = Episode(machine_configs, jobs_configs, algorithm, 'event_{0}.trace'.format(jobs_len) )
 episode.run()
-print("Randome Algorithm")
+print("Random Algorithm")
 print(episode.env.now, time.time() - tic, average_completion(episode), average_slowdown(episode))
