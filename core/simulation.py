@@ -14,7 +14,7 @@ class Simulation(object):
         self.task_broker.attach(self)
         self.scheduler.attach(self)
 
-    def run(self):
+    def init_process(self):
         # Starting monitor process before task_broker process
         # and scheduler process is necessary for log records integrity.
         if self.event_file is not None:

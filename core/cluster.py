@@ -17,6 +17,7 @@ class Cluster(object):
     @property
     def unfinished_tasks(self):
         ls = []
+
         for job in self.jobs:
             ls.extend(job.unfinished_tasks)
         return ls
