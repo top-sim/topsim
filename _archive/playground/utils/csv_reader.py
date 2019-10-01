@@ -42,7 +42,10 @@ class CSVReader(object):
     def generate(self, offset, number):
         number = number if offset + number < len(self.job_configs) else len(self.job_configs) - offset
         ret = self.job_configs[offset: offset + number]
-        the_first_job_config = ret[0]
+        the_first_job_config = ret[0    def __init__(self, filename):
+        self.filename = filename
+        df = pd.read_csv(self.filename)
+]
         submit_time_base = the_first_job_config.submit_time
 
         tasks_number = 0

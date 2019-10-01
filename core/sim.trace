@@ -1,0 +1,153 @@
+[
+    {
+        "timestamp": 0,
+        "cluster_state": {
+            "arrived_jobs": 0,
+            "unfinished_jobs": 0,
+            "unfinished_job_ids": "[]",
+            "finished_jobs": 0,
+            "finished_job_ids": "[]",
+            "unfinished_tasks": 0,
+            "finished_tasks": 0,
+            "running_task_instances": 0,
+            "machine_states": [
+                {
+                    "id": 0,
+                    "cpu_capacity": 64,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": 1,
+                    "cpu_capacity": 64,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": 2,
+                    "cpu_capacity": 64,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": 3,
+                    "cpu_capacity": 64,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": 4,
+                    "cpu_capacity": 64,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": false,
+            "telescope_arrays_used": 0,
+            "observations_waiting": 3
+        }
+    },
+    {
+        "timestamp": 0,
+        "cluster_state": {
+            "arrived_jobs": 0,
+            "unfinished_jobs": 0,
+            "unfinished_job_ids": "[]",
+            "finished_jobs": 0,
+            "finished_job_ids": "[]",
+            "unfinished_tasks": 0,
+            "finished_tasks": 0,
+            "running_task_instances": 0,
+            "machine_states": [
+                {
+                    "id": 0,
+                    "cpu_capacity": 64,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": 1,
+                    "cpu_capacity": 64,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": 2,
+                    "cpu_capacity": 64,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": 3,
+                    "cpu_capacity": 64,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": 4,
+                    "cpu_capacity": 64,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        }
+    }
+]

@@ -8,19 +8,19 @@ import sys
 sys.path.append('..')
 
 from core.machine import MachineConfig
-from playground.algorithm.random_algorithm import RandomAlgorithm
-from playground.algorithm.tetris import Tetris
-from playground.algorithm.first_fit import FirstFitAlgorithm
-from playground.algorithm.smart.DRL import RLAlgorithm
-from playground.algorithm.smart.agent import Agent
-from playground.algorithm.smart.brain import Brain
+from _archive.playground.algorithm import RandomAlgorithm
+from _archive.playground.algorithm import Tetris
+from _archive.playground.algorithm import FirstFitAlgorithm
+from _archive.playground.algorithm import RLAlgorithm
+from _archive.playground.algorithm import Agent
+from _archive.playground.algorithm.smart.brain import Brain
 
-from playground.algorithm.smart.reward_giver import AverageCompletionRewardGiver
+from _archive.playground.algorithm import AverageCompletionRewardGiver
 
-from playground.utils.csv_reader import CSVReader
-from playground.utils.feature_functions import features_extract_func_ac, features_normalize_func_ac
-from playground.utils.tools import multiprocessing_run, average_completion, average_slowdown
-from playground.utils.episode import Episode
+from _archive.playground.utils.csv_reader import CSVReader
+from _archive.playground import features_extract_func_ac, features_normalize_func_ac
+from _archive.playground.utils.tools import multiprocessing_run, average_completion, average_slowdown
+from _archive.playground.utils.episode import Episode
 
 os.environ['CUDA_VISIBLE_DEVICES'] = ''
 

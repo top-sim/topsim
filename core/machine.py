@@ -24,14 +24,14 @@ class MachineDoor(Enum):
 
 
 class Machine(object):
-    def __init__(self, machine_config):
-        self.id = machine_config.id
-        self.cpu_capacity = machine_config.cpu_capacity
-        self.memory_capacity = machine_config.memory_capacity
-        self.disk_capacity = machine_config.disk_capacity
-        self.cpu = machine_config.cpu
-        self.memory = machine_config.memory
-        self.disk = machine_config.disk
+    def __init__(self, mid, cpu_capacity, memory_capacity, disk_capacity, cpu=None, memory=None, disk=None):
+        self.id = mid
+        self.cpu_capacity = cpu_capacity
+        self.memory_capacity = memory_capacity
+        self.disk_capacity = disk_capacity
+        self.cpu = cpu_capacity if cpu is None else cpu
+        self.memory = memory_capacity if memory is None else memory
+        self.disk = disk_capacity if disk is None else disk
 
         self.cluster = None
         self.task_instances = []

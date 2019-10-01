@@ -14,14 +14,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.  
 
 from core.machine import MachineConfig
-from playground.utils.episode import Episode
-from playground.algorithm.random_algorithm import RandomAlgorithm
-from playground.utils.csv_reader import CSVReader
-import os
+from _archive.playground.utils.episode import Episode
+from _archive.playground.algorithm import RandomAlgorithm
+from _archive.playground.utils.csv_reader import CSVReader
 import time
-import numpy as np
 import sys
-from playground.utils.tools import multiprocessing_run, average_completion, average_slowdown
+from _archive.playground.utils.tools import average_completion, average_slowdown
 sys.path.append('..')
 
 machines_number = 5

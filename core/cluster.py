@@ -51,9 +51,8 @@ class Cluster(object):
             task_instances.extend(machine.running_task_instances)
         return task_instances
 
-    def add_machines(self, machine_configs):
-        for machine_config in machine_configs:
-            machine = Machine(machine_config)
+    def add_machines(self, machine_list):
+        for machine in machine_list:
             self.machines.append(machine)
             machine.attach(self)
 
