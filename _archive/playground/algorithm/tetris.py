@@ -1,5 +1,5 @@
 import numpy as np
-from core.alogrithm import Algorithm
+from core.algorithm import Algorithm
 
 
 class Tetris(Algorithm):

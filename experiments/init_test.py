@@ -26,7 +26,7 @@ machines_number = 5
 jobs_len = 5
 n_iter = 50  # Original code was 100
 n_episode = 12
-jobs_csv = "jobs.csv"
+jobs_csv = "workflows.csv"
 
 machine_configs = [MachineConfig(64, 1, 1) for i in range(machines_number)]
 csv_reader = CSVReader(jobs_csv)

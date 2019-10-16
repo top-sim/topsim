@@ -32,7 +32,7 @@ n_job_chunk = 200
 jobs_len = 10
 n_iter = 10
 n_episode = 12
-jobs_csv = './jobs.csv'
+jobs_csv = './workflows.csv'
 
 brain = Brain(6)
 reward_giver = MakespanRewardGiver(-1)

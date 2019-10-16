@@ -1,10 +1,11 @@
 import simpy
 from core.simulation import Simulation
-
+from core.planner import Planner
+import config_data
 
 class Telescope(object):
 
-	def __init__(self, env, observations, buffer_obj, telescope_config):
+	def __init__(self, env, observations, buffer_obj, telescope_config, planner):
 		self.simulation = None
 		self.env = env
 		self.observations = observations  # .sort(key=lambda x: x.start)
@@ -13,6 +14,7 @@ class Telescope(object):
 		self.telescope_status = False
 		self.telescope_use = 0
 		self.max_array_use = telescope_config
+		self.planner = planner
 
 	def attach(self, simulation):
 		self.simulation = simulation
@@ -29,6 +31,7 @@ class Telescope(object):
 					self.telescope_use += observation.demand
 					self.telescope_status = True
 					observation.running = True
+					self.env.process(self.planner.run(observation))
 					print('Telescope is now using', self.telescope_use, 'arrays')
 				elif self.env.now > observation.start + observation.duration and self.telescope_status:
 					buffer_trigger = self.env.process(self.buffer.run(observation.name))
@@ -53,6 +56,15 @@ class Telescope(object):
 		}
 
 
+class Workflow(object):
+	"""
+	Workflow Object is used to store basic information about the workflow.
+	The workflow is specified in a file with name 'workflow', and then read into the simulator.
+	"""
+	def __init__(self, workflow):
+		self.id = workflow
+
+
 class Observation(object):
 
 	def __init__(self, name, start, duration, demand, workflow):
@@ -74,8 +86,9 @@ class Buffer(object):
 	def run(self, observation_workflow):
 		print("Observation placed in buffer at ", self.env.now)
 		print(observation_workflow)
-		self.simulation.scheduler.add_workflow(observation_workflow)
-		yield self.env.timeout(0)
+		self.simulation.task_broker.add_workflow(observation_workflow)
+		yield self.env.process(self.simulation.task_broker.run())
+		# yield self.env.timeout(0)
 
 	def attach(self, simulation):
 		self.simulation = simulation

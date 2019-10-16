@@ -4,12 +4,12 @@ from core.machine import Machine
 class Cluster(object):
     def __init__(self):
         self.machines = []
-        self.jobs = []
+        self.workflows = []
 
     @property
     def unfinished_jobs(self):
         ls = []
-        for job in self.jobs:
+        for job in self.workflows:
             if not job.finished:
                 ls.append(job)
         return ls
@@ -18,21 +18,21 @@ class Cluster(object):
     def unfinished_tasks(self):
         ls = []
 
-        for job in self.jobs:
+        for job in self.workflows:
             ls.extend(job.unfinished_tasks)
         return ls
 
     @property
     def tasks_which_has_waiting_instance(self):
         ls = []
-        for job in self.jobs:
+        for job in self.workflows:
             ls.extend(job.tasks_which_has_waiting_instance)
         return ls
 
     @property
     def finished_jobs(self):
         ls = []
-        for job in self.jobs:
+        for job in self.workflows:
             if job.finished:
                 ls.append(job)
         return ls
@@ -40,7 +40,7 @@ class Cluster(object):
     @property
     def finished_tasks(self):
         ls = []
-        for job in self.jobs:
+        for job in self.workflows:
             ls.extend(job.finished_tasks)
         return ls
 
@@ -56,8 +56,9 @@ class Cluster(object):
             self.machines.append(machine)
             machine.attach(self)
 
-    def add_job(self, job):
-        self.jobs.append(job)
+    def add_workflow(self, workflow):
+        if workflow not in self.workflows:
+            self.workflows.append(workflow)
 
     @property
     def cpu(self):
@@ -86,7 +87,7 @@ class Cluster(object):
     @property
     def state(self):
         return {
-            'arrived_jobs': len(self.jobs),
+            'arrived_jobs': len(self.workflows),
             'unfinished_jobs': len(self.unfinished_jobs),
             'unfinished_job_ids': str(self.unfinished_jobs),
             'finished_jobs': len(self.finished_jobs),

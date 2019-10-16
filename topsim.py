@@ -2,9 +2,14 @@ import core.simulation
 import sys
 import argparse
 from core.simulation import Simulation
+from core import config
+
+import config_data
+
 from core.cluster import Cluster
 import simpy
 from core.machine import Machine
+from core.planner import Planner
 from core.scheduler import Scheduler
 from core.broker import Broker
 from core.simulation import Simulation
@@ -38,24 +43,23 @@ def run_simulation(arg,parser):
 	# Copied from playground.episode
 	machines_number = 5
 	jobs_len = 10
-	jobs_csv = './jobs.csv'
-	machines = [Machine(i, 64, 1, 1) for i in range(machines_number)]
+	jobs_csv = './workflows.csv'
+	machines = config.process_machine_config(config_data.machine_config)
+	observations = config.process_telescope_config(config_data.telescope_config)
 	task_configs = []
 	env = simpy.Environment()
 	cluster = Cluster()
 	cluster.add_machines(machines)
 	task_broker = Broker(env, task_configs)
 	scheduler = Scheduler(env, algorithm)
-	emu = Observation('emu', 0, 10, 36, workflow_file)
-	dingo = Observation('dingo', 10, 15, 18, workflow_file)
-	vast = Observation('vast', 20, 30, 18, workflow_file)
+	planner = Planner(env, 'heft', config_data.machine_config)
 
 	tconfig = 36  # for starters, we will define telescope configuration as simply number of arrays that exist
 	# [start_time, duration, num_arrayssimple_sim.py:40_used]
-	observation_data = [emu, dingo, vast]  # , [40, 10, 36]]
+#	observation_data = [emu, dingo, vast]  # , [40, 10, 36]]
 	buffer = Buffer(env)
 
-	telescope = Telescope(env, observation_data, buffer, tconfig)
+	telescope = Telescope(env, observations, buffer, tconfig,planner)
 
 	simulation = Simulation(env, telescope, cluster, task_broker, scheduler, event_file)
 
@@ -63,10 +67,8 @@ def run_simulation(arg,parser):
 	env.run(until=100)  # until=100)
 
 
-
 def run_scheduler():
 	pass
-
 
 def run_planner():
 	pass

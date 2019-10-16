@@ -32,14 +32,15 @@ class Scheduler(object):
 		while not self.simulation.finished:
 			self.make_decision()
 			yield self.env.timeout(1)
-
-	def add_workflow(self, workflow):
-		print("Adding", workflow, "to workflows")
-		self.waiting_workflows.append(workflow)
-		print("Waiting workflows", self.waiting_workflows)
+	#
+	# def add_workflow(self, workflow):
+	# 	print("Adding", workflow, "to workflows")
+	# 	self.waiting_workflows.append(workflow)
+	# 	print("Waiting workflows", self.waiting_workflows)
 
 	@property
 	def state(self):
+		# Change this to 'workflows scheduled/workflows unscheduled'
 		return {
 			'waiting_workflows': [wf for wf in self.waiting_workflows]
 		}

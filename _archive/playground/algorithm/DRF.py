@@ -1,4 +1,4 @@
-from core.alogrithm import Algorithm
+from core.algorithm import Algorithm
 
 
 class DRF(Algorithm):

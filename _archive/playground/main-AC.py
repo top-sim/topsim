@@ -31,7 +31,7 @@ machines_number = 5
 jobs_len = 10
 n_iter = 50 # Original code was 100
 n_episode = 12
-jobs_csv = './jobs.csv'
+jobs_csv = './workflows.csv'
 
 brain = Brain(9)
 reward_giver = AverageCompletionRewardGiver()
