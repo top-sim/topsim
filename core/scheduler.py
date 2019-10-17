@@ -5,7 +5,7 @@ class Scheduler(object):
 		self.simulation = None
 		self.cluster = None
 		self.destroyed = False
-		self.waiting_workflows = []
+		self.workflow_plans = []
 		self.valid_pairs = {}
 
 	def attach(self, simulation):
@@ -17,7 +17,7 @@ class Scheduler(object):
 		pass
 
 	def make_decision(self):
-		if self.waiting_workflows:
+		if self.workflow_plans:
 			print("Scheduler: Waiting to process", self.waiting_workflows)
 		else:
 			print("Scheduler: Nothing to process")
@@ -42,5 +42,5 @@ class Scheduler(object):
 	def state(self):
 		# Change this to 'workflows scheduled/workflows unscheduled'
 		return {
-			'waiting_workflows': [wf for wf in self.waiting_workflows]
+			'waiting_workflows': [plan.id for plan in self.workflow_plans]
 		}

@@ -1,4 +1,4 @@
 name,start,duration,demand,filename
-'emu',0,10,36,'test/final_heft.json'
-'dingo',10,15,18,'test/final_heft.json'
-'vat',20,30,18,'test/final_heft.json'
+'emu',0,10,36,test/workflow_config.json
+'dingo',10,15,18,test/workflow_config.json
+'vat',20,30,18,test/workflow_config.json

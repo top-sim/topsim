@@ -31,7 +31,8 @@ class Telescope(object):
 					self.telescope_use += observation.demand
 					self.telescope_status = True
 					observation.running = True
-					self.env.process(self.planner.run(observation))
+					plan_trigger = self.env.process(self.planner.run(observation))
+					yield plan_trigger
 					print('Telescope is now using', self.telescope_use, 'arrays')
 				elif self.env.now > observation.start + observation.duration and self.telescope_status:
 					buffer_trigger = self.env.process(self.buffer.run(observation.name))
@@ -75,6 +76,7 @@ class Observation(object):
 		self.running = False
 		self.completed = False
 		self.workflow = workflow
+		self.plan = None
 
 
 class Buffer(object):
