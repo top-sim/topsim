@@ -1,10 +1,10 @@
-import simpy
-from core.simulation import Simulation
-from core.planner import Planner
-import config_data
+# import simpy
+# from core.simulation import Simulation
+# from core.planner import Planner
+# import config_data
+
 
 class Telescope(object):
-
 	def __init__(self, env, observations, buffer_obj, telescope_config, planner):
 		self.simulation = None
 		self.env = env
@@ -35,7 +35,7 @@ class Telescope(object):
 					yield plan_trigger
 					print('Telescope is now using', self.telescope_use, 'arrays')
 				elif self.env.now > observation.start + observation.duration and self.telescope_status:
-					buffer_trigger = self.env.process(self.buffer.run(observation.name))
+					buffer_trigger = self.env.process(self.buffer.run(observation))
 					yield buffer_trigger
 					self.telescope_use -= observation.demand
 					print('Telescope is now using', self.telescope_use, 'arrays')
@@ -85,10 +85,11 @@ class Buffer(object):
 		self.env = environ
 		self.simulation = None
 
-	def run(self, observation_workflow):
+	def run(self, observation):
 		print("Observation placed in buffer at ", self.env.now)
-		print(observation_workflow)
-		self.simulation.task_broker.add_workflow(observation_workflow)
+		print(observation.name)
+		observation.plan.start_time = self.env.now
+		self.simulation.task_broker.add_observation_to_waiting_workflows(observation)
 		yield self.env.process(self.simulation.task_broker.run())
 		# yield self.env.timeout(0)
 

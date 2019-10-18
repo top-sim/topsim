@@ -28,14 +28,13 @@ class Planner(object):
 		wf = Workflow(self.wfconfig)
 		wfenv = Environment(self.envconfig)
 		wf.add_environment(wfenv)
-		plan = Plan(None, None, None, None)
+		plan = Plan(self.wfname, None, None, None)
 		if algorithm is 'heft':
 			makespan = shadow_heft(wf)
 			plan.makespan = makespan
 		else:
 			sys.exit("Other algorithms are not supported")
 
-		plan.id = self.wfname
 		plan.exec_order = wf.execution_order
 		plan.allocation = wf.machine_alloc
 		return plan
@@ -51,3 +50,5 @@ class Plan(object):
 		self.exec_order = exec_order
 		self.allocation = allocation
 		self.makespan = makespan
+		self.start_time = None
+

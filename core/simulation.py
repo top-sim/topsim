@@ -28,5 +28,6 @@ class Simulation(object):
 	@property
 	def finished(self):
 		return not (
-				self.telescope.observations or self.task_broker.waiting_workflows
+				self.telescope.observations or self.task_broker.observations_for_processing
+				or self.cluster.workflows
 		)

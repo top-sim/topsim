@@ -17,16 +17,17 @@ class Scheduler(object):
 		pass
 
 	def make_decision(self):
+		print(self.cluster.workflows)
 		if self.workflow_plans:
-			print("Scheduler: Waiting to process", self.waiting_workflows)
+			print("Scheduler: Waiting to process", self.workflow_plans)
 		else:
 			print("Scheduler: Nothing to process")
-		while True:
-			machine, task = self.algorithm(self.cluster, self.env.now)
-			if machine is None or task is None:
-				break
-			else:
-				task.start_task_instance(machine)
+		# while True:
+		# 	machine, task = self.algorithm(self.cluster, self.env.now)
+		# 	if machine is None or task is None:
+		# 		break
+		# 	else:
+		# 		task.start_task_instance(machine)
 
 	def run(self):
 		while not self.simulation.finished:
@@ -35,12 +36,12 @@ class Scheduler(object):
 	#
 	# def add_workflow(self, workflow):
 	# 	print("Adding", workflow, "to workflows")
-	# 	self.waiting_workflows.append(workflow)
-	# 	print("Waiting workflows", self.waiting_workflows)
+	# 	self.observations_for_processing.append(workflow)
+	# 	print("Waiting workflows", self.observations_for_processing)
 
 	@property
 	def state(self):
 		# Change this to 'workflows scheduled/workflows unscheduled'
 		return {
-			'waiting_workflows': [plan.id for plan in self.workflow_plans]
+			'observations_for_processing': [plan.id for plan in self.workflow_plans]
 		}
