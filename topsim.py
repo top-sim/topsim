@@ -11,11 +11,12 @@ import simpy
 from core.machine import Machine
 from core.planner import Planner
 from core.scheduler import Scheduler
-from core.broker import Broker
+# from core.buffer import Broker
 from core.simulation import Simulation
-from core.telescope import Telescope, Observation, Buffer
+from core.telescope import Telescope, Observation
+from core.buffer import Buffer
 from scheduler.random_algorithm import RandomAlgorithm
-
+from scheduler.fifo_algorithm import FifoAlgorithm
 """
 topsim.py takes command-line arguments to specify how the simulation will run
 It can also be used to run tests 
@@ -39,7 +40,8 @@ def run_simulation(arg,parser):
 	else:
 		parser.print_help()
 	event_file = '/home/rwb/github/topsim/sim.trace'
-	algorithm = RandomAlgorithm()
+	# algorithm = RandomAlgorithm()
+	algorithm = Fifo
 	# Copied from playground.episode
 	machines_number = 5
 	jobs_len = 10
@@ -50,7 +52,7 @@ def run_simulation(arg,parser):
 	env = simpy.Environment()
 	cluster = Cluster()
 	cluster.add_machines(machines)
-	task_broker = Broker(env, task_configs)
+	# task_broker = Broker(env, task_configs)
 	scheduler = Scheduler(env, algorithm)
 	planner = Planner(env, 'heft', config_data.machine_config)
 
@@ -61,7 +63,7 @@ def run_simulation(arg,parser):
 
 	telescope = Telescope(env, observations, buffer, tconfig,planner)
 
-	simulation = Simulation(env, telescope, cluster, task_broker, scheduler, event_file)
+	simulation = Simulation(env, telescope, cluster, buffer, scheduler, event_file)
 
 	simulation.init_process()
 	env.run(until=100)  # until=100)

@@ -18,7 +18,7 @@ class Telescope(object):
 
 	def attach(self, simulation):
 		self.simulation = simulation
-		self.buffer.attach(simulation)
+		# self.buffer.attach(simulation)
 
 	def run(self):
 		while self.observations:
@@ -55,19 +55,22 @@ class Telescope(object):
 			'telescope_arrays_used': self.telescope_use,
 			'observations_waiting': len(self.observations)
 		}
-
-
-class Workflow(object):
-	"""
-	Workflow Object is used to store basic information about the workflow.
-	The workflow is specified in a file with name 'workflow', and then read into the simulator.
-	"""
-	def __init__(self, workflow):
-		self.id = workflow
-
+#
+#
+# class Workflow(object):
+# 	"""
+# 	Workflow Object is used to store basic information about the workflow.
+# 	The workflow is specified in a file with name 'workflow', and then read into the simulator.
+# 	"""
+# 	def __init__(self, workflow):
+# 		self.id = workflow
+#
 
 class Observation(object):
-
+	"""
+	Observation object stores information about a given observation; the object also
+	stores information about the workflow, and the generated plan for that workflow.
+	"""
 	def __init__(self, name, start, duration, demand, workflow):
 		self.name = name
 		self.start = start
@@ -79,22 +82,7 @@ class Observation(object):
 		self.plan = None
 
 
-class Buffer(object):
 
-	def __init__(self, environ):
-		self.env = environ
-		self.simulation = None
-
-	def run(self, observation):
-		print("Observation placed in buffer at ", self.env.now)
-		print(observation.name)
-		observation.plan.start_time = self.env.now
-		self.simulation.task_broker.add_observation_to_waiting_workflows(observation)
-		yield self.env.process(self.simulation.task_broker.run())
-		# yield self.env.timeout(0)
-
-	def attach(self, simulation):
-		self.simulation = simulation
 #
 #
 # if __name__ == '__main__':

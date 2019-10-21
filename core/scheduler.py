@@ -22,12 +22,39 @@ class Scheduler(object):
 			print("Scheduler: Waiting to process", self.workflow_plans)
 		else:
 			print("Scheduler: Nothing to process")
+		max = -1
+		current_plan = None
+		for plan in self.cluster.workflow_plans:
+			if max == -1 or plan.start_time < max:
+				max = plan.start_time
+				current_plan = plan
+		if current_plan:
+			print(current_plan.id, current_plan.exec_order)
+			while True:
+				machine, task = self.algorithm(self.cluster, self.env.now)
+				if machine is None or task is None:
+					break
+				else:
+					self.allocate_task(task, machine)
+					# task.start_task_instance(machine)
 		# while True:
 		# 	machine, task = self.algorithm(self.cluster, self.env.now)
 		# 	if machine is None or task is None:
 		# 		break
 		# 	else:
 		# 		task.start_task_instance(machine)
+
+	def allocate_task(self, task, machine):
+		"""
+		We are going to move away slightly from the 'task initiates its allocation', which was
+		the method elected in CloudSimPy; instead, the scheduler performs the allocation (I prefer
+		this from a logical/Actor way of thinking').
+		:param task:
+		:param machine:
+		:return:
+		"""
+
+		pass
 
 	def run(self):
 		while not self.simulation.finished:
@@ -43,5 +70,5 @@ class Scheduler(object):
 	def state(self):
 		# Change this to 'workflows scheduled/workflows unscheduled'
 		return {
-			'observations_for_processing': [plan.id for plan in self.workflow_plans]
+			# 'observations_for_processing': [plan.id for plan in self.workflow_plans]
 		}

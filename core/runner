@@ -2,7 +2,7 @@
 import simpy
 from core.cluster import Cluster
 from core.scheduler import Scheduler
-from core.broker import Broker
+from core.buffer import Broker
 from core.simulation import Simulation
 
 

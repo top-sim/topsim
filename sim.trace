@@ -48,9 +48,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 3
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 1,
@@ -101,9 +99,7 @@
             "telescope_arrays_used": 36,
             "observations_waiting": 3
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 2,
@@ -154,9 +150,7 @@
             "telescope_arrays_used": 36,
             "observations_waiting": 3
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 3,
@@ -207,9 +201,7 @@
             "telescope_arrays_used": 36,
             "observations_waiting": 3
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 4,
@@ -260,9 +252,7 @@
             "telescope_arrays_used": 36,
             "observations_waiting": 3
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 5,
@@ -313,9 +303,7 @@
             "telescope_arrays_used": 36,
             "observations_waiting": 3
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 6,
@@ -366,9 +354,7 @@
             "telescope_arrays_used": 36,
             "observations_waiting": 3
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 7,
@@ -419,9 +405,7 @@
             "telescope_arrays_used": 36,
             "observations_waiting": 3
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 8,
@@ -472,9 +456,7 @@
             "telescope_arrays_used": 36,
             "observations_waiting": 3
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 9,
@@ -525,9 +507,7 @@
             "telescope_arrays_used": 36,
             "observations_waiting": 3
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 10,
@@ -578,9 +558,7 @@
             "telescope_arrays_used": 36,
             "observations_waiting": 3
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 11,
@@ -631,9 +609,7 @@
             "telescope_arrays_used": 36,
             "observations_waiting": 3
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 12,
@@ -686,9 +662,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 2
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 13,
@@ -741,9 +715,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 2
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 14,
@@ -796,9 +768,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 2
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 15,
@@ -851,9 +821,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 2
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 16,
@@ -906,9 +874,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 2
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 17,
@@ -961,9 +927,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 2
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 18,
@@ -1016,9 +980,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 2
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 19,
@@ -1071,9 +1033,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 2
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 20,
@@ -1126,9 +1086,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 2
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 21,
@@ -1181,9 +1139,7 @@
             "telescope_arrays_used": 36,
             "observations_waiting": 2
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 22,
@@ -1236,9 +1192,7 @@
             "telescope_arrays_used": 36,
             "observations_waiting": 2
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 23,
@@ -1291,9 +1245,7 @@
             "telescope_arrays_used": 36,
             "observations_waiting": 2
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 24,
@@ -1346,9 +1298,7 @@
             "telescope_arrays_used": 36,
             "observations_waiting": 2
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 25,
@@ -1401,9 +1351,7 @@
             "telescope_arrays_used": 36,
             "observations_waiting": 2
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 26,
@@ -1456,9 +1404,7 @@
             "telescope_arrays_used": 36,
             "observations_waiting": 2
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 27,
@@ -1512,9 +1458,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 28,
@@ -1568,9 +1512,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 29,
@@ -1624,9 +1566,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 30,
@@ -1680,9 +1620,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 31,
@@ -1736,9 +1674,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 32,
@@ -1792,9 +1728,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 33,
@@ -1848,9 +1782,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 34,
@@ -1904,9 +1836,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 35,
@@ -1960,9 +1890,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 36,
@@ -2016,9 +1944,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 37,
@@ -2072,9 +1998,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 38,
@@ -2128,9 +2052,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 39,
@@ -2184,9 +2106,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 40,
@@ -2240,9 +2160,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 41,
@@ -2296,9 +2214,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 42,
@@ -2352,9 +2268,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 43,
@@ -2408,9 +2322,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 44,
@@ -2464,9 +2376,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 45,
@@ -2520,9 +2430,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 46,
@@ -2576,9 +2484,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 47,
@@ -2632,9 +2538,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 48,
@@ -2688,9 +2592,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 49,
@@ -2744,9 +2646,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 50,
@@ -2800,9 +2700,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 51,
@@ -2856,9 +2754,7 @@
             "telescope_arrays_used": 18,
             "observations_waiting": 1
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 52,
@@ -2913,9 +2809,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 53,
@@ -2970,9 +2864,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 54,
@@ -3027,9 +2919,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 55,
@@ -3084,9 +2974,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 56,
@@ -3141,9 +3029,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 57,
@@ -3198,9 +3084,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 58,
@@ -3255,9 +3139,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 59,
@@ -3312,9 +3194,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 60,
@@ -3369,9 +3249,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 61,
@@ -3426,9 +3304,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 62,
@@ -3483,9 +3359,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 63,
@@ -3540,9 +3414,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 64,
@@ -3597,9 +3469,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 65,
@@ -3654,9 +3524,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 66,
@@ -3711,9 +3579,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 67,
@@ -3768,9 +3634,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 68,
@@ -3825,9 +3689,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 69,
@@ -3882,9 +3744,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 70,
@@ -3939,9 +3799,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 71,
@@ -3996,9 +3854,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 72,
@@ -4053,9 +3909,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 73,
@@ -4110,9 +3964,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 74,
@@ -4167,9 +4019,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 75,
@@ -4224,9 +4074,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 76,
@@ -4281,9 +4129,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 77,
@@ -4338,9 +4184,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 78,
@@ -4395,9 +4239,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 79,
@@ -4452,9 +4294,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 80,
@@ -4509,9 +4349,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 81,
@@ -4566,9 +4404,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 82,
@@ -4623,9 +4459,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 83,
@@ -4680,9 +4514,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 84,
@@ -4737,9 +4569,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 85,
@@ -4794,9 +4624,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 86,
@@ -4851,9 +4679,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 87,
@@ -4908,9 +4734,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 88,
@@ -4965,9 +4789,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 89,
@@ -5022,9 +4844,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 90,
@@ -5079,9 +4899,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 91,
@@ -5136,9 +4954,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 92,
@@ -5193,9 +5009,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 93,
@@ -5250,9 +5064,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 94,
@@ -5307,9 +5119,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 95,
@@ -5364,9 +5174,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 96,
@@ -5421,9 +5229,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 97,
@@ -5478,9 +5284,7 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     },
     {
         "timestamp": 98,
@@ -5535,8 +5339,6 @@
             "telescope_arrays_used": 0,
             "observations_waiting": 0
         },
-        "scheduler_state": {
-            "observations_for_processing": []
-        }
+        "scheduler_state": {}
     }
 ]

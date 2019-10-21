@@ -16,7 +16,7 @@
 import numpy as np
 from core.algorithm import Algorithm
 
-class fifoAlgorithm(Algorithm):
+class FifoAlgorithm(Algorithm):
     def __init__(self, threshold=0.8):
         self.threshold = threshold
 
