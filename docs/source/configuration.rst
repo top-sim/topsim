@@ -19,6 +19,7 @@ workflow descrition file (``filename``).
 Cluster
 -------
 The cluster is initalised using the *shadow* library environment specification JSON format. An example
+
 .. code-block:: json
 
 	{
