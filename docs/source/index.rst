@@ -6,7 +6,7 @@ TopSim
 
 
 Telescope OPerations Simulator (TopSim) is a simulation framework built to evaluate
-planning and scheduling paradigms for large-scale telescope operations, such as the
+planning and scheduling paradigms for lublrge-scale telescope operations, such as the
 Square Kilometre Array (SKA). 
 
 
@@ -18,7 +18,7 @@ are activated due to events that occur during an 'Observation'.
 Requirements
 -------------
 .. toctree::
-    :maxdepth: 1
+	:maxdepth: 1
 
 
 TopSim, in addition to the **SimPy** library, makes use of the following Python libraries:
@@ -34,8 +34,11 @@ have these libraries installed on your machine.
 Telescope Operations Model
 --------------------------
 .. toctree::
-    :maxdepth: 1
+	:maxdepth: 1
 
-Algorithms and _shadow_ integration
+	configuration
+	runningsim
+
+Algorithms and *shadow* integration
 -----------------------------------
 
