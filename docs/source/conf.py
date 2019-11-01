@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'TopSim'
-copyright = '2019, Ryan W. Bunney'
-author = 'Ryan W. Bunney'
+copyright = '2019, RW Bunney'
+author = 'RW Bunney'
 
 master_doc = 'index'
 # -- General configuration ---------------------------------------------------
