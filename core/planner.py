@@ -25,6 +25,7 @@ class Planner(object):
 		yield self.env.timeout(0)
 
 	def plan(self, algorithm):
+
 		wf = Workflow(self.wfconfig)
 		wfenv = Environment(self.envconfig)
 		wf.add_environment(wfenv)

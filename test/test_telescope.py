@@ -1,4 +1,4 @@
-# Copyright (C) 04/10/2019 RW Bunney
+# Copyright (C) 27/11/19 RW Bunney
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,16 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-########################################################################
-
-"""
-Config Data for the simulation; the format of this will change, this is a stub
-"""
-# telescope observations
-telescope_config = 'data/observations.csv'
-machine_config = 'data/system_config.json'
-workflow_config = 'data/workflow_config.json'
-event_file = '/home/rwb/github/topsim/sim.trace'
-planning_algorithm = 'heft'
+import unittest
 
 
+class TestTelescope(unittest.TestCase):
+
+	def setUp(self):
+		pass
+
+	def tearDown(self):
+		pass

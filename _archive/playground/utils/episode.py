@@ -18,5 +18,5 @@ class Episode(object):
         self.simulation = Simulation(self.env, cluster, task_broker, scheduler, event_file)
 
     def run(self):
-        self.simulation.init_process()
+        self.simulation.start()
         self.env.run()

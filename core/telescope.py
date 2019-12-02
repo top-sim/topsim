@@ -16,10 +16,6 @@ class Telescope(object):
 		self.max_array_use = telescope_config
 		self.planner = planner
 
-	def attach(self, simulation):
-		self.simulation = simulation
-		# self.buffer.attach(simulation)
-
 	def run(self):
 		while self.observations:
 			for observation in self.observations:

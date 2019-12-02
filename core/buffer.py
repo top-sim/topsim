@@ -3,10 +3,9 @@ from collections import deque
 
 
 class Buffer(object):
-	def __init__(self, environ):
-		self.env = environ
-		self.simulation = None
-		self.cluster = None
+	def __init__(self, env, cluster):
+		self.env = env
+		self.cluster = cluster
 		self.destroyed = False
 		# Observations_for_processing is a queue of observations; popleft() to get the oldest observation
 		self.observations_for_processing = deque()
@@ -34,9 +33,9 @@ class Buffer(object):
 		self.observations_for_processing.append(observation)
 		print("Waiting workflows", self.observations_for_processing)
 
-	def attach(self, simulation):
-		self.simulation = simulation
-		self.cluster = simulation.cluster
+	# def attach(self, simulation):
+	# 	self.simulation = simulation
+	# 	self.cluster = simulation.cluster
 
 # class Broker(object):
 # 	def __init__(self, env, job_configs):

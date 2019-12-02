@@ -1,3 +1,5 @@
+.. _configuration:
+
 TopSim Config files
 =========================
 

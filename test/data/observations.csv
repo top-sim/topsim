@@ -1,0 +1,4 @@
+name,start,duration,demand,filename
+emu,0,10,36,data/workflow_config.json
+dingo,10,15,18,data/workflow_config.json
+vat,20,30,18,data/workflow_config.json

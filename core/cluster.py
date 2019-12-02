@@ -1,12 +1,34 @@
-# from core.machine import Machine
+import json
+from core.machine import Machine
 
 
 class Cluster(object):
-	def __init__(self):
+	def __init__(self, machines):
 		self.machines = []
-		self.workflows = []
+		self._add_machines(machines)
+		self.workflows = []  # Keeping here to stop runtime errors
 		self.workflow_plans = []
 		self.queue = []
+		self.finished_workflows = []
+
+	def _add_machines(self, machine_config):
+		machines = _process_machine_config(machine_config)
+		for machine in machines:
+			self.machines.append(machine)
+			machine.attach(self)
+
+	def add_workflow(self, workflow_id):
+		if workflow_id not in self.workflows:
+			self.workflows.append(workflow_id)
+			return True
+		else:
+			return False
+
+	def add_workflow_plan(self, workflow_plan):
+		if self.add_workflow(workflow_plan.id):
+			self.workflow_plans.append(workflow_plan)
+		else:
+			print("Workflow for observation {0} is already waiting to be scheduled".format(workflow_plan.id))
 
 	@property
 	def unfinished_jobs(self):
@@ -21,6 +43,7 @@ class Cluster(object):
 		ls = []
 
 		for job in self.workflows:
+
 			ls.extend(job.unfinished_tasks)
 		return ls
 
@@ -53,24 +76,6 @@ class Cluster(object):
 			task_instances.extend(machine.running_task_instances)
 		return task_instances
 
-	def add_machines(self, machine_list):
-		for machine in machine_list:
-			self.machines.append(machine)
-			machine.attach(self)
-
-	def add_workflow(self,workflow_id):
-		if workflow_id not in self.workflows:
-			self.workflows.append(workflow_id)
-			return True
-		else:
-			return False
-
-	def add_workflow_plan(self, workflow_plan):
-		if self.add_workflow(workflow_plan.id):
-			self.workflow_plans.append(workflow_plan)
-		else:
-			print("Workflow for observation {0} is already waiting to be scheduled".format(workflow_plan.id))
-
 	@property
 	def cpu(self):
 		return sum([machine.cpu for machine in self.machines])
@@ -98,7 +103,9 @@ class Cluster(object):
 	@property
 	def state(self):
 		return {
-			'arrived_jobs': len(self.workflows),
+			'arrived_workflows': len(self.workflows),
+			'unfinished_workflows': len(self.workflows),
+			'finihsed_workflows': self.workflows,
 			# 'unfinished_jobs': len(self.unfinished_jobs),
 			# 'unfinished_job_ids': str(self.unfinished_jobs),
 			# 'finished_jobs': len(self.finished_jobs),
@@ -112,3 +119,21 @@ class Cluster(object):
 			'memory': self.memory / self.memory_capacity,
 			'disk': self.disk / self.disk_capacity,
 		}
+
+
+# Helper function that acts as static function for Cluster
+def _process_machine_config(machine_config):
+	with open(machine_config, 'r') as infile:
+		config = json.load(infile)
+	machines = config['system']['resources']
+	machine_list = []
+	for machine in machines:
+		machine_list.append(Machine(
+			machine,
+			machines[machine]['flops'],
+			1,
+			1,
+		))
+	return machine_list
+	pass
+

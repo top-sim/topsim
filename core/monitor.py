@@ -9,7 +9,7 @@ class Monitor(object):
 		self.events = []
 
 	def run(self):
-		while not self.simulation.finished:
+		while not self.simulation.is_finished():
 			state = {
 				'timestamp': self.env.now,
 				'cluster_state': self.simulation.cluster.state,

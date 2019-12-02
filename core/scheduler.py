@@ -1,16 +1,17 @@
+
+
 class Scheduler(object):
-	def __init__(self, env, algorithm):
+	def __init__(self, env, algorithm, cluster):
 		self.env = env
 		self.algorithm = algorithm
 		self.simulation = None
-		self.cluster = None
 		self.destroyed = False
 		self.workflow_plans = []
 		self.valid_pairs = {}
+		self.cluster = cluster
 
-	def attach(self, simulation):
-		self.simulation = simulation
-		self.cluster = simulation.cluster
+	# def attach(self, simulation):
+	# 	self.simulation = simulation
 
 	def _init_workflow(self, workflow):
 		# Get the nodes for the workflow from somewhere
@@ -44,6 +45,18 @@ class Scheduler(object):
 		# 	else:
 		# 		task.start_task_instance(machine)
 
+
+	def unroll_plan(self, plan):
+		"""
+		The plan object has the exec_order and allocation attributes.
+		We need to use these attributes to instantiate the tasks with their respective
+		start times and execution order.
+		:param plan:
+		:return:
+		"""
+		alloc = plan.allocation
+
+
 	def allocate_task(self, task, machine):
 		"""
 		We are going to move away slightly from the 'task initiates its allocation', which was
@@ -57,14 +70,14 @@ class Scheduler(object):
 		pass
 
 	def run(self):
-		while not self.simulation.finished:
+		while True:
 			self.make_decision()
 			yield self.env.timeout(1)
 	#
 	# def add_workflow(self, workflow):
 	# 	print("Adding", workflow, "to workflows")
 	# 	self.observations_for_processing.append(workflow)
-	# 	print("Waiting workflows", self.observations_for_processing)
+	# 	print("Waiting workflows", self.observations_for_processing
 
 	@property
 	def state(self):
@@ -72,3 +85,14 @@ class Scheduler(object):
 		return {
 			# 'observations_for_processing': [plan.id for plan in self.workflow_plans]
 		}
+
+
+class Task(object):
+	def __init__(self, id):
+		self. id = id
+		self.start = 0
+		self.finish = 0
+		self.flops = 0
+		self.alloc = None
+		self.duration = None
+

@@ -40,33 +40,16 @@ def run_simulation(arg,parser):
 	else:
 		parser.print_help()
 	event_file = '/home/rwb/github/topsim/sim.trace'
-	# algorithm = RandomAlgorithm()
-	algorithm = Fifo
-	# Copied from playground.episode
-	machines_number = 5
-	jobs_len = 10
-	jobs_csv = './workflows.csv'
-	machines = config.process_machine_config(config_data.machine_config)
-	observations = config.process_telescope_config(config_data.telescope_config)
-	task_configs = []
+	planning_algorithm = 'heft'
 	env = simpy.Environment()
-	cluster = Cluster()
-	cluster.add_machines(machines)
-	# task_broker = Broker(env, task_configs)
-	scheduler = Scheduler(env, algorithm)
-	planner = Planner(env, 'heft', config_data.machine_config)
+	tmax = 36  # for starters, we will define telescope configuration as simply number of arrays that exist
+	salgorithm = FifoAlgorithm()
+	simulation = Simulation(env, config_data.telescope_config, tmax, config_data.machine_config,
+							salgorithm, 'heft', event_file)
 
-	tconfig = 36  # for starters, we will define telescope configuration as simply number of arrays that exist
-	# [start_time, duration, num_arrayssimple_sim.py:40_used]
-#	observation_data = [emu, dingo, vast]  # , [40, 10, 36]]
-	buffer = Buffer(env)
-
-	telescope = Telescope(env, observations, buffer, tconfig,planner)
-
-	simulation = Simulation(env, telescope, cluster, buffer, scheduler, event_file)
-
-	simulation.init_process()
-	env.run(until=100)  # until=100)
+	simulation.start()
+	simulation.run()
+	# env.run(until=100)  # until=100)
 
 
 def run_scheduler():
