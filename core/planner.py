@@ -6,7 +6,9 @@ from os import path
 from shadow.classes.workflow import Workflow
 from shadow.classes.environment import Environment
 from shadow.algorithms.heuristic import heft as shadow_heft
+import config_data
 
+# BUFFER_OFFSET = config_data.buffer_offset
 
 # from core.telescope import Observation
 class Planner(object):
@@ -52,4 +54,10 @@ class Plan(object):
 		self.allocation = allocation
 		self.makespan = makespan
 		self.start_time = None
+
+	# def apply_offset(self):
+	# 	for self.allocation
+	#
+
+
 

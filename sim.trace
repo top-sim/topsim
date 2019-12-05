@@ -4,9 +4,7 @@
         "cluster_state": {
             "arrived_workflows": 0,
             "unfinished_workflows": 0,
-            "finihsed_workflows": [
-                "emu"
-            ],
+            "finihsed_workflows": [],
             "machine_states": [
                 {
                     "id": "cat0_m0",
@@ -42,7 +40,6 @@
                     "finished_task_instances": 0
                 }
             ],
-            "observation_workflows_waiting": [],
             "cpu": 1.0,
             "memory": 1.0,
             "disk": 1.0
@@ -59,9 +56,7 @@
         "cluster_state": {
             "arrived_workflows": 0,
             "unfinished_workflows": 0,
-            "finihsed_workflows": [
-                "emu"
-            ],
+            "finihsed_workflows": [],
             "machine_states": [
                 {
                     "id": "cat0_m0",
@@ -97,7 +92,6 @@
                     "finished_task_instances": 0
                 }
             ],
-            "observation_workflows_waiting": [],
             "cpu": 1.0,
             "memory": 1.0,
             "disk": 1.0
@@ -114,9 +108,7 @@
         "cluster_state": {
             "arrived_workflows": 0,
             "unfinished_workflows": 0,
-            "finihsed_workflows": [
-                "emu"
-            ],
+            "finihsed_workflows": [],
             "machine_states": [
                 {
                     "id": "cat0_m0",
@@ -152,7 +144,6 @@
                     "finished_task_instances": 0
                 }
             ],
-            "observation_workflows_waiting": [],
             "cpu": 1.0,
             "memory": 1.0,
             "disk": 1.0
@@ -169,9 +160,7 @@
         "cluster_state": {
             "arrived_workflows": 0,
             "unfinished_workflows": 0,
-            "finihsed_workflows": [
-                "emu"
-            ],
+            "finihsed_workflows": [],
             "machine_states": [
                 {
                     "id": "cat0_m0",
@@ -207,7 +196,6 @@
                     "finished_task_instances": 0
                 }
             ],
-            "observation_workflows_waiting": [],
             "cpu": 1.0,
             "memory": 1.0,
             "disk": 1.0
@@ -224,9 +212,7 @@
         "cluster_state": {
             "arrived_workflows": 0,
             "unfinished_workflows": 0,
-            "finihsed_workflows": [
-                "emu"
-            ],
+            "finihsed_workflows": [],
             "machine_states": [
                 {
                     "id": "cat0_m0",
@@ -262,7 +248,6 @@
                     "finished_task_instances": 0
                 }
             ],
-            "observation_workflows_waiting": [],
             "cpu": 1.0,
             "memory": 1.0,
             "disk": 1.0
@@ -279,9 +264,7 @@
         "cluster_state": {
             "arrived_workflows": 0,
             "unfinished_workflows": 0,
-            "finihsed_workflows": [
-                "emu"
-            ],
+            "finihsed_workflows": [],
             "machine_states": [
                 {
                     "id": "cat0_m0",
@@ -317,7 +300,6 @@
                     "finished_task_instances": 0
                 }
             ],
-            "observation_workflows_waiting": [],
             "cpu": 1.0,
             "memory": 1.0,
             "disk": 1.0
@@ -334,9 +316,7 @@
         "cluster_state": {
             "arrived_workflows": 0,
             "unfinished_workflows": 0,
-            "finihsed_workflows": [
-                "emu"
-            ],
+            "finihsed_workflows": [],
             "machine_states": [
                 {
                     "id": "cat0_m0",
@@ -372,7 +352,6 @@
                     "finished_task_instances": 0
                 }
             ],
-            "observation_workflows_waiting": [],
             "cpu": 1.0,
             "memory": 1.0,
             "disk": 1.0
@@ -389,9 +368,7 @@
         "cluster_state": {
             "arrived_workflows": 0,
             "unfinished_workflows": 0,
-            "finihsed_workflows": [
-                "emu"
-            ],
+            "finihsed_workflows": [],
             "machine_states": [
                 {
                     "id": "cat0_m0",
@@ -427,7 +404,6 @@
                     "finished_task_instances": 0
                 }
             ],
-            "observation_workflows_waiting": [],
             "cpu": 1.0,
             "memory": 1.0,
             "disk": 1.0
@@ -444,9 +420,7 @@
         "cluster_state": {
             "arrived_workflows": 0,
             "unfinished_workflows": 0,
-            "finihsed_workflows": [
-                "emu"
-            ],
+            "finihsed_workflows": [],
             "machine_states": [
                 {
                     "id": "cat0_m0",
@@ -482,7 +456,6 @@
                     "finished_task_instances": 0
                 }
             ],
-            "observation_workflows_waiting": [],
             "cpu": 1.0,
             "memory": 1.0,
             "disk": 1.0
@@ -499,9 +472,7 @@
         "cluster_state": {
             "arrived_workflows": 0,
             "unfinished_workflows": 0,
-            "finihsed_workflows": [
-                "emu"
-            ],
+            "finihsed_workflows": [],
             "machine_states": [
                 {
                     "id": "cat0_m0",
@@ -537,7 +508,6 @@
                     "finished_task_instances": 0
                 }
             ],
-            "observation_workflows_waiting": [],
             "cpu": 1.0,
             "memory": 1.0,
             "disk": 1.0
@@ -554,9 +524,7 @@
         "cluster_state": {
             "arrived_workflows": 0,
             "unfinished_workflows": 0,
-            "finihsed_workflows": [
-                "emu"
-            ],
+            "finihsed_workflows": [],
             "machine_states": [
                 {
                     "id": "cat0_m0",
@@ -592,7 +560,6 @@
                     "finished_task_instances": 0
                 }
             ],
-            "observation_workflows_waiting": [],
             "cpu": 1.0,
             "memory": 1.0,
             "disk": 1.0
@@ -609,9 +576,7 @@
         "cluster_state": {
             "arrived_workflows": 0,
             "unfinished_workflows": 0,
-            "finihsed_workflows": [
-                "emu"
-            ],
+            "finihsed_workflows": [],
             "machine_states": [
                 {
                     "id": "cat0_m0",
@@ -647,7 +612,6 @@
                     "finished_task_instances": 0
                 }
             ],
-            "observation_workflows_waiting": [],
             "cpu": 1.0,
             "memory": 1.0,
             "disk": 1.0
@@ -656,6 +620,2450 @@
             "telescope_in_use": true,
             "telescope_arrays_used": 36,
             "observations_waiting": 3
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 12,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": false,
+            "telescope_arrays_used": 0,
+            "observations_waiting": 2
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 13,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 2
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 14,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 2
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 15,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 2
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 16,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 2
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 17,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 2
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 18,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 2
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 19,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 2
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 20,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 2
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 21,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 36,
+            "observations_waiting": 2
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 22,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 36,
+            "observations_waiting": 2
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 23,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 36,
+            "observations_waiting": 2
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 24,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 36,
+            "observations_waiting": 2
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 25,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 36,
+            "observations_waiting": 2
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 26,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 36,
+            "observations_waiting": 2
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 27,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 28,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 29,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 30,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 31,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 32,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 33,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 34,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 35,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 36,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 37,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 38,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 39,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 40,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 41,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 42,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 43,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 44,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 45,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 46,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 47,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 48,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 49,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 50,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 51,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": true,
+            "telescope_arrays_used": 18,
+            "observations_waiting": 1
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 52,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": false,
+            "telescope_arrays_used": 0,
+            "observations_waiting": 0
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 53,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": false,
+            "telescope_arrays_used": 0,
+            "observations_waiting": 0
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 54,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": false,
+            "telescope_arrays_used": 0,
+            "observations_waiting": 0
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 55,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": false,
+            "telescope_arrays_used": 0,
+            "observations_waiting": 0
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 56,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": false,
+            "telescope_arrays_used": 0,
+            "observations_waiting": 0
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 57,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": false,
+            "telescope_arrays_used": 0,
+            "observations_waiting": 0
+        },
+        "scheduler_state": {}
+    },
+    {
+        "timestamp": 58,
+        "cluster_state": {
+            "arrived_workflows": 0,
+            "unfinished_workflows": 0,
+            "finihsed_workflows": [],
+            "machine_states": [
+                {
+                    "id": "cat0_m0",
+                    "cpu_capacity": 7.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat1_m1",
+                    "cpu_capacity": 6.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                },
+                {
+                    "id": "cat2_m2",
+                    "cpu_capacity": 11.0,
+                    "memory_capacity": 1,
+                    "disk_capacity": 1,
+                    "cpu": 1.0,
+                    "memory": 1.0,
+                    "disk": 1.0,
+                    "running_task_instances": 0,
+                    "finished_task_instances": 0
+                }
+            ],
+            "cpu": 1.0,
+            "memory": 1.0,
+            "disk": 1.0
+        },
+        "telescope_state": {
+            "telescope_in_use": false,
+            "telescope_arrays_used": 0,
+            "observations_waiting": 0
         },
         "scheduler_state": {}
     }

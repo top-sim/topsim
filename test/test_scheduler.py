@@ -21,6 +21,7 @@ from scheduler.fifo_algorithm import FifoAlgorithm
 
 from core.scheduler import Scheduler, Task
 from core.cluster import Cluster
+from core.planner import Planner
 
 import config_data
 
@@ -38,6 +39,7 @@ class TestSchedulerFIFO(unittest.TestCase):
 	def setUp(self):
 		self.env = simpy.Environment()
 		sched_algorithm = FifoAlgorithm()
+		self.planner = Planner(self.env, config_data.planning_algorithm, config_data.machine_config)
 		self.cluster = Cluster(config_data.machine_config)
 		self.scheduler = Scheduler(self.env, sched_algorithm, self.cluster)
 
@@ -55,4 +57,7 @@ class TestSchedulerFIFO(unittest.TestCase):
 		""" scheduler.make_decision() will do something interesting only when we add a workflow plan to the
 		cluster resource.
 		"""
+		# Add workflow plan to Cluster
+		plan = Plan(wf,none, none, none)
+
 		pass

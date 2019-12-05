@@ -20,7 +20,10 @@ class FifoAlgorithm(Algorithm):
     def __init__(self, threshold=0.8):
         self.threshold = threshold
 
-    def __call__(self, cluster, clock):
+    def parse_workflow_plan(self):
+        pass
+
+    def __call__(self, cluster, clock, workflow_plan):
         machines = cluster.machines
         tasks = cluster.tasks_which_has_waiting_instance
         candidate_task = None
@@ -42,3 +45,4 @@ class FifoAlgorithm(Algorithm):
             return all_candidates[pair_index]
         else:
             return candidate_machine, candidate_task
+

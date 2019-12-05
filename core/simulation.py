@@ -50,9 +50,9 @@ class Simulation(object):
 		self.buffer = Buffer(env, self.cluster)
 		self.planner = Planner(env, palgorithm, machine_config)
 		self.telescope = Telescope(env, observations, self.buffer, telescopemax, self.planner)
-		self.scheduler = Scheduler(env, salgorithm, self.cluster)
+		self.scheduler = Scheduler(env, salgorithm, self.buffer, self.cluster)
 
-	def start(self):
+	def start(self, runtime=100):
 		# Starting monitor process before task_broker process
 		# and scheduler process is necessary for log records integrity.
 		if self.event_file is not None:
@@ -61,14 +61,17 @@ class Simulation(object):
 		# self.env.process(self.buffer.run())
 		# self.env.process(self.task_broker.run())
 		self.env.process(self.scheduler.run())
-		while not self.is_finished():
 			# Calling env.run() invokes the processes passed in init_process()
-			self.env.run()
+		if runtime > 0:
+			self.env.run(until=runtime)
+		else:
+			while not self.is_finished():
+				self.env.run()
 
 	def is_finished(self):
 		if (self.telescope.observations
 			or self.buffer.observations_for_processing
-			or self.cluster.workflows):
+			or self.scheduler.workflows):
 			# Using compound 'or' doesn't give us a True/False
 			return False
 		else:
@@ -92,7 +95,7 @@ def _process_telescope_config(telescope_config):
 			obs['filename']
 		)
 		observations.append(observation)
-
+	infile.close()
 	return observations
 
 

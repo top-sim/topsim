@@ -25,4 +25,4 @@ class TestSimulation(unittest.TestCase):
 		pass
 
 	def testBasicRun(self):
-		self.simulation.start()
+		self.simulation.start(runtime=60)

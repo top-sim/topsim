@@ -18,11 +18,15 @@
 """
 Config Data for the simulation; the format of this will change, this is a stub
 """
-# telescope observations
+# Simulation configuration for testing
 telescope_config = 'data/observations.csv'
 machine_config = 'data/system_config.json'
 workflow_config = 'data/workflow_config.json'
 event_file = '/home/rwb/github/topsim/sim.trace'
 planning_algorithm = 'heft'
+
+# Extra time added to the start time of an observation workflow  when it enters the buffer
+# This is to account for I/O and overheads
+buffer_offset = 5
 
 

@@ -13,12 +13,33 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import unittest
+import simpy
 
+from core.planner import Planner, Plan
+from scheduler.fifo_algorithm import FifoAlgorithm
+import config_data
 
 class TestPlanner(unittest.TestCase):
 
 	def setUp(self):
+		self.env = simpy.Environment()
+		sched_algorithm = FifoAlgorithm()
+		self.planner = Planner(self.env, config_data.planning_algorithm, config_data.machine_config)
 		pass
 
 	def tearDown(self):
+		pass
+
+
+	def testShadowIntegration(self):
+		pass
+
+
+	def testPlanReadsFromFile(self):
+		pass
+
+	def testPlanAddsBufferTime(self):
+		pass
+
+	def testGracefulExit(self):
 		pass

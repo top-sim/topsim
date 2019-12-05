@@ -7,7 +7,6 @@ class Cluster(object):
 		self.machines = []
 		self._add_machines(machines)
 		self.workflows = []  # Keeping here to stop runtime errors
-		self.workflow_plans = []
 		self.queue = []
 		self.finished_workflows = []
 
@@ -24,11 +23,6 @@ class Cluster(object):
 		else:
 			return False
 
-	def add_workflow_plan(self, workflow_plan):
-		if self.add_workflow(workflow_plan.id):
-			self.workflow_plans.append(workflow_plan)
-		else:
-			print("Workflow for observation {0} is already waiting to be scheduled".format(workflow_plan.id))
 
 	@property
 	def unfinished_jobs(self):
@@ -114,7 +108,7 @@ class Cluster(object):
 			# 'finished_tasks': len(self.finished_tasks),
 			# 'running_task_instances': len(self.running_task_instances),
 			'machine_states': [machine.state for machine in self.machines],
-			'observation_workflows_waiting': [plan.id for plan in self.workflow_plans],
+			# 'observation_workflows_waiting': [plan.id for plan in self.workflow_plans],
 			'cpu': self.cpu / self.cpu_capacity,
 			'memory': self.memory / self.memory_capacity,
 			'disk': self.disk / self.disk_capacity,

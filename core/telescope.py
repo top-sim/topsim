@@ -42,6 +42,8 @@ class Telescope(object):
 					print("Nothing to do for ", observation.name, self.env.now)
 			print(self.env.now)
 			yield self.env.timeout(1)
+		# if not self.observations:
+		# 	print('Telescope is ceasing operations')
 			# print('Time now is ', self.env.now)
 
 	@property
