@@ -1,13 +1,14 @@
 import json
 from core.machine import Machine
+from queue import Queue
 
 
 class Cluster(object):
 	def __init__(self, machines):
 		self.machines = []
 		self._add_machines(machines)
-		self.workflows = []  # Keeping here to stop runtime errors
-		self.queue = []
+		# self.workflows = []  # Keeping here to stop runtime errors
+		self.queue = Queue()
 		self.finished_workflows = []
 
 	def _add_machines(self, machine_config):
@@ -15,14 +16,6 @@ class Cluster(object):
 		for machine in machines:
 			self.machines.append(machine)
 			machine.attach(self)
-
-	def add_workflow(self, workflow_id):
-		if workflow_id not in self.workflows:
-			self.workflows.append(workflow_id)
-			return True
-		else:
-			return False
-
 
 	@property
 	def unfinished_jobs(self):

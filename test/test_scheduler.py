@@ -19,11 +19,21 @@ import simpy
 from core.simulation import Simulation
 from scheduler.fifo_algorithm import FifoAlgorithm
 
+from core.telescope import Observation
 from core.scheduler import Scheduler, Task
 from core.cluster import Cluster
-from core.planner import Planner
+from core.planner import Planner, Plan
+from core.buffer import Buffer
+from core.simulation import _process_telescope_config
 
-import config_data
+import test_data
+
+
+# Globals
+OBS_START_TME = 0
+OBS_DURATION = 10
+OBS_DEMAND = 15
+OBS_WORKFLOW = test_data.test_scheduler_workflow
 
 class TestSchedulerRandom(unittest.TestCase):
 
@@ -39,9 +49,16 @@ class TestSchedulerFIFO(unittest.TestCase):
 	def setUp(self):
 		self.env = simpy.Environment()
 		sched_algorithm = FifoAlgorithm()
-		self.planner = Planner(self.env, config_data.planning_algorithm, config_data.machine_config)
-		self.cluster = Cluster(config_data.machine_config)
+		self.planner = Planner(self.env, test_data.planning_algorithm, test_data.machine_config)
+		self.cluster = Cluster(test_data.machine_config)
+		self.buffer = Buffer(self.env, self.cluster)
 		self.scheduler = Scheduler(self.env, sched_algorithm, self.cluster)
+		self.observation = Observation('scheduler_observation',
+									OBS_START_TME,
+									OBS_DURATION,
+									OBS_DEMAND,
+									OBS_WORKFLOW)
+
 
 	def tearDown(self):
 		pass
@@ -55,9 +72,17 @@ class TestSchedulerFIFO(unittest.TestCase):
 
 	def testSchedulerDecision(self):
 		""" scheduler.make_decision() will do something interesting only when we add a workflow plan to the
-		cluster resource.
+		buffer.
 		"""
 		# Add workflow plan to Cluster
-		plan = Plan(wf,none, none, none)
+		planner = Planner(self.env, test_data.machine_config)
+		# calling planner.run() will store the generate plan in the observation object
+		self.planner.run(self.observation)
+
+		#  Observation is what we are interested in with the scheduler, because the observation stores the plan;
+		#  The observation object is what is stored in the buffer's 'observations_for_processing' queue.
+		self.buffer.add_observation_to_waiting_workflows(self.observation)
+
+
 
 		pass

@@ -25,6 +25,11 @@ workflow_config = 'data/workflow_config.json'
 event_file = '/home/rwb/github/topsim/sim.trace'
 planning_algorithm = 'heft'
 
+test_scheduler_workflow = 'data/workflow_config.json'
+test_buffer_workflow = 'data/workflow_config.json'
+test_plan_workflow = 'data/workflow_config.json'
+
+
 # Extra time added to the start time of an observation workflow  when it enters the buffer
 # This is to account for I/O and overheads
 buffer_offset = 5

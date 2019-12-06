@@ -16,9 +16,9 @@
 from core.job import Job
 from core.scheduler import Scheduler
 from queue import Queue
-import config_data
+import config
 
-BUFFER_OFFSET = config_data.buffer_offset
+BUFFER_OFFSET = config.BUFFER_TIME_OFFSET
 
 
 class Buffer(object):
@@ -37,8 +37,6 @@ class Buffer(object):
 		# Reminder that observations_for_processing has Observation objects.
 		# self.observations_for_processing.remove(obs)
 
-	# self.destroyed = True
-
 	def add_observation_to_waiting_workflows(self, observation):
 		print("Adding", observation.name, "to workflows")
 		observation.plan.start_time = self.env.now + BUFFER_OFFSET
@@ -46,29 +44,4 @@ class Buffer(object):
 		print("Waiting workflows", self.observations_for_processing)
 
 
-	# def attach(self, simulation):
-	# 	self.simulation = simulation
-	# 	self.cluster = simulation.cluster
 
-	# class Broker(object):
-	# 	def __init__(self, env, job_configs):
-	# 		self.env = env
-	# 		self.simulation = None
-	# 		self.cluster = None
-	# 		self.destroyed = False
-	# 		self.job_configs = job_configs
-	# 		self.observations_for_processing = []
-	#
-	# 	def attach(self, simulation):
-	# 		self.simulation = simulation
-	#
-	# 	def run(self):
-	#
-	"""
-	The broker is going to accumulate workflows over time. At each time point, it 
-	is going to check if it has any new workflows; if it does, it will go and fetch
-	the information about that workflow (intended start time of first task etc.). This 
-	expected start time is produced by the planner, which should take into account 
-	the expected exit time of the observation, and a 'buffer delay' that is specified at 
-	the start of the simulation.  
-	"""

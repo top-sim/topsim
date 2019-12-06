@@ -4,7 +4,7 @@ import argparse
 from core.simulation import Simulation
 from core import config
 
-import config_data
+import test_data
 
 from core.cluster import Cluster
 import simpy
@@ -44,7 +44,7 @@ def run_simulation(arg,parser):
 	env = simpy.Environment()
 	tmax = 36  # for starters, we will define telescope configuration as simply number of arrays that exist
 	salgorithm = FifoAlgorithm()
-	simulation = Simulation(env, config_data.telescope_config, tmax, config_data.machine_config,
+	simulation = Simulation(env, test_data.telescope_config, tmax, test_data.machine_config,
 							salgorithm, 'heft', event_file)
 
 	simulation.start()

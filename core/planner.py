@@ -6,11 +6,12 @@ from os import path
 from shadow.classes.workflow import Workflow
 from shadow.classes.environment import Environment
 from shadow.algorithms.heuristic import heft as shadow_heft
-import config_data
+import test_data
 
 # BUFFER_OFFSET = config_data.buffer_offset
-
 # from core.telescope import Observation
+
+
 class Planner(object):
 	def __init__(self, env, algorithm, envconfig):
 		self.env = env

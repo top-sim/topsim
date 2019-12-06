@@ -64,3 +64,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Trace Files from running the simulation
+*.trace

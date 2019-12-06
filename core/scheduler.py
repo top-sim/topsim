@@ -53,13 +53,6 @@ class Scheduler(object):
 					break
 				else:
 					self.allocate_task(task, machine)
-					# task.start_task_instance(machine)
-		# while True:
-		# 	machine, task = self.algorithm(self.cluster, self.env.now)
-		# 	if machine is None or task is None:
-		# 		break
-		# 	else:
-		# 		task.start_task_instance(machine)
 
 
 	def unroll_plan(self, plan):
