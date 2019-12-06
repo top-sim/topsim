@@ -66,4 +66,4 @@ docs/_build/
 target/
 
 # Trace Files from running the simulation
-*.trace
+sim.trace
