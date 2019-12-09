@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import unittest
 import simpy
+import os
 
 from core.planner import Planner, Plan
 from core.cluster import Cluster
@@ -25,14 +26,17 @@ from scheduler.fifo_algorithm import FifoAlgorithm
 
 import test_data
 
+current_dir = os.path.abspath('.')
+
 # Globals
 OBS_START_TME = 0
 OBS_DURATION = 10
 OBS_DEMAND = 15
-OBS_WORKFLOW = test_data.test_plan_workflow
+OBS_WORKFLOW = "{0}/{1}".format(current_dir, test_data.test_plan_workflow)
+
 
 PLAN_ALGORITHM = test_data.planning_algorithm
-MACHINE_CONFIG = test_data.machine_config
+MACHINE_CONFIG = "{0}/{1}".format(current_dir, test_data.machine_config)
 
 
 class TestPlanner(unittest.TestCase):

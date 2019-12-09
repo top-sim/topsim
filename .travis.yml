@@ -1,1 +1,10 @@
 language: python
+
+before_script:
+  - git clone https://github.com/myxie/shadow ~/shadow 
+  - export PYTHONPATH=$PYTHONPATH:~/shadow/
+
+
+script: python -m unittest test.test_planner
+
+

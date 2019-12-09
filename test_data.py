@@ -18,16 +18,17 @@
 """
 Config Data for the simulation; the format of this will change, this is a stub
 """
+
 # Simulation configuration for testing
-telescope_config = 'data/observations.csv'
-machine_config = 'data/system_config.json'
-workflow_config = 'data/workflow_config.json'
+telescope_config = 'test/data/observations.csv'
+machine_config = 'test/data/system_config.json'
+workflow_config = 'test/data/workflow_config.json'
 event_file = '/home/rwb/github/topsim/sim.trace'
 planning_algorithm = 'heft'
 
-test_scheduler_workflow = 'data/workflow_config.json'
-test_buffer_workflow = 'data/workflow_config.json'
-test_plan_workflow = 'data/workflow_config.json'
+test_scheduler_workflow = 'test/data/workflow_config.json'
+test_buffer_workflow = 'test/data/workflow_config.json'
+test_plan_workflow = 'test/data/workflow_config.json'
 
 
 # Extra time added to the start time of an observation workflow  when it enters the buffer
