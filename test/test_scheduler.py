@@ -83,6 +83,7 @@ class TestSchedulerFIFO(unittest.TestCase):
 		#  The observation object is what is stored in the buffer's 'observations_for_processing' queue.
 		self.buffer.add_observation_to_waiting_workflows(self.observation)
 
+		# We get an observaiton into the buffer, the scheduler makes a decision - what then?
 
 
 		pass

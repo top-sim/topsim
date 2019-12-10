@@ -28,23 +28,40 @@ class Scheduler(object):
 	# def attach(self, simulation):
 	# 	self.simulation = simulation
 
-	def _init_workflow(self, workflow):
-		# Get the nodes for the workflow from somewhere
-		pass
+	def run(self):
+		while True:
+			print(self.env.now)
+			if self.check_buffer():
+				self.process_workflow_in_buffer()
+			yield self.env.timeout(1)
 
-	def make_decision(self):
-		if self.workflows:
-			print("Scheduler: Waiting to process", self.workflows)
+	def check_buffer(self):
+		if not self.buffer.observations_for_processing.empty():
+			print("Workflows currently waiting in the Buffer: {0}".format(self.buffer.observations_for_processing))
+			obs = self.buffer.observations_for_processing.get()  # Get oldest observation
+			assert obs.plan.start_time >= self.env.now
+			self.workflows[obs.plan.id] = obs.plan
+			return True
 		else:
-			print("Scheduler: Nothing to process")
+			return False
+
+	def process_workflow_in_buffer(self):
+		# Workflow needs a priority
+		if self.workflows:
+			print("Scheduler: Currently waiting to process: ", self.workflows)
+		else:
+			print("Scheduler: Nothing in Buffer to process")
+
 		max = -1
 		current_plan = None
-		# NB workflows is a workflow-id: workflow-plan key:value pair
+
+		# Note workflows is a workflow-id: workflow-plan key:value pair
 		for workflow in self.workflows:
 			st = self.workflows[workflow].start_time
 			if max == -1 or st < max:
 				max = st
 				current_plan = self.workflows[workflow]
+
 		if current_plan:
 			print("Current plan: ", current_plan.id, current_plan.exec_order)
 			while True:
@@ -75,25 +92,12 @@ class Scheduler(object):
 		:param machine:
 		:return:
 		"""
-
 		pass
 
-	def run(self):
-		while True:
-			print(self.env.now)
-			if self.check_buffer():
-				self.make_decision()
-			yield self.env.timeout(1)
 
-	def check_buffer(self):
-		if not self.buffer.observations_for_processing.empty():
-			print("Workflows currently waiting in the Buffer: {0}".format(self.buffer.observations_for_processing))
-			obs = self.buffer.observations_for_processing.get()  # Get oldest observation
-			assert obs.plan.start_time >= self.env.now
-			self.workflows[obs.plan.id] = obs.plan
-			return True
-		else:
-			return False
+	def _init_workflow(self, workflow):
+		# Get the nodes for the workflow from somewhere
+		pass
 
 	#
 	# def add_workflow(self, workflow):
@@ -110,6 +114,11 @@ class Scheduler(object):
 
 
 class Task(object):
+	"""
+	Tasks have priorities inheritted from the workflows from which they are arrived; once
+	they arrive on the cluster queue, they are workflow agnositc, and are processed according to
+	their priority.
+	"""
 	def __init__(self, id):
 		self. id = id
 		self.start = 0
@@ -117,4 +126,21 @@ class Task(object):
 		self.flops = 0
 		self.alloc = None
 		self.duration = None
+		self.priority = 0  # Default priority
+
+	def __lt__(self, other):
+		return self.priority < other.priority
+
+	def __le__(self, other):
+		return self.priority <= other.priority
+
+	def __eq__(self, other):
+		return self.priority == other.priority
+
+	def __ge__(self, other):
+		return self.priority >= other.priority
+
+	def __gt__(self, other):
+		return self.priority > other.priority
+
 

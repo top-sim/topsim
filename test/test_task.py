@@ -58,4 +58,8 @@ class TestTaskClass(unittest.TestCase):
 		self.assertEqual(get_t1.id, self.t1.id)
 		self.assertEqual(get_t2.id, self.t2.id)
 
+	# TODO Test the order of two independent sets of tasks with different priorities
+	# TODO is retained when they are added to the queue
 
+	def testWorkflowExecutionOrderSanity(self):
+		pass
