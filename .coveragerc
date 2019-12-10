@@ -1,5 +1,5 @@
 [run] 
 source = .
 omit = *__init__*
-	 _archive/
+	 *_archive*
 	 
