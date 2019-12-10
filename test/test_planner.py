@@ -59,8 +59,7 @@ class TestPlanner(unittest.TestCase):
 		pass
 
 	def testShadowIntegration(self):
-		# Test build failure status
-		self.assertEqual(1, 2)
+		pass
 
 	def testPlanReadsFromFile(self):
 		# Return a "Plan" object for provided workflow/observation
