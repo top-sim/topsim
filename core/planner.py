@@ -43,6 +43,7 @@ class Planner(object):
 		plan.allocation = wf.machine_alloc
 		return plan
 
+# TODO move core.workflow into this file
 
 class Plan(object):
 	"""

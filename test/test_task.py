@@ -17,13 +17,14 @@ import os
 import unittest
 from queue import PriorityQueue
 
-from core.scheduler import Task
+from core.workflow import Task
 
 
 class TestTaskClass(unittest.TestCase):
 	"""
 	Test equivelance and priorities for task class within priority queue
 	"""
+
 	def setUp(self):
 		self.t1 = Task(1)
 		self.t2 = Task(2)
@@ -58,8 +59,6 @@ class TestTaskClass(unittest.TestCase):
 		self.assertEqual(get_t1.id, self.t1.id)
 		self.assertEqual(get_t2.id, self.t2.id)
 
-	# TODO Test the order of two independent sets of tasks with different priorities
-	# TODO is retained when they are added to the queue
 
-	def testWorkflowExecutionOrderSanity(self):
-		pass
+
+

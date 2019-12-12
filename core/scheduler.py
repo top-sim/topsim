@@ -12,7 +12,7 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+from queue import PriorityQueue
 
 class Scheduler(object):
 	def __init__(self, env, algorithm, buffer, cluster):
@@ -80,6 +80,7 @@ class Scheduler(object):
 		:param plan:
 		:return:
 		"""
+
 		alloc = plan.allocation
 
 
@@ -112,35 +113,13 @@ class Scheduler(object):
 			# 'observations_for_processing': [plan.id for plan in self.workflow_plans]
 		}
 
+"""
+TODO implement a priority queue of queues, in which we have a queue of queues that each have a priority;
+the construction of these queues is somethign that needs more work as they are likely to explode in size 
+ Unless we put a limit on queue size (e.g. workflow-queue-max), and then the scheduler won't allcoate anything from the 
+ workflow to its workflow-ids queue
+"""
 
-class Task(object):
-	"""
-	Tasks have priorities inheritted from the workflows from which they are arrived; once
-	they arrive on the cluster queue, they are workflow agnositc, and are processed according to
-	their priority.
-	"""
-	def __init__(self, id):
-		self. id = id
-		self.start = 0
-		self.finish = 0
-		self.flops = 0
-		self.alloc = None
-		self.duration = None
-		self.priority = 0  # Default priority
 
-	def __lt__(self, other):
-		return self.priority < other.priority
-
-	def __le__(self, other):
-		return self.priority <= other.priority
-
-	def __eq__(self, other):
-		return self.priority == other.priority
-
-	def __ge__(self, other):
-		return self.priority >= other.priority
-
-	def __gt__(self, other):
-		return self.priority > other.priority
 
 

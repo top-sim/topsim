@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from core.job import Job
+from core.workflow import Job
 from core.scheduler import Scheduler
 from queue import Queue
 import config

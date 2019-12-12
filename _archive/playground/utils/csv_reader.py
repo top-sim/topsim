@@ -2,7 +2,7 @@ from operator import attrgetter
 import pandas as pd
 import numpy as np
 
-from core.job import JobConfig, TaskConfig
+from core.workflow import JobConfig, TaskConfig
 
 
 class CSVReader(object):
