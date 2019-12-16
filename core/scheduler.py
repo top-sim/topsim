@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from queue import PriorityQueue
 
+
 class Scheduler(object):
 	def __init__(self, env, algorithm, buffer, cluster):
 		self.env = env
@@ -74,7 +75,7 @@ class Scheduler(object):
 
 	def unroll_plan(self, plan):
 		"""
-		The plan object has the exec_order and allocation attributes.
+		The plan object has the task_order and allocation attributes.
 		We need to use these attributes to instantiate the tasks with their respective
 		start times and execution order.
 		:param plan:

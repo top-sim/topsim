@@ -15,7 +15,6 @@ class Cluster(object):
 		machines = _process_machine_config(machine_config)
 		for machine in machines:
 			self.machines.append(machine)
-			machine.attach(self)
 
 	def add_task_to_queue(self):
 		pass

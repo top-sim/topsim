@@ -32,34 +32,58 @@ class Planner(object):
 		wf = Workflow(self.wfconfig)
 		wfenv = Environment(self.envconfig)
 		wf.add_environment(wfenv)
-		plan = Plan(self.wfname, None, None, None)
+		plan = WorkflowPlan(self.wfname, None, None, None)
 		if algorithm is 'heft':
 			makespan = shadow_heft(wf)
 			plan.makespan = makespan
 		else:
 			sys.exit("Other algorithms are not supported")
 
-		plan.exec_order = wf.execution_order
+		plan.task_order = wf.execution_order
 		plan.allocation = wf.machine_alloc
 		return plan
 
-# TODO move core.workflow into this file
 
-class Plan(object):
+class WorkflowPlan(object):
 	"""
-	Plan object contains a workflow id, which is the workflow to which it is associated
-	A workflow is created from shadow library; however, the planner is the
+	WorkflowPlans are used within the Planner, SchedulerA Actors and Cluster Resource. They are higher-level than the
+	shadow library representation, as they are a storage component of scheduled tasks, rather than directly representing
+	the DAG nature of the workflow. This is why the tasks are stored in queues.
 	"""
+
 	def __init__(self, workflow, exec_order, allocation, makespan):
 		self.id = workflow
-		self.exec_order = exec_order
+		self.task_order = exec_order
 		self.allocation = allocation
 		self.makespan = makespan
 		self.start_time = None
+		self.priority = 0
 
-	# def apply_offset(self):
-	# 	for self.allocation
-	#
+	def __lt__(self, other):
+		return self.priority < other.priority
 
+	def __eq__(self, other):
+		return self.priority == other.priority
+
+	def __gt__(self, other):
+		return self.priority > other.priority
+
+
+class Task(object):
+
+	"""
+	Tasks have priorities inheritted from the workflows from which they are arrived; once
+	they arrive on the cluster queue, they are workflow agnositc, and are processed according to
+	their priority.
+	"""
+	def __init__(self, tid):
+		self. id = tid
+		self.start = 0
+		self.finish = 0
+		self.flops = 0
+		self.memory = None
+		self.io = 0
+		self.alloc = None
+		self.duration = None
 
 

@@ -16,7 +16,7 @@ import unittest
 import simpy
 import os
 
-from core.planner import Planner, Plan
+from core.planner import Planner, WorkflowPlan
 from core.cluster import Cluster
 from core.scheduler import Scheduler
 from core.telescope import Observation
@@ -80,4 +80,21 @@ class TestPlanner(unittest.TestCase):
 		pass
 
 	def testIncorrectParameters(self):
+		pass
+
+
+class TestWorkflowPlan(unittest.TestCase):
+
+	def setUp(self):
+		pass
+
+	def tearDown(self):
+		pass
+
+
+class TestTaskClass(unittest.TestCase):
+	def setUp(self):
+		pass
+
+	def tearDown(self):
 		pass

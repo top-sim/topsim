@@ -20,9 +20,9 @@ from core.simulation import Simulation
 from scheduler.fifo_algorithm import FifoAlgorithm
 
 from core.telescope import Observation
-from core.scheduler import Scheduler, Task
+from core.scheduler import Scheduler
 from core.cluster import Cluster
-from core.planner import Planner, Plan
+from core.planner import Planner, WorkflowPlan
 from core.buffer import Buffer
 from core.simulation import _process_telescope_config
 
@@ -52,13 +52,12 @@ class TestSchedulerFIFO(unittest.TestCase):
 		self.planner = Planner(self.env, test_data.planning_algorithm, test_data.machine_config)
 		self.cluster = Cluster(test_data.machine_config)
 		self.buffer = Buffer(self.env, self.cluster)
-		self.scheduler = Scheduler(self.env, sched_algorithm, self.cluster)
+		self.scheduler = Scheduler(self.env, sched_algorithm, self.buffer, self.cluster)
 		self.observation = Observation('scheduler_observation',
 									OBS_START_TME,
 									OBS_DURATION,
 									OBS_DEMAND,
 									OBS_WORKFLOW)
-
 
 	def tearDown(self):
 		pass

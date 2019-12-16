@@ -1,12 +1,10 @@
 # import simpy
-# from core.simulation import Simulation
 # from core.planner import Planner
 # import config_data
 
 
 class Telescope(object):
 	def __init__(self, env, observations, buffer_obj, telescope_config, planner):
-		self.simulation = None
 		self.env = env
 		self.observations = observations  # .sort(key=lambda x: x.start)
 		self.buffer = buffer_obj
@@ -46,8 +44,7 @@ class Telescope(object):
 		# 	print('Telescope is ceasing operations')
 			# print('Time now is ', self.env.now)
 
-	@property
-	def state(self):
+	def print_state(self):
 		return {
 			'telescope_in_use': self.telescope_status,
 			'telescope_arrays_used': self.telescope_use,

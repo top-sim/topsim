@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from core.workflow import Job
-from core.scheduler import Scheduler
 from queue import Queue
 import config
 
@@ -25,7 +23,6 @@ class Buffer(object):
 	def __init__(self, env, cluster):
 		self.env = env
 		self.cluster = cluster
-		self.destroyed = False
 		self.observations_for_processing = Queue()
 		self.workflow_plans = {}
 

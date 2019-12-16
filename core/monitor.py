@@ -13,7 +13,7 @@ class Monitor(object):
 			state = {
 				'timestamp': self.env.now,
 				'cluster_state': self.simulation.cluster.state,
-				'telescope_state': self.simulation.telescope.state,
+				'telescope_state': self.simulation.telescope.print_state(),
 				'scheduler_state': self.simulation.scheduler.state
 			}
 			print("Storing state...", self.simulation.scheduler.state)

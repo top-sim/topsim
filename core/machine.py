@@ -33,7 +33,6 @@ class Machine(object):
 		self.memory = memory_capacity if memory is None else memory
 		self.disk = disk_capacity if disk is None else disk
 
-		self.cluster = None
 		self.task_instances = []
 		self.machine_door = MachineDoor.NULL
 
@@ -65,9 +64,6 @@ class Machine(object):
 			if task_instance.finished:
 				ls.append(task_instance)
 		return ls
-
-	def attach(self, cluster):
-		self.cluster = cluster
 
 	def accommodate(self, task):
 		return self.cpu >= task.task_config.cpu and \

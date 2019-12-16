@@ -1,13 +1,15 @@
-import core.simulation 
+import core.simulation
 import sys
 import argparse
 from core.simulation import Simulation
 from core import config
 
 import test_data
-
+import test.test_buffer, test.test_cluster, test.test_planner, test.test_scheduler
 from core.cluster import Cluster
 import simpy
+import unittest
+
 from core.machine import Machine
 from core.planner import Planner
 from core.scheduler import Scheduler
@@ -17,13 +19,28 @@ from core.telescope import Telescope, Observation
 from core.buffer import Buffer
 from scheduler.random_algorithm import RandomAlgorithm
 from scheduler.fifo_algorithm import FifoAlgorithm
+
 """
 topsim.py takes command-line arguments to specify how the simulation will run
 It can also be used to run tests 
 """
+testcases = {  # Tests for the test runner
+	"buffer": test.test_buffer,
+	"cluster": test.test_cluster,
+	"planner": test.test_planner
+	# "scheduler": test.test_scheduler
+}
 
 
-def run_tests():
+def run_tests(arg, tests, test_parser):
+	if arg['all']:
+		suite = unittest.TestSuite()
+		loader = unittest.TestLoader()
+		for test in tests:
+			suite.addTests(loader.loadTestsFromModule(tests[test]))
+		runner = unittest.TextTestRunner()
+		runner.run(suite)
+		return True
 	# Tests do not exist yet. This is something to add in the future, when we have end-to-end functionality
 	pass
 
@@ -32,7 +49,7 @@ def run_algorithm():
 	pass
 
 
-def run_simulation(arg,parser):
+def run_simulation(arg, parser):
 	workflow_file = None
 	print(arg['workflow'])
 	if arg['workflow']:
@@ -49,11 +66,14 @@ def run_simulation(arg,parser):
 
 	simulation.start()
 	simulation.run()
-	# env.run(until=100)  # until=100)
+
+
+# env.run(until=100)  # until=100)
 
 
 def run_scheduler():
 	pass
+
 
 def run_planner():
 	pass
@@ -88,4 +108,4 @@ if __name__ == "__main__":
 	if args.command == 'sim':
 		args.func(vars(args), simulation_parser)
 	if args.command == 'test':
-		args.func(vars(args), test_parser)
+		args.func(vars(args), testcases, test_parser)
