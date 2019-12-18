@@ -70,18 +70,14 @@ class TestSchedulerFIFO(unittest.TestCase):
 		pass
 
 	def testSchedulerDecision(self):
-		""" scheduler.make_decision() will do something interesting only when we add a workflow plan to the
-		buffer.
-		"""
-		# Add workflow plan to Cluster
-		planner = Planner(self.env, test_data.machine_config)
-		# calling planner.run() will store the generate plan in the observation object
-		self.planner.run(self.observation)
-
+		# scheduler.make_decision() will do something interesting only when we add a workflow plan to the
+		# buffer.
+		next(self.planner.run(self.observation))
 		#  Observation is what we are interested in with the scheduler, because the observation stores the plan;
 		#  The observation object is what is stored in the buffer's 'observations_for_processing' queue.
 		self.buffer.add_observation_to_waiting_workflows(self.observation)
 
+		# Lets start doing scheduler things!
 		# We get an observaiton into the buffer, the scheduler makes a decision - what then?
 
 

@@ -27,8 +27,8 @@ It can also be used to run tests
 testcases = {  # Tests for the test runner
 	"buffer": test.test_buffer,
 	"cluster": test.test_cluster,
-	"planner": test.test_planner
-	# "scheduler": test.test_scheduler
+	"planner": test.test_planner,
+	"scheduler": test.test_scheduler
 }
 
 
