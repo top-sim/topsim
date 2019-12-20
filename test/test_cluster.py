@@ -23,3 +23,6 @@ class TestCluster(unittest.TestCase):
 
 	def tearDown(self):
 		pass
+
+	def testClusterQueue(self):
+		pass

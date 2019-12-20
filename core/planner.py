@@ -53,11 +53,21 @@ class WorkflowPlan(object):
 
 	def __init__(self, workflow, exec_order, allocation, makespan):
 		self.id = workflow
-		self.task_order = exec_order
+		self.task_order = self._convert_node_to_task(exec_order)
 		self.allocation = allocation
 		self.makespan = makespan
 		self.start_time = None
 		self.priority = 0
+
+	def _convert_node_to_task(self, task_list):
+		"""
+		Convert a node in the task_order list to a Task object
+		:return:
+		"""
+		task_order = []
+
+		return task_order
+
 
 	def __lt__(self, other):
 		return self.priority < other.priority

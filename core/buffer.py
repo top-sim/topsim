@@ -37,8 +37,18 @@ class Buffer(object):
 	def add_observation_to_waiting_workflows(self, observation):
 		print("Adding", observation.name, "to workflows")
 		observation.plan.start_time = self.env.now + BUFFER_OFFSET
+		self.process_observation_plan_for_scheduling(observation)
 		self.observations_for_processing.put(observation)
 		print("Waiting workflows", self.observations_for_processing)
+
+	def process_observation_plan_for_scheduling(self, observation):
+		"""
+		Get observation plan and push it to the cluster
+		:return:
+		"""
+
+		pass
+
 
 
 

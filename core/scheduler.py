@@ -21,8 +21,8 @@ class Scheduler(object):
 		# algorithm is a class
 		self.algorithm = algorithm
 		# self.destroyed = False
-		self.workflows = {}
-		self.valid_pairs = {}
+		# self.workflows = {}
+		# self.valid_pairs = {}
 		self.cluster = cluster
 		self.buffer = buffer
 
