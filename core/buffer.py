@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from queue import Queue
+from queue import PriorityQueue
 import config
 
 BUFFER_OFFSET = config.BUFFER_TIME_OFFSET
@@ -23,7 +23,7 @@ class Buffer(object):
 	def __init__(self, env, cluster):
 		self.env = env
 		self.cluster = cluster
-		self.observations_for_processing = Queue()
+		self.observations_for_processing = PriorityQueue()
 		self.workflow_plans = {}
 
 	def run(self, observation):
@@ -37,15 +37,9 @@ class Buffer(object):
 	def add_observation_to_waiting_workflows(self, observation):
 		print("Adding", observation.name, "to workflows")
 		observation.plan.start_time = self.env.now + BUFFER_OFFSET
-		self.process_observation_plan_for_scheduling(observation)
-		self.observations_for_processing.put(observation)
+		# self.process_observation_plan_for_scheduling(observation)
+		self.observations_for_processing.put(observation.plan)
 		print("Waiting workflows", self.observations_for_processing)
-
-	def process_observation_plan_for_scheduling(self, observation):
-		"""
-		Get observation plan and push it to the cluster
-		:return:
-		"""
 
 		pass
 

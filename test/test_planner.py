@@ -34,7 +34,6 @@ OBS_DURATION = 10
 OBS_DEMAND = 15
 OBS_WORKFLOW = "{0}/{1}".format(current_dir, test_data.test_plan_workflow)
 
-
 PLAN_ALGORITHM = test_data.planning_algorithm
 MACHINE_CONFIG = "{0}/{1}".format(current_dir, test_data.machine_config)
 
@@ -63,9 +62,7 @@ class TestPlanner(unittest.TestCase):
 
 	def testPlanReadsFromFile(self):
 		# Return a "Plan" object for provided workflow/observation
-		self.planner.wfname = self.observation.name
-		self.planner.wfconfig = self.observation.workflow
-		plan = self.planner.plan(PLAN_ALGORITHM)
+		plan = self.planner.plan(self.observation.name, self.observation.workflow, PLAN_ALGORITHM)
 		self.assertEqual(plan.id, 'planner_observation')  # Expected ID for the workflow
 		self.assertEqual(plan.makespan, 98)  # Expected makespan for the given graph
 
@@ -86,10 +83,28 @@ class TestPlanner(unittest.TestCase):
 class TestWorkflowPlan(unittest.TestCase):
 
 	def setUp(self):
+		self.env = simpy.Environment()
+		sched_algorithm = FifoAlgorithm()
+		self.planner = Planner(self.env, PLAN_ALGORITHM, MACHINE_CONFIG)
+		self.cluster = Cluster(test_data.machine_config)
+		# self.buffer = Buffer(self.env, self.cluster)
+		# self.scheduler = Scheduler(self.env, sched_algorithm, self.buffer, self.cluster)
+		self.observation = Observation('planner_observation',
+									OBS_START_TME,
+									OBS_DURATION,
+									OBS_DEMAND,
+									OBS_WORKFLOW)
 		pass
 
 	def tearDown(self):
 		pass
+
+	def testWorkflowPlanCreation(self):
+		plan = self.planner.plan(self.observation.name, self.observation.workflow, 'heft')
+		expected_exec_order = [0, 3, 2, 5, 1, 4, 8, 6, 7, 9]
+		self.assertEqual(len(plan.tasks), len(expected_exec_order))
+		for x in range(len(plan.tasks)):
+			self.assertTrue(plan.tasks[x].id == expected_exec_order[x])
 
 
 class TestTaskClass(unittest.TestCase):
