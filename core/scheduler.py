@@ -31,7 +31,7 @@ class Scheduler(object):
 
 	def run(self):
 		while True:
-			print(self.env.now)
+			print('Current time:', self.env.now)
 			if self.check_buffer() or self.workflows:
 				self.process_workflows()
 			yield self.env.timeout(1)

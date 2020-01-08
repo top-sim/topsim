@@ -80,16 +80,20 @@ class TestSchedulerFIFO(unittest.TestCase):
 		# Lets start doing scheduler things!
 		# IT is important to note that the scheduler is only effective within the context of a simulation,
 		# as it is directly affected by calls to env.now; this means we need to run a mini-simulation in this
-		# test
+		# test - which we can 'simulate' - haha - by using the enviroment and clever timeouts.
 		# We get an observaiton into the buffer, the scheduler makes a decision - what then?
 		# We use check_buffer to update the workflows in the scheduler workflow list
 		# This is called every time-step in the simulation, and is how we add workflow plans to the schedulers list
-		self.scheduler.check_buffer()
+		test_flag = True
+		self.env.process(self.scheduler.run())
+		self.env.run(until=3)
+		# while test_flag:
+		# 	next(self.scheduler.run())
+
 		# Now that a single workflow has been taken from the buffer and added to the list of workflows, we can schedule
-		self.scheduler.process_workflows()
+		#
+		# print(self.env.now)
+		# self.scheduler.process_workflows()
 
 		# process_workflows() is passing the workflow
 
-
-
-		pass
