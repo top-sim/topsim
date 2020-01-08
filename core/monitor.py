@@ -12,20 +12,20 @@ class Monitor(object):
 		while not self.simulation.is_finished():
 			state = {
 				'timestamp': self.env.now,
-				'cluster_state': self.simulation.cluster.state,
+				# 'cluster_state': self.simulation.cluster.state,
 				'telescope_state': self.simulation.telescope.print_state(),
-				'scheduler_state': self.simulation.scheduler.state
+				'scheduler_state': self.simulation.scheduler.print_state()
 			}
-			print("Storing state...", self.simulation.scheduler.state)
+			print("Storing state...", self.simulation.scheduler.print_state())
 			self.events.append(state)
 			yield self.env.timeout(1)
 			self.write_to_file()
 
 		state = {
 			'timestamp': self.env.now,
-			'cluster_state': self.simulation.cluster.state,
-			'telescope_state': self.simulation.telescope.state,
-			'scheduler_state': self.simulation.scheduler.state
+			# 'cluster_state': self.simulation.cluster.state,
+			'telescope_state': self.simulation.telescope.print_state(),
+			'scheduler_state': self.simulation.scheduler.print_state()
 		}
 		self.events.append(state)
 

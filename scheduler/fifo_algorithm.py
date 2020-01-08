@@ -17,32 +17,35 @@ import numpy as np
 from core.algorithm import Algorithm
 
 class FifoAlgorithm(Algorithm):
-    def __init__(self, threshold=0.8):
-        self.threshold = threshold
+	def __init__(self, threshold=0.8):
+		self.threshold = threshold
 
-    def parse_workflow_plan(self):
-        pass
+	def parse_workflow_plan(self):
+		pass
 
-    def __call__(self, cluster, clock, workflow_plan):
-        machines = cluster.machines
-        tasks = cluster.tasks_which_has_waiting_instance
-        candidate_task = None
-        candidate_machine = None
-        all_candidates = []
+	def __call__(self, cluster, clock, workflow_plan):
+		machines = cluster.machines
+		# tasks = cluster.tasks_which_has_waiting_instance
+		tasks = workflow_plan.tasks
+		candidate_task = None
+		candidate_machine = None
 
-        for machine in machines:
-            for task in tasks:
-                if machine.accommodate(task):
-                    all_candidates.append((machine, task))
-                    if np.random.rand() > self.threshold:
-                        candidate_machine = machine
-                        candidate_task = task
-                        break
-        if len(all_candidates) == 0:
-            return None, None
-        if candidate_task is None:
-            pair_index = np.random.randint(0, len(all_candidates))
-            return all_candidates[pair_index]
-        else:
-            return candidate_machine, candidate_task
-
+		all_candidates = []
+		workflow_plan
+		return None, None
+		# for machine in machines:
+		# 	for task in tasks:
+		# 		if machine.accommodate(task):
+		# 			all_candidates.append((machine, task))
+		# 			if np.random.rand() > self.threshold:
+		# 				candidate_machine = machine
+		# 				candidate_task = task
+		# 				break
+		# if len(all_candidates) == 0:
+		# 	return None, None
+		# if candidate_task is None:
+		# 	pair_index = np.random.randint(0, len(all_candidates))
+		# 	return all_candidates[pair_index]
+		# else:
+		# 	return candidate_machine, candidate_task
+		#

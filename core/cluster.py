@@ -7,17 +7,16 @@ class Cluster(object):
 	def __init__(self, machines):
 		self.machines = []
 		self._add_machines(machines)
+		self.waiting_tasks = None
+		self.running_tasks = None
+		self.finished_tasks = None
 		# self.workflows = []  # Keeping here to stop runtime errors
-		self.queue = PriorityQueue()
 		self.finished_workflows = []
 
 	def _add_machines(self, machine_config):
 		machines = _process_machine_config(machine_config)
 		for machine in machines:
 			self.machines.append(machine)
-
-	def add_task_to_queue(self):
-		pass
 
 
 # Helper function that acts as static function for Cluster

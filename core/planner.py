@@ -1,4 +1,5 @@
 import sys
+from enum import Enum
 from os import path
 
 # sys.path.append(path.abspath('../../shadow'))
@@ -62,6 +63,7 @@ class WorkflowPlan(object):
 				taskobj.duration = taskobj.start - taskobj.finish
 				taskobj.machine_id = machine
 				taskobj.exec_order = workflow.execution_order.index(task[taskid])
+				taskobj.flops = workflow.graph.nodes[taskobj.id]['flops']
 				self.tasks.append(taskobj)
 		self.tasks.sort(key=lambda x: x.exec_order)
 		self.exec_order = workflow.execution_order
@@ -77,6 +79,10 @@ class WorkflowPlan(object):
 	def __gt__(self, other):
 		return self.priority > other.priority
 
+class  TaskStatus(Enum):
+	UNSCHEDULED = 1
+	SCHEDULED = 2
+	FINISHED = 3
 
 class Task(object):
 	"""
@@ -95,3 +101,13 @@ class Task(object):
 		self.machine_id = None
 		self.duration = None
 		self.exec_order = None
+		self.task_state = TaskStatus.UNSCHEDULED
+
+	def __lt__(self, other):
+		return self.exec_order < other.exec_order
+
+	def __eq__(self, other):
+		return self.exec_order == other.exec_order
+
+	def __gt__(self, other):
+		return self.exec_order > other.exec_order

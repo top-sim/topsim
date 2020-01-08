@@ -106,6 +106,10 @@ class TestWorkflowPlan(unittest.TestCase):
 		for x in range(len(plan.tasks)):
 			self.assertTrue(plan.tasks[x].id == expected_exec_order[x])
 
+		# Get taskid 5
+		task5_comp = plan.tasks[3].flops
+		self.assertEqual(task5_comp, 169)
+
 
 class TestTaskClass(unittest.TestCase):
 	def setUp(self):

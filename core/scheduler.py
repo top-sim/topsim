@@ -32,58 +32,47 @@ class Scheduler(object):
 	def run(self):
 		while True:
 			print(self.env.now)
-			if self.check_buffer():
-				self.process_workflow_in_buffer()
+			if self.check_buffer() or self.workflows:
+				self.process_workflows()
 			yield self.env.timeout(1)
 
 	def check_buffer(self):
 		if not self.buffer.observations_for_processing.empty():
 			print("Workflows currently waiting in the Buffer: {0}".format(self.buffer.observations_for_processing))
-			obs = self.buffer.observations_for_processing.get()  # Get oldest observation
-			assert obs.plan.start_time >= self.env.now
-			self.workflows[obs.plan.id] = obs.plan
+			obsplan = self.buffer.observations_for_processing.get()  # Get oldest observation
+			assert obsplan.start_time >= self.env.now
+			self.workflows[obsplan.id] = obsplan
 			return True
 		else:
 			return False
 
-	def process_workflow_in_buffer(self):
+	def process_workflows(self):
 		# Workflow needs a priority
 		if self.workflows:
 			print("Scheduler: Currently waiting to process: ", self.workflows)
 		else:
 			print("Scheduler: Nothing in Buffer to process")
 
-		max = -1
+		minst = -1
 		current_plan = None
 
 		# Note workflows is a workflow-id: workflow-plan key:value pair
 		for workflow in self.workflows:
 			st = self.workflows[workflow].start_time
-			if max == -1 or st < max:
-				max = st
+			if minst == -1 or st < minst:
+				minst = st
 				current_plan = self.workflows[workflow]
-
+		# if self.env.now == 65:
+		# 		x = 1
 		if current_plan:
 			print("Current plan: ", current_plan.id, current_plan.exec_order)
+
 			while True:
-				machine, task = self.algorithm(self.cluster, self.env.now)
+				machine, task = self.algorithm(self.cluster, self.env.now, current_plan)
 				if machine is None or task is None:
 					break
 				else:
 					self.allocate_task(task, machine)
-
-
-	def unroll_plan(self, plan):
-		"""
-		The plan object has the task_order and allocation attributes.
-		We need to use these attributes to instantiate the tasks with their respective
-		start times and execution order.
-		:param plan:
-		:return:
-		"""
-
-		alloc = plan.allocation
-
 
 	def allocate_task(self, task, machine):
 		"""
@@ -96,30 +85,18 @@ class Scheduler(object):
 		"""
 		pass
 
-
-	def _init_workflow(self, workflow):
-		# Get the nodes for the workflow from somewhere
-		pass
-
 	#
 	# def add_workflow(self, workflow):
 	# 	print("Adding", workflow, "to workflows")
 	# 	self.observations_for_processing.append(workflow)
 	# 	print("Waiting workflows", self.observations_for_processing
 
-	@property
-	def state(self):
+	def print_state(self):
 		# Change this to 'workflows scheduled/workflows unscheduled'
 		return {
-			# 'observations_for_processing': [plan.id for plan in self.workflow_plans]
+			'observations_for_processing': [plan.id for plan in self.workflows]
 		}
 
-"""
-TODO implement a priority queue of queues, in which we have a queue of queues that each have a priority;
-the construction of these queues is somethign that needs more work as they are likely to explode in size 
- Unless we put a limit on queue size (e.g. workflow-queue-max), and then the scheduler won't allcoate anything from the 
- workflow to its workflow-ids queue
-"""
 
 
 

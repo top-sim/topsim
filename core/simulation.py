@@ -45,7 +45,7 @@ class Simulation(object):
 		# Process necessary config files
 		observations = _process_telescope_config(telescope_config)
 
-		# Initialise Actor and Resource objects
+		# Initiaise Actor and Resource objects
 		self.cluster = Cluster(machine_config)
 		self.buffer = Buffer(env, self.cluster)
 		self.planner = Planner(env, palgorithm, machine_config)

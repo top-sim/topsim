@@ -17,7 +17,7 @@ from core.scheduler import Scheduler
 from core.simulation import Simulation
 from core.telescope import Telescope, Observation
 from core.buffer import Buffer
-from scheduler.random_algorithm import RandomAlgorithm
+# from scheduler.random_algorithm import RandomAlgorithm
 from scheduler.fifo_algorithm import FifoAlgorithm
 
 """
@@ -65,7 +65,6 @@ def run_simulation(arg, parser):
 							salgorithm, 'heft', event_file)
 
 	simulation.start()
-	simulation.run()
 
 
 # env.run(until=100)  # until=100)
