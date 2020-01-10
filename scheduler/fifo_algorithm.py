@@ -31,7 +31,7 @@ class FifoAlgorithm(Algorithm):
 		candidate_machine = None
 
 		all_candidates = []
-		workflow_plan
+		# Get the first task from the list of tasks
 		return None, None
 		# for machine in machines:
 		# 	for task in tasks:
