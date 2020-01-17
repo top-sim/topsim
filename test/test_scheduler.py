@@ -17,7 +17,7 @@ import unittest
 import simpy
 
 from core.simulation import Simulation
-from scheduler.fifo_algorithm import FifoAlgorithm
+from algorithms.scheduling import FifoAlgorithm
 
 from core.telescope import Observation
 from core.scheduler import Scheduler
@@ -70,30 +70,30 @@ class TestSchedulerFIFO(unittest.TestCase):
 		pass
 
 	def testSchedulerDecision(self):
-		# scheduler.make_decision() will do something interesting only when we add a workflow plan to the
+		# algorithms.make_decision() will do something interesting only when we add a workflow plan to the
 		# buffer.
 		next(self.planner.run(self.observation))
-		#  Observation is what we are interested in with the scheduler, because the observation stores the plan;
+		#  Observation is what we are interested in with the algorithms, because the observation stores the plan;
 		#  The observation object is what is stored in the buffer's 'observations_for_processing' queue.
 		self.buffer.add_observation_to_waiting_workflows(self.observation)
 
-		# Lets start doing scheduler things!
-		# IT is important to note that the scheduler is only effective within the context of a simulation,
+		# Lets start doing algorithms things!
+		# IT is important to note that the algorithms is only effective within the context of a simulation,
 		# as it is directly affected by calls to env.now; this means we need to run a mini-simulation in this
 		# test - which we can 'simulate' - haha - by using the enviroment and clever timeouts.
-		# We get an observaiton into the buffer, the scheduler makes a decision - what then?
-		# We use check_buffer to update the workflows in the scheduler workflow list
+		# We get an observaiton into the buffer, the algorithms makes a decision - what then?
+		# We use check_buffer to update the workflows in the algorithms workflow list
 		# This is called every time-step in the simulation, and is how we add workflow plans to the schedulers list
 		test_flag = True
 		self.env.process(self.scheduler.run())
-		self.env.run(until=3)
+		self.env.run(until=100)
 		# while test_flag:
-		# 	next(self.scheduler.run())
+		# 	next(self.algorithms.run())
 
 		# Now that a single workflow has been taken from the buffer and added to the list of workflows, we can schedule
 		#
 		# print(self.env.now)
-		# self.scheduler.process_workflows()
+		# self.algorithms.process_workflows()
 
 		# process_workflows() is passing the workflow
 

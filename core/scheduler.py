@@ -14,6 +14,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from queue import PriorityQueue
 
+import numpy as np
+from core.algorithm import Algorithm
+from core.planner import TaskStatus
 
 class Scheduler(object):
 	def __init__(self, env, algorithm, buffer, cluster):
@@ -33,7 +36,7 @@ class Scheduler(object):
 		while True:
 			print('Current time:', self.env.now)
 			if self.check_buffer() or self.workflows:
-				self.process_workflows()
+				self.schedule_workflows()
 			yield self.env.timeout(1)
 
 	def check_buffer(self):
@@ -46,13 +49,13 @@ class Scheduler(object):
 		else:
 			return False
 
-	def process_workflows(self):
+	def schedule_workflows(self):
 		# Workflow needs a priority
 		if self.workflows:
 			print("Scheduler: Currently waiting to process: ", self.workflows)
 		else:
 			print("Scheduler: Nothing in Buffer to process")
-
+		# Min -scheduling time
 		minst = -1
 		current_plan = None
 
@@ -62,8 +65,7 @@ class Scheduler(object):
 			if minst == -1 or st < minst:
 				minst = st
 				current_plan = self.workflows[workflow]
-		# if self.env.now == 65:
-		# 		x = 1
+
 		if current_plan:
 			print("Current plan: ", current_plan.id, current_plan.exec_order)
 
@@ -72,18 +74,21 @@ class Scheduler(object):
 				if machine is None or task is None:
 					break
 				else:
-					self.allocate_task(task, machine)
+					# Runs the task on the machine
+					task.run(self.find_appropriate_machine_in_cluster(machine))
+					if task.task_status is TaskStatus.SCHEDULED:
+						self.cluster.running_tasks.append(task)
 
-	def allocate_task(self, task, machine):
-		"""
-		We are going to move away slightly from the 'task initiates its allocation', which was
-		the method elected in CloudSimPy; instead, the scheduler performs the allocation (I prefer
-		this from a logical/Actor way of thinking').
-		:param task:
-		:param machine:
-		:return:
-		"""
-		pass
+	# When we run tasks we want to run it on a given machine on the cluster, which the task does not
+	# have access to unless we pass it to the class (which seems a bit ridiculous)
+
+	# get task to run
+
+	def find_appropriate_machine_in_cluster(self, machine_id):
+		for machine in self.cluster.machines:
+			if machine.id == machine_id:
+				return machine
+
 
 	#
 	# def add_workflow(self, workflow):
@@ -96,8 +101,6 @@ class Scheduler(object):
 		return {
 			'observations_for_processing': [plan.id for plan in self.workflows]
 		}
-
-
 
 
 

@@ -32,54 +32,30 @@ class Machine(object):
 		self.cpu = cpu_capacity if cpu is None else cpu
 		self.memory = memory_capacity if memory is None else memory
 		self.disk = disk_capacity if disk is None else disk
-
-		self.task_instances = []
 		self.machine_door = MachineDoor.NULL
+		self.current_task = None
 
-	def run_task_instance(self, task_instance):
-		self.cpu -= task_instance.cpu
+	def run_task(self, task_instance):
+		self.cpu -= task_instance.flops
 		self.memory -= task_instance.memory
-		self.disk -= task_instance.disk
-		self.task_instances.append(task_instance)
+		self.disk -= task_instance.io
+		self.current_task = task_instance
+		# self.task_instances.append(task_instance)
 		self.machine_door = MachineDoor.TASK_IN
 
-	def stop_task_instance(self, task_instance):
-		self.cpu += task_instance.cpu
+	def stop_task(self, task_instance):
+		self.cpu += task_instance.flops
 		self.memory += task_instance.memory
-		self.disk += task_instance.disk
+		self.disk += task_instance.io
 		self.machine_door = MachineDoor.TASK_OUT
-
-	@property
-	def running_task_instances(self):
-		ls = []
-		for task_instance in self.task_instances:
-			if task_instance.started and not task_instance.finished:
-				ls.append(task_instance)
-		return ls
-
-	@property
-	def finished_task_instances(self):
-		ls = []
-		for task_instance in self.task_instances:
-			if task_instance.finished:
-				ls.append(task_instance)
-		return ls
+		self.current_task = None
 
 	def accommodate(self, task):
-		return self.cpu >= task.task_config.cpu and \
-			   self.memory >= task.task_config.memory and \
-			   self.disk >= task.task_config.disk
+		return self.cpu >= task.task_config.flops and \
+			self.memory >= task.task_config.memory and \
+			self.disk >= task.task_config.io
 
-	@property
-	def feature(self):
-		return [self.cpu, self.memory, self.disk]
-
-	@property
-	def capacity(self):
-		return [self.cpu_capacity, self.memory_capacity, self.disk_capacity]
-
-	@property
-	def state(self):
+	def state_summary(self):
 		return {
 			'id': self.id,
 			'cpu_capacity': self.cpu_capacity,
@@ -88,8 +64,6 @@ class Machine(object):
 			'cpu': self.cpu / self.cpu_capacity,
 			'memory': self.memory / self.memory_capacity,
 			'disk': self.disk / self.disk_capacity,
-			'running_task_instances': len(self.running_task_instances),
-			'finished_task_instances': len(self.finished_task_instances)
 		}
 
 	def __eq__(self, other):

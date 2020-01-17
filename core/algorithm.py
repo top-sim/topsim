@@ -3,5 +3,5 @@ from abc import ABC, abstractmethod
 
 class Algorithm(ABC):
     @abstractmethod
-    def __call__(self, cluster, clock,plan):
+    def __call__(self, cluster, clock, plan):
         pass

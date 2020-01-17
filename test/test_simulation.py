@@ -3,7 +3,7 @@ import simpy
 
 from core.simulation import Simulation
 from core.telescope import Telescope
-from scheduler.fifo_algorithm import FifoAlgorithm
+from algorithms.scheduling import FifoAlgorithm
 import test_data
 
 

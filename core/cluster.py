@@ -7,9 +7,9 @@ class Cluster(object):
 	def __init__(self, machines):
 		self.machines = []
 		self._add_machines(machines)
-		self.waiting_tasks = None
-		self.running_tasks = None
-		self.finished_tasks = None
+		self.running_tasks = []
+		self.finished_tasks = []
+		self.waiting_tasks = []
 		# self.workflows = []  # Keeping here to stop runtime errors
 		self.finished_workflows = []
 

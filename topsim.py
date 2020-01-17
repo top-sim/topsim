@@ -17,8 +17,8 @@ from core.scheduler import Scheduler
 from core.simulation import Simulation
 from core.telescope import Telescope, Observation
 from core.buffer import Buffer
-# from scheduler.random_algorithm import RandomAlgorithm
-from scheduler.fifo_algorithm import FifoAlgorithm
+# from algorithms.random_algorithm import RandomAlgorithm
+from algorithms.scheduling import FifoAlgorithm
 
 """
 topsim.py takes command-line arguments to specify how the simulation will run
@@ -28,7 +28,7 @@ testcases = {  # Tests for the test runner
 	"buffer": test.test_buffer,
 	"cluster": test.test_cluster,
 	"planner": test.test_planner,
-	"scheduler": test.test_scheduler
+	"algorithms": test.test_scheduler
 }
 
 

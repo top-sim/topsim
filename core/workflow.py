@@ -28,7 +28,8 @@ class Task(object):
 	they arrive on the cluster queue, they are workflow agnositc, and are processed according to
 	their priority.
 	"""
-	def __init__(self, id):
+	def __init__(self, id, env=None, pred = None):
+		self.env = env
 		self. id = id
 		self.start = 0
 		self.finish = 0
@@ -37,4 +38,4 @@ class Task(object):
 		self.io = 0
 		self.alloc = None
 		self.duration = None
-
+		self.pred = pred

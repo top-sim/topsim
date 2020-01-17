@@ -22,7 +22,7 @@ from core.scheduler import Scheduler
 from core.telescope import Observation
 from core.buffer import Buffer
 
-from scheduler.fifo_algorithm import FifoAlgorithm
+from algorithms.scheduling import FifoAlgorithm
 
 import test_data
 
@@ -46,7 +46,7 @@ class TestPlanner(unittest.TestCase):
 		self.planner = Planner(self.env, PLAN_ALGORITHM, MACHINE_CONFIG)
 		self.cluster = Cluster(test_data.machine_config)
 		# self.buffer = Buffer(self.env, self.cluster)
-		# self.scheduler = Scheduler(self.env, sched_algorithm, self.buffer, self.cluster)
+		# self.algorithms = Scheduler(self.env, sched_algorithm, self.buffer, self.cluster)
 		self.observation = Observation('planner_observation',
 									OBS_START_TME,
 									OBS_DURATION,
@@ -88,7 +88,7 @@ class TestWorkflowPlan(unittest.TestCase):
 		self.planner = Planner(self.env, PLAN_ALGORITHM, MACHINE_CONFIG)
 		self.cluster = Cluster(test_data.machine_config)
 		# self.buffer = Buffer(self.env, self.cluster)
-		# self.scheduler = Scheduler(self.env, sched_algorithm, self.buffer, self.cluster)
+		# self.algorithms = Scheduler(self.env, sched_algorithm, self.buffer, self.cluster)
 		self.observation = Observation('planner_observation',
 									OBS_START_TME,
 									OBS_DURATION,

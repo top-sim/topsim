@@ -1,5 +1,5 @@
 from core.config import *
-
+from core.planner import TaskStatus
 
 class Task(object):
     def __init__(self, env, job, task_config):
@@ -102,7 +102,6 @@ class TaskInstance(object):
         self.started_timestamp = None
         self.finished_timestamp = None
 
-    @property
     def id(self):
         return str(self.task.id) + '-' + str(self.task_instance_index)
 
@@ -110,17 +109,18 @@ class TaskInstance(object):
         # self.cluster.waiting_tasks.remove(self)
         # self.cluster.running_tasks.append(self)
         # self.machine.run(self)
+        self.task_status = TaskStatus.SCHEDULED
         yield self.env.timeout(self.duration)
 
         self.finished = True
         self.finished_timestamp = self.env.now
 
-        self.machine.stop_task_instance(self)
+        self.machine.stop_task(self)
 
     def schedule(self, machine):
         self.started = True
         self.started_timestamp = self.env.now
 
         self.machine = machine
-        self.machine.run_task_instance(self)
+        self.machine.run_task(self)
         self.process = self.env.process(self.do_work())

@@ -4,8 +4,7 @@ import json
 from core.monitor import Monitor
 from core.scheduler import Scheduler
 from core.cluster import Cluster
-from core.machine import Machine
-from core.algorithm import Algorithm
+from core.visualiser import Visualiser
 from core.telescope import Telescope, Observation
 from core.buffer import Buffer
 from core.planner import Planner
@@ -26,7 +25,7 @@ class Simulation(object):
 	finished.
 	"""
 
-	def __init__(self, env, telescope_config, telescopemax, machine_config,salgorithm,palgorithm, event_file):
+	def __init__(self, env, telescope_config, telescopemax, machine_config,salgorithm,palgorithm, event_file, visualisation=False):
 		"""
 		:param env:
 		:param telescope_config:
@@ -41,7 +40,8 @@ class Simulation(object):
 		self.event_file = event_file
 		if event_file is not None:
 			self.monitor = Monitor(self)
-
+		if visualisation:
+			self.visualiser = Visualiser(self)
 		# Process necessary config files
 		observations = _process_telescope_config(telescope_config)
 
@@ -54,9 +54,10 @@ class Simulation(object):
 
 	def start(self, runtime=100):
 		# Starting monitor process before task_broker process
-		# and scheduler process is necessary for log records integrity.
+		# and algorithms process is necessary for log records integrity.
 		if self.event_file is not None:
 			self.env.process(self.monitor.run())
+
 		self.env.process(self.telescope.run())
 		# self.env.process(self.buffer.run())
 		# self.env.process(self.task_broker.run())
@@ -71,7 +72,8 @@ class Simulation(object):
 	def is_finished(self):
 		if (self.telescope.observations
 			or self.buffer.observations_for_processing
-			or self.scheduler.workflows):
+			or self.scheduler.workflows
+			or self.cluster.running_tasks):
 			# Using compound 'or' doesn't give us a True/False
 			return False
 		else:
