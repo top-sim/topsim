@@ -64,7 +64,7 @@ def run_simulation(arg, parser):
 	simulation = Simulation(env, test_data.telescope_config, tmax, test_data.machine_config,
 							salgorithm, 'heft', event_file)
 
-	simulation.start()
+	simulation.start(-1)
 
 
 # env.run(until=100)  # until=100)

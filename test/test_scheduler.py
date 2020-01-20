@@ -19,7 +19,7 @@ import simpy
 from core.simulation import Simulation
 from algorithms.scheduling import FifoAlgorithm
 
-from core.telescope import Observation
+from core.telescope import Observation, Telescope
 from core.scheduler import Scheduler
 from core.cluster import Cluster
 from core.planner import Planner, WorkflowPlan
@@ -52,12 +52,14 @@ class TestSchedulerFIFO(unittest.TestCase):
 		self.planner = Planner(self.env, test_data.planning_algorithm, test_data.machine_config)
 		self.cluster = Cluster(test_data.machine_config)
 		self.buffer = Buffer(self.env, self.cluster)
-		self.scheduler = Scheduler(self.env, sched_algorithm, self.buffer, self.cluster)
 		self.observation = Observation('scheduler_observation',
 									OBS_START_TME,
 									OBS_DURATION,
 									OBS_DEMAND,
 									OBS_WORKFLOW)
+		telescopemax = 36 # maximum number of antennas
+		self.telescope = Telescope(self.env, self.observation,self.buffer,telescopemax,self.planner)
+		self.scheduler = Scheduler(self.env, sched_algorithm, self.buffer, self.cluster, self.telescope)
 
 	def tearDown(self):
 		pass
@@ -86,7 +88,26 @@ class TestSchedulerFIFO(unittest.TestCase):
 		# This is called every time-step in the simulation, and is how we add workflow plans to the schedulers list
 		test_flag = True
 		self.env.process(self.scheduler.run())
+		self.env.run(until=1)
+		print(self.env.now)
+		# We should be able to get this working nicely
+		"""
+		For this experiment, we are running the scheduler on a single observation, and getting it 
+		to allocate a task to the required machine. the first task should be scheduled at T = 0, 
+		so at t = 1, we should check to make sure that the target has been scheduled, and that it is on the appropriate 
+		machine
+		"""
+		# Generate list of IDs
+		expected_machine = "cat2_m2"
+		expected_task_no = 0
+		self.assertTrue(self.cluster.running_tasks)
+		for m in self.cluster.machines:
+			if m.id == expected_machine:
+				self.assertEqual(m.current_task.id, expected_task_no)
+		# Need to assert that there is something in cluster.running_tasks
+		# first element of running tasks should be the first task
 		self.env.run(until=100)
+		print(self.env.now)
 		# while test_flag:
 		# 	next(self.algorithms.run())
 

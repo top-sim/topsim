@@ -33,6 +33,12 @@ class Planner(object):
 		return plan
 
 
+class WorkflowStatus(Enum):
+	UNSCHEDULED = 1
+	SCHEDULED = 2
+	FINISHED = 3
+
+
 class WorkflowPlan(object):
 	"""
 	WorkflowPlans are used within the Planner, SchedulerA Actors and Cluster Resource. They are higher-level than the
@@ -70,6 +76,9 @@ class WorkflowPlan(object):
 		self.exec_order = workflow.execution_order
 		self.start_time = None
 		self.priority = 0
+		self.status = WorkflowStatus.UNSCHEDULED
+
+
 
 	def __lt__(self, other):
 		return self.priority < other.priority
@@ -117,14 +126,14 @@ class Task(object):
 		self.memory = 0
 		self.io = 0
 
-	def __lt__(self, other):
-		return self.exec_order < other.exec_order
-
-	def __eq__(self, other):
-		return self.exec_order == other.exec_order
-
-	def __gt__(self, other):
-		return self.exec_order > other.exec_order
+	# def __lt__(self, other):
+	# 	return self.exec_order < other.exec_order
+	#
+	# def __eq__(self, other):
+	# 	return self.exec_order == other.exec_order
+	#
+	# def __gt__(self, other):
+	# 	return self.exec_order > other.exec_order
 
 	def __hash__(self):
 		return hash(self.id)

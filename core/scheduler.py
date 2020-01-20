@@ -16,61 +16,85 @@ from queue import PriorityQueue
 
 import numpy as np
 from core.algorithm import Algorithm
-from core.planner import TaskStatus
+from core.planner import TaskStatus,WorkflowStatus
+
 
 class Scheduler(object):
-	def __init__(self, env, algorithm, buffer, cluster):
+	def __init__(self, env, algorithm, buffer, cluster, telescope):
 		self.env = env
+		self.telescope = telescope
 		# algorithm is a class
 		self.algorithm = algorithm
 		# self.destroyed = False
-		self.workflows = {}
+		self.workflow_plans = []
 		# self.valid_pairs = {}
 		self.cluster = cluster
 		self.buffer = buffer
+		self.current_plan = None
 
 	# def attach(self, simulation):
 	# 	self.simulation = simulation
 
 	def run(self):
 		while True:
-			print('Current time:', self.env.now)
-			if self.check_buffer() or self.workflows:
+			# print('Current time:', self.env.now)
+			# AT THE END OF THE SIMULATION, WE GET STUCK HERE. NEED TO EXIT
+			if self.check_buffer() or self.workflow_plans or self.cluster.running_tasks:
 				self.schedule_workflows()
 			yield self.env.timeout(1)
+			if len(self.workflow_plans) == 0 and len(self.telescope.observations) == 0:
+				print("No more workflows")
+				break
 
 	def check_buffer(self):
 		if not self.buffer.observations_for_processing.empty():
 			print("Workflows currently waiting in the Buffer: {0}".format(self.buffer.observations_for_processing))
 			obsplan = self.buffer.observations_for_processing.get()  # Get oldest observation
 			assert obsplan.start_time >= self.env.now
-			self.workflows[obsplan.id] = obsplan
+			self.workflow_plans.append(obsplan)
 			return True
 		else:
 			return False
 
 	def schedule_workflows(self):
 		# Workflow needs a priority
-		if self.workflows:
-			print("Scheduler: Currently waiting to process: ", self.workflows)
-		else:
-			print("Scheduler: Nothing in Buffer to process")
+		# for workflow in self.workflow_plans:
+		# 	cplan = workflow
+		# 	if cplan.status is WorkflowStatus.FINISHED:
+
 		# Min -scheduling time
 		minst = -1
-		current_plan = None
+		if not self.current_plan:
+			for workflow_plan in self.workflow_plans:
+				st = workflow_plan.start_time
+				if minst == -1 or st < minst:
+					minst = st
+					self.current_plan = workflow_plan
+					self.current_plan.start_time = self.env.now
+					print("New observation {0} scheduled for processing".format(self.current_plan.id), self.env.now)
 
-		# Note workflows is a workflow-id: workflow-plan key:value pair
-		for workflow in self.workflows:
-			st = self.workflows[workflow].start_time
-			if minst == -1 or st < minst:
-				minst = st
-				current_plan = self.workflows[workflow]
+		if self.current_plan.status is WorkflowStatus.FINISHED:
+			self.workflow_plans.remove(self.current_plan)
+			self.current_plan = None
 
-		if current_plan:
-			print("Current plan: ", current_plan.id, current_plan.exec_order)
+		if self.workflow_plans:
+			for workflow_plan in self.workflow_plans:
+				if workflow_plan.status is WorkflowStatus.FINISHED:
+					self.workflow_plans.remove(self.current_plan)
+			print("Scheduler: Currently waiting to process: ", self.workflow_plans)
+		else:
+			print("Scheduler: Nothing in Buffer to process")
+
+		# Note workflows is a {workflow-id: workflow-plan} key:value pair
+
+		# This is the current 'priority' - we determine which workflow has been waiting the longest
+
+
+		if self.current_plan:
+			print("Current plan: ", self.current_plan.id, self.current_plan.exec_order)
 
 			while True:
-				machine, task = self.algorithm(self.cluster, self.env.now, current_plan)
+				machine, task = self.algorithm(self.cluster, self.env.now, self.current_plan)
 				if machine is None or task is None:
 					break
 				else:
@@ -90,6 +114,7 @@ class Scheduler(object):
 				return machine
 
 
+
 	#
 	# def add_workflow(self, workflow):
 	# 	print("Adding", workflow, "to workflows")
@@ -99,8 +124,5 @@ class Scheduler(object):
 	def print_state(self):
 		# Change this to 'workflows scheduled/workflows unscheduled'
 		return {
-			'observations_for_processing': [plan.id for plan in self.workflows]
+			'observations_for_processing': [plan.id for plan in self.workflow_plans]
 		}
-
-
-

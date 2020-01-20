@@ -50,9 +50,9 @@ class Simulation(object):
 		self.buffer = Buffer(env, self.cluster)
 		self.planner = Planner(env, palgorithm, machine_config)
 		self.telescope = Telescope(env, observations, self.buffer, telescopemax, self.planner)
-		self.scheduler = Scheduler(env, salgorithm, self.buffer, self.cluster)
+		self.scheduler = Scheduler(env, salgorithm, self.buffer, self.cluster, self.telescope)
 
-	def start(self, runtime=100):
+	def start(self, runtime=150):
 		# Starting monitor process before task_broker process
 		# and algorithms process is necessary for log records integrity.
 		if self.event_file is not None:
@@ -66,14 +66,17 @@ class Simulation(object):
 		if runtime > 0:
 			self.env.run(until=runtime)
 		else:
-			while not self.is_finished():
+			if not self.is_finished():
 				self.env.run()
 
+		print("Simulation Finished")
+
 	def is_finished(self):
-		if (self.telescope.observations
-			or self.buffer.observations_for_processing
-			or self.scheduler.workflows
-			or self.cluster.running_tasks):
+		x = (len(self.telescope.observations) == 0
+			or self.buffer.observations_for_processing.empty()
+			or len(self.scheduler.workflow_plans) == 0
+			or len(self.cluster.running_tasks) == 0)
+		if (x):
 			# Using compound 'or' doesn't give us a True/False
 			return False
 		else:
