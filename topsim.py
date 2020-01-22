@@ -61,8 +61,18 @@ def run_simulation(arg, parser):
 	env = simpy.Environment()
 	tmax = 36  # for starters, we will define telescope configuration as simply number of arrays that exist
 	salgorithm = FifoAlgorithm()
-	simulation = Simulation(env, test_data.telescope_config, tmax, test_data.machine_config,
-							salgorithm, 'heft', event_file)
+	vis = False
+	if arg['visualise']:
+		vis = True
+
+	simulation = Simulation(env,
+							test_data.telescope_config,
+							tmax,
+							test_data.machine_config,
+							salgorithm,
+							'heft',
+							event_file,
+							vis)
 
 	simulation.start(-1)
 
@@ -100,6 +110,7 @@ if __name__ == "__main__":
 	simulation_parser.set_defaults(func=run_simulation)
 	simulation_parser.add_argument('workflow', help='Name of algorithm')
 	simulation_parser.add_argument('--calc_time', help='Set calc_time True/False', choices=['True', 'False'])
+	simulation_parser.add_argument('--visualise', help='Visualise the simulation', choices=['True', 'False'])
 
 	args = parser.parse_args()
 	if not args.command:
@@ -108,3 +119,5 @@ if __name__ == "__main__":
 		args.func(vars(args), simulation_parser)
 	if args.command == 'test':
 		args.func(vars(args), testcases, test_parser)
+
+

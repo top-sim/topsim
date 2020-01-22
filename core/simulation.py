@@ -38,6 +38,7 @@ class Simulation(object):
 		self.env = env
 		# Event file setup
 		self.event_file = event_file
+		self.visualisation = visualisation
 		if event_file is not None:
 			self.monitor = Monitor(self)
 		if visualisation:
@@ -57,7 +58,8 @@ class Simulation(object):
 		# and algorithms process is necessary for log records integrity.
 		if self.event_file is not None:
 			self.env.process(self.monitor.run())
-
+		if self.visualisation:
+			self.env.process(self.visualiser.run())
 		self.env.process(self.telescope.run())
 		# self.env.process(self.buffer.run())
 		# self.env.process(self.task_broker.run())
@@ -73,14 +75,14 @@ class Simulation(object):
 
 	def is_finished(self):
 		x = (len(self.telescope.observations) == 0
-			or self.buffer.observations_for_processing.empty()
-			or len(self.scheduler.workflow_plans) == 0
-			or len(self.cluster.running_tasks) == 0)
+			and self.buffer.observations_for_processing.empty()
+			and len(self.scheduler.workflow_plans) == 0
+			and len(self.cluster.running_tasks) == 0)
 		if (x):
 			# Using compound 'or' doesn't give us a True/False
-			return False
-		else:
 			return True
+		else:
+			return False
 
 
 
