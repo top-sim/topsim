@@ -33,5 +33,4 @@ def _process_machine_config(machine_config):
 			1,
 		))
 	return machine_list
-	pass
 

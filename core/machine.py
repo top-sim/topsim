@@ -68,3 +68,6 @@ class Machine(object):
 
 	def __eq__(self, other):
 		return isinstance(other, Machine) and other.id == self.id
+
+	def __repr__(self):
+		return str(self.id)
