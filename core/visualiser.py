@@ -32,7 +32,7 @@ from bokeh.layouts import column
 from bokeh.models import ColumnDataSource, Slider
 from bokeh.models import BasicTicker, ColorBar, ColumnDataSource, LinearColorMapper, PrintfTickFormatter
 from bokeh.plotting import figure
-from bokeh.models.widgets import Button
+from bokeh.models.widgets import Button, DataTable, TableColumn
 from bokeh.server.server import Server
 from bokeh.themes import Theme
 from threading import Thread
@@ -48,6 +48,7 @@ from flask import Flask, render_template
 from bokeh.embed import server_document
 from tornado.ioloop import IOLoop
 from bokeh.transform import transform
+
 
 class Visualiser(object):
 	def __init__(self, simulation):
@@ -80,71 +81,64 @@ class Visualiser(object):
 		mapper = LinearColorMapper(palette=colors, low=0, high=1)
 		button = Button(label="Start", button_type="success")
 		# create three plots
-		machines = self.simulation.cluster.machines
-		machine_ids = [m.id for m in machines]
-		color = 'blue'
-		tempdf = pd.DataFrame({"machine_ids": machine_ids, "current_time":self.env.now})
-		tempdf.columns.name = "machine_ids"
-		taskexist = []
-		for machine in machines:
-			val = 0
-			if machine.current_task:
-				val = 1
-			taskexist.append(val)
-		tempdf['taskexist'] = taskexist
-		tempdf = tempdf.set_index('current_time')
-		df = pd.DataFrame(tempdf.stack(), columns=['taskexist']).reset_index()
+		sourcedata = dict(name=[], start=[], duration=[], demand=[],running=[])
+		for observation in self.simulation.telescope.observations:
+			sourcedata['name'].append(observation.name)
+			sourcedata['start'].append(observation.start)
+			sourcedata['duration'].append(observation.duration)
+			sourcedata['demand'].append(observation.demand)
+			sourcedata['running'].append(observation.running)
 
-		source = ColumnDataSource(df)
+		plot = { 'time': [self.env.now],
+				'running': [len(self.simulation.cluster.running_tasks)],
+				'finished': [len(self.simulation.cluster.finished_tasks)],
+				'waiting': [len(self.simulation.cluster.waiting_tasks)]}
+
+		source = ColumnDataSource(data=sourcedata)
+		plotdata = ColumnDataSource(plot)
+
 		def update_start():
 			if not self.start:
 				self.start = True
 
+		p = figure(plot_width=400, plot_height=400)
+		p.line(x='time', y='running', alpha=0.2, line_width=3, color='navy', source=plotdata)
+		p.line(x='time', y='finished', alpha=0.8, line_width=2, color='orange', source=plotdata)
+		p.line(x='time',y='waiting',alpha=0.5, line_width=2, color='green',source=plotdata)
+
+		columns = [
+			TableColumn(field="name", title="Name"),
+			TableColumn(field="start", title="Start Time"),
+			TableColumn(field="demand", title="No. Antennas"),
+			TableColumn(field="duration", title="Observation Length"),
+			TableColumn(field="running", title="Running Status")
+		]
+		data_table = DataTable(source=source, columns=columns, width=600, height=280)
+
 		def update():
 			if self.env:
-				machines = self.simulation.cluster.machines
-				machine_ids = [m.id for m in machines]
-				color = 'blue'
-				current_time = self.env.now
-				intermed = pd.DataFrame({"machine_ids": machine_ids, "current_time": current_time})
-				taskexist = []
-				for machine in machines:
-					val = 0
-					if machine.current_task:
-						val = 1
-					taskexist.append(val)
-				intermed['taskexist'] = taskexist
-				intermed = intermed.set_index('current_time')
-				new = {"index":[self.env.now for m in machine_ids], "machine_ids":machine_ids,"taskexist":taskexist,"current_time":[self.env.now for m in machine_ids]}
-				source.stream(new)
+				updata = {'time':[self.env.now],
+								'running':[len(self.simulation.cluster.running_tasks)],
+								'finished':[len(self.simulation.cluster.finished_tasks)],
+								'waiting':[len(self.simulation.cluster.waiting_tasks)]
+							}
+				plotdata.stream(updata)
+
+		# def table_update():
+		# 	if self.env:
+		# 		tmp = dict(name=[], start=[], duration=[], demand=[], running=[])
+		# 		for observation in self.simulation.telescope.observations:
+		# 			tmp['name'].append(observation.name)
+		# 			tmp['start'].append(observation.start)
+		# 			tmp['duration'].append(observation.duration)
+		# 			tmp['demand'].append(observation.demand)
+		# 			tmp['running'].append(observation.running)
+		# 		source.stream(tmp)
 
 		doc.add_periodic_callback(update, 500)
+		# doc.add_periodic_callback(table_update,500)
 		button.on_click(update_start)
 
-		p = figure(plot_width=800, plot_height=300, title="Simulation",
-				x_range=[0,350], y_range=list(reversed(tempdf.columns)),
-				toolbar_location=None, tools="", x_axis_location="above")
-
-		p.rect(x="current_time",y="machine_ids", width=1, height=1, source=source,
-			line_color=None, fill_color=transform('taskexist', mapper))
-		# fig = figure(title='Simulation playback!',plot_height=250,
-		# 			x_range=[0,350], y_range=machine_ids)
-		# fig.hbar(y="machine_ids", right="time", height=0.9, source=source,
-		# 		line_color='white', fill_color=factor_cmap('machines',
-		# 												palette=Spectral6,
-		# 												factors=machine_ids
-		# 												))
-		# fig.line(source=source, x='x', y='y', color='blue')  # size=10)
-		color_bar = ColorBar(color_mapper=mapper, location=(0, 0),
-							 ticker=BasicTicker(desired_num_ticks=len(colors)),
-							 formatter=PrintfTickFormatter(format="%d%%"))
-
-		p.add_layout(color_bar, 'right')
-		p.axis.axis_line_color = None
-		p.axis.major_tick_line_color = None
-		p.axis.major_label_text_font_size = "5pt"
-		p.axis.major_label_standoff = 0
-		p.xaxis.major_label_orientation = 1.0
 		# fig.xgrid.grid_line_color = None
 		# fig.x_range.start = 0
 		# fig.x_range.end = 350
@@ -152,5 +146,5 @@ class Visualiser(object):
 		# fig.legend.location = "top_center"
 
 		doc.title = "Now with live updating!"
-		doc.add_root(layout([button], [p]))
+		doc.add_root(layout([button], [p,data_table]))
 		return doc

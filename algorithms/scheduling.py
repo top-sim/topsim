@@ -44,6 +44,7 @@ class FifoAlgorithm(Algorithm):
 			# Check if the running tasks have finished
 			if t.task_status is TaskStatus.FINISHED:
 				self.cluster.running_tasks.remove(t)
+				self.cluster.finished_tasks.append(t)
 				workflow_plan.tasks.remove(t)
 		if len(workflow_plan.tasks) == 0:
 			workflow_plan.status = WorkflowStatus.FINISHED
