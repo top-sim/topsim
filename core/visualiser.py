@@ -69,7 +69,7 @@ class Visualiser(object):
 		thread.start()
 		while not self.simulation.is_finished():
 			if self.start:
-				time.sleep(0.1)
+				time.sleep(0.6)
 				yield self.env.timeout(1)
 
 	def make_document(self, doc):
@@ -124,19 +124,17 @@ class Visualiser(object):
 							}
 				plotdata.stream(updata)
 
-		# def table_update():
-		# 	if self.env:
-		# 		tmp = dict(name=[], start=[], duration=[], demand=[], running=[])
-		# 		for observation in self.simulation.telescope.observations:
-		# 			tmp['name'].append(observation.name)
-		# 			tmp['start'].append(observation.start)
-		# 			tmp['duration'].append(observation.duration)
-		# 			tmp['demand'].append(observation.demand)
-		# 			tmp['running'].append(observation.running)
-		# 		source.stream(tmp)
+		def table_update():
+			if self.env:
+				index = 0
+				val = False
+				for i in range(len(sourcedata['running'])):
+					val = self.simulation.telescope.observations[i].running
+					dictionary = {"running": [(i, val)]}
+					source.patch(dictionary)
 
 		doc.add_periodic_callback(update, 500)
-		# doc.add_periodic_callback(table_update,500)
+		doc.add_periodic_callback(table_update,500)
 		button.on_click(update_start)
 
 		# fig.xgrid.grid_line_color = None
