@@ -21,7 +21,7 @@ Config Data for the simulation; the format of this will change, this is a stub
 
 # Simulation configuration for testing
 telescope_config = 'test/data/observations.csv'
-machine_config = 'test/data/system_config.json'
+machine_config = 'test/data/daligue_pipeline_test_sys.json'
 workflow_config = 'test/data/workflow_config.json'
 event_file = '/home/rwb/github/topsim/sim.trace'
 planning_algorithm = 'heft'
