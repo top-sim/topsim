@@ -124,6 +124,7 @@ class Visualiser(object):
 							}
 				plotdata.stream(updata)
 
+		# TODO add stream for the machine load (this should dynamically update as a bar plot)
 		# def table_update():
 		# 	if self.env:
 		# 		tmp = dict(name=[], start=[], duration=[], demand=[], running=[])
@@ -145,6 +146,6 @@ class Visualiser(object):
 		# fig.legend.orientation = "horizontal"
 		# fig.legend.location = "top_center"
 
-		doc.title = "Now with live updating!"
+		doc.title = "TopSim Dashboard"
 		doc.add_root(layout([button], [p,data_table]))
 		return doc

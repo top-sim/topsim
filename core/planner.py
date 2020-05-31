@@ -4,8 +4,8 @@ from os import path
 
 # sys.path.append(path.abspath('../../shadow'))
 
-from shadow.classes.workflow import Workflow
-from shadow.classes.environment import Environment
+from shadow.models.workflow import Workflow as ShadowWorkflow
+from shadow.models.environment import Environment as ShadowEnvironment
 from shadow.algorithms.heuristic import heft as shadow_heft
 import test_data
 
@@ -26,10 +26,10 @@ class Planner(object):
 		yield self.env.timeout(0)
 
 	def plan(self, name, workflow, algorithm):
-		wf = Workflow(workflow)
-		wfenv = Environment(self.envconfig)
-		wf.add_environment(wfenv)
-		plan = WorkflowPlan(name, wf, algorithm, self.env)
+		workflow = ShadowWorkflow(workflow)
+		workflow_env = ShadowEnvironment(self.envconfig)
+		workflow.add_environment(workflow_env)
+		plan = WorkflowPlan(name, workflow, algorithm, self.env)
 		return plan
 
 
@@ -60,20 +60,17 @@ class WorkflowPlan(object):
 		self.tasks = []
 		task_order = []
 
-		for machine in workflow.machine_alloc:
-			machine_tasks = workflow.machine_alloc[machine]
-			for task in machine_tasks:
-				taskobj = Task(task[taskid], env)
-				taskobj.est = task[ast]
-				taskobj.eft = task[aft]
+		for task in workflow.tasks:
+				taskobj = Task(task.tid, env)
+				taskobj.est = task.ast
+				taskobj.eft = task.aft
 				taskobj.duration = taskobj.eft - taskobj.est
-				taskobj.machine_id = machine
-				taskobj.exec_order = workflow.execution_order.index(task[taskid])
-				taskobj.flops = workflow.graph.nodes[taskobj.id]['flops']
-				taskobj.pred = list(workflow.graph.predecessors(taskobj.id))
+				taskobj.machine_id = task.machine.id
+				taskobj.flops = task.flops_demand
+				taskobj.pred = list(workflow.graph.predecessors(task))
 				self.tasks.append(taskobj)
-		self.tasks.sort(key=lambda x: x.exec_order)
-		self.exec_order = workflow.execution_order
+		self.tasks.sort(key=lambda x: x.ast)
+		self.exec_order = workflow.solution.execution_order
 		self.start_time = None
 		self.priority = 0
 		self.status = WorkflowStatus.UNSCHEDULED

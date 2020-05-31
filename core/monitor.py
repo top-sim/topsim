@@ -32,5 +32,5 @@ class Monitor(object):
 		self.write_to_file()
 
 	def write_to_file(self):
-		with open(self.event_file, 'w') as f:
+		with open(self.event_file, 'w+') as f:
 			json.dump(self.events, f, indent=4)

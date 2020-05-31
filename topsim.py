@@ -56,7 +56,7 @@ def run_simulation(arg, parser):
 		workflow_file = arg['workflow']
 	else:
 		parser.print_help()
-	event_file = '/home/rwb/github/topsim/sim.trace'
+	event_file = 'sim.trace'
 	planning_algorithm = 'heft'
 	env = simpy.Environment()
 	tmax = 36  # for starters, we will define telescope configuration as simply number of arrays that exist
