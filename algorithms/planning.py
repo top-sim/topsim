@@ -19,3 +19,4 @@ This is a placeholder file for algorithm implementations; in the future,
 we will pull in the shadow framework and wrap it in a planning algorithm class
 """
 
+# Todo - wrap Shadow functionality in here

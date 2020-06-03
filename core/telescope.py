@@ -1,6 +1,12 @@
 # import simpy
 # from core.planner import Planner
 # import config_data
+import logging
+# CHANGE THIS TO GET DEBUG VALUES FROM LOGS
+
+from enum import Enum
+
+logger = logging.getLogger(__name__)
 
 
 class Telescope(object):
@@ -15,34 +21,32 @@ class Telescope(object):
 		self.planner = planner
 
 	def run(self):
-		while self.observations:
+		while self.check_observation_status():
 			for observation in self.observations:
-				if observation.start <= self.env.now \
-					and observation.demand <= self.max_array_use-self.telescope_use \
-					and not observation.running: \
+				current_capacity = self.max_array_use-self.telescope_use
+				if observation.is_ready(self.env.now, current_capacity):
 					# and not obs_schedule_status:
-					print('Observation', observation.name, 'scheduled', self.env.now)
+					logger.info('Observation %s scheduled for %s',observation.name, self.env.now)
 					self.telescope_use += observation.demand
 					self.telescope_status = True
-					observation.running = True
+					observation.status = RunStatus.RUNNING
 					plan_trigger = self.env.process(self.planner.run(observation))
 					yield plan_trigger
-					print('Telescope is now using', self.telescope_use, 'arrays')
+					logger.info('Telescope is now using %s arrays', self.telescope_use)
 				elif self.env.now > observation.start + observation.duration and self.telescope_status:
 					buffer_trigger = self.env.process(self.buffer.run(observation))
 					yield buffer_trigger
 					self.telescope_use -= observation.demand
+					logger.info('Telescope is now using %s arrays', self.telescope_use)
 					print('Telescope is now using', self.telescope_use, 'arrays')
 					if self.telescope_use is 0:
 						self.telescope_status = False
-					self.observations.remove(observation)
+					observation.status = RunStatus.FINISHED
+
 				else:
 					print("Nothing to do for ", observation.name, self.env.now)
 			print(self.env.now)
 			yield self.env.timeout(1)
-		# if not self.observations:
-		# 	print('Telescope is ceasing operations')
-			# print('Time now is ', self.env.now)
 
 	def print_state(self):
 		return {
@@ -50,16 +54,15 @@ class Telescope(object):
 			'telescope_arrays_used': self.telescope_use,
 			'observations_waiting': len(self.observations)
 		}
-#
-#
-# class Workflow(object):
-# 	"""
-# 	Workflow Object is used to store basic information about the workflow.
-# 	The workflow is specified in a file with name 'workflow', and then read into the simulator.
-# 	"""
-# 	def __init__(self, workflow):
-# 		self.id = workflow
-#
+
+	def check_observation_status(self):
+		for observation in self.observations:
+			if observation.status == RunStatus.FINISHED:
+				continue
+			else:
+				return True
+		return True
+
 
 class Observation(object):
 	"""
@@ -71,11 +74,23 @@ class Observation(object):
 		self.start = start
 		self.duration = duration
 		self.demand = demand
-		self.running = False
-		self.completed = False
+		self.status = RunStatus.WAITING
 		self.workflow = workflow
 		self.plan = None
 
+	def is_ready(self, current_time, current_telescope_capacity):
+		if self.start <= current_time \
+			and self.demand <= current_telescope_capacity \
+			and not self.status == RunStatus.RUNNING:
+			return True
+		else:
+			return False
+
+
+class RunStatus(str, Enum):
+	WAITING = 'WAITING'
+	RUNNING = 'RUNNING'
+	FINISHED = 'FINISHED'
 
 
 #

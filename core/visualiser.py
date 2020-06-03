@@ -81,20 +81,12 @@ class Visualiser(object):
 		mapper = LinearColorMapper(palette=colors, low=0, high=1)
 		button = Button(label="Start", button_type="success")
 		# create three plots
-		sourcedata = dict(name=[], start=[], duration=[], demand=[],running=[])
-		for observation in self.simulation.telescope.observations:
-			sourcedata['name'].append(observation.name)
-			sourcedata['start'].append(observation.start)
-			sourcedata['duration'].append(observation.duration)
-			sourcedata['demand'].append(observation.demand)
-			sourcedata['running'].append(observation.running)
 
-		plot = { 'time': [self.env.now],
+		plot = {'time': [self.env.now],
 				'running': [len(self.simulation.cluster.running_tasks)],
 				'finished': [len(self.simulation.cluster.finished_tasks)],
 				'waiting': [len(self.simulation.cluster.waiting_tasks)]}
 
-		source = ColumnDataSource(data=sourcedata)
 		plotdata = ColumnDataSource(plot)
 
 		def update_start():
@@ -104,8 +96,22 @@ class Visualiser(object):
 		p = figure(plot_width=400, plot_height=400)
 		p.line(x='time', y='running', alpha=0.2, line_width=3, color='navy', source=plotdata)
 		p.line(x='time', y='finished', alpha=0.8, line_width=2, color='orange', source=plotdata)
-		p.line(x='time',y='waiting',alpha=0.5, line_width=2, color='green',source=plotdata)
+		p.line(x='time', y='waiting', alpha=0.5, line_width=2, color='green', source=plotdata)
 
+
+		def update_plot():
+			if self.env:
+				updata = {
+					'time': [self.env.now],
+					'running': [len(self.simulation.cluster.running_tasks)],
+					'finished': [len(self.simulation.cluster.finished_tasks)],
+					'waiting': [len(self.simulation.cluster.waiting_tasks)]
+				}
+				plotdata.stream(updata)
+
+		"""
+		SETUP TABLE 
+		"""
 		columns = [
 			TableColumn(field="name", title="Name"),
 			TableColumn(field="start", title="Start Time"),
@@ -113,28 +119,25 @@ class Visualiser(object):
 			TableColumn(field="duration", title="Observation Length"),
 			TableColumn(field="running", title="Running Status")
 		]
-		data_table = DataTable(source=source, columns=columns, width=600, height=280)
 
-		def update():
+		sourcedata = dict(name=[], start=[], duration=[], demand=[], running=[])
+		tablesource = ColumnDataSource(data=sourcedata)
+		for observation in self.simulation.telescope.observations:
+			sourcedata['name'].append(observation.name)
+			sourcedata['start'].append(observation.start)
+			sourcedata['duration'].append(observation.duration)
+			sourcedata['demand'].append(observation.demand)
+			sourcedata['running'].append(observation.status)
+		data_table = DataTable(source=tablesource, columns=columns, width=600, height=280)
+
+		def update_table():
 			if self.env:
-				updata = {'time':[self.env.now],
-								'running':[len(self.simulation.cluster.running_tasks)],
-								'finished':[len(self.simulation.cluster.finished_tasks)],
-								'waiting':[len(self.simulation.cluster.waiting_tasks)]
-							}
-				plotdata.stream(updata)
+				for i, observation in enumerate(self.simulation.telescope.observations):
+					dictionary = {"running": [(i, observation.status)]}
+					tablesource.patch(dictionary)
 
-		def table_update():
-			if self.env:
-				index = 0
-				val = False
-				for i in range(len(sourcedata['running'])):
-					val = self.simulation.telescope.observations[i].running
-					dictionary = {"running": [(i, val)]}
-					source.patch(dictionary)
-
-		doc.add_periodic_callback(update, 500)
-		doc.add_periodic_callback(table_update,500)
+		doc.add_periodic_callback(update_plot, 500)
+		doc.add_periodic_callback(update_table, 500)
 		button.on_click(update_start)
 
 		# fig.xgrid.grid_line_color = None
@@ -144,5 +147,5 @@ class Visualiser(object):
 		# fig.legend.location = "top_center"
 
 		doc.title = "TopSim Dashboard"
-		doc.add_root(layout([button], [p,data_table]))
+		doc.add_root(layout([button], [p, data_table]))
 		return doc

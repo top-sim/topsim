@@ -44,5 +44,6 @@ class Buffer(object):
 		pass
 
 
-
+# TODO Buffer needs more specifications - data transfer times/latency/bandwidth
+# TODO Need specification on buffer makeup
 

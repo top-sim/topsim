@@ -33,7 +33,7 @@ class Planner(object):
 		return plan
 
 
-class WorkflowStatus(Enum):
+class WorkflowStatus(int, Enum):
 	UNSCHEDULED = 1
 	SCHEDULED = 2
 	FINISHED = 3

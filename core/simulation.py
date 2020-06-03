@@ -61,10 +61,8 @@ class Simulation(object):
 		if self.visualisation:
 			self.env.process(self.visualiser.run())
 		self.env.process(self.telescope.run())
-		# self.env.process(self.buffer.run())
-		# self.env.process(self.task_broker.run())
 		self.env.process(self.scheduler.run())
-			# Calling env.run() invokes the processes passed in init_process()
+		# Calling env.run() invokes the processes passed in init_process()
 		if runtime > 0:
 			self.env.run(until=runtime)
 		else:
@@ -74,16 +72,17 @@ class Simulation(object):
 		print("Simulation Finished")
 
 	def is_finished(self):
-		x = (len(self.telescope.observations) == 0
-			and self.buffer.observations_for_processing.empty()
-			and len(self.scheduler.workflow_plans) == 0
-			and len(self.cluster.running_tasks) == 0)
-		if (x):
+		status = (
+				not self.telescope.check_observation_status()
+				and self.buffer.observations_for_processing.empty()
+				and len(self.scheduler.workflow_plans) == 0
+				and len(self.cluster.running_tasks) == 0
+		)
+		if status:
 			# Using compound 'or' doesn't give us a True/False
 			return True
 		else:
 			return False
-
 
 
 def _process_telescope_config(telescope_config):

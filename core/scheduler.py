@@ -42,7 +42,7 @@ class Scheduler(object):
 			if self.check_buffer() or self.workflow_plans or self.cluster.running_tasks:
 				self.schedule_workflows()
 			yield self.env.timeout(1)
-			if len(self.workflow_plans) == 0 and len(self.telescope.observations) == 0:
+			if len(self.workflow_plans) == 0 and not self.telescope.check_observation_status():
 				print("No more workflows")
 				break
 

@@ -16,6 +16,7 @@ from enum import Enum
 #         self.id = MachineConfig.idx
 #         MachineConfig.idx += 1
 
+# TODO need I/O information here
 
 class MachineDoor(Enum):
 	TASK_IN = 0
