@@ -6,8 +6,8 @@ import logging
 
 from enum import Enum
 
+logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)
-
 
 class Telescope(object):
 	def __init__(self, env, observations, buffer_obj, telescope_config, planner):
@@ -23,9 +23,8 @@ class Telescope(object):
 	def run(self):
 		while self.check_observation_status():
 			for observation in self.observations:
-				current_capacity = self.max_array_use-self.telescope_use
-				if observation.is_ready(self.env.now, current_capacity):
-					# and not obs_schedule_status:
+				capacity = self.max_array_use-self.telescope_use
+				if observation.is_ready(self.env.now, capacity):
 					logger.info('Observation %s scheduled for %s',observation.name, self.env.now)
 					self.telescope_use += observation.demand
 					self.telescope_status = True
@@ -33,27 +32,23 @@ class Telescope(object):
 					plan_trigger = self.env.process(self.planner.run(observation))
 					yield plan_trigger
 					logger.info('Telescope is now using %s arrays', self.telescope_use)
-				elif self.env.now > observation.start + observation.duration and self.telescope_status:
+				elif self.env.now > observation.start + observation.duration and self.telescope_status and (observation.status is not RunStatus.FINISHED) :
 					buffer_trigger = self.env.process(self.buffer.run(observation))
 					yield buffer_trigger
 					self.telescope_use -= observation.demand
 					logger.info('Telescope is now using %s arrays', self.telescope_use)
-					print('Telescope is now using', self.telescope_use, 'arrays')
+					# print('Telescope is now using', self.telescope_use, 'arrays')
 					if self.telescope_use is 0:
 						self.telescope_status = False
 					observation.status = RunStatus.FINISHED
 
-				else:
-					print("Nothing to do for ", observation.name, self.env.now)
-			print(self.env.now)
+				# else:
+				# 	# print("Nothing to do for ", observation.name, self.env.now)
+			# logger.info('Time is %s', self.env.now)
 			yield self.env.timeout(1)
 
-	def print_state(self):
-		return {
-			'telescope_in_use': self.telescope_status,
-			'telescope_arrays_used': self.telescope_use,
-			'observations_waiting': len(self.observations)
-		}
+	def run_observation_on_telescope(self, demand):
+		pass
 
 	def check_observation_status(self):
 		for observation in self.observations:
@@ -61,8 +56,15 @@ class Telescope(object):
 				continue
 			else:
 				return True
-		return True
+		return False
 
+
+	def print_state(self):
+		return {
+			'telescope_in_use': self.telescope_status,
+			'telescope_arrays_used': self.telescope_use,
+			'observations_waiting': len(self.observations)
+		}
 
 class Observation(object):
 	"""
@@ -78,10 +80,10 @@ class Observation(object):
 		self.workflow = workflow
 		self.plan = None
 
-	def is_ready(self, current_time, current_telescope_capacity):
+	def is_ready(self, current_time, capacity):
 		if self.start <= current_time \
-			and self.demand <= current_telescope_capacity \
-			and not self.status == RunStatus.RUNNING:
+			and self.demand <= capacity \
+			and self.status is RunStatus.WAITING:
 			return True
 		else:
 			return False

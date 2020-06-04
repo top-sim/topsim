@@ -14,8 +14,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import numpy as np
+import logging
+
 from core.algorithm import Algorithm
 from core.planner import TaskStatus, WorkflowStatus
+
+logger = logging.getLogger(__name__)
+
 
 class FifoAlgorithm(Algorithm):
 	def __init__(self, threshold=0.8):
@@ -48,13 +53,8 @@ class FifoAlgorithm(Algorithm):
 				workflow_plan.tasks.remove(t)
 		if len(workflow_plan.tasks) == 0:
 			workflow_plan.status = WorkflowStatus.FINISHED
-			print(workflow_id, "is Finished")
+			logger.debug(workflow_id, "is finished")
 
-		for t in self.cluster.waiting_tasks:
-			# Check if a task waiting to be allocated has predecessors still running
-			a = t
-			pred = set(t.pred)
-			running = set(cluster.running_tasks)
 		# Check if there is an overlap between the two sets
 		for t in tasks:
 			# Allocate the first element in the Task list:

@@ -14,6 +14,8 @@ Ideally, this is the 'final' class/object that we have tests for; everything sho
 for it to be put in here, but as we are retroactively adding unit tests, this will evolve with
 the rest of the unittests. 
 """
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Simulation(object):
@@ -69,13 +71,13 @@ class Simulation(object):
 			if not self.is_finished():
 				self.env.run()
 
-		print("Simulation Finished")
+		logger.info("Simulation Finished @ %s", self.env.now)
 
 	def is_finished(self):
 		status = (
 				not self.telescope.check_observation_status()
 				and self.buffer.observations_for_processing.empty()
-				and len(self.scheduler.workflow_plans) == 0
+				and len(self.scheduler.waiting_observations) == 0
 				and len(self.cluster.running_tasks) == 0
 		)
 		if status:

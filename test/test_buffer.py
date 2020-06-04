@@ -61,7 +61,7 @@ class TestBuffer(unittest.TestCase):
 		# Buffer observation queue should be empty
 		self.assertTrue(self.buffer.observations_for_processing.empty())
 		self.buffer.add_observation_to_waiting_workflows(self.observation)
-		self.assertTrue(self.buffer.observations_for_processing.qsize() == 1)
+		self.assertTrue(self.buffer.observations_for_processing.size() == 1)
 		#
 		# # Get the observation and check we have applied the buffer offset
 		# self.assertTrue(self.observation.start > OBS_START_TME + OBS_DURATION)

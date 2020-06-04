@@ -8,7 +8,9 @@ from shadow.models.workflow import Workflow as ShadowWorkflow
 from shadow.models.environment import Environment as ShadowEnvironment
 from shadow.algorithms.heuristic import heft as shadow_heft
 import test_data
+import logging
 
+logger = logging.getLogger(__name__)
 
 # BUFFER_OFFSET = config_data.buffer_offset
 # from core.telescope import Observation
@@ -69,7 +71,7 @@ class WorkflowPlan(object):
 				taskobj.flops = task.flops_demand
 				taskobj.pred = list(workflow.graph.predecessors(task))
 				self.tasks.append(taskobj)
-		self.tasks.sort(key=lambda x: x.ast)
+		self.tasks.sort(key=lambda x: x.est)
 		self.exec_order = workflow.solution.execution_order
 		self.start_time = None
 		self.priority = 0
@@ -140,15 +142,14 @@ class Task(object):
 
 	def do_work(self):
 		yield self.env.timeout(self.duration)
-
 		self.finished_timestamp = self.env.now
-		print(self.id,'finished at', self.finished_timestamp)
+		logger.debug('%s finished at %s', self.id, self.finished_timestamp)
 		self.task_status = TaskStatus.FINISHED
 		self.machine.stop_task(self)
 
 	def run(self, machine):
 		self.started_timestamp = self.env.now
-		print(self.id,'started at', self.started_timestamp)
+		logger.debug('%s started at %s', self.id, self.started_timestamp)
 		# THIS IS THE MACHINE TASK
 		self.machine = machine
 		self.machine.run_task(self)

@@ -52,13 +52,13 @@ class TestSchedulerFIFO(unittest.TestCase):
 		self.planner = Planner(self.env, test_data.planning_algorithm, test_data.machine_config)
 		self.cluster = Cluster(test_data.machine_config)
 		self.buffer = Buffer(self.env, self.cluster)
-		self.observation = Observation('scheduler_observation',
+		self.observations = [Observation('scheduler_observation',
 									OBS_START_TME,
 									OBS_DURATION,
 									OBS_DEMAND,
-									OBS_WORKFLOW)
+									OBS_WORKFLOW)]
 		telescopemax = 36 # maximum number of antennas
-		self.telescope = Telescope(self.env, self.observation,self.buffer,telescopemax,self.planner)
+		self.telescope = Telescope(self.env, self.observations,self.buffer,telescopemax,self.planner)
 		self.scheduler = Scheduler(self.env, sched_algorithm, self.buffer, self.cluster, self.telescope)
 
 	def tearDown(self):
@@ -74,10 +74,10 @@ class TestSchedulerFIFO(unittest.TestCase):
 	def testSchedulerDecision(self):
 		# algorithms.make_decision() will do something interesting only when we add a workflow plan to the
 		# buffer.
-		next(self.planner.run(self.observation))
+		next(self.planner.run(self.observations[0]))
 		#  Observation is what we are interested in with the algorithms, because the observation stores the plan;
 		#  The observation object is what is stored in the buffer's 'observations_for_processing' queue.
-		self.buffer.add_observation_to_waiting_workflows(self.observation)
+		self.buffer.add_observation_to_waiting_workflows(self.observations[0])
 
 		# Lets start doing algorithms things!
 		# IT is important to note that the algorithms is only effective within the context of a simulation,

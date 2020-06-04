@@ -48,7 +48,8 @@ from flask import Flask, render_template
 from bokeh.embed import server_document
 from tornado.ioloop import IOLoop
 from bokeh.transform import transform
-
+import logging
+logger = logging.getLogger(__name__)
 
 class Visualiser(object):
 	def __init__(self, simulation):
@@ -57,7 +58,7 @@ class Visualiser(object):
 		self.events = []
 		self.not_started = True
 		self.start = False
-		print('Opening Bokeh application on http://localhost:5006/')
+		logger.debug('Opening Bokeh application on http://localhost:5006/')
 		apps = {'/': Application(FunctionHandler(self.make_document))}
 
 		self.server = Server(apps, port=8080)
@@ -69,7 +70,7 @@ class Visualiser(object):
 		thread.start()
 		while not self.simulation.is_finished():
 			if self.start:
-				time.sleep(0.6)
+				time.sleep(0.1)
 				yield self.env.timeout(1)
 
 	def make_document(self, doc):
@@ -82,10 +83,11 @@ class Visualiser(object):
 		button = Button(label="Start", button_type="success")
 		# create three plots
 
-		plot = {'time': [self.env.now],
-				'running': [len(self.simulation.cluster.running_tasks)],
-				'finished': [len(self.simulation.cluster.finished_tasks)],
-				'waiting': [len(self.simulation.cluster.waiting_tasks)]}
+		plot = {
+			'time': [self.env.now],
+			'running': [len(self.simulation.cluster.running_tasks)],
+			'finished': [len(self.simulation.cluster.finished_tasks)]
+		}
 
 		plotdata = ColumnDataSource(plot)
 
@@ -96,16 +98,13 @@ class Visualiser(object):
 		p = figure(plot_width=400, plot_height=400)
 		p.line(x='time', y='running', alpha=0.2, line_width=3, color='navy', source=plotdata)
 		p.line(x='time', y='finished', alpha=0.8, line_width=2, color='orange', source=plotdata)
-		p.line(x='time', y='waiting', alpha=0.5, line_width=2, color='green', source=plotdata)
-
 
 		def update_plot():
 			if self.env:
 				updata = {
 					'time': [self.env.now],
 					'running': [len(self.simulation.cluster.running_tasks)],
-					'finished': [len(self.simulation.cluster.finished_tasks)],
-					'waiting': [len(self.simulation.cluster.waiting_tasks)]
+					'finished': [len(self.simulation.cluster.finished_tasks)]
 				}
 				plotdata.stream(updata)
 

@@ -101,13 +101,13 @@ class TestWorkflowPlan(unittest.TestCase):
 
 	def testWorkflowPlanCreation(self):
 		plan = self.planner.plan(self.observation.name, self.observation.workflow, 'heft')
-		expected_exec_order = [0, 3, 2, 5, 1, 4, 8, 6, 7, 9]
+		expected_exec_order = [0, 3, 2, 4, 1, 5, 6, 8, 7, 9]
 		self.assertEqual(len(plan.tasks), len(expected_exec_order))
 		for x in range(len(plan.tasks)):
-			self.assertTrue(plan.tasks[x].id == expected_exec_order[x])
+			self.assertEqual(plan.tasks[x].id, expected_exec_order[x])
 
 		# Get taskid 5
-		task5_comp = plan.tasks[3].flops
+		task5_comp = plan.tasks[5].flops
 		self.assertEqual(task5_comp, 169)
 
 
