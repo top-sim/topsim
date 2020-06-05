@@ -96,8 +96,10 @@ class Visualiser(object):
 				self.start = True
 
 		p = figure(plot_width=400, plot_height=400)
-		p.line(x='time', y='running', alpha=0.2, line_width=3, color='navy', source=plotdata)
-		p.line(x='time', y='finished', alpha=0.8, line_width=2, color='orange', source=plotdata)
+		p.line(x='time', y='running', legend_label='Running tasks', alpha=0.2, line_width=3, color='navy', source=plotdata)
+		p.line(x='time', y='finished', legend_label='Finished tasks', alpha=0.8, line_width=2, color='orange', source=plotdata)
+		p.xaxis.axis_label = 'Time'
+		p.yaxis.axis_label = 'Tasks'
 
 		def update_plot():
 			if self.env:
