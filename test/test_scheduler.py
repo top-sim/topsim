@@ -16,18 +16,15 @@
 import unittest
 import simpy
 
-from core.simulation import Simulation
 from algorithms.scheduling import FifoAlgorithm
 
 from core.telescope import Observation, Telescope
 from core.scheduler import Scheduler
 from core.cluster import Cluster
-from core.planner import Planner, WorkflowPlan
+from core.planner import Planner
 from core.buffer import Buffer
-from core.simulation import _process_telescope_config
 
-import test_data
-
+from config import data as test_data
 
 # Globals
 OBS_START_TME = 0

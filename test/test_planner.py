@@ -16,15 +16,13 @@ import unittest
 import simpy
 import os
 
-from core.planner import Planner, WorkflowPlan
+from core.planner import Planner
 from core.cluster import Cluster
-from core.scheduler import Scheduler
 from core.telescope import Observation
-from core.buffer import Buffer
 
 from algorithms.scheduling import FifoAlgorithm
 
-import test_data
+from config import data as test_data
 
 current_dir = os.path.abspath('.')
 

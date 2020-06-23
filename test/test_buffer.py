@@ -16,7 +16,7 @@
 import unittest
 import simpy
 
-import test_data
+from config import data as test_data
 from core.planner import Planner
 from core.telescope import Observation
 from core.buffer import Buffer

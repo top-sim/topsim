@@ -2,9 +2,8 @@ import unittest
 import simpy
 
 from core.simulation import Simulation
-from core.telescope import Telescope
 from algorithms.scheduling import FifoAlgorithm
-import test_data
+from config import data as test_data
 
 
 class TestSimulation(unittest.TestCase):

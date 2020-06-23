@@ -1,13 +1,11 @@
 import sys
 from enum import Enum
-from os import path
 
 # sys.path.append(path.abspath('../../shadow'))
 
 from shadow.models.workflow import Workflow as ShadowWorkflow
 from shadow.models.environment import Environment as ShadowEnvironment
 from shadow.algorithms.heuristic import heft as shadow_heft
-import test_data
 import logging
 
 logger = logging.getLogger(__name__)

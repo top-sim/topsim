@@ -14,8 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import logging
-from queue import PriorityQueue
-import config
+from config import config
 
 logger = logging.getLogger(__name__)
 

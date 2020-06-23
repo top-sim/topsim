@@ -1,22 +1,11 @@
-import core.simulation
-import sys
 import argparse
-from core.simulation import Simulation
-from core import config
 
-import test_data
-import test.test_buffer, test.test_cluster, test.test_planner, test.test_scheduler
-from core.cluster import Cluster
+from test import test_scheduler, test_buffer,test_cluster,test_planner
 import simpy
 import unittest
 
-from core.machine import Machine
-from core.planner import Planner
-from core.scheduler import Scheduler
 # from core.buffer import Broker
 from core.simulation import Simulation
-from core.telescope import Telescope, Observation
-from core.buffer import Buffer
 # from algorithms.random_algorithm import RandomAlgorithm
 from algorithms.scheduling import FifoAlgorithm
 
@@ -25,10 +14,10 @@ topsim.py takes command-line arguments to specify how the simulation will run
 It can also be used to run tests 
 """
 testcases = {  # Tests for the test runner
-	"buffer": test.test_buffer,
-	"cluster": test.test_cluster,
-	"planner": test.test_planner,
-	"algorithms": test.test_scheduler
+	"buffer": test_buffer,
+	"cluster": test_cluster,
+	"planner": test_planner,
+	"algorithms": test_scheduler
 }
 
 
