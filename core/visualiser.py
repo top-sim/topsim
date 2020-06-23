@@ -22,8 +22,8 @@ from bokeh.application import Application
 from bokeh.application.handlers.function import FunctionHandler
 from bokeh.plotting import figure, ColumnDataSource
 import json
-import numpy as np
-import pandas as pd
+# import numpy as np
+# import pandas as pd
 from bokeh.driving import count
 from bokeh.layouts import column, gridplot, row
 from bokeh.models import ColumnDataSource, Select, Slider
@@ -44,7 +44,6 @@ from bokeh.plotting import figure
 from bokeh.palettes import Spectral6
 from bokeh.transform import factor_cmap
 from bokeh.sampledata.sea_surface_temperature import sea_surface_temperature
-from flask import Flask, render_template
 from bokeh.embed import server_document
 from tornado.ioloop import IOLoop
 from bokeh.transform import transform
