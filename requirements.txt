@@ -13,4 +13,5 @@ simpy>=3.0.11
 matplotlib>=3.1.1
 coverage>=4.5.4
 coveralls>=1.8.2
+bokeh>=1.4
 -e git+git://github.com/myxie/shadow@master#egg=shadow

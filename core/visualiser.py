@@ -17,19 +17,39 @@ import time
 """
 Use 'bokeh' python library to visualise the current state of the system
 """
+from bokeh.server.server import Server
 from bokeh.application import Application
 from bokeh.application.handlers.function import FunctionHandler
-from bokeh.models import LinearColorMapper
+from bokeh.plotting import figure, ColumnDataSource
+import json
+import numpy as np
+import pandas as pd
+from bokeh.driving import count
+from bokeh.layouts import column, gridplot, row
+from bokeh.models import ColumnDataSource, Select, Slider
+from bokeh.plotting import curdoc, figure
+from bokeh.layouts import column
+from bokeh.models import ColumnDataSource, Slider
+from bokeh.models import BasicTicker, ColorBar, ColumnDataSource, LinearColorMapper, PrintfTickFormatter
+from bokeh.plotting import figure
 from bokeh.models.widgets import Button, DataTable, TableColumn
 from bokeh.server.server import Server
+from bokeh.themes import Theme
 from threading import Thread
-from bokeh.layouts import layout
-from bokeh.models import ColumnDataSource
+from bokeh.colors import color
+from bokeh.io import curdoc
+from bokeh.layouts import column, row, layout
+from bokeh.models import ColumnDataSource, PreText, Select
 from bokeh.plotting import figure
-
+from bokeh.palettes import Spectral6
+from bokeh.transform import factor_cmap
+from bokeh.sampledata.sea_surface_temperature import sea_surface_temperature
+from flask import Flask, render_template
+from bokeh.embed import server_document
+from tornado.ioloop import IOLoop
+from bokeh.transform import transform
 import logging
 logger = logging.getLogger(__name__)
-
 
 class Visualiser(object):
 	def __init__(self, simulation):
@@ -50,7 +70,7 @@ class Visualiser(object):
 		thread.start()
 		while not self.simulation.is_finished():
 			if self.start:
-				time.sleep(0.1)
+				# time.sleep(0.1)
 				yield self.env.timeout(1)
 
 	def make_document(self, doc):

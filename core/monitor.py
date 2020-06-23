@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 
 logging.basicConfig(level='INFO')
 logger = logging.getLogger(__name__)
@@ -14,7 +15,7 @@ class Monitor(object):
 	def run(self):
 		while not self.simulation.is_finished():
 			logger.debug('SimTime=%s',self.env.now)
-
+			# time.sleep(0.5)
 			state = {
 				'timestamp': self.env.now,
 				# 'cluster_state': self.simulation.cluster.state,

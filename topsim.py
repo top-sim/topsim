@@ -2,8 +2,10 @@ import argparse
 
 from test import test_scheduler, test_buffer,test_cluster,test_planner
 import simpy
+import simpy.rt
 import unittest
 
+import config.data as test_data
 # from core.buffer import Broker
 from core.simulation import Simulation
 # from algorithms.random_algorithm import RandomAlgorithm
@@ -47,7 +49,7 @@ def run_simulation(arg, parser):
 		parser.print_help()
 	event_file = 'sim.trace'
 	planning_algorithm = 'heft'
-	env = simpy.Environment()
+	env = simpy.rt.RealtimeEnvironment(factor=0.5, strict=False)# Environment()
 	tmax = 36  # for starters, we will define telescope configuration as simply number of arrays that exist
 	salgorithm = FifoAlgorithm()
 	vis = False
