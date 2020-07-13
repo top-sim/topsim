@@ -1,4 +1,5 @@
 # enable jupyter_server_proxy
+jupyter trust visual/visualisation_example_notebook
 jupyter serverextension enable --sys-prefix jupyter_server_proxy
 # install the bokeh server extension so that
 # bokeh launches at startup
