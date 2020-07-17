@@ -1,22 +1,7 @@
 from enum import Enum
 
-
-# class MachineConfig(object):
-#     idx = 0
-#
-#     def __init__(self, cpu_capacity, memory_capacity, disk_capacity, cpu=None, memory=None, disk=None):
-#         self.cpu_capacity = cpu_capacity
-#         self.memory_capacity = memory_capacity
-#         self.disk_capacity = disk_capacity
-#
-#         self.cpu = cpu_capacity if cpu is None else cpu
-#         self.memory = memory_capacity if memory is None else memory
-#         self.disk = disk_capacity if disk is None else disk
-#
-#         self.id = MachineConfig.idx
-#         MachineConfig.idx += 1
-
 # TODO need I/O information here
+
 
 class MachineDoor(Enum):
 	TASK_IN = 0
@@ -34,6 +19,7 @@ class Machine(object):
 		self.memory = memory_capacity if memory is None else memory
 		self.disk = disk_capacity if disk is None else disk
 		self.machine_door = MachineDoor.NULL
+		self.transfer_flag = False
 		self.current_task = None
 
 	def run_task(self, task_instance):
@@ -50,6 +36,22 @@ class Machine(object):
 		self.disk += task_instance.io
 		self.machine_door = MachineDoor.TASK_OUT
 		self.current_task = None
+
+	def transfer_data_from(self, machine):
+		"""
+		Transfer the data from :param: machine
+		Parameters
+		----------
+		machine
+
+		Returns
+		-------
+
+		"""
+		pass
+
+	def transfer_data_to(self, machine):
+		pass
 
 	def accommodate(self, task):
 		return self.cpu >= task.task_config.flops and \
@@ -72,3 +74,7 @@ class Machine(object):
 
 	def __repr__(self):
 		return str(self.id)
+
+
+def utilisation_policy(machine):
+	return None

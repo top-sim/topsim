@@ -25,12 +25,9 @@ class Scheduler(object):
 	def __init__(self, env, algorithm, buffer, cluster, telescope):
 		self.env = env
 		self.telescope = telescope
-		# algorithm is a class
 		self.algorithm = algorithm
-		# self.destroyed = False
 		self.waiting_observations = []
 		self.current_observation = None
-		# self.valid_pairs = {}
 		self.cluster = cluster
 		self.buffer = buffer
 		self.current_plan = None
@@ -40,7 +37,6 @@ class Scheduler(object):
 
 	def run(self):
 		while True:
-			# print('Current time:', self.env.now)
 			# AT THE END OF THE SIMULATION, WE GET STUCK HERE. NEED TO EXIT
 			if self.check_buffer() or self.waiting_observations or self.cluster.running_tasks:
 				self.schedule_workflows()
@@ -64,11 +60,7 @@ class Scheduler(object):
 			return False
 
 	def schedule_workflows(self):
-		logger.debug('Scheduling')
-		# Workflow needs a priority
-		# for workflow in self.waiting_observations:
-		# 	cplan = workflow
-		# 	if cplan.status is WorkflowStatus.FINISHED:
+		logger.debug('Attempting to schedule workflow to cluster')
 
 		# Min -scheduling time
 		minst = -1
@@ -84,6 +76,7 @@ class Scheduler(object):
 
 		if self.current_plan.status is WorkflowStatus.FINISHED:
 			self.waiting_observations.remove(self.current_observation)
+			self.buffer.request_observation_data_from_buffer(self.current_observation)
 			self.buffer.waiting_observation_list.remove(self.current_observation)
 			logger.info('%s finished processing @ %s', self.current_observation.name, self.env.now)
 			self.current_plan = None

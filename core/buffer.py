@@ -18,7 +18,9 @@ from config import config
 
 logger = logging.getLogger(__name__)
 
+
 BUFFER_OFFSET = config.BUFFER_TIME_OFFSET
+
 
 class BufferQueue():
 	def __init__(self):
@@ -38,29 +40,56 @@ class BufferQueue():
 
 
 class Buffer(object):
-	def __init__(self, env, cluster):
+	def __init__(self, env, cluster, buffer_io):
 		self.env = env
 		self.cluster = cluster
+		self.io = buffer_io
+		self.hardware = {}
 		self.observations_for_processing = BufferQueue()
 		self.waiting_observation_list = []
 		self.workflow_plans = {}
 		self.new_observation = 0
+		self.capacity = 0
 
 	def run(self, observation):
 		logger.debug("Attempting to add observation %s to buffer", observation.name)
-		# logger.info("Observation %s placed in buffer at ", observation.name, self.env.now)
 		self.add_observation_to_buffer(observation)
 		yield self.env.timeout(0)
-		# Reminder that observations_for_processing has Observation objects.
-		# self.observations_for_processing.remove(obs)
+
+	def check_buffer_capacity(self, data_product):
+		if self.capacity - data_product.size < 0:
+			return False
+		else:
+			return True
 
 	def add_observation_to_buffer(self, observation):
 		logger.info("Adding observation %s data to buffer at time %s", observation.name, self.env.now)
+		# This will take time
 		observation.plan.start_time = self.env.now + BUFFER_OFFSET
-		# self.process_observation_plan_for_scheduling(observation)
 		self.waiting_observation_list.append(observation)
 		logger.debug('Observations in buffer %', self.waiting_observation_list)
 
+	def request_observation_data_from_buffer(self, observation):
+		logger.info("Removing observation from buffer at time %s")
+		data_transfer_time = 0
+		# This will take time, so we need to timeout
+		yield self.env.timeout(data_transfer_time)
+		self.waiting_observation_list.remove(observation)
+		# In the future we will be able to interrupt this
+		return True
+
+	def request_data(self, task):
+		pass
+
+	def add_data_to_buffer(self, data_object):
+		dump_time = self._data_transfer_time(data_object)
+		return dump_time
+
+	def _data_transfer_time(self, data_object):
+		pass
+
 # TODO Buffer needs more specifications - data transfer times/latency/bandwidth
 # TODO Need specification on buffer makeup
+
+
 
