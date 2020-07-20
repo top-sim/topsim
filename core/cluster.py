@@ -13,10 +13,22 @@ class Cluster(object):
 		self.finished_workflows = []
 
 	def has_capacity(self):
+		"""
+		:return:
+		"""
 		if self.machines:
 			return True
 		else:
 			return False
+
+	def provision_ingest_resources(self, pipeline):
+		"""
+		Based on the requirements of the pipeline, provision a certain number of resources
+		:param pipeline: The type of ingest pipeline - see Observation
+		:return: None
+		"""
+
+		pass
 
 	def availability(self):
 		""" Returns

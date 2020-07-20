@@ -44,6 +44,8 @@ class Buffer(object):
 		self.env = env
 		self.cluster = cluster
 		self.io = buffer_io
+		self.hot = None
+		self.cold = None
 		self.hardware = {}
 		self.observations_for_processing = BufferQueue()
 		self.waiting_observation_list = []
@@ -61,6 +63,9 @@ class Buffer(object):
 			return False
 		else:
 			return True
+
+	def ingest_data_dump(self, data):
+		pass
 
 	def add_observation_to_buffer(self, observation):
 		logger.info("Adding observation %s data to buffer at time %s", observation.name, self.env.now)

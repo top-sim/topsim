@@ -154,16 +154,3 @@ class Task(object):
 		self.task_status = TaskStatus.SCHEDULED
 		self.process = self.env.process(self.do_work())
 
-# MAchine functions - change these to 'allocate_task_to_machine' and 'remove_task_from_machine'
-# def run_task_instance(self, task_instance):
-# 	self.cpu -= task_instance.cpu
-# 	self.memory -= task_instance.memory
-# 	self.disk -= task_instance.disk
-# 	self.task_instances.append(task_instance)
-# 	self.machine_door = MachineDoor.TASK_IN
-#
-# def stop_task_instance(self, task_instance):
-# 	self.cpu += task_instance.cpu
-# 	self.memory += task_instance.memory
-# 	self.disk += task_instance.disk
-# 	self.machine_door = MachineDoor.TASK_OUT

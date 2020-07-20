@@ -9,6 +9,7 @@ from enum import Enum
 logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)
 
+
 class Telescope(object):
 	def __init__(self, env, observations, buffer_obj, telescope_config, planner):
 		self.env = env
@@ -33,8 +34,7 @@ class Telescope(object):
 					yield plan_trigger
 					logger.info('Telescope is now using %s arrays', self.telescope_use)
 				elif self.env.now > observation.start + observation.duration and self.telescope_status and (observation.status is not RunStatus.FINISHED) :
-					buffer_trigger = self.env.process(self.buffer.run(observation))
-					yield buffer_trigger
+
 					self.telescope_use -= observation.demand
 					logger.info('Telescope is now using %s arrays', self.telescope_use)
 					# print('Telescope is now using', self.telescope_use, 'arrays')
@@ -49,6 +49,20 @@ class Telescope(object):
 
 	def run_observation_on_telescope(self, demand):
 		pass
+
+	def start_ingest_pipelines(self, observation):
+		"""
+		Ingest is 'streaming' data to the buffer during the observation
+		How we calculate how long it takes remains to be seen
+		For the time being, we will be doubling the observation time
+		"""
+		streaming_time = observation.duration*2
+		if self.buffer.check_buffer_capacity(observation.project_output):
+			yield self.env.timeout(streaming_time)
+		else:
+			return False
+		buffer_trigger = self.env.process(self.buffer.run(observation))
+		yield buffer_trigger
 
 	def check_observation_status(self):
 		for observation in self.observations:
@@ -66,6 +80,7 @@ class Telescope(object):
 			'observations_waiting': len(self.observations)
 		}
 
+
 class Observation(object):
 	"""
 	Observation object stores information about a given observation; the object also
@@ -78,6 +93,8 @@ class Observation(object):
 		self.demand = demand
 		self.status = RunStatus.WAITING
 		self.workflow = workflow
+		self.data_output = 0
+		self.type = None
 		self.plan = None
 
 	def is_ready(self, current_time, capacity):
@@ -87,6 +104,13 @@ class Observation(object):
 			return True
 		else:
 			return False
+
+
+class ObservationType(Enum):
+	CONTINUUM = 'CONTINUUM'
+	SECTRAL = 'SPECTRAL'
+	PULSAR = 'PULSAR'
+	TRANSIENT = 'TRANSIENT'
 
 
 class RunStatus(str, Enum):

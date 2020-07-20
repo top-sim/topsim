@@ -59,6 +59,27 @@ class Scheduler(object):
 		else:
 			return False
 
+
+	def allocate_ingest(self):
+		"""
+		Scheduler is the middleman between the Telescope and the Cluster
+		Checks to see if there is enough
+		Returns
+		-------
+
+		"""
+		pass
+
+	def partiton_cluster(self):
+		"""
+		Need to take pipeline into account and use this to determine how much cluster is being used
+
+		Returns
+		-------
+
+		"""
+
+
 	def schedule_workflows(self):
 		logger.debug('Attempting to schedule workflow to cluster')
 

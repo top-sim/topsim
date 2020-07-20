@@ -3,10 +3,10 @@ from enum import Enum
 # TODO need I/O information here
 
 
-class MachineDoor(Enum):
-	TASK_IN = 0
-	TASK_OUT = 1
-	NULL = 3
+class Status(Enum):
+	IDLE = 0
+	IN_USE = 1
+	ERROR = 2
 
 
 class Machine(object):
@@ -18,7 +18,7 @@ class Machine(object):
 		self.cpu = cpu_capacity if cpu is None else cpu
 		self.memory = memory_capacity if memory is None else memory
 		self.disk = disk_capacity if disk is None else disk
-		self.machine_door = MachineDoor.NULL
+		self.status = Status.IDLE
 		self.transfer_flag = False
 		self.current_task = None
 
@@ -28,13 +28,13 @@ class Machine(object):
 		self.disk -= task_instance.io
 		self.current_task = task_instance
 		# self.task_instances.append(task_instance)
-		self.machine_door = MachineDoor.TASK_IN
+		self.status = Status.IN_USE
 
 	def stop_task(self, task_instance):
 		self.cpu += task_instance.flops
 		self.memory += task_instance.memory
 		self.disk += task_instance.io
-		self.machine_door = MachineDoor.TASK_OUT
+		self.status = Status.IDLE
 		self.current_task = None
 
 	def transfer_data_from(self, machine):
