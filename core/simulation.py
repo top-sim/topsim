@@ -49,7 +49,7 @@ class Simulation(object):
 		observations = _process_telescope_config(telescope_config)
 
 		# Initiaise Actor and Resource objects
-		self.cluster = Cluster(machine_config)
+		self.cluster = Cluster(env, machine_config)
 		self.buffer = Buffer(env, self.cluster)
 		self.planner = Planner(env, palgorithm, machine_config)
 		self.telescope = Telescope(env, observations, self.buffer, telescopemax, self.planner)
@@ -64,6 +64,7 @@ class Simulation(object):
 			self.env.process(self.visualiser.run())
 		self.env.process(self.telescope.run())
 		self.env.process(self.scheduler.run())
+		self.env.process(self.cluster.run())
 		# Calling env.run() invokes the processes passed in init_process()
 		if runtime > 0:
 			self.env.run(until=runtime)
@@ -75,7 +76,7 @@ class Simulation(object):
 
 	def is_finished(self):
 		status = (
-				not self.telescope.check_observation_status()
+				not self.telescope.observations_to_process()
 				and self.buffer.observations_for_processing.empty()
 				and len(self.scheduler.waiting_observations) == 0
 				and len(self.cluster.running_tasks) == 0

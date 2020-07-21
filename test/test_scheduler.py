@@ -76,13 +76,16 @@ class TestSchedulerFIFO(unittest.TestCase):
 		#  The observation object is what is stored in the buffer's 'observations_for_processing' queue.
 		self.buffer.add_observation_to_waiting_workflows(self.observations[0])
 
-		# Lets start doing algorithms things!
-		# IT is important to note that the algorithms is only effective within the context of a simulation,
-		# as it is directly affected by calls to env.now; this means we need to run a mini-simulation in this
-		# test - which we can 'simulate' - haha - by using the enviroment and clever timeouts.
-		# We get an observaiton into the buffer, the algorithms makes a decision - what then?
-		# We use check_buffer to update the workflows in the algorithms workflow list
-		# This is called every time-step in the simulation, and is how we add workflow plans to the schedulers list
+		'''
+		Lets start doing algorithms things!
+		IT is important to note that the algorithms is only effective within the context of a simulation,
+		as it is directly affected by calls to env.now; this means we need to run a mini-simulation in this
+		test - which we can 'simulate' - haha - by using the enviroment and clever timeouts.
+		We get an observaiton into the buffer, the algorithms makes a decision - what then?
+		We use check_buffer to update the workflows in the algorithms workflow list
+		This is called every time-step in the simulation, and is how we add workflow plans to the schedulers list
+		'''
+
 		test_flag = True
 		self.env.process(self.scheduler.run())
 		self.env.run(until=1)
@@ -105,8 +108,8 @@ class TestSchedulerFIFO(unittest.TestCase):
 		# first element of running tasks should be the first task
 		self.env.run(until=100)
 		print(self.env.now)
-		# while test_flag:
-		# 	next(self.algorithms.run())
+		while test_flag:
+			next(self.algorithms.run())
 
 		# Now that a single workflow has been taken from the buffer and added to the list of workflows, we can schedule
 		#

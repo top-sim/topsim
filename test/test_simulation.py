@@ -4,6 +4,10 @@ import simpy
 from core.simulation import Simulation
 from algorithms.scheduling import FifoAlgorithm
 from config import data as test_data
+import logging
+
+logging.basicConfig(level='DEBUG')
+logger = logging.getLogger(__name__)
 
 
 class TestSimulation(unittest.TestCase):

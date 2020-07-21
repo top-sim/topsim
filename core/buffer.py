@@ -18,11 +18,10 @@ from config import config
 
 logger = logging.getLogger(__name__)
 
-
 BUFFER_OFFSET = config.BUFFER_TIME_OFFSET
 
 
-class BufferQueue():
+class BufferQueue:
 	def __init__(self):
 		self._queue = []
 
@@ -40,7 +39,7 @@ class BufferQueue():
 
 
 class Buffer(object):
-	def __init__(self, env, cluster, buffer_io):
+	def __init__(self, env, cluster, buffer_io=None):
 		self.env = env
 		self.cluster = cluster
 		self.io = buffer_io
@@ -53,10 +52,13 @@ class Buffer(object):
 		self.new_observation = 0
 		self.capacity = 0
 
-	def run(self, observation):
+	def run(self):
 		logger.debug("Attempting to add observation %s to buffer", observation.name)
-		self.add_observation_to_buffer(observation)
-		yield self.env.timeout(0)
+		while True:
+			if self.cluster.ingest:
+				self.ingest_data_stream(observation.ingest_datarate)
+				self.add_observation_to_buffer(observation)
+			yield self.env.timeout(1)
 
 	def check_buffer_capacity(self, data_product):
 		if self.capacity - data_product.size < 0:
@@ -68,7 +70,7 @@ class Buffer(object):
 		pass
 
 	def add_observation_to_buffer(self, observation):
-		logger.info("Adding observation %s data to buffer at time %s", observation.name, self.env.now)
+		logger.info("%s data to buffer at time %s", observation.name, self.env.now)
 		# This will take time
 		observation.plan.start_time = self.env.now + BUFFER_OFFSET
 		self.waiting_observation_list.append(observation)
@@ -83,6 +85,15 @@ class Buffer(object):
 		# In the future we will be able to interrupt this
 		return True
 
+	def ingest_data_stream(self, data):
+		"""
+		Buffer ingests the data stream from the Ingest pipelines. the data is what is added to the 'hot' buffer
+		every timestep
+		:param data: The size of the data
+		:return:
+		"""
+
+
 	def request_data(self, task):
 		pass
 
@@ -95,6 +106,3 @@ class Buffer(object):
 
 # TODO Buffer needs more specifications - data transfer times/latency/bandwidth
 # TODO Need specification on buffer makeup
-
-
-

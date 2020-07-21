@@ -32,15 +32,17 @@ class Scheduler(object):
 		self.buffer = buffer
 		self.current_plan = None
 
-	# def attach(self, simulation):
-	# 	self.simulation = simulation
-
 	def run(self):
 		while True:
 			# AT THE END OF THE SIMULATION, WE GET STUCK HERE. NEED TO EXIT
-			if self.check_buffer() or self.waiting_observations or self.cluster.running_tasks:
-				self.schedule_workflows()
-			if len(self.waiting_observations) == 0 and not self.telescope.check_observation_status():
+			if self.buffer.waiting_observation_list or self.waiting_observations or self.cluster.running_tasks:
+				for observation in self.buffer.waiting_observation_list:
+					if observation not in self.waiting_observations:
+						self.waiting_observations.append(observation)
+				allocation = self.allocate_tasks()
+				if allocation:
+					logger.info("Successfully allocated")
+			if len(self.waiting_observations) == 0 and not self.telescope.observations_to_process():
 				logger.debug("No more waiting workflows")
 				break
 			yield self.env.timeout(1)
@@ -60,27 +62,7 @@ class Scheduler(object):
 			return False
 
 
-	def allocate_ingest(self):
-		"""
-		Scheduler is the middleman between the Telescope and the Cluster
-		Checks to see if there is enough
-		Returns
-		-------
-
-		"""
-		pass
-
-	def partiton_cluster(self):
-		"""
-		Need to take pipeline into account and use this to determine how much cluster is being used
-
-		Returns
-		-------
-
-		"""
-
-
-	def schedule_workflows(self):
+	def allocate_tasks(self):
 		logger.debug('Attempting to schedule workflow to cluster')
 
 		# Min -scheduling time
@@ -96,6 +78,7 @@ class Scheduler(object):
 					logger.info("New observation %s scheduled for processing @ Time: %s", observation.plan.id, self.env.now)
 
 		if self.current_plan.status is WorkflowStatus.FINISHED:
+			# TODO wrap this into a function moving forward
 			self.waiting_observations.remove(self.current_observation)
 			self.buffer.request_observation_data_from_buffer(self.current_observation)
 			self.buffer.waiting_observation_list.remove(self.current_observation)
@@ -120,10 +103,15 @@ class Scheduler(object):
 				if machine is None or task is None:
 					break
 				else:
-					# Runs the task on the machine
-					task.run(self.find_appropriate_machine_in_cluster(machine))
+					# Runs the task on the machie
+					task.machine = machine
+					self.cluster.allocate_task(task, machine)
+					# self.cluster.waiting_tasks.append(task)
+					# task.run(self.find_appropriate_machine_in_cluster(machine))
 					if task.task_status is TaskStatus.SCHEDULED:
 						self.cluster.running_tasks.append(task)
+
+		return True
 
 	# When we run tasks we want to run it on a given machine on the cluster, which the task does not
 	# have access to unless we pass it to the class (which seems a bit ridiculous)
@@ -134,8 +122,39 @@ class Scheduler(object):
 			if machine.id == machine_id:
 				return machine
 
+	def start_ingest_pipelines(self, observation):
+		"""
+		Ingest is 'streaming' data to the buffer during the observation
+		How we calculate how long it takes remains to be seen
+		For the time being, we will be doubling the observation time
+		"""
+		streaming_time = observation.duration*2
+		if self.buffer.check_buffer_capacity(observation.project_output):
+			yield self.env.timeout(streaming_time)
+		else:
+			return False
+		buffer_trigger = self.env.process(self.buffer.run(observation))
+		yield buffer_trigger
 
 
+	def allocate_ingest(self):
+		"""
+		Scheduler is the middleman between the Telescope and the Cluster
+		Checks to see if there is enough
+		Returns
+		-------
+
+		"""
+		pass
+
+	def partiton_cluster(self):
+		"""
+		Need to take pipeline into account and use this to determine how much cluster is being used
+
+		Returns
+		-------
+
+		"""
 	#
 	# def add_workflow(self, workflow):
 	# 	print("Adding", workflow, "to workflows")

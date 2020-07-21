@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import unittest
+import simpy
 
 
 class TestCluster(unittest.TestCase):
@@ -25,4 +26,20 @@ class TestCluster(unittest.TestCase):
 		pass
 
 	def testClusterQueue(self):
-		pass
+		env = simpy.Environment()
+		env.process(self.run_env(env))
+		env.run(until=20)
+
+	def run_env(self, env):
+		i = 0
+		while i < 15:
+			print(env.now)
+			if env.now == 5:
+				env.process(self.secret(env))
+			i += 1
+			yield env.timeout(1)
+
+	def secret(self, env):
+		print('Started secret business @ {0}'.format(env.now))
+		yield env.timeout(4)
+		print('Finished secret business @ {0}'.format(env.now))

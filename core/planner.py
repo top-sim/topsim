@@ -49,7 +49,7 @@ class WorkflowPlan(object):
 	def __init__(self, wid, workflow, algorithm, env):
 		self.id = wid
 		if algorithm is 'heft':
-			self.makespan = shadow_heft(workflow)
+			self.solution = shadow_heft(workflow)
 		else:
 			sys.exit("Other algorithms are not supported")
 
@@ -60,22 +60,23 @@ class WorkflowPlan(object):
 		self.tasks = []
 		task_order = []
 
-		for task in workflow.tasks:
-				taskobj = Task(task.tid, env)
-				taskobj.est = task.ast
-				taskobj.eft = task.aft
+		# The solution object is now how we get information on allocatiosn from SHADOW
+
+		for task in self.solution.task_allocations:
+				allocation = self.solution.task_allocations.get(task)
+				taskobj = Task(task, env)
+				taskobj.est = allocation.ast
+				taskobj.eft = allocation.aft
 				taskobj.duration = taskobj.eft - taskobj.est
-				taskobj.machine_id = task.machine.id
+				taskobj.machine_id = allocation.machine
 				taskobj.flops = task.flops_demand
 				taskobj.pred = list(workflow.graph.predecessors(task))
 				self.tasks.append(taskobj)
 		self.tasks.sort(key=lambda x: x.est)
-		self.exec_order = workflow.solution.execution_order
+		self.exec_order = self.solution.execution_order
 		self.start_time = None
 		self.priority = 0
 		self.status = WorkflowStatus.UNSCHEDULED
-
-
 
 	def __lt__(self, other):
 		return self.priority < other.priority
@@ -117,6 +118,8 @@ class Task(object):
 		self.exec_order = None
 		self.task_status = TaskStatus.UNSCHEDULED
 		self.pred = None
+		self.finished_timestamp = None
+		self.started_timestamp = None
 
 		# Machine information that is less important currently (will update this in future versions)
 		self.flops = 0
@@ -134,23 +137,23 @@ class Task(object):
 
 	def __hash__(self):
 		return hash(self.id)
-	# self.cluster.waiting_tasks.remove(self)
-	# self.cluster.running_tasks.append(self)
-	# self.machine.run(self)
 
 	def do_work(self):
 		yield self.env.timeout(self.duration)
 		self.finished_timestamp = self.env.now
 		logger.debug('%s finished at %s', self.id, self.finished_timestamp)
 		self.task_status = TaskStatus.FINISHED
-		self.machine.stop_task(self)
+		return True
+		# self.machine.stop_task(self)
 
-	def run(self, machine):
+	def run(self):
 		self.started_timestamp = self.env.now
 		logger.debug('%s started at %s', self.id, self.started_timestamp)
-		# THIS IS THE MACHINE TASK
-		self.machine = machine
-		self.machine.run_task(self)
 		self.task_status = TaskStatus.SCHEDULED
-		self.process = self.env.process(self.do_work())
+		process = self.env.process(self.do_work())
+		if process:
+			return self.task_status
+		else:
+			raise RuntimeError('Task {0} failed to execute normally'.format(self))
+
 

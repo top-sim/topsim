@@ -10,7 +10,25 @@ logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)
 
 
-class Telescope(object):
+class TelescopeQueue:
+
+	def __init__(self):
+		self._queue = []
+
+	def push(self, x):
+		self._queue.append(x)
+
+	def pop(self):
+		return self._queue.pop(0)
+
+	def size(self):
+		return len(self._queue)
+
+	def empty(self):
+		return len(self._queue) == 0
+
+
+class Telescope:
 	def __init__(self, env, observations, buffer_obj, telescope_config, planner):
 		self.env = env
 		self.observations = observations  # .sort(key=lambda x: x.start)
@@ -22,7 +40,7 @@ class Telescope(object):
 		self.planner = planner
 
 	def run(self):
-		while self.check_observation_status():
+		while self.observations_to_process():
 			for observation in self.observations:
 				capacity = self.max_array_use-self.telescope_use
 				if observation.is_ready(self.env.now, capacity):
@@ -34,7 +52,6 @@ class Telescope(object):
 					yield plan_trigger
 					logger.info('Telescope is now using %s arrays', self.telescope_use)
 				elif self.env.now > observation.start + observation.duration and self.telescope_status and (observation.status is not RunStatus.FINISHED) :
-
 					self.telescope_use -= observation.demand
 					logger.info('Telescope is now using %s arrays', self.telescope_use)
 					# print('Telescope is now using', self.telescope_use, 'arrays')
@@ -50,21 +67,8 @@ class Telescope(object):
 	def run_observation_on_telescope(self, demand):
 		pass
 
-	def start_ingest_pipelines(self, observation):
-		"""
-		Ingest is 'streaming' data to the buffer during the observation
-		How we calculate how long it takes remains to be seen
-		For the time being, we will be doubling the observation time
-		"""
-		streaming_time = observation.duration*2
-		if self.buffer.check_buffer_capacity(observation.project_output):
-			yield self.env.timeout(streaming_time)
-		else:
-			return False
-		buffer_trigger = self.env.process(self.buffer.run(observation))
-		yield buffer_trigger
 
-	def check_observation_status(self):
+	def observations_to_process(self):
 		for observation in self.observations:
 			if observation.status == RunStatus.FINISHED:
 				continue

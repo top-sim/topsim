@@ -1,12 +1,14 @@
 from enum import Enum
 
 # TODO need I/O information here
+from core.planner import TaskStatus
 
 
 class Status(Enum):
 	IDLE = 0
 	IN_USE = 1
-	ERROR = 2
+	RESERVED = 2
+	ERROR = 3
 
 
 class Machine(object):
@@ -21,6 +23,18 @@ class Machine(object):
 		self.status = Status.IDLE
 		self.transfer_flag = False
 		self.current_task = None
+
+	def run(self, task):
+		if task.task_status is TaskStatus.SCHEDULED:
+			self.run_task(task)
+		else:
+			return False
+		run_status = task.run()
+		if run_status is TaskStatus.FINISHED:
+			self.stop_task(task)
+			return True
+		else:
+			raise RuntimeError('Machine: {0} failed to execute Task: {1}'.format(self, task))
 
 	def run_task(self, task_instance):
 		self.cpu -= task_instance.flops
