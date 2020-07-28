@@ -40,75 +40,28 @@ def run_algorithm():
 	pass
 
 
-def run_simulation(arg, parser):
-	workflow_file = None
-	print(arg['workflow'])
-	if arg['workflow']:
-		workflow_file = arg['workflow']
-	else:
-		parser.print_help()
+if __name__ == '__main__':
+
+	workflow_file = 'test/data/daligue_pipeline_test.json'
 	event_file = 'sim.trace'
 	planning_algorithm = 'heft'
-	env = simpy.rt.RealtimeEnvironment(factor=0.5, strict=False)# Environment()
+	# env = simpy.rt.RealtimeEnvironment(factor=0.5, strict=False)# Environment()
 	tmax = 36  # for starters, we will define telescope configuration as simply number of arrays that exist
-	salgorithm = FifoAlgorithm()
+	env = simpy.Environment()
+	scheduling_algorithm = FifoAlgorithm()
 	vis = False
-	if arg['visualise']:
-		vis = True
 
-	simulation = Simulation(env,
-							test_data.telescope_config,
-							tmax,
-							test_data.machine_config,
-							salgorithm,
-							'heft',
-							event_file,
-							vis)
-
+	# TODO move things like 'heft' into a 'common' file which has SchedulingAlgorithm.HEFT = 'heft' etc.
+	simulation = Simulation(
+		env,
+		test_data.telescope_config,
+		tmax,
+		test_data.machine_config,
+		scheduling_algorithm,
+		planning_algorithm,
+		event_file,
+		vis)
 	simulation.start(-1)
 
-
-# env.run(until=100)  # until=100)
-
-
-def run_scheduler():
-	pass
-
-
-def run_planner():
-	pass
-
-
-if __name__ == "__main__":
-
-	parser = argparse.ArgumentParser(description='TopSim: Telescope Operations Simulator')
-
-	subparsers = parser.add_subparsers(dest='command')
-
-	# choices = list(cfg.test.keys())
-	# test = { # Tests for the test runner
-	# 	"workflow": test.test_workflow,
-	# 	"graph_generator": test.test_graph_generator,
-	# 	"heuristic": test.test_heuristic,
-	# 	"metaheuristic": test.test_metaheuristic}
-
-	test_parser = subparsers.add_parser('test', help='Test Runner')
-	test_parser.add_argument('--all', action='store_true', help='Run all test')
-
-	test_parser.set_defaults(func=run_tests)
-
-	simulation_parser = subparsers.add_parser('sim', help='Run a simulation')
-	simulation_parser.set_defaults(func=run_simulation)
-	simulation_parser.add_argument('workflow', help='Name of algorithm')
-	simulation_parser.add_argument('--calc_time', help='Set calc_time True/False', choices=['True', 'False'])
-	simulation_parser.add_argument('--visualise', help='Visualise the simulation', choices=['True', 'False'])
-
-	args = parser.parse_args()
-	if not args.command:
-		parser.print_help()
-	if args.command == 'sim':
-		args.func(vars(args), simulation_parser)
-	if args.command == 'test':
-		args.func(vars(args), testcases, test_parser)
 
 
