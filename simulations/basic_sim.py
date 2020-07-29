@@ -16,3 +16,32 @@
 """
 Basic simulation, with minimal Observation Plan and dummy observation workflows
 """
+
+import simpy
+
+from algorithms.scheduling import FifoAlgorithm
+from core.simulation import Simulation
+import config.data as test_data
+
+
+workflow_file = 'test/data/daliuge_pipeline_test.json'
+event_file = 'sim.trace'
+planning_algorithm = 'heft'
+# env = simpy.RealtimeEnvironment(factor=0.5, strict=False)
+env = simpy.Environment()
+tmax = 36  # for starters, we will define telescope configuration as simply number of arrays that exist
+salgorithm = FifoAlgorithm()
+vis = False
+
+# TODO move things like 'heft' into a 'common' file which has SchedulingAlgorithm.HEFT = 'heft' etc.
+simulation = Simulation(
+	env,
+	test_data.telescope_config,
+	tmax,
+	test_data.machine_config,
+	salgorithm,
+	'heft',
+	event_file,
+	vis
+)
+simulation.start(-1)
