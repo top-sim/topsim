@@ -1,0 +1,20 @@
+{
+	"observation": [
+		{
+			"name": "emu",
+			"start": 0,
+			"duration": 10,
+			"demand": 36,
+			"workflow": "continuum",
+			"data_product_rate": 4
+		},
+		{
+			"name": "dingo",
+			"start": 15,
+			"duration": 20,
+			"demand": 18,
+			"workflow": "spectral",
+			"data_product_rate": 5
+		}
+	]
+}

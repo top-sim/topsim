@@ -16,9 +16,9 @@
 import unittest
 import simpy
 
-from config import data as test_data
+from common import data as test_data
 from core.planner import Planner
-from core.telescope import Observation
+from core.telescope import Telescope, Observation
 from core.buffer import Buffer
 from core.cluster import Cluster
 
@@ -30,28 +30,87 @@ OBS_WORKFLOW = test_data.test_buffer_workflow
 MACHINE_CONFIG = test_data.machine_config
 PLAN_ALGORITHM = test_data.planning_algorithm
 
-class TestBuffer(unittest.TestCase):
+BUFFER_CONFIG  = 'path/to/buffer/config/file'
+
+class TestBufferConfig(unittest.TestCase):
+
+	def setUp(self):
+		self.config = BUFFER_CONFIG
+
+	def testHotBufferConfig(self):
+		"""
+		Process the Hot Buffer section of the config file
+		"""
+
+	def testColdBufferConfig(self):
+		"""
+		Process cold buffer section of the config file
+		:return:
+		"""
+
+
+class TestBufferIngestDataStream(unittest.TestCase):
+
+	def setUp(self):
+		"""
+		setup the buffer and do config stuff
+		:return: Nothing
+		"""
+		self.env = simpy.Environment()
+		self.cluster = Cluster(self.env, MACHINE_CONFIG)
+		self.buffer = Buffer(self.env, self.cluster)
+		self.observation = Observation('scheduler_observation',
+									   OBS_START_TME,
+									   OBS_DURATION,
+									   OBS_DEMAND,
+									   OBS_WORKFLOW)
+
+	def testIngestEdgeCase(self):
+		"""
+		Buffer must accept ingest at rate up to 'max ingest data rate' but
+		raises an exception if the ingest rate for an observation is greater
+		(this means we have an error).
+
+		In addition, we are coordinating this ingest between the scheduler and
+		the telescope and the cluster so these actors also need to work
+		together in some way, which this test will also attempt to do .
+
+		:return: No return value as this is a test :'(
+		"""
+		telescope = Telescope(
+			self.env,
+			self.observation,
+			self.buffer,
+			telescope_config=None,
+			planner=None
+		)
+
+		# test what happens when there is no ingest pipeline on cluster
+		original_capacity = None
+		next(self.buffer.run())
+		self.assertEqual(self.buffer.hot.capacity, original_capacity)
+
+class TestColdBufferWorkflowStream(unittest.TestCase):
 
 	def setUp(self):
 		self.env = simpy.Environment()
-		self.cluster = Cluster(MACHINE_CONFIG)
+		self.cluster = Cluster(self.env, MACHINE_CONFIG)
 		self.buffer = Buffer(self.env, self.cluster)
 		self.observation = Observation('scheduler_observation',
-									OBS_START_TME,
-									OBS_DURATION,
-									OBS_DEMAND,
-									OBS_WORKFLOW)
+									   OBS_START_TME,
+									   OBS_DURATION,
+									   OBS_DEMAND,
+									   OBS_WORKFLOW)
 
 		self.planner = Planner(self.env, PLAN_ALGORITHM, MACHINE_CONFIG)
-		pass
 
 	def tearDown(self):
 		pass
 
 	def testWorkflowAddedToQueue(self):
 		"""
-		We only add a workflow to the queue once an observation has finished (and, therefore, after we have finished
-		generating a plan for it).
+		We only add a workflow to the queue once an observation has finished
+		(and, therefore, after we have finished generating a plan for it).
 		:return: None
 		"""
 
@@ -62,7 +121,6 @@ class TestBuffer(unittest.TestCase):
 		self.assertTrue(self.buffer.observations_for_processing.empty())
 		self.buffer.add_observation_to_waiting_workflows(self.observation)
 		self.assertTrue(self.buffer.observations_for_processing.size() == 1)
-		#
-		# # Get the observation and check we have applied the buffer offset
-		# self.assertTrue(self.observation.start > OBS_START_TME + OBS_DURATION)
-
+#
+# # Get the observation and check we have applied the buffer offset
+# self.assertTrue(self.observation.start > OBS_START_TME + OBS_DURATION)

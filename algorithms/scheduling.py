@@ -75,3 +75,10 @@ class FifoAlgorithm(Algorithm):
 						return t.machine_id, t
 
 		return None, None
+
+
+class GlobalDagDelayHeuristic(Algorithm):
+
+	"""
+	Implementation of the bespoke Delay heuristic I have been working on
+	"""

@@ -29,11 +29,12 @@ class TelescopeQueue:
 
 
 class Telescope:
-	def __init__(self, env, observations, buffer_obj, telescope_config, planner):
+	def __init__(
+			self, env, observations, buffer_obj, telescope_config, planner
+	):
 		self.env = env
-		self.observations = observations  # .sort(key=lambda x: x.start)
+		self.observations = observations
 		self.buffer = buffer_obj
-		# self.run_observation = self.env.process(self.run(env))
 		self.telescope_status = False
 		self.telescope_use = 0
 		self.max_array_use = telescope_config
@@ -42,31 +43,41 @@ class Telescope:
 	def run(self):
 		while self.observations_to_process():
 			for observation in self.observations:
-				capacity = self.max_array_use-self.telescope_use
+				capacity = self.max_array_use - self.telescope_use
+				# TODO INSERT IF CONDITION COMMENT
 				if observation.is_ready(self.env.now, capacity):
-					logger.info('Observation %s scheduled for %s',observation.name, self.env.now)
+					logger.info(
+						'Observation %s scheduled for %s',
+						observation.name,
+						self.env.now
+					)
 					self.telescope_use += observation.demand
 					self.telescope_status = True
 					observation.status = RunStatus.RUNNING
-					plan_trigger = self.env.process(self.planner.run(observation))
+					plan_trigger = self.env.process(
+						self.planner.run(observation)
+					)
 					yield plan_trigger
-					logger.info('Telescope is now using %s arrays', self.telescope_use)
-				elif self.env.now > observation.start + observation.duration and self.telescope_status and (observation.status is not RunStatus.FINISHED) :
+					logger.info(
+						'Telescope is now using %s arrays',
+						self.telescope_use)
+
+				# TODO INSERT ELIF CONDITION COMMENT
+				elif self.env.now > observation.start + observation.duration \
+					and self.telescope_status \
+					and (observation.status is not RunStatus.FINISHED):
+
 					self.telescope_use -= observation.demand
-					logger.info('Telescope is now using %s arrays', self.telescope_use)
-					# print('Telescope is now using', self.telescope_use, 'arrays')
+					logger.info('Telescope is now using %s arrays',
+								self.telescope_use)
 					if self.telescope_use is 0:
 						self.telescope_status = False
 					observation.status = RunStatus.FINISHED
 
-				# else:
-				# 	# print("Nothing to do for ", observation.name, self.env.now)
-			# logger.info('Time is %s', self.env.now)
-			yield self.env.timeout(1)
+		yield self.env.timeout(1)
 
 	def run_observation_on_telescope(self, demand):
 		pass
-
 
 	def observations_to_process(self):
 		for observation in self.observations:
@@ -75,7 +86,6 @@ class Telescope:
 			else:
 				return True
 		return False
-
 
 	def print_state(self):
 		return {
@@ -90,6 +100,7 @@ class Observation(object):
 	Observation object stores information about a given observation; the object also
 	stores information about the workflow, and the generated plan for that workflow.
 	"""
+
 	def __init__(self, name, start, duration, demand, workflow):
 		self.name = name
 		self.start = start
@@ -97,17 +108,25 @@ class Observation(object):
 		self.demand = demand
 		self.status = RunStatus.WAITING
 		self.workflow = workflow
-		self.data_output = 0
+		self.total_data_size = 0
+		self.ingest_data_rate = None
 		self.type = None
 		self.plan = None
 
 	def is_ready(self, current_time, capacity):
 		if self.start <= current_time \
-			and self.demand <= capacity \
-			and self.status is RunStatus.WAITING:
+				and self.demand <= capacity \
+				and self.status is RunStatus.WAITING:
 			return True
 		else:
 			return False
+
+	def process_observation_template(self, filename):
+		"""
+		Read in observation plan outline
+		:return: True if JSON is passed correctly
+		"""
+		return True
 
 
 class ObservationType(Enum):
@@ -122,21 +141,3 @@ class RunStatus(str, Enum):
 	RUNNING = 'RUNNING'
 	FINISHED = 'FINISHED'
 
-
-#
-#
-# if __name__ == '__main__':
-#
-#     emu = Observation('emu', 0, 10, 46)
-#     dingo = Observation('dingo', 10, 15, 18)
-#     vast = Observation('vast', 20, 30, 18)
-#
-#     tconfig = 36  # for starters, we will define telescope configuration as simply number of arrays that exist
-#     # [start_time, duration, num_arrays_used]
-#     observation_data = [emu, dingo, vast]  # , [40, 10, 36]]
-#
-#     simenv = simpy.environment()
-#     buffer = Buffer(simenv)
-#
-#     telescope = Telescope(simenv, observation_data, buffer, tconfig)
-#     simenv.run()

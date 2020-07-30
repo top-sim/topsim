@@ -24,7 +24,7 @@ from core.cluster import Cluster
 from core.planner import Planner
 from core.buffer import Buffer
 
-from config import data as test_data
+from common import data as test_data
 
 # Globals
 OBS_START_TME = 0

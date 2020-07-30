@@ -21,7 +21,7 @@ import simpy
 
 from algorithms.scheduling import FifoAlgorithm
 from core.simulation import Simulation
-import config.data as test_data
+import common.data as test_data
 
 
 workflow_file = 'test/data/daliuge_pipeline_test.json'

@@ -13,6 +13,7 @@ class Cluster(object):
 		self.finished_tasks = []
 		self.waiting_tasks = []
 		# self.workflows = []  # Keeping here to stop runtime errors
+		self.ingest = False
 		self.finished_workflows = []
 		self.ingest_pipeline = None
 		self.ingest_obervation = None
@@ -63,7 +64,7 @@ class Cluster(object):
 		:param pipeline: The type of ingest pipeline - see Observation
 		:return: None
 		"""
-
+		# Mark resources as 'in-use' for the given pipeline.
 		pass
 
 	def availability(self):

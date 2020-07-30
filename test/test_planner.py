@@ -22,7 +22,7 @@ from core.telescope import Observation
 
 from algorithms.scheduling import FifoAlgorithm
 
-from config import data as test_data
+from common import data as test_data
 
 current_dir = os.path.abspath('.')
 
