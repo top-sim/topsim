@@ -1,5 +1,6 @@
 import json
 from core.machine import Machine
+from core import config
 from queue import Queue, PriorityQueue
 
 from core.planner import TaskStatus
@@ -7,7 +8,8 @@ from core.planner import TaskStatus
 
 class Cluster(object):
 	def __init__(self,env, machine_config):
-		self.machines = _process_machine_config(machine_config)
+
+		self.machines = config.process_machine_config(machine_config)
 		self.dmachine = {machine.id:machine for machine in self.machines}
 		self.running_tasks = []
 		self.finished_tasks = []
@@ -102,18 +104,3 @@ class Cluster(object):
 				efficiency += 1
 		return efficiency
 
-
-# Helper function that acts as static function for Cluster
-def _process_machine_config(machine_config):
-	with open(machine_config, 'r') as infile:
-		config = json.load(infile)
-	machines = config['system']['resources']
-	machine_list = []
-	for machine in machines:
-		machine_list.append(Machine(
-			machine,
-			machines[machine]['flops'],
-			1,
-			1,
-		))
-	return machine_list

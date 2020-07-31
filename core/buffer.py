@@ -17,11 +17,11 @@ import logging
 from common import config
 
 from core.telescope import RunStatus
-import core.config as config
+import common.config
 
 logger = logging.getLogger(__name__)
 
-BUFFER_OFFSET = config.BUFFER_TIME_OFFSET
+BUFFER_OFFSET = common.config.BUFFER_TIME_OFFSET
 
 
 class BufferQueue:

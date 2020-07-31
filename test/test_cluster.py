@@ -16,6 +16,26 @@
 import unittest
 import simpy
 
+from core.cluster import Cluster
+
+CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
+
+
+class TestClusterConfig(unittest.TestCase):
+
+	def setUp(self):
+		self.env = simpy.Environment()
+
+	def testClusterConfig(self):
+		"""
+		Initialise a Cluster object with the machine config file
+		"""
+		self.cluster = Cluster(env=self.env, machine_config=CLUSTER_CONFIG)
+		# This is a homogeneous file, so each flops value should be 95
+		for machine in self.cluster.machines:
+			self.assertEqual(84,machine['flops'])
+			self.assertEqual(10, machine['rates'])
+
 
 class TestCluster(unittest.TestCase):
 

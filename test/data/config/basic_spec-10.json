@@ -1,0 +1,49 @@
+{
+  "header": {
+    "time": "false",
+    "gen_specs": {
+      "file": "recipes/routput/basic_spec-10.json",
+      "seed": 20,
+      "range": "[(50, 100)]",
+      "heterogeneity": 1.0,
+      "multiplier": 1
+    }
+  },
+  "system": {
+    "resources": {
+      "cat0_m0": {
+        "flops": 95
+      },
+      "cat0_m1": {
+        "flops": 95
+      },
+      "cat0_m2": {
+        "flops": 95
+      },
+      "cat0_m3": {
+        "flops": 95
+      },
+      "cat0_m4": {
+        "flops": 95
+      },
+      "cat0_m5": {
+        "flops": 95
+      },
+      "cat0_m6": {
+        "flops": 95
+      },
+      "cat0_m7": {
+        "flops": 95
+      },
+      "cat0_m8": {
+        "flops": 95
+      },
+      "cat0_m9": {
+        "flops": 95
+      }
+    },
+    "rates": {
+      "cat0": 5
+    }
+  }
+}

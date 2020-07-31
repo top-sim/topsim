@@ -30,17 +30,23 @@ OBS_WORKFLOW = test_data.test_buffer_workflow
 MACHINE_CONFIG = test_data.machine_config
 PLAN_ALGORITHM = test_data.planning_algorithm
 
-BUFFER_CONFIG  = 'path/to/buffer/config/file'
+CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
+BUFFER_CONFIG = 'test/data/config/buffer.json'
+
 
 class TestBufferConfig(unittest.TestCase):
 
 	def setUp(self):
-		self.config = BUFFER_CONFIG
+		self.env = simpy.Environment()
+		self.cluster = Cluster(env=self.env, machine_config=CLUSTER_CONFIG)
 
 	def testHotBufferConfig(self):
 		"""
 		Process the Hot Buffer section of the config file
 		"""
+		self.buffer = Buffer(
+			env=self.env, cluster=self.cluster, config=BUFFER_CONFIG
+		)
 
 	def testColdBufferConfig(self):
 		"""
@@ -89,6 +95,7 @@ class TestBufferIngestDataStream(unittest.TestCase):
 		original_capacity = None
 		next(self.buffer.run())
 		self.assertEqual(self.buffer.hot.capacity, original_capacity)
+
 
 class TestColdBufferWorkflowStream(unittest.TestCase):
 

@@ -13,7 +13,7 @@ import pandas as pd
 
 
 # Helper function that acts as static function for Cluster
-def _process_machine_config(machine_config):
+def process_machine_config(machine_config):
 	with open(machine_config, 'r') as infile:
 		config = json.load(infile)
 	machines = config['system']['resources']
@@ -28,7 +28,7 @@ def _process_machine_config(machine_config):
 	return machine_list
 
 
-def _process_telescope_config(telescope_config):
+def process_telescope_config(telescope_config):
 	observations = []
 	infile = open(telescope_config)
 	config = pd.read_csv(infile)
