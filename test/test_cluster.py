@@ -14,11 +14,19 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import unittest
+import logging
+import json
 import simpy
 
 from core.cluster import Cluster
 
+logging.basicConfig(level="INFO")
+logger = logging.getLogger(__name__)
+
 CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
+CLUSTER_NOFILE = "test/data/config/cluster_config.json"  # Does not exist
+CLUSTER_INCORRECT_JSON = "test/data/config/sneaky.json"
+CLUSTER_NOT_JSON = "test/data/config/oops.txt"
 
 
 class TestClusterConfig(unittest.TestCase):
@@ -26,15 +34,38 @@ class TestClusterConfig(unittest.TestCase):
 	def setUp(self):
 		self.env = simpy.Environment()
 
-	def testClusterConfig(self):
+	def testClusterConfigFileExists(self):
 		"""
 		Initialise a Cluster object with the machine config file
 		"""
-		self.cluster = Cluster(env=self.env, machine_config=CLUSTER_CONFIG)
+		cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
 		# This is a homogeneous file, so each flops value should be 95
-		for machine in self.cluster.machines:
-			self.assertEqual(84,machine['flops'])
-			self.assertEqual(10, machine['rates'])
+		for machine in cluster.machines:
+			# machine is an object instance of Machine
+			self.assertEqual(84, machine.cpu)
+			self.assertEqual(10, machine.bandwidth)
+
+	def testClusterConfigNoFile(self):
+		"""
+		Attempt to initialise a cluster with the wrong file
+		:return: None
+		"""
+		config = CLUSTER_NOFILE
+		self.assertRaises(
+			FileNotFoundError, Cluster, self.env, config
+		)
+
+	def testClusterConfigIncorrectJSON(self):
+		config = CLUSTER_INCORRECT_JSON
+		self.assertRaises(
+			KeyError, Cluster, self.env, config
+		)
+
+	def testClusterConfigNotJSON(self):
+		config = CLUSTER_NOT_JSON
+		self.assertRaises(
+			json.JSONDecodeError, Cluster, self.env, config
+		)
 
 
 class TestCluster(unittest.TestCase):
@@ -53,13 +84,13 @@ class TestCluster(unittest.TestCase):
 	def run_env(self, env):
 		i = 0
 		while i < 15:
-			print(env.now)
+			logger.debug(env.now)
 			if env.now == 5:
 				env.process(self.secret(env))
 			i += 1
 			yield env.timeout(1)
 
 	def secret(self, env):
-		print('Started secret business @ {0}'.format(env.now))
+		logger.debug('Started secret business @ {0}'.format(env.now))
 		yield env.timeout(4)
-		print('Finished secret business @ {0}'.format(env.now))
+		logger.debug('Finished secret business @ {0}'.format(env.now))

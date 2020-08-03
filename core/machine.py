@@ -12,14 +12,12 @@ class Status(Enum):
 
 
 class Machine(object):
-	def __init__(self, mid, cpu_capacity, memory_capacity, disk_capacity, cpu=None, memory=None, disk=None):
-		self.id = mid
-		self.cpu_capacity = cpu_capacity
-		self.memory_capacity = memory_capacity
-		self.disk_capacity = disk_capacity
-		self.cpu = cpu_capacity if cpu is None else cpu
-		self.memory = memory_capacity if memory is None else memory
-		self.disk = disk_capacity if disk is None else disk
+	def __init__(self, id, cpu, memory, disk,bandwidth):
+		self.id = id
+		self.cpu = cpu
+		self.memory = memory
+		self.disk = disk
+		self.bandwidth = bandwidth
 		self.status = Status.IDLE
 		self.transfer_flag = False
 		self.current_task = None
@@ -34,7 +32,9 @@ class Machine(object):
 			self.stop_task(task)
 			return True
 		else:
-			raise RuntimeError('Machine: {0} failed to execute Task: {1}'.format(self, task))
+			raise RuntimeError(
+				'Machine: {0} failed to execute Task: {1}'.format(self, task)
+			)
 
 	def run_task(self, task_instance):
 		self.cpu -= task_instance.flops
@@ -75,9 +75,6 @@ class Machine(object):
 	def state_summary(self):
 		return {
 			'id': self.id,
-			'cpu_capacity': self.cpu_capacity,
-			'memory_capacity': self.memory_capacity,
-			'disk_capacity': self.disk_capacity,
 			'cpu': self.cpu / self.cpu_capacity,
 			'memory': self.memory / self.memory_capacity,
 			'disk': self.disk / self.disk_capacity,

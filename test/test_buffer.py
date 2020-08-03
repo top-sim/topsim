@@ -38,15 +38,16 @@ class TestBufferConfig(unittest.TestCase):
 
 	def setUp(self):
 		self.env = simpy.Environment()
-		self.cluster = Cluster(env=self.env, machine_config=CLUSTER_CONFIG)
+		self.cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
 
 	def testHotBufferConfig(self):
 		"""
 		Process the Hot Buffer section of the config file
 		"""
-		self.buffer = Buffer(
+		buffer = Buffer(
 			env=self.env, cluster=self.cluster, config=BUFFER_CONFIG
 		)
+		# Something something buffer.hot
 
 	def testColdBufferConfig(self):
 		"""
@@ -54,6 +55,10 @@ class TestBufferConfig(unittest.TestCase):
 		:return:
 		"""
 
+	def testBufferNoFile(self):
+		config = None
+		buffer = None
+		self.assertRaises(FileNotFoundError, buffer)
 
 class TestBufferIngestDataStream(unittest.TestCase):
 

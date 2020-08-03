@@ -4,6 +4,10 @@ from core.machine import Machine
 from core.buffer import HotBuffer, ColdBuffer
 import pandas as pd
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 # class Workflow(object):
 # 	def __init__(self,workflow):
@@ -14,17 +18,34 @@ import pandas as pd
 
 # Helper function that acts as static function for Cluster
 def process_machine_config(machine_config):
-	with open(machine_config, 'r') as infile:
-		config = json.load(infile)
+	config = None
+	try:
+		with open(machine_config, 'r') as infile:
+			config = json.load(infile)
+	except OSError:
+		logger.warning("File %s not found", machine_config)
+		raise
+	except json.JSONDecodeError:
+		raise
+	try:
+		'system' in config and 'resources' in config['system']
+	except KeyError:
+		logger.warning(
+			"'system' is not in %s, check your JSON is correctly formatted",
+			machine_config
+		)
 	machines = config['system']['resources']
 	machine_list = []
 	for machine in machines:
-		machine_list.append(Machine(
-			machine,
-			machines[machine]['flops'],
-			1,
-			1,
-		))
+		machine_list.append(
+			Machine(
+				id=machine,
+				cpu=machines[machine]['flops'],
+				memory=1,
+				disk=1,
+				bandwidth=machines[machine]['rates']
+			)
+		)
 	return machine_list
 
 
@@ -48,15 +69,16 @@ def process_telescope_config(telescope_config):
 	return observations
 
 
-def process_telescope_config(telescope_config):
-	return Telescope
+#
+#
+# def process_telescope_config(telescope_config):
+# 	return Telescope
 
 
-def process_buffer_config(self,config):
+def process_buffer_config(self, config):
 	hot = HotBuffer(None, None)
 	cold = ColdBuffer(None, None)
 	return hot, cold
-
 
 
 class TaskInstanceConfig(object):
@@ -68,7 +90,8 @@ class TaskInstanceConfig(object):
 
 
 class TaskConfig(object):
-	def __init__(self, task_index, instances_number, cpu, memory, disk, duration):
+	def __init__(self, task_index, instances_number, cpu, memory, disk,
+				 duration):
 		self.task_index = task_index
 		self.instances_number = instances_number
 		self.cpu = cpu
@@ -85,5 +108,3 @@ class JobConfig(object):
 
 	def __repr__(self):
 		return str(self.id)
-
-

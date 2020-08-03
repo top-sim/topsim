@@ -7,9 +7,11 @@ from core.planner import TaskStatus
 
 
 class Cluster(object):
-	def __init__(self,env, machine_config):
-
-		self.machines = config.process_machine_config(machine_config)
+	def __init__(self,env, spec):
+		try:
+			self.machines = config.process_machine_config(spec)
+		except OSError:
+			raise
 		self.dmachine = {machine.id:machine for machine in self.machines}
 		self.running_tasks = []
 		self.finished_tasks = []
