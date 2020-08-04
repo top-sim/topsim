@@ -1,4 +1,4 @@
-# Copyright (C) 27/11/19 RW Bunney
+# Copyright (C) 4/8/20 RW Bunney
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,21 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import unittest
-import simpy
 
-OBSERVATION_CONFIG = 'test/data/config/observations.json'
 
-class TestTelescopeConfig(unittest.TestCase):
+# TODO Buffer needs more specifications - data transfer times/latency/bandwidth
+# TODO Need specification on buffer makeup
 
-	def setUp(self):
-		self.env = simpy.Environment()
-		observations = process_telescope_config(config)
-
-class TestTelescope(unittest.TestCase):
-
-	def setUp(self):
-		pass
-
-	def tearDown(self):
-		pass

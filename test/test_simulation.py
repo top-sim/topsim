@@ -15,7 +15,7 @@ class TestSimulation(unittest.TestCase):
 
 	def setUp(self):
 		env = None
-		# tel = Telescope(env, observations, buffer_obj, telescope_config, planner)
+		# tel = Telescope(env, buffer_obj, telescope_config, planner)
 		event_file = test_data.event_file
 		planning_algorithm = test_data.planning_algorithm
 		env = simpy.Environment()

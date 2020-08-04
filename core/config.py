@@ -1,8 +1,8 @@
 import json
 from core.telescope import Telescope, Observation
 from core.machine import Machine
-from core.buffer import HotBuffer, ColdBuffer
 import pandas as pd
+
 
 import logging
 
@@ -34,6 +34,7 @@ def process_machine_config(machine_config):
 			"'system' is not in %s, check your JSON is correctly formatted",
 			machine_config
 		)
+		raise
 	machines = config['system']['resources']
 	machine_list = []
 	for machine in machines:
@@ -73,12 +74,6 @@ def process_telescope_config(telescope_config):
 #
 # def process_telescope_config(telescope_config):
 # 	return Telescope
-
-
-def process_buffer_config(self, config):
-	hot = HotBuffer(None, None)
-	cold = ColdBuffer(None, None)
-	return hot, cold
 
 
 class TaskInstanceConfig(object):

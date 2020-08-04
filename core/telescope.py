@@ -30,56 +30,66 @@ class TelescopeQueue:
 
 class Telescope:
 	def __init__(
-			self, env, observations, buffer_obj, telescope_config, planner
+			self, env, buffer_obj, telescope_config,
+			planner
 	):
 		self.env = env
-		self.observations = observations
+		try:
+			x = process_telescope_config(telescope_config)
+		except OSError:
+			raise
+		self.observations = None
+		self.total_arrays = None
 		self.buffer = buffer_obj
 		self.telescope_status = False
 		self.telescope_use = 0
-		self.max_array_use = telescope_config
 		self.planner = planner
 
 	def run(self):
-		while self.observations_to_process():
+		while self.has_observations_to_process():
 			for observation in self.observations:
-				capacity = self.max_array_use - self.telescope_use
-				# TODO INSERT IF CONDITION COMMENT
+				capacity = self.total_arrays - self.telescope_use
+				# IF there is an observation ready for start
 				if observation.is_ready(self.env.now, capacity):
 					logger.info(
 						'Observation %s scheduled for %s',
 						observation.name,
 						self.env.now
 					)
-					self.telescope_use += observation.demand
-					self.telescope_status = True
-					observation.status = RunStatus.RUNNING
+					observation.status = self.begin_observation(observation)
 					plan_trigger = self.env.process(
 						self.planner.run(observation)
 					)
 					yield plan_trigger
 					logger.info(
-						'Telescope is now using %s arrays',
-						self.telescope_use)
-
-				# TODO INSERT ELIF CONDITION COMMENT
-				elif self.env.now > observation.start + observation.duration \
-					and self.telescope_status \
-					and (observation.status is not RunStatus.FINISHED):
-
-					self.telescope_use -= observation.demand
-					logger.info('Telescope is now using %s arrays',
-								self.telescope_use)
-					if self.telescope_use is 0:
-						self.telescope_status = False
-					observation.status = RunStatus.FINISHED
+						'Telescope is now using %s arrays', self.telescope_use
+					)
+				# If an observation is running and we want to stop it
+				elif observation.is_finished(self.env.now,
+											 self.telescope_status):
+					observation.status = self.finish_observation(observation)
+					logger.info(
+						'Telescope is now using %s arrays', self.telescope_use
+					)
 
 		yield self.env.timeout(1)
+
+	def begin_observation(self, observation):
+		self.telescope_use += observation.demand
+		self.telescope_status = True
+		return RunStatus.RUNNING
+
+	def finish_observation(self, observation):
+		self.telescope_use -= observation.demand
+
+		if self.telescope_use is 0:
+			self.telescope_status = False
+		return RunStatus.FINISHED
 
 	def run_observation_on_telescope(self, demand):
 		pass
 
-	def observations_to_process(self):
+	def has_observations_to_process(self):
 		for observation in self.observations:
 			if observation.status == RunStatus.FINISHED:
 				continue
@@ -121,14 +131,44 @@ class Observation(object):
 		else:
 			return False
 
-	def process_observation_template(self, filename):
-		"""
-		Read in observation plan outline
-		:return: True if JSON is passed correctly
-		"""
-		return True
+	def is_finished(self, current_time, telescope_status):
+		if current_time > self.start + self.duration \
+				and telescope_status \
+				and (self.status is not RunStatus.FINISHED):
+			return True
+		else:
+			return False
+
+def process_observation_template(self, filename):
+	"""
+	Read in observation plan outline
+	:return: True if JSON is passed correctly
+	"""
+	return True
 
 
+def process_telescope_config(telescope_config):
+	observations = []
+	infile = open(telescope_config)
+	config = pd.read_csv(infile)
+	# config.
+	# Format is name, start, duration, demand, filename
+	for i in range(len(config)):
+		obs = config.iloc[i, :]
+		observation = Observation(
+			obs['name'],
+			int(obs['start']),
+			int(obs['duration']),
+			int(obs['demand']),
+			obs['filename']
+		)
+		observations.append(observation)
+	infile.close()
+	return observations
+
+
+#
+#
 class ObservationType(Enum):
 	CONTINUUM = 'CONTINUUM'
 	SECTRAL = 'SPECTRAL'
@@ -140,4 +180,3 @@ class RunStatus(str, Enum):
 	WAITING = 'WAITING'
 	RUNNING = 'RUNNING'
 	FINISHED = 'FINISHED'
-

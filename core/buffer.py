@@ -14,10 +14,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import logging
-from common import config
-
-from core.telescope import RunStatus
+import json
 import common.config
+from core.telescope import RunStatus
 
 logger = logging.getLogger(__name__)
 
@@ -46,16 +45,16 @@ class Buffer(object):
 		self.env = env
 		self.cluster = cluster
 		# TODO split the hot/cold buffer into separate objects/tuples?
-		self.hot_total_capacity = 0
-		self.hot,self.cold = config.process_buffer_config(config)
-		self.cold_total_capacity = 0
-		self.cold = None
+		# We are reading this from a file, check it works
+		try:
+			self.hot, self.cold = process_buffer_config(config)
+		except OSError:
+			raise
 		self.hardware = {}
 		self.observations_for_processing = BufferQueue()
 		self.waiting_observation_list = []
 		self.workflow_plans = {}
 		self.new_observation = 0
-
 
 	def run(self):
 		while True:
@@ -73,7 +72,7 @@ class Buffer(object):
 
 	def check_buffer_capacity(self, observation):
 		if self.hot - observation.size < 0 \
-			and self.cold - observation.size < 0:
+				and self.cold - observation.size < 0:
 			return False
 		else:
 			return True
@@ -114,7 +113,6 @@ class Buffer(object):
 			yield hot_buffer_accepts
 
 
-
 class HotBuffer:
 	def __init__(self, capacity, max_ingest_data_rate):
 		self.total_capacity = capacity
@@ -136,12 +134,11 @@ class HotBuffer:
 				'Incoming data rate {0} exceeds maximum.'.format(
 					incoming_datarate)
 			)
-		if self.current_capacity - incoming_datarate <0:
+		if self.current_capacity - incoming_datarate < 0:
 			return False
 		else:
 			self.current_capacity - incoming_datarate
 			return True
-
 
 	def cold_buffer_data_request(self, observation):
 		"""
@@ -152,13 +149,42 @@ class HotBuffer:
 
 
 class ColdBuffer:
-	def __init__(self,size, data_rate):
+	def __init__(self, capacity, max_data_rate):
 		"""
 		The ColdBuffer takes data from the hot buffer for use in workflow
 		processing
 		"""
+		self.total_capacity = capacity
+		self.current_capacity = self.total_capacity
+		self.max_data_rate = max_data_rate
 
 
-# TODO Buffer needs more specifications - data transfer times/latency/bandwidth
-# TODO Need specification on buffer makeup
+def process_buffer_config(spec):
+	try:
+		with open(spec, 'r') as infile:
+			config = json.load(infile)
+	except OSError:
+		logger.warning("File %s not found", spec)
+		raise
+	except json.JSONDecodeError:
+		logger.warning("Please check file is in JSON Format")
+		raise
+	try:
+		'hot' in config and 'cold' in config
+	except KeyError:
+		logger.warning(
+			"'system' is not in %s, check your JSON is correctly formatted",
+			config
+		)
+		raise
+	hot = HotBuffer(
+		capacity=config['hot']['capacity'],
+		max_ingest_data_rate=config['hot']['max_ingest_rate']
+	)
+	cold = ColdBuffer(
+		capacity=config['cold']['capacity'],
+		max_data_rate=config['cold']['max_data_rate']
+	)
+
+	return hot, cold
 

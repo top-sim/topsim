@@ -14,6 +14,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import unittest
+import json
+
 import simpy
 
 from common import data as test_data
@@ -32,6 +34,9 @@ PLAN_ALGORITHM = test_data.planning_algorithm
 
 CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
 BUFFER_CONFIG = 'test/data/config/buffer.json'
+BUFFER_NOFILE = "test/data/config/buffer_config.json"  # Does not exist
+BUFFER_INCORRECT_JSON = "test/data/config/sneaky.json"
+BUFFER_NOT_JSON = "test/data/config/oops.txt"
 
 
 class TestBufferConfig(unittest.TestCase):
@@ -47,19 +52,43 @@ class TestBufferConfig(unittest.TestCase):
 		buffer = Buffer(
 			env=self.env, cluster=self.cluster, config=BUFFER_CONFIG
 		)
-		# Something something buffer.hot
+		self.assertEqual(500, buffer.hot.total_capacity)
+		self.assertEqual(500, buffer.hot.current_capacity)
+		self.assertEqual(5, buffer.hot.max_ingest_data_rate)
 
 	def testColdBufferConfig(self):
 		"""
 		Process cold buffer section of the config file
 		:return:
 		"""
+		buffer = Buffer(
+			env=self.env, cluster=self.cluster, config=BUFFER_CONFIG
+		)
+		self.assertEqual(250, buffer.cold.total_capacity)
+		self.assertEqual(250, buffer.cold.current_capacity)
+		self.assertEqual(2, buffer.cold.max_data_rate)
 
-	def testBufferNoFile(self):
-		config = None
-		buffer = None
-		self.assertRaises(FileNotFoundError, buffer)
+	def testBufferConfigNoFile(self):
+		"""
+		Attempt to initialise a cluster with the wrong file
+		:return: None
+		"""
+		config = BUFFER_NOFILE
+		self.assertRaises(
+			FileNotFoundError, Buffer, self.env, self.cluster, config
+		)
 
+	def testBufferConfigIncorrectJSON(self):
+		config = BUFFER_INCORRECT_JSON
+		self.assertRaises(
+			KeyError, Buffer, self.env, self.cluster, config
+		)
+
+	def testBufferConfigNotJSON(self):
+		config = BUFFER_NOT_JSON
+		self.assertRaises(
+			json.JSONDecodeError, Buffer, self.env, self.cluster, config
+		)
 class TestBufferIngestDataStream(unittest.TestCase):
 
 	def setUp(self):

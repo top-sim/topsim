@@ -1,5 +1,9 @@
 {
-	"observation": [
+
+	"telescope": {
+		"total_arrays": 36
+	},
+	"observations": [
 		{
 			"name": "emu",
 			"start": 0,
