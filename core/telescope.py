@@ -30,8 +30,7 @@ class TelescopeQueue:
 
 class Telescope:
 	def __init__(
-			self, env, buffer_obj, telescope_config,
-			planner
+			self, env, buffer_obj, telescope_config, planner
 	):
 		self.env = env
 		try:

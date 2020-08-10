@@ -22,7 +22,6 @@ class TestTelescopeConfig(unittest.TestCase):
 
 	def setUp(self):
 		self.env = simpy.Environment()
-		observations = process_telescope_config(config)
 
 class TestTelescope(unittest.TestCase):
 
@@ -31,3 +30,9 @@ class TestTelescope(unittest.TestCase):
 
 	def tearDown(self):
 		pass
+
+
+class TestObservationConfig(unittest.TestCase):
+
+	def setUp(self):
+		self.env = simpy.Environment()
