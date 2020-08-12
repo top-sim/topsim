@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from queue import PriorityQueue
 import logging
+from enum import Enum
 import numpy as np
 from core.algorithm import Algorithm
 from core.planner import TaskStatus,WorkflowStatus
@@ -22,45 +23,36 @@ logger = logging.getLogger(__name__)
 
 
 class Scheduler(object):
-	def __init__(self, env, algorithm, buffer, cluster, telescope):
+	def __init__(self, env, buffer, cluster, algorithm):
 		self.env = env
-		self.telescope = telescope
 		self.algorithm = algorithm
 		self.waiting_observations = []
 		self.current_observation = None
 		self.cluster = cluster
 		self.buffer = buffer
 		self.current_plan = None
+		self.scheduler_status = SchedulerStatus.SLEEP
 
 	def run(self):
+		self.scheduler_status = SchedulerStatus.RUNNING
 		while True:
 			# AT THE END OF THE SIMULATION, WE GET STUCK HERE. NEED TO EXIT
-			if self.buffer.waiting_observation_list or self.waiting_observations or self.cluster.running_tasks:
+			if self.buffer.waiting_observation_list \
+				or self.waiting_observations \
+				or self.cluster.running_tasks:
+
 				for observation in self.buffer.waiting_observation_list:
 					if observation not in self.waiting_observations:
 						self.waiting_observations.append(observation)
 				allocation = self.allocate_tasks()
 				if allocation:
 					logger.info("Successfully allocated")
-			if len(self.waiting_observations) == 0 and not self.telescope.observations_to_process():
+
+			if len(self.waiting_observations) == 0 \
+				and self.scheduler_status == SchedulerStatus.SHUTDOWN:
 				logger.debug("No more waiting workflows")
 				break
 			yield self.env.timeout(1)
-
-	def check_buffer(self):
-		if self.buffer.waiting_observation_list:
-			logger.debug(
-				"Workflows currently waiting in the Buffer: {0}".format(
-					[o.name for o in self.buffer.waiting_observation_list]
-				)
-			)
-			for observation in self.buffer.waiting_observation_list:
-				if observation not in self.waiting_observations:
-					self.waiting_observations.append(observation)
-			return True
-		else:
-			return False
-
 
 	def allocate_tasks(self):
 		logger.debug('Attempting to schedule workflow to cluster')
@@ -136,6 +128,17 @@ class Scheduler(object):
 		buffer_trigger = self.env.process(self.buffer.run(observation))
 		yield buffer_trigger
 
+	def check_ingest_capacity(self, observation):
+		"""
+		Check the cluster and buffer to ensure that we have enough capacity
+		to run the INGEST pipeline for the provided observation
+		:return:
+		"""
+		if self.buffer.check_buffer_capacity(observation):
+			logger.debug("Buffer has enough capacity for %s", observation.name)
+		if self.cluster.check_ingest_capacity(observation):
+			logger.debug("Cluster is able to process ingest for observation "
+						 "%s", observation.name)
 
 	def allocate_ingest(self):
 		"""
@@ -161,8 +164,24 @@ class Scheduler(object):
 	# 	self.observations_for_processing.append(workflow)
 	# 	print("Waiting workflows", self.observations_for_processing
 
+	def init_scheduler(self):
+		self.scheduler_status = SchedulerStatus.RUNNING
+		return True
+
+
+	def shutdown_scheduler(self):
+		self.scheduler_status = SchedulerStatus.SHUTDOWN
+		return True
+
 	def print_state(self):
 		# Change this to 'workflows scheduled/workflows unscheduled'
 		return {
 			'observations_for_processing': [observation.plan.id for observation in self.waiting_observations]
 		}
+
+
+class SchedulerStatus(Enum):
+	SLEEP = 'SLEEP'
+	RUNNING = 'RUNNING'
+	SHUTDOWN = 'SHUTDOWN'
+

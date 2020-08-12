@@ -15,13 +15,47 @@
 
 import unittest
 import simpy
+import json
+
+from core.telescope import Telescope
+from core.scheduler import Scheduler
+from core.buffer import Buffer
+from core.cluster import Cluster
 
 OBSERVATION_CONFIG = 'test/data/config/observations.json'
+CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
+BUFFER_CONFIG = 'test/data/config/buffer.json'
+
 
 class TestTelescopeConfig(unittest.TestCase):
 
 	def setUp(self):
 		self.env = simpy.Environment()
+		cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
+		buffer = Buffer(env=self.env,cluster=cluster, config=BUFFER_CONFIG)
+		self.scheduler = Scheduler(
+			env=self.env, buffer=buffer,cluster=cluster, algorithm=None
+		)
+
+	def testTelescopeBasicConfig(self):
+		telescope = Telescope(
+			env=self.env, telescope_config=OBSERVATION_CONFIG,
+			planner=None, scheduler=self.scheduler
+		)
+
+
+class TestObservationConfig(unittest.TestCase):
+
+	def setUp(self):
+		self.env = simpy.Environment()
+
+	def testObservationConfigJSON(self):
+		"""
+		Ensure the JSON has been presented directly
+
+		:return:
+		"""
+
 
 class TestTelescope(unittest.TestCase):
 
@@ -32,7 +66,3 @@ class TestTelescope(unittest.TestCase):
 		pass
 
 
-class TestObservationConfig(unittest.TestCase):
-
-	def setUp(self):
-		self.env = simpy.Environment()

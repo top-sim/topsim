@@ -71,8 +71,8 @@ class Buffer(object):
 			yield self.env.timeout(1)
 
 	def check_buffer_capacity(self, observation):
-		if self.hot - observation.size < 0 \
-				and self.cold - observation.size < 0:
+		if self.hot.current_capacity - observation.size < 0 \
+				and self.cold.current_capacity - observation.size < 0:
 			return False
 		else:
 			return True

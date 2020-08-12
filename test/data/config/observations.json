@@ -1,7 +1,12 @@
 {
 
 	"telescope": {
-		"total_arrays": 36
+		"total_arrays": 36,
+		"pipelines": [
+			"continuum",
+			"spectral",
+			"pulsar"
+		]
 	},
 	"observations": [
 		{
@@ -9,7 +14,8 @@
 			"start": 0,
 			"duration": 10,
 			"demand": 36,
-			"workflow": "continuum",
+			"workflow": "something.json",
+			"type": "continuum",
 			"data_product_rate": 4
 		},
 		{
