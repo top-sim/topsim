@@ -12,25 +12,65 @@ logger = logging.getLogger(__name__)
 
 # BUFFER_OFFSET = config_data.buffer_offset
 # from core.telescope import Observation
+"""
+The Planner is our interface with static scheduling algorithms. It provides 
+an interface to other libraries and selects the library based on the provided 
+algorithms based to the _init_. Currently, the SHADOW library is the only 
+library that the Planner is aligned with; this may change in the future.  
+"""
 
 
 class Planner(object):
-	def __init__(self, env, algorithm, envconfig):
+	def __init__(self, env, algorithm, cluster):
 		self.env = env
-		self.envconfig = envconfig
+		self.cluster = cluster
+		# self.envconfig = envconfig
 		self.algorithm = algorithm
 
 	def run(self, observation):
 		# wfid = observation.name
-		observation.plan = self.plan(observation.name, observation.workflow, self.algorithm)
+		observation.plan = self.plan(observation.name, observation.workflow,
+									 self.algorithm)
 		yield self.env.timeout(0)
 
 	def plan(self, name, workflow, algorithm):
 		workflow = ShadowWorkflow(workflow)
-		workflow_env = ShadowEnvironment(self.envconfig)
+		available_resources = self.cluster_to_shadow_format()
+		workflow_env = ShadowEnvironment(available_resources)
 		workflow.add_environment(workflow_env)
 		plan = WorkflowPlan(name, workflow, algorithm, self.env)
 		return plan
+
+	def cluster_to_shadow_format(self):
+		"""
+		Given the cluster, select from the available resources to allocate
+		and create a dictionary in the format required for shadow.
+		:return: dictionary of machine requirements
+		"""
+		sdict = {}
+		# "flops": 84,
+		# "rates": 10
+		# "costs": 0.7
+		available_resources = self.cluster.available_resources()
+		dictionary = {
+			"system": {
+				"resources": None,
+				"bandwidth": self.cluster.system_bandwidth
+			}
+		}
+		resources = {}
+		for machine in available_resources:
+			resources[machine.name] = {
+				"flops": machine.cpu,
+				"rates": machine.bandwidth,
+				"io": machine.disk,
+				"memory": machine.memory
+			}
+		dictionary['resources'] = resources
+
+		return dictionary
+
+	# for machine in available_resources:
 
 
 class WorkflowStatus(int, Enum):
@@ -63,15 +103,15 @@ class WorkflowPlan(object):
 		# The solution object is now how we get information on allocatiosn from SHADOW
 
 		for task in self.solution.task_allocations:
-				allocation = self.solution.task_allocations.get(task)
-				taskobj = Task(task, env)
-				taskobj.est = allocation.ast
-				taskobj.eft = allocation.aft
-				taskobj.duration = taskobj.eft - taskobj.est
-				taskobj.machine_id = allocation.machine
-				taskobj.flops = task.flops_demand
-				taskobj.pred = list(workflow.graph.predecessors(task))
-				self.tasks.append(taskobj)
+			allocation = self.solution.task_allocations.get(task)
+			taskobj = Task(task, env)
+			taskobj.est = allocation.ast
+			taskobj.eft = allocation.aft
+			taskobj.duration = taskobj.eft - taskobj.est
+			taskobj.machine_id = allocation.machine
+			taskobj.flops = task.flops_demand
+			taskobj.pred = list(workflow.graph.predecessors(task))
+			self.tasks.append(taskobj)
 		self.tasks.sort(key=lambda x: x.est)
 		self.exec_order = self.solution.execution_order
 		self.start_time = None
@@ -100,6 +140,7 @@ class Task(object):
 	they arrive on the cluster queue, they are workflow agnositc, and are processed according to
 	their priority.
 	"""
+
 	# NB I don't want tasks to have null defaults; should we improve on this by initialising
 	# everything in a task at once?
 	def __init__(self, tid, env):
@@ -144,7 +185,8 @@ class Task(object):
 		logger.debug('%s finished at %s', self.id, self.finished_timestamp)
 		self.task_status = TaskStatus.FINISHED
 		return True
-		# self.machine.stop_task(self)
+
+	# self.machine.stop_task(self)
 
 	def run(self):
 		self.started_timestamp = self.env.now
@@ -154,6 +196,5 @@ class Task(object):
 		if process:
 			return self.task_status
 		else:
-			raise RuntimeError('Task {0} failed to execute normally'.format(self))
-
-
+			raise RuntimeError(
+				'Task {0} failed to execute normally'.format(self))

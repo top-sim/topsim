@@ -51,6 +51,7 @@
         "flops": 84,
         "rates": 10
       }
-    }
+    },
+    "bandwidth": 1.0
   }
 }

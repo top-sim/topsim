@@ -7,12 +7,43 @@ from core.planner import TaskStatus
 
 
 class Cluster(object):
-	def __init__(self,env, spec):
+	"""
+	A class used to represent the Cluster, the abstract representation
+	of computing resources in the Science Data Processor
+
+	Attributes
+	----------
+	says_str : str
+	    a formatted string to print out what the animal says
+	name : str
+	    the name of the animal
+	sound : str
+	    the sound that the animal makes
+	num_legs : int
+	    the number of legs the animal has (default 4)
+
+	Methods
+	-------
+	says(sound=None)
+	    Prints the animals name and what sound it makes
+	"""
+
+	def __init__(self, env, spec):
+		"""
+
+		:param env:
+		:param spec:
+		"""
 		try:
-			self.machines = config.process_machine_config(spec)
+			self.machines, self.system_bandwidth = \
+				config.process_machine_config(spec)
 		except OSError:
 			raise
-		self.dmachine = {machine.id:machine for machine in self.machines}
+		self.dmachine = {machine.id: machine for machine in self.machines}
+		self.available_resouces = {
+			machine.id: machine for machine in self.machines
+		}
+		self.occupied_resouces = {}
 		self.running_tasks = []
 		self.finished_tasks = []
 		self.waiting_tasks = []
@@ -36,7 +67,6 @@ class Cluster(object):
 						machine.run(task)
 			yield self.env.timeout(1)
 
-
 	def ingest_pipeline_provision(self, observation, ingest_time):
 		"""
 		For a given observation (param), we  will take up a certain amount of the system resources
@@ -51,7 +81,6 @@ class Cluster(object):
 		"""
 
 		return True
-
 
 	def has_capacity(self):
 		"""
@@ -83,6 +112,10 @@ class Cluster(object):
 
 		return availability
 
+	def available_resources(self):
+		available_resources = None
+		return available_resources
+
 	def resource_use(self):
 		"""Returns the utilisation of the Cluster"""
 		ustilisation = None
@@ -105,4 +138,3 @@ class Cluster(object):
 			if machine.current_task:
 				efficiency += 1
 		return efficiency
-

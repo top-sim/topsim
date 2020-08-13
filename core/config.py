@@ -28,7 +28,8 @@ def process_machine_config(machine_config):
 	except json.JSONDecodeError:
 		raise
 	try:
-		'system' in config and 'resources' in config['system']
+		'system' in config and 'resources' in config['system'] \
+		and 'bandwidth' in config['system']
 	except KeyError:
 		logger.warning(
 			"'system' is not in %s, check your JSON is correctly formatted",
@@ -47,7 +48,10 @@ def process_machine_config(machine_config):
 				bandwidth=machines[machine]['rates']
 			)
 		)
-	return machine_list
+
+	bandwidth = config['system']['bandwidth']
+	return machine_list, bandwidth
+
 
 
 def process_telescope_config(telescope_config):

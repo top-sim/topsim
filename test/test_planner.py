@@ -30,12 +30,27 @@ current_dir = os.path.abspath('.')
 OBS_START_TME = 0
 OBS_DURATION = 10
 OBS_DEMAND = 15
-OBS_WORKFLOW = "{0}/{1}".format(current_dir, test_data.test_plan_workflow)
 
-PLAN_ALGORITHM = test_data.planning_algorithm
-MACHINE_CONFIG = "{0}/{1}".format(current_dir, test_data.machine_config)
+PLAN_ALGORITHM = 'heft'
+CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
+
+MACHINE_CONFIG = None
+OBS_WORKFLOW = None
 
 
+class TestPlannerConfig(unittest.TestCase):
+
+	def setUp(self):
+		self.env = simpy.Environment()
+		self.cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
+
+	def testPlannerBasicConfig(self):
+		planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
+		available_resources = planner.cluster_to_shadow_format()
+		# TODO write tests for the 
+
+
+@unittest.skip
 class TestPlanner(unittest.TestCase):
 
 	def setUp(self):
@@ -46,10 +61,10 @@ class TestPlanner(unittest.TestCase):
 		# self.buffer = Buffer(self.env, self.cluster)
 		# self.algorithms = Scheduler(self.env, sched_algorithm, self.buffer, self.cluster)
 		self.observation = Observation('planner_observation',
-									OBS_START_TME,
-									OBS_DURATION,
-									OBS_DEMAND,
-									OBS_WORKFLOW)
+									   OBS_START_TME,
+									   OBS_DURATION,
+									   OBS_DEMAND,
+									   OBS_WORKFLOW)
 		pass
 
 	def tearDown(self):
@@ -60,9 +75,12 @@ class TestPlanner(unittest.TestCase):
 
 	def testPlanReadsFromFile(self):
 		# Return a "Plan" object for provided workflow/observation
-		plan = self.planner.plan(self.observation.name, self.observation.workflow, PLAN_ALGORITHM)
-		self.assertEqual(plan.id, 'planner_observation')  # Expected ID for the workflow
-		self.assertEqual(plan.makespan, 98)  # Expected makespan for the given graph
+		plan = self.planner.plan(self.observation.name,
+								 self.observation.workflow, PLAN_ALGORITHM)
+		self.assertEqual(plan.id,
+						 'planner_observation')  # Expected ID for the workflow
+		self.assertEqual(plan.makespan,
+						 98)  # Expected makespan for the given graph
 
 	def testPlannerRun(self):
 		next(self.planner.run(self.observation))
@@ -88,17 +106,18 @@ class TestWorkflowPlan(unittest.TestCase):
 		# self.buffer = Buffer(self.env, self.cluster)
 		# self.algorithms = Scheduler(self.env, sched_algorithm, self.buffer, self.cluster)
 		self.observation = Observation('planner_observation',
-									OBS_START_TME,
-									OBS_DURATION,
-									OBS_DEMAND,
-									OBS_WORKFLOW)
+									   OBS_START_TME,
+									   OBS_DURATION,
+									   OBS_DEMAND,
+									   OBS_WORKFLOW)
 		pass
 
 	def tearDown(self):
 		pass
 
 	def testWorkflowPlanCreation(self):
-		plan = self.planner.plan(self.observation.name, self.observation.workflow, 'heft')
+		plan = self.planner.plan(self.observation.name,
+								 self.observation.workflow, 'heft')
 		expected_exec_order = [0, 3, 2, 4, 1, 5, 6, 8, 7, 9]
 		self.assertEqual(len(plan.tasks), len(expected_exec_order))
 		for x in range(len(plan.tasks)):
