@@ -89,21 +89,33 @@ class TestBufferConfig(unittest.TestCase):
 		self.assertRaises(
 			json.JSONDecodeError, Buffer, self.env, self.cluster, config
 		)
+
+
 class TestBufferIngestDataStream(unittest.TestCase):
 
 	def setUp(self):
+		"""
+
+		Returns
+		-------
+
+		"""
 		"""
 		setup the buffer and do config stuff
 		:return: Nothing
 		"""
 		self.env = simpy.Environment()
 		self.cluster = Cluster(self.env, MACHINE_CONFIG)
-		self.buffer = Buffer(self.env, self.cluster)
-		self.observation = Observation('scheduler_observation',
-									   OBS_START_TME,
-									   OBS_DURATION,
-									   OBS_DEMAND,
-									   OBS_WORKFLOW)
+		self.buffer = Buffer(self.env, self.cluster, BUFFER_CONFIG)
+		self.observation = Observation(
+			name='test_observation',
+			start=OBS_START_TME,
+			duration=OBS_DURATION,
+			demand=OBS_DEMAND,
+			workflow=OBS_WORKFLOW,
+			type='continuum',
+			data_rate=5,
+		)
 
 	def testIngestEdgeCase(self):
 		"""
@@ -121,7 +133,7 @@ class TestBufferIngestDataStream(unittest.TestCase):
 			self.env,
 			self.observation,
 			self.buffer,
-			telescope_config=None,
+			config=None,
 			planner=None
 		)
 

@@ -67,7 +67,7 @@ class Buffer(object):
 				# Observation is only 'added_to_buffer' once the data
 				# has been completely added
 				if observation.status == RunStatus.FINISHED:
-					self.add_observation_to_buffer(observation)
+					self.add(observation)
 			yield self.env.timeout(1)
 
 	def check_buffer_capacity(self, observation):
@@ -80,7 +80,7 @@ class Buffer(object):
 	def ingest_data_dump(self, data):
 		pass
 
-	def add_observation_to_buffer(self, observation):
+	def add(self, observation):
 		logger.info(
 			"%s data to buffer at time %s", observation.name, self.env.now
 		)
@@ -89,7 +89,7 @@ class Buffer(object):
 		self.waiting_observation_list.append(observation)
 		logger.debug('Observations in buffer %', self.waiting_observation_list)
 
-	def request_observation_data_from_buffer(self, observation):
+	def request_data_from(self, observation):
 		logger.info("Removing observation from buffer at time %s")
 		data_transfer_time = 0
 		# This will take time, so we need to timeout

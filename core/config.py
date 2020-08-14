@@ -76,7 +76,7 @@ def process_telescope_config(telescope_config):
 
 #
 #
-# def process_telescope_config(telescope_config):
+# def process_telescope_config(config):
 # 	return Telescope
 
 

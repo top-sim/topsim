@@ -37,13 +37,15 @@ class TestTelescopeConfig(unittest.TestCase):
 		self.scheduler = Scheduler(
 			env=self.env, buffer=buffer,cluster=cluster, algorithm=None
 		)
-		planner = Planner()
+		planner = Planner(self.env, 'heft', cluster)
 
 	def testTelescopeBasicConfig(self):
 		telescope = Telescope(
-			env=self.env, telescope_config=OBSERVATION_CONFIG,
+			env=self.env, config=OBSERVATION_CONFIG,
 			planner=None, scheduler=self.scheduler
 		)
+		self.assertEqual(36, telescope.total_arrays)
+		self.assertEqual(10, telescope.pipelines['pulsar'])
 
 
 class TestObservationConfig(unittest.TestCase):

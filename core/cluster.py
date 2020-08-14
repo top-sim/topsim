@@ -40,7 +40,7 @@ class Cluster(object):
 		except OSError:
 			raise
 		self.dmachine = {machine.id: machine for machine in self.machines}
-		self.available_resouces = {
+		self.available_resources = {
 			machine.id: machine for machine in self.machines
 		}
 		self.occupied_resouces = {}
@@ -82,6 +82,27 @@ class Cluster(object):
 
 		return True
 
+	def check_ingest_capacity(self, observation):
+		"""
+		Check if the Cluster has the machine capacity to process the
+		observation Ingest pipeline
+
+		Observation objects have an observation type - this corresponds to
+		an ingest pipeline that is set out in the Telescope. This pipeline type
+		determines the number of machines in the cluster, and the duration,
+		which must be reserved for the observation.
+
+		Parameters
+		----------
+		observation : core.Telescope.Observation object
+			The observation we are attempting to commence
+
+		Returns
+		-------
+			True if the cluster has capacity
+			False if the cluster does not have capacity to run the pipeline
+		"""
+
 	def has_capacity(self):
 		"""
 		:return:
@@ -111,10 +132,6 @@ class Cluster(object):
 				availability += 1
 
 		return availability
-
-	def available_resources(self):
-		available_resources = None
-		return available_resources
 
 	def resource_use(self):
 		"""Returns the utilisation of the Cluster"""

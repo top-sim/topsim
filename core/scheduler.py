@@ -54,73 +54,30 @@ class Scheduler(object):
 				break
 			yield self.env.timeout(1)
 
-	def allocate_tasks(self):
-		logger.debug('Attempting to schedule workflow to cluster')
-
-		# Min -scheduling time
-		minst = -1
-		if not self.current_plan:
-			for observation in self.waiting_observations:
-				st = observation.plan.start_time
-				if minst == -1 or st < minst:
-					minst = st
-					self.current_plan = observation.plan
-					self.current_plan.start_time = self.env.now
-					self.current_observation = observation
-					logger.info("New observation %s scheduled for processing @ Time: %s", observation.plan.id, self.env.now)
-
-		if self.current_plan.status is WorkflowStatus.FINISHED:
-			# TODO wrap this into a function moving forward
-			self.waiting_observations.remove(self.current_observation)
-			self.buffer.request_observation_data_from_buffer(self.current_observation)
-			self.buffer.waiting_observation_list.remove(self.current_observation)
-			logger.info('%s finished processing @ %s', self.current_observation.name, self.env.now)
-			self.current_plan = None
-			self.current_observation = None
-
-		if self.waiting_observations:
-			for observation in self.waiting_observations:
-				if observation.plan.status is WorkflowStatus.FINISHED:
-					self.waiting_observations.remove(self.current_observation)
-					self.buffer.waiting_observation_list.remove(self.current_observation)
-			logger.debug("Currently waiting to process: %s", self.waiting_observations)
-		else:
-			logger.debug("Nothing in Buffer to process")
-
-		if self.current_plan:
-			logger.debug("Current plan: %s, %s ", self.current_plan.id, self.current_plan.exec_order)
-
-			while True:
-				machine, task = self.algorithm(self.cluster, self.env.now, self.current_plan)
-				if machine is None or task is None:
-					break
-				else:
-					# Runs the task on the machie
-					task.machine = machine
-					self.cluster.allocate_task(task, machine)
-					# self.cluster.waiting_tasks.append(task)
-					# task.run(self.find_appropriate_machine_in_cluster(machine))
-					if task.task_status is TaskStatus.SCHEDULED:
-						self.cluster.running_tasks.append(task)
-
-		return True
-
-	# When we run tasks we want to run it on a given machine on the cluster, which the task does not
-	# have access to unless we pass it to the class (which seems a bit ridiculous)
-	# get task to run
-
-	def find_appropriate_machine_in_cluster(self, machine_id):
-		for machine in self.cluster.machines:
-			if machine.id == machine_id:
-				return machine
-
-	def start_ingest_pipelines(self, observation):
+	def start_ingest_pipelines(self, observation, pipeline):
 		"""
 		Ingest is 'streaming' data to the buffer during the observation
 		How we calculate how long it takes remains to be seen
 		For the time being, we will be doubling the observation time
+
+		Parameters
+		---------
+		observation : core.Telescope.Observation object
+			The observation from which we are starting Ingest
+		Returns
+		-------
+			True/False
+
+		Yields
+		------
+		buffer_trigger : Simpy.Environment.Process
+			Yields a process to the buffer, which will add the Buffer
+
+		Raises
+		------
 		"""
-		streaming_time = observation.duration*2
+
+		streaming_time = int(observation.duration/2)
 		if self.buffer.check_buffer_capacity(observation.project_output):
 			yield self.env.timeout(streaming_time)
 		else:
@@ -128,7 +85,7 @@ class Scheduler(object):
 		buffer_trigger = self.env.process(self.buffer.run(observation))
 		yield buffer_trigger
 
-	def check_ingest_capacity(self, observation):
+	def check_ingest_capacity(self, observation, pipelines):
 		"""
 		Check the cluster and buffer to ensure that we have enough capacity
 		to run the INGEST pipeline for the provided observation
@@ -140,7 +97,7 @@ class Scheduler(object):
 			logger.debug("Cluster is able to process ingest for observation "
 						 "%s", observation.name)
 
-	def allocate_ingest(self):
+	def allocate_ingest(self, observation):
 		"""
 		Scheduler is the middleman between the Telescope and the Cluster
 		Checks to see if there is enough
@@ -178,6 +135,63 @@ class Scheduler(object):
 		return {
 			'observations_for_processing': [observation.plan.id for observation in self.waiting_observations]
 		}
+
+	def allocate_tasks(self):
+		logger.debug('Attempting to schedule workflow to cluster')
+
+		# Min -scheduling time
+		minst = -1
+		if not self.current_plan:
+			for observation in self.waiting_observations:
+				st = observation.plan.start_time
+				if minst == -1 or st < minst:
+					minst = st
+					self.current_plan = observation.plan
+					self.current_plan.start_time = self.env.now
+					self.current_observation = observation
+					logger.info(
+						"New observation %s scheduled for processing @ Time: "
+						"%s", observation.plan.id, self.env.now
+					)
+
+		if self.current_plan.status is WorkflowStatus.FINISHED:
+			# TODO wrap this into a function moving forward
+			self.waiting_observations.remove(self.current_observation)
+			self.buffer.request_data_from(self.current_observation)
+			self.buffer.waiting_observation_list.remove(self.current_observation)
+			logger.info('%s finished processing @ %s', self.current_observation.name, self.env.now)
+			self.current_plan = None
+			self.current_observation = None
+
+		if self.waiting_observations:
+			for observation in self.waiting_observations:
+				if observation.plan.status is WorkflowStatus.FINISHED:
+					self.waiting_observations.remove(self.current_observation)
+					self.buffer.waiting_observation_list.remove(self.current_observation)
+			logger.debug("Currently waiting to process: %s", self.waiting_observations)
+		else:
+			logger.debug("Nothing in Buffer to process")
+
+		if self.current_plan:
+			logger.debug("Current plan: %s, %s ", self.current_plan.id, self.current_plan.exec_order)
+
+			while True:
+				machine, task = self.algorithm(self.cluster, self.env.now, self.current_plan)
+				if machine is None or task is None:
+					break
+				else:
+					# Runs the task on the machie
+					task.machine = machine
+					self.cluster.allocate_task(task, machine)
+					if task.task_status is TaskStatus.SCHEDULED:
+						self.cluster.running_tasks.append(task)
+
+		return True
+
+	def find_appropriate_machine_in_cluster(self, machine_id):
+		for machine in self.cluster.machines:
+			if machine.id == machine_id:
+				return machine
 
 
 class SchedulerStatus(Enum):

@@ -36,7 +36,7 @@ class Planner(object):
 	def plan(self, name, workflow, algorithm):
 		workflow = ShadowWorkflow(workflow)
 		available_resources = self.cluster_to_shadow_format()
-		workflow_env = ShadowEnvironment(available_resources)
+		workflow_env = ShadowEnvironment(available_resources, dictionary=True)
 		workflow.add_environment(workflow_env)
 		plan = WorkflowPlan(name, workflow, algorithm, self.env)
 		return plan
@@ -51,7 +51,7 @@ class Planner(object):
 		# "flops": 84,
 		# "rates": 10
 		# "costs": 0.7
-		available_resources = self.cluster.available_resources()
+		available_resources = self.cluster.available_resources
 		dictionary = {
 			"system": {
 				"resources": None,
@@ -60,17 +60,18 @@ class Planner(object):
 		}
 		resources = {}
 		for machine in available_resources:
-			resources[machine.name] = {
-				"flops": machine.cpu,
-				"rates": machine.bandwidth,
-				"io": machine.disk,
-				"memory": machine.memory
+			m = available_resources[machine]
+			resources[m.id] = {
+				"flops": m.cpu,
+				"rates": m.bandwidth,
+				"io": m.disk,
+				"memory": m.memory
 			}
-		dictionary['resources'] = resources
+		dictionary['system']['resources'] = resources
 
 		return dictionary
 
-	# for machine in available_resources:
+# for machine in available_resources:
 
 
 class WorkflowStatus(int, Enum):
@@ -104,7 +105,7 @@ class WorkflowPlan(object):
 
 		for task in self.solution.task_allocations:
 			allocation = self.solution.task_allocations.get(task)
-			taskobj = Task(task, env)
+			taskobj = Task(task.tid, env)
 			taskobj.est = allocation.ast
 			taskobj.eft = allocation.aft
 			taskobj.duration = taskobj.eft - taskobj.est

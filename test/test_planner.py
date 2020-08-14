@@ -35,7 +35,7 @@ PLAN_ALGORITHM = 'heft'
 CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
 
 MACHINE_CONFIG = None
-OBS_WORKFLOW = None
+OBS_WORKFLOW = "test/data/config/workflow_config.json"
 
 
 class TestPlannerConfig(unittest.TestCase):
@@ -47,7 +47,12 @@ class TestPlannerConfig(unittest.TestCase):
 	def testPlannerBasicConfig(self):
 		planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
 		available_resources = planner.cluster_to_shadow_format()
-		# TODO write tests for the 
+		# TODO write tests for the plan
+		self.assertEqual(1.0, available_resources['system']['bandwidth'])
+		machine = available_resources['system']['resources']['cat0_m0']
+		self.assertEqual(
+			84, available_resources['system']['resources']['cat0_m0']['flops']
+		)
 
 
 @unittest.skip
@@ -57,9 +62,10 @@ class TestPlanner(unittest.TestCase):
 		self.env = simpy.Environment()
 		sched_algorithm = FifoAlgorithm()
 		self.planner = Planner(self.env, PLAN_ALGORITHM, MACHINE_CONFIG)
-		self.cluster = Cluster(test_data.machine_config)
+		self.cluster = Cluster(self.env, CLUSTER_CONFIG)
 		# self.buffer = Buffer(self.env, self.cluster)
-		# self.algorithms = Scheduler(self.env, sched_algorithm, self.buffer, self.cluster)
+		# self.algorithms = Scheduler(self.env,
+		# sched_algorithm, self.buffer, self.cluster)
 		self.observation = Observation('planner_observation',
 									   OBS_START_TME,
 									   OBS_DURATION,
@@ -100,37 +106,31 @@ class TestWorkflowPlan(unittest.TestCase):
 
 	def setUp(self):
 		self.env = simpy.Environment()
-		sched_algorithm = FifoAlgorithm()
-		self.planner = Planner(self.env, PLAN_ALGORITHM, MACHINE_CONFIG)
-		self.cluster = Cluster(test_data.machine_config)
-		# self.buffer = Buffer(self.env, self.cluster)
-		# self.algorithms = Scheduler(self.env, sched_algorithm, self.buffer, self.cluster)
-		self.observation = Observation('planner_observation',
-									   OBS_START_TME,
-									   OBS_DURATION,
-									   OBS_DEMAND,
-									   OBS_WORKFLOW)
-		pass
+		self.cluster = Cluster(self.env, CLUSTER_CONFIG)
+		self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
+		self.observation = Observation(
+			'planner_observation',
+			OBS_START_TME,
+			OBS_DURATION,
+			OBS_DEMAND,
+			OBS_WORKFLOW,
+			type=None,
+			data_rate=None
+		)
 
 	def tearDown(self):
 		pass
 
 	def testWorkflowPlanCreation(self):
-		plan = self.planner.plan(self.observation.name,
-								 self.observation.workflow, 'heft')
-		expected_exec_order = [0, 3, 2, 4, 1, 5, 6, 8, 7, 9]
+		plan = self.planner.plan(
+			self.observation.name,
+			self.observation.workflow,
+			'heft'
+		)
+		expected_exec_order = [0, 5, 3, 4, 2, 1, 6, 8, 7, 9]
 		self.assertEqual(len(plan.tasks), len(expected_exec_order))
 		for x in range(len(plan.tasks)):
 			self.assertEqual(plan.tasks[x].id, expected_exec_order[x])
-
 		# Get taskid 5
 		task5_comp = plan.tasks[5].flops
-		self.assertEqual(task5_comp, 169)
-
-
-class TestTaskClass(unittest.TestCase):
-	def setUp(self):
-		pass
-
-	def tearDown(self):
-		pass
+		self.assertEqual(task5_comp, 92000)
