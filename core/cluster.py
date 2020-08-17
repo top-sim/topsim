@@ -46,7 +46,6 @@ class Cluster(object):
 		self.running_tasks = []
 		self.finished_tasks = []
 		self.waiting_tasks = []
-		# self.workflows = []  # Keeping here to stop runtime errors
 		self.ingest = False
 		self.finished_workflows = []
 		self.ingest_pipeline = None
@@ -126,8 +125,8 @@ class Cluster(object):
 
 		Returns
 		-------
-
 		"""
+
 		tasks = self._generate_ingest_tasks(demand, duration)
 		# Generate machine/task pairs
 		pairs = []
@@ -141,11 +140,14 @@ class Cluster(object):
 		while True:
 			for pair in pairs:
 				(machine, task) = pair
-				self.running_tasks.append(task)
-				machine.run(task)
-			break
+				if task not in self.running_tasks:
+					self.running_tasks.append(task)
+					yield machine.run(task)
+				else:
+					break
 
-		return True
+
+		# return True
 
 
 	# Mark resources as 'in-use' for the given pipeline.

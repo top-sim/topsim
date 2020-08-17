@@ -8,6 +8,7 @@ from shadow.models.environment import Environment as ShadowEnvironment
 from shadow.algorithms.heuristic import heft as shadow_heft
 import logging
 
+
 logger = logging.getLogger(__name__)
 
 # BUFFER_OFFSET = config_data.buffer_offset

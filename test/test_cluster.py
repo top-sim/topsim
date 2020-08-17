@@ -22,7 +22,7 @@ from core.cluster import Cluster
 from core.telescope import Observation
 from core.planner import TaskStatus
 
-logging.basicConfig(level="INFO")
+logging.basicConfig(level="DEBUG")
 logger = logging.getLogger(__name__)
 
 CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
@@ -97,20 +97,20 @@ class TestIngest(unittest.TestCase):
 	def testClusterProvisionIngest(self):
 		duration = self.observation.duration
 		pipeline_demand = 5
-
-		self.env.process(self.run_ingest(duration,pipeline_demand))
-		# self.env.run(until=20)
+		self.run_ingest(duration,pipeline_demand)
+		self.env.run(until=20)
 
 	def run_ingest(self, duration,demand):
 		retval = self.cluster.provision_ingest_resources(
-			duration,
-			demand
+			demand,
+			duration
 		)
+		self.assertEqual(5, len(self.cluster.available_resources))
+		self.assertEqual(5, len(self.cluster.running_tasks))
 		for task in self.cluster.running_tasks:
 			self.assertEqual(TaskStatus.SCHEDULED, task.task_status)
-		yield self.env.timeout(3)
-		for task in self.cluster.running_tasks:
-			self.assertEqual(task.task_status, TaskStatus.RUNNING)
+		# for task in self.cluster.running_tasks:
+		# 	self.assertEqual(TaskStatus.RUNNING, task.task_status)
 
 
 class TestCluster(unittest.TestCase):

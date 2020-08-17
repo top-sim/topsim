@@ -23,19 +23,24 @@ class Machine(object):
 		self.current_task = None
 
 	def run(self, task):
+		# return True
 		if task.task_status is TaskStatus.SCHEDULED:
 			self.run_task(task)
 		else:
 			return False
-		run_status = task.run()
-		yield run_status
-		if run_status is TaskStatus.FINISHED:
-			self.stop_task(task)
-			return True
-		else:
-			raise RuntimeError(
-				'Machine: {0} failed to execute Task: {1}'.format(self, task)
-			)
+		while True:
+			run_status = task.run()
+			yield run_status
+		# yield run_status
+		# logger.debug("Finished yield")
+		# yield run_status
+		# if run_status is TaskStatus.FINISHED:
+		# 	self.stop_task(task)
+		# 	return True
+		# else:
+		# 	raise RuntimeError(
+		# 		'Machine: {0} failed to execute Task: {1}'.format(self, task)
+		# 	)
 
 	def run_task(self, task_instance):
 		self.cpu -= task_instance.flops
