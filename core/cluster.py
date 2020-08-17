@@ -3,7 +3,7 @@ from core.machine import Machine
 from core import config
 from queue import Queue, PriorityQueue
 
-from core.planner import TaskStatus
+from core.planner import Task, TaskStatus
 
 
 class Cluster(object):
@@ -40,9 +40,8 @@ class Cluster(object):
 		except OSError:
 			raise
 		self.dmachine = {machine.id: machine for machine in self.machines}
-		self.available_resources = {
-			machine.id: machine for machine in self.machines
-		}
+		self.available_resources = [machine for machine in self.machines]
+
 		self.occupied_resouces = {}
 		self.running_tasks = []
 		self.finished_tasks = []
@@ -69,20 +68,22 @@ class Cluster(object):
 
 	def ingest_pipeline_provision(self, observation, ingest_time):
 		"""
-		For a given observation (param), we  will take up a certain amount of the system resources
-		for a set period of time for 'ingest' computation. This will likely be almost all the time, but the
-		resources that are selected may change based on the observation (e.g. larger
-		telescope demans = more resources)
+		For a given observation (param), we  will take up a certain amount
+		of the system resources for a set period of time for 'ingest'
+		computation. This will likely be  almost all the time, but the
+		resources that are selected may change based on the observation
+		(e.g. larger telescope demand = more resources)
 
-		When coordinating with the buffer, we want to pass to the buffer the amount of data produced by
-		the ingest pipeline every timesetp, which for now is the observation.data_product_size / ingest_time
+		When coordinating with the buffer, we want to pass to the buffer the
+		amount of data produced by the ingest pipeline every timese:p
+
 		:param observation:
 		:return:
 		"""
 
 		return True
 
-	def check_ingest_capacity(self, observation):
+	def check_ingest_capacity(self, pipeline_demand):
 		"""
 		Check if the Cluster has the machine capacity to process the
 		observation Ingest pipeline
@@ -94,8 +95,8 @@ class Cluster(object):
 
 		Parameters
 		----------
-		observation : core.Telescope.Observation object
-			The observation we are attempting to commence
+		pipeline_demand :  int
+			The number of
 
 		Returns
 		-------
@@ -103,23 +104,81 @@ class Cluster(object):
 			False if the cluster does not have capacity to run the pipeline
 		"""
 
-	def has_capacity(self):
-		"""
-		:return:
-		"""
-		if self.machines:
+		# Pipeline demand is the number of machines required for the pipeline
+		# Length is how long the pipeline will take to
+		# ingest/observation will take
+		if len(self.available_resources) >= pipeline_demand:
 			return True
 		else:
 			return False
 
-	def provision_ingest_resources(self, pipeline):
+	def provision_ingest_resources(self, demand, duration):
 		"""
-		Based on the requirements of the pipeline, provision a certain number of resources
-		:param pipeline: The type of ingest pipeline - see Observation
-		:return: None
+		Based on the requirements of the pipeline, provision a certain
+		number of resources
+
+		Parameters
+		----------
+
+		demand : int
+			The type of ingest pipeline - see Observation
+		duration : int
+
+		Returns
+		-------
+
 		"""
-		# Mark resources as 'in-use' for the given pipeline.
-		pass
+		tasks = self._generate_ingest_tasks(demand, duration)
+		# Generate machine/task pairs
+		pairs = []
+		resources = self.available_resources[:demand]
+		self.available_resources = self.available_resources[demand:]
+
+		for x in range(demand):
+			machine = resources[x]
+			pairs.append((machine, tasks[x]))
+
+		while True:
+			for pair in pairs:
+				(machine, task) = pair
+				self.running_tasks.append(task)
+				machine.run(task)
+			break
+
+		return True
+
+
+	# Mark resources as 'in-use' for the given pipeline.
+	# Runs the task on the machie
+	# Create a 'dummy' task for each machine, of the duration of the
+	# Observation
+
+	# task.length = length
+	# self.cluster.allocate_task(task, machine)
+	# if task.task_status is TaskStatus.SCHEDULED:
+	# 	self.cluster.running_tasks.append(task)
+
+	def _generate_ingest_tasks(self, demand, duration):
+		"""
+		Parameters
+		----------
+		demand : int
+			Number of machines that are provisioned for ingest
+		duration : int
+			Duration of observation (in simulation timesteps)
+
+		Returns
+		-------
+		tasks : list()
+			List of core.Planner.Task objects
+		"""
+		tasks = []
+		for i in range(demand):
+			t = Task(i, env=self.env)
+			t.duration = duration
+			t.task_status = TaskStatus.SCHEDULED
+			tasks.append(t)
+		return tasks
 
 	def availability(self):
 		""" Returns

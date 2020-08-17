@@ -3,17 +3,14 @@
 		"total_arrays": 36,
 		"pipelines": {
 			"continuum": {
-				"demand": 5,
-				"length": 5
+				"demand": 5
 			}
 		},
 		"spectral": {
-			"demand": 10,
-			"length": 10
+			"demand": 10
 		},
 		"pulsar": {
-			"demand": 5,
-			"length": 10
+			"demand": 5
 		}
 	},
 	"observations": [

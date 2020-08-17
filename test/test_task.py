@@ -46,7 +46,7 @@ class TestTaskClass(unittest.TestCase):
 
 		pass
 
-	def testDifferentPriority(self):
+	def testDifferentPriority(self)
 		self.t1.priority = 2
 		self.t2.priority = 1
 

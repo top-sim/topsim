@@ -19,6 +19,8 @@ import json
 import simpy
 
 from core.cluster import Cluster
+from core.telescope import Observation
+from core.planner import TaskStatus
 
 logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)
@@ -27,6 +29,11 @@ CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
 CLUSTER_NOFILE = "test/data/config/cluster_config.json"  # Does not exist
 CLUSTER_INCORRECT_JSON = "test/data/config/sneaky.json"
 CLUSTER_NOT_JSON = "test/data/config/oops.txt"
+
+OBS_START_TME = 0
+OBS_DURATION = 10
+OBS_DEMAND = 15
+OBS_WORKFLOW = "test/data/config/workflow_config.json"
 
 
 class TestClusterConfig(unittest.TestCase):
@@ -66,6 +73,44 @@ class TestClusterConfig(unittest.TestCase):
 		self.assertRaises(
 			json.JSONDecodeError, Cluster, self.env, config
 		)
+
+
+class TestIngest(unittest.TestCase):
+
+	def setUp(self) -> None:
+		self.env = simpy.Environment()
+		self.cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
+		self.observation = Observation(
+			'planner_observation',
+			OBS_START_TME,
+			OBS_DURATION,
+			OBS_DEMAND,
+			OBS_WORKFLOW,
+			type=None,
+			data_rate=None
+		)
+
+	def testClusterCheckIngest(self):
+		retval = self.cluster.check_ingest_capacity(pipeline_demand=5)
+		self.assertTrue(retval)
+
+	def testClusterProvisionIngest(self):
+		duration = self.observation.duration
+		pipeline_demand = 5
+
+		self.env.process(self.run_ingest(duration,pipeline_demand))
+		# self.env.run(until=20)
+
+	def run_ingest(self, duration,demand):
+		retval = self.cluster.provision_ingest_resources(
+			duration,
+			demand
+		)
+		for task in self.cluster.running_tasks:
+			self.assertEqual(TaskStatus.SCHEDULED, task.task_status)
+		yield self.env.timeout(3)
+		for task in self.cluster.running_tasks:
+			self.assertEqual(task.task_status, TaskStatus.RUNNING)
 
 
 class TestCluster(unittest.TestCase):

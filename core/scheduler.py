@@ -89,23 +89,53 @@ class Scheduler(object):
 		"""
 		Check the cluster and buffer to ensure that we have enough capacity
 		to run the INGEST pipeline for the provided observation
-		:return:
+
+		Parameters
+		----------
+		observation : core.Telescope.Observation object
+			The observation that we are attempting to run/ingest
+
+		pipelines : dict()
+			A dictionary of the different types of observations and the
+			corresponding pipeline attributes (length, num of machines etc.)
+
+		Returns
+		-------
+		has_capacity : bool
+			True if the buffer AND the cluster have the capacity to run the
+			provided observation
+			False if either of them do not have capacity.
 		"""
+
+		buffer_capacity = False
 		if self.buffer.check_buffer_capacity(observation):
 			logger.debug("Buffer has enough capacity for %s", observation.name)
-		if self.cluster.check_ingest_capacity(observation):
-			logger.debug("Cluster is able to process ingest for observation "
-						 "%s", observation.name)
+			buffer_capacity = True
 
-	def allocate_ingest(self, observation):
+		cluster_capacity = False
+		pipeline_demand = pipelines[observation.type]['demand']
+		if self.cluster.check_ingest_capacity(pipeline_demand):
+			logger.debug(
+				"Cluster is able to process ingest for observation %s",
+				observation.name
+			)
+			cluster_capacity = True
+
+		return buffer_capacity and cluster_capacity
+
+	def allocate_ingest(self, observation, pipelines):
 		"""
 		Scheduler is the middleman between the Telescope and the Cluster
 		Checks to see if there is enough
 		Returns
 		-------
-
 		"""
-		pass
+		pipeline_demand = pipelines[observation.type]['demand']
+		ingest_sucess = self.cluster.provision_ingest_resources(
+			pipeline_demand,
+			observation.duration
+		)
+
 
 	def partiton_cluster(self):
 		"""
@@ -141,6 +171,7 @@ class Scheduler(object):
 
 		# Min -scheduling time
 		minst = -1
+		# TODO new method 'check_for_ready_observations)
 		if not self.current_plan:
 			for observation in self.waiting_observations:
 				st = observation.plan.start_time
@@ -154,6 +185,7 @@ class Scheduler(object):
 						"%s", observation.plan.id, self.env.now
 					)
 
+		# TODO new method 'clean_up_processed_workflow'
 		if self.current_plan.status is WorkflowStatus.FINISHED:
 			# TODO wrap this into a function moving forward
 			self.waiting_observations.remove(self.current_observation)
@@ -167,22 +199,33 @@ class Scheduler(object):
 			for observation in self.waiting_observations:
 				if observation.plan.status is WorkflowStatus.FINISHED:
 					self.waiting_observations.remove(self.current_observation)
-					self.buffer.waiting_observation_list.remove(self.current_observation)
-			logger.debug("Currently waiting to process: %s", self.waiting_observations)
+					self.buffer.waiting_observation_list.remove(
+						self.current_observation
+					)
+			logger.debug(
+				"Currently waiting to process: %s", self.waiting_observations
+			)
 		else:
 			logger.debug("Nothing in Buffer to process")
 
 		if self.current_plan:
-			logger.debug("Current plan: %s, %s ", self.current_plan.id, self.current_plan.exec_order)
+			logger.debug(
+				"Current plan: %s, %s ",
+				self.current_plan.id,
+				self.current_plan.exec_order
+			)
 
 			while True:
-				machine, task = self.algorithm(self.cluster, self.env.now, self.current_plan)
+				machine, task = self.algorithm(
+					self.cluster, self.env.now, self.current_plan
+				)
 				if machine is None or task is None:
 					break
 				else:
 					# Runs the task on the machie
-					task.machine = machine
-					self.cluster.allocate_task(task, machine)
+					# task.machine = machine
+					task.task_status = TaskStatus.SCHEDULED
+					machine.run(task)
 					if task.task_status is TaskStatus.SCHEDULED:
 						self.cluster.running_tasks.append(task)
 

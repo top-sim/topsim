@@ -132,7 +132,8 @@ class WorkflowPlan(object):
 class TaskStatus(Enum):
 	UNSCHEDULED = 1
 	SCHEDULED = 2
-	FINISHED = 3
+	RUNNING = 3
+	FINISHED = 4
 
 
 class Task(object):
@@ -163,7 +164,9 @@ class Task(object):
 		self.finished_timestamp = None
 		self.started_timestamp = None
 
-		# Machine information that is less important currently (will update this in future versions)
+		# Machine information that is less important
+		# currently (will update this in future versions)
+
 		self.flops = 0
 		self.memory = 0
 		self.io = 0
@@ -192,7 +195,7 @@ class Task(object):
 	def run(self):
 		self.started_timestamp = self.env.now
 		logger.debug('%s started at %s', self.id, self.started_timestamp)
-		self.task_status = TaskStatus.SCHEDULED
+		self.task_status = TaskStatus.RUNNING
 		process = self.env.process(self.do_work())
 		if process:
 			return self.task_status

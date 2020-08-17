@@ -95,6 +95,33 @@ class Telescope:
 		self.planner = planner
 
 	def run(self):
+		"""
+		The entry point for the Telescope actor; this will make decisions per
+		timestep and then once these decisions have been resolved, yield a
+		timeout to indicate a single timestep has passed for the Telescope.
+
+		Decisions made within this function are:
+
+			* Check telescope capacity for running new observations
+
+			* Communicate with Scheduler to determine if the Buffer and Cluster
+			have capacity to run a new Observation (Ingest and Storage
+			conditions).
+
+			* Initiate the generation of a WorkflowPlan using the Planner, once
+			and observation is scheduled for observation.
+
+			* Finalise an Observation and initiate the 'clean-up'.
+
+		Returns
+		-------
+
+		Yields
+		------
+		self.env.timeout(1)
+			A single simulation timestep
+		"""
+
 		while self.has_observations_to_process():
 			for observation in self.observations:
 				capacity = self.total_arrays - self.telescope_use
@@ -106,11 +133,15 @@ class Telescope:
 						self.env.now
 					)
 				if self.scheduler.check_ingest_capacity(observation):
+					ret = self.scheduler.allocate_ingest(
+						observation, self.pipelines
+					)
 					observation.status = self.begin_observation(observation)
 					plan_trigger = self.env.process(
 						self.planner.run(observation)
 					)
 					yield plan_trigger
+					retval = self.scheduler.allocate_ingest(observation)
 					logger.info(
 						'Telescope is now using %s arrays', self.telescope_use
 					)

@@ -28,6 +28,7 @@ class Machine(object):
 		else:
 			return False
 		run_status = task.run()
+		yield run_status
 		if run_status is TaskStatus.FINISHED:
 			self.stop_task(task)
 			return True
