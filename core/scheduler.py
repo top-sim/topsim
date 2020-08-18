@@ -17,6 +17,7 @@ import logging
 from enum import Enum
 import numpy as np
 from core.algorithm import Algorithm
+from core.telescope import Observation, RunStatus
 from core.planner import TaskStatus,WorkflowStatus
 
 logger = logging.getLogger(__name__)
@@ -55,27 +56,6 @@ class Scheduler(object):
 			yield self.env.timeout(1)
 
 	def start_ingest_pipelines(self, observation, pipeline):
-		"""
-		Ingest is 'streaming' data to the buffer during the observation
-		How we calculate how long it takes remains to be seen
-		For the time being, we will be doubling the observation time
-
-		Parameters
-		---------
-		observation : core.Telescope.Observation object
-			The observation from which we are starting Ingest
-		Returns
-		-------
-			True/False
-
-		Yields
-		------
-		buffer_trigger : Simpy.Environment.Process
-			Yields a process to the buffer, which will add the Buffer
-
-		Raises
-		------
-		"""
 
 		streaming_time = int(observation.duration/2)
 		if self.buffer.check_buffer_capacity(observation.project_output):
@@ -125,26 +105,43 @@ class Scheduler(object):
 
 	def allocate_ingest(self, observation, pipelines):
 		"""
-		Scheduler is the middleman between the Telescope and the Cluster
-		Checks to see if there is enough
+		Ingest is 'streaming' data to the buffer during the observation
+		How we calculate how long it takes remains to be seen
+		For the time being, we will be doubling the observation time
+
+		Parameters
+		---------
+		observation : core.Telescope.Observation object
+			The observation from which we are starting Ingest
 		Returns
 		-------
+			True/False
+
+		Yields
+		------
+		buffer_trigger : Simpy.Environment.Process
+			Yields a process to the buffer, which will add the Buffer
+
+		Raises
+		------
 		"""
+
 		pipeline_demand = pipelines[observation.type]['demand']
-		ingest_sucess = self.cluster.provision_ingest_resources(
-			pipeline_demand,
-			observation.duration
-		)
+		while observation.status is RunStatus.RUNNING:
+			cluster_ingest = self.env.process(
+				self.cluster.provision_ingest_resources(
+					pipeline_demand,
+					observation.duration
+				)
+			)
 
+			buffer_ingest = self.env.process(
+				self.buffer.ingest_data_stream(
+					observation
+				)
+			)
+			yield self.env.timeout(1)
 
-	def partiton_cluster(self):
-		"""
-		Need to take pipeline into account and use this to determine how much cluster is being used
-
-		Returns
-		-------
-
-		"""
 	#
 	# def add_workflow(self, workflow):
 	# 	print("Adding", workflow, "to workflows")

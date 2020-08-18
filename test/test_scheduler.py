@@ -23,14 +23,19 @@ from core.scheduler import Scheduler
 from core.cluster import Cluster
 from core.planner import Planner
 from core.buffer import Buffer
+from core.telescope import RunStatus
+from algorithms.scheduling import FifoAlgorithm
 
 from common import data as test_data
 
+BUFFER_CONFIG = 'test/data/config/buffer.json'
+CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
 # Globals
 OBS_START_TME = 0
 OBS_DURATION = 10
 OBS_DEMAND = 15
 OBS_WORKFLOW = test_data.test_scheduler_workflow
+
 
 class TestSchedulerRandom(unittest.TestCase):
 
@@ -41,31 +46,120 @@ class TestSchedulerRandom(unittest.TestCase):
 		pass
 
 
+class TestSchedulerIngest(unittest.TestCase):
+
+	def setUp(self) -> None:
+		self.env = simpy.Environment()
+		self.cluster = Cluster(self.env, CLUSTER_CONFIG)
+		self.buffer = Buffer(self.env, self.cluster, BUFFER_CONFIG)
+		self.scheduler = Scheduler(
+			self.env, self.buffer, self.cluster, FifoAlgorithm
+		)
+
+	def testSchdulerCheckIngestReady(self):
+		"""
+		Check the return status of check_ingest_capacity is correct
+		"""
+		pipelines = {
+			"continuum": {
+				"demand": 5
+			}
+		}
+		observation = Observation(
+			'planner_observation',
+			OBS_START_TME,
+			OBS_DURATION,
+			OBS_DEMAND,
+			OBS_WORKFLOW,
+			type="continuum",
+			data_rate=2
+		)
+		# There should be capacity
+		self.assertEqual(0.0, self.env.now)
+		ret = self.scheduler.check_ingest_capacity(observation, pipelines)
+		self.assertTrue(ret)
+
+		# Let's remove capacity to check it returns false
+		tmp = self.cluster.available_resources
+		self.cluster.available_resources = self.cluster.available_resources[:3]
+		ret = self.scheduler.check_ingest_capacity(observation, pipelines)
+		self.assertFalse(ret)
+		self.cluster.available_resources = tmp
+		self.assertEqual(10, len(self.cluster.available_resources))
+
+	def testSchedulerProvisionsIngest(self):
+		"""
+		Ensure that the scheduler correcly coordinates ingest onto the Cluster
+		and into the Buffer
+
+		Returns
+		-------
+		"""
+		pipelines = {
+			"continuum": {
+				"demand": 5
+			}
+		}
+
+		observation = Observation(
+			'planner_observation',
+			OBS_START_TME,
+			OBS_DURATION,
+			OBS_DEMAND,
+			OBS_WORKFLOW,
+			type="continuum",
+			data_rate=2
+		)
+		ready_status = self.scheduler.check_ingest_capacity(
+			observation,
+			pipelines
+		)
+		observation.status = RunStatus.RUNNING
+		self.env.process(self.scheduler.allocate_ingest(
+					observation,
+					pipelines
+				)
+		)
+		self.env.run(until=1)
+		self.assertEqual(5,len(self.cluster.available_resources))
+		# TODO test the buffer ingest functionality
+		self.assertEqual(2,observation.total_data_size)
+		# self.assertEqual(1.0,self.env.now)
+
+
+
+
+		# After 1 timestep, data in the HotBuffer should be 2
+
+		#After 5 timesteps, data should be 10
+
+
+
+
+
+@unittest.skip
 class TestSchedulerFIFO(unittest.TestCase):
 
 	def setUp(self):
 		self.env = simpy.Environment()
 		sched_algorithm = FifoAlgorithm()
-		self.planner = Planner(self.env, test_data.planning_algorithm, test_data.machine_config)
+		self.planner = Planner(self.env, test_data.planning_algorithm,
+							   test_data.machine_config)
 		self.cluster = Cluster(test_data.machine_config)
 		self.buffer = Buffer(self.env, self.cluster)
 		self.observations = [Observation('scheduler_observation',
-									OBS_START_TME,
-									OBS_DURATION,
-									OBS_DEMAND,
-									OBS_WORKFLOW)]
-		telescopemax = 36 # maximum number of antennas
-		self.telescope = Telescope(self.env, self.observations,self.buffer,telescopemax,self.planner)
-		self.scheduler = Scheduler(self.env, sched_algorithm, self.buffer, self.cluster, self.telescope)
+										 OBS_START_TME,
+										 OBS_DURATION,
+										 OBS_DEMAND,
+										 OBS_WORKFLOW)]
+		telescopemax = 36  # maximum number of antennas
+
+		self.telescope = Telescope(self.env, self.observations, self.buffer,
+								   telescopemax, self.planner)
+		self.scheduler = Scheduler(self.env, sched_algorithm, self.buffer,
+								   self.cluster, self.telescope)
 
 	def tearDown(self):
-		pass
-
-	"""
-	The scheduler should be initialised with no workflow plans and valid pairs. 
-	"""
-	def testSchedulerInit(self):
-
 		pass
 
 	def testSchedulerDecision(self):
@@ -111,10 +205,9 @@ class TestSchedulerFIFO(unittest.TestCase):
 		while test_flag:
 			next(self.algorithms.run())
 
-		# Now that a single workflow has been taken from the buffer and added to the list of workflows, we can schedule
-		#
-		# print(self.env.now)
-		# self.algorithms.process_workflows()
+	# Now that a single workflow has been taken from the buffer and added to the list of workflows, we can schedule
+	#
+	# print(self.env.now)
+	# self.algorithms.process_workflows()
 
-		# process_workflows() is passing the workflow
-
+	# process_workflows() is passing the workflow

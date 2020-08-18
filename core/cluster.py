@@ -1,5 +1,6 @@
 import json
-from core.machine import Machine
+import copy
+from core.machine import Machine,Status
 from core import config
 from queue import Queue, PriorityQueue
 
@@ -42,7 +43,8 @@ class Cluster(object):
 		self.dmachine = {machine.id: machine for machine in self.machines}
 		self.available_resources = [machine for machine in self.machines]
 
-		self.occupied_resouces = {}
+		self.occupied_resources = []
+		self.ingest_resources = []
 		self.running_tasks = []
 		self.finished_tasks = []
 		self.waiting_tasks = []
@@ -132,6 +134,7 @@ class Cluster(object):
 		pairs = []
 		resources = self.available_resources[:demand]
 		self.available_resources = self.available_resources[demand:]
+		self.ingest_resources = resources
 
 		for x in range(demand):
 			machine = resources[x]
@@ -142,9 +145,25 @@ class Cluster(object):
 				(machine, task) = pair
 				if task not in self.running_tasks:
 					self.running_tasks.append(task)
-					yield machine.run(task)
+					self.env.process(machine.run(task))
+					# status = machine.current_task.task_status
+					# task.task_status=val
 				else:
 					break
+			# yield self.env.timeout(1)
+			yield self.env.timeout(1)
+			for pair in pairs:
+				(machine, task) = pair
+				if task.task_status is TaskStatus.FINISHED:
+					self.running_tasks.remove(task)
+					self.finished_tasks.append(task)
+					self.available_resources.append(machine)
+					self.ingest_resources.remove(machine)
+					continue
+			if len(self.ingest_resources) == 0:
+				# We've finished ingest
+				break
+
 
 
 		# return True

@@ -189,8 +189,6 @@ class Task(object):
 		self.finished_timestamp = self.env.now
 		logger.debug('%s finished at %s', self.id, self.finished_timestamp)
 		self.task_status = TaskStatus.FINISHED
-		return True
-
 	# self.machine.stop_task(self)
 
 	def run(self):

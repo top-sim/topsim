@@ -250,7 +250,6 @@ class Observation(object):
 		self.workflow = workflow
 		self.total_data_size = 0
 		self.ingest_data_rate = data_rate
-		self.type = None
 		self.plan = None
 
 	def is_ready(self, current_time, capacity):

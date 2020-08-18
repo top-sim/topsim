@@ -97,20 +97,32 @@ class TestIngest(unittest.TestCase):
 	def testClusterProvisionIngest(self):
 		duration = self.observation.duration
 		pipeline_demand = 5
-		self.run_ingest(duration,pipeline_demand)
-		self.env.run(until=20)
+		self.env.process(self.cluster.run())
+		peek = self.env.peek()
+		self.env.process(self.cluster.provision_ingest_resources(
+			pipeline_demand,
+			duration)
+		)
+		self.env.run(until=1)
+		self.assertEqual(1, self.env.now)
+		# self.process(self.run_ingest(duration,pipeline_demand))
+		# for task in self.cluster.running_tasks:
+		#  	self.assertEqual(TaskStatus.RUNNING, task.task_status)
+		self.assertEqual(5, len(self.cluster.available_resources))
+		self.assertEqual(5, len(self.cluster.running_tasks))
+		self.env.run(until=10)
+		self.assertEqual(5, len(self.cluster.available_resources))
+		self.env.run(until=11)
+		self.assertEqual(10,len(self.cluster.available_resources))
+		self.assertEqual(20.0,self.env.now)
 
 	def run_ingest(self, duration,demand):
 		retval = self.cluster.provision_ingest_resources(
 			demand,
 			duration
 		)
-		self.assertEqual(5, len(self.cluster.available_resources))
-		self.assertEqual(5, len(self.cluster.running_tasks))
 		for task in self.cluster.running_tasks:
 			self.assertEqual(TaskStatus.SCHEDULED, task.task_status)
-		# for task in self.cluster.running_tasks:
-		# 	self.assertEqual(TaskStatus.RUNNING, task.task_status)
 
 
 class TestCluster(unittest.TestCase):
