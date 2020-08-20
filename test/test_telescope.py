@@ -45,7 +45,34 @@ class TestTelescopeConfig(unittest.TestCase):
 			planner=None, scheduler=self.scheduler
 		)
 		self.assertEqual(36, telescope.total_arrays)
-		self.assertEqual(10, telescope.pipelines['pulsar'])
+		self.assertEqual(5, telescope.pipelines['pulsar']['demand'])
+
+
+class TestTelescopeIngest(unittest.TestCase):
+
+	def setUp(self) -> None:
+		self.env = simpy.Environment()
+		self.cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
+		self.buffer = Buffer(env=self.env, cluster=self.cluster,
+							 config=BUFFER_CONFIG)
+		self.scheduler = Scheduler(
+			env=self.env, buffer=self.buffer, cluster=self.cluster,
+			algorithm=None
+		)
+		self.planner = Planner(self.env, 'heft', self.cluster)
+
+	def testIngest(self):
+		telescope = Telescope(
+			env=self.env, config=OBSERVATION_CONFIG,
+			planner=self.planner, scheduler=self.scheduler
+		)
+		self.assertEqual(0, telescope.telescope_use)
+		self.env.process(telescope.run())
+		self.env.run(until=2)
+		self.assertEqual(36, telescope.telescope_use)
+		self.assertEqual(5,len(self.cluster.available_resources))
+		# After 1 timestep, data in the HotBuffer should be 2
+		self.assertEqual(498,self.buffer.hot.current_capacity)
 
 
 class TestObservationConfig(unittest.TestCase):

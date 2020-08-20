@@ -15,7 +15,10 @@
 
 import unittest
 import simpy
+import logging
 
+logging.basicConfig(level="DEBUG")
+logger = logging.getLogger(__name__)
 from algorithms.scheduling import FifoAlgorithm
 
 from core.telescope import Observation, Telescope
@@ -114,24 +117,22 @@ class TestSchedulerIngest(unittest.TestCase):
 			observation,
 			pipelines
 		)
-		observation.status = RunStatus.RUNNING
-		self.env.process(self.scheduler.allocate_ingest(
+		observation.status = RunStatus.WAITING
+		status = self.env.process(self.scheduler.allocate_ingest(
 					observation,
 					pipelines
 				)
 		)
 		self.env.run(until=1)
 		self.assertEqual(5,len(self.cluster.available_resources))
-		# TODO test the buffer ingest functionality
-		self.assertEqual(2,observation.total_data_size)
-		# self.assertEqual(1.0,self.env.now)
-
-
-
-
 		# After 1 timestep, data in the HotBuffer should be 2
+		self.assertEqual(498,self.buffer.hot.current_capacity)
+		self.env.run(until=114)
+		self.assertEqual(10, len(self.cluster.available_resources))
+		self.assertEqual(5, len(self.cluster.finished_tasks))
+		self.assertEqual(480, self.buffer.hot.current_capacity)
 
-		#After 5 timesteps, data should be 10
+
 
 
 

@@ -58,16 +58,16 @@ class Buffer(object):
 
 	def run(self):
 		while True:
-			if self.cluster.ingest:
-				observation = self.cluster.ingest_observation
-				logger.debug(
-					"Attempting to add observation %s to buffer",
-					observation.name)
-				observation.data = self.ingest_data_stream(observation)
-				# Observation is only 'added_to_buffer' once the data
-				# has been completely added
-				if observation.status == RunStatus.FINISHED:
-					self.add(observation)
+			# if self.cluster.ingest:
+			# 	observation = self.cluster.ingest_observation
+			# 	logger.debug(
+			# # 		"Attempting to add observation %s to buffer",
+			# # 		observation.name)
+			# # 	observation.data = self.ingest_data_stream(observation)
+			# 	# Observation is only 'added_to_buffer' once the data
+			# 	# has been completely added
+			# 	if observation.status == RunStatus.FINISHED:
+			# 		self.add(observation)
 			yield self.env.timeout(1)
 
 	def check_buffer_capacity(self, observation):
@@ -104,14 +104,28 @@ class Buffer(object):
 		Buffer ingests the data stream from the Ingest pipelines. the data
 		is what is added to the 'hot' buffer every timestep
 		That is - the observation.ingest_data_rate is a per-timestep value
-		:param observation: The observation that is being conducted(?)
-		:return: True if the buffer 'Accepts' the data
+
+		Parameters
+		----------
+		observation : core.Telescope.Observation object
+			The observation we are attempting to ingest
+
 		"""
+		time_left = observation.duration-1
 		while observation.status == RunStatus.RUNNING:
-			hot_buffer_accepts = self.hot.process_incoming_data_stream(
-				observation.ingest_data_rate
+
+			hotbuffer_capacity = self.hot.process_incoming_data_stream(
+				observation.ingest_data_rate,
+				self.env.now
 			)
-			yield self.env.timeout(1)
+			if time_left > 0:
+				time_left -= 1
+			else:
+				break
+
+			yield self.env.timeout(
+				1, value=hotbuffer_capacity
+			)
 
 
 class HotBuffer:
@@ -120,7 +134,7 @@ class HotBuffer:
 		self.current_capacity = self.total_capacity
 		self.max_ingest_data_rate = max_ingest_data_rate
 
-	def process_incoming_data_stream(self, incoming_datarate):
+	def process_incoming_data_stream(self, incoming_datarate, time):
 		"""
 		During Ingest, the buffer will coordinate the incoming data from
 		the observation. This is a sanity check function to make sure the
@@ -135,11 +149,12 @@ class HotBuffer:
 				'Incoming data rate {0} exceeds maximum.'.format(
 					incoming_datarate)
 			)
-		if self.current_capacity - incoming_datarate < 0:
-			return False
 		else:
-			self.current_capacity - incoming_datarate
+			self.current_capacity -= incoming_datarate
+			logger.debug("Current HotBuffer capacity is %s @ %s",
+						 self.current_capacity, time)
 			return True
+
 
 	def cold_buffer_data_request(self, observation):
 		"""

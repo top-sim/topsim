@@ -117,6 +117,20 @@ class TestBufferIngestDataStream(unittest.TestCase):
 			data_rate=5,
 		)
 
+	def testBasicIngest(self):
+		"""
+		Test the 'ingest_data_stream' event, which is to be called in the
+		Scheduler. The changes we expect in this are simple - after n
+		timesteps, the HotBuffer.currect_capacity will have reduced
+		n*observation_ingest_rate.
+		"""
+
+		ret = self.env.process(
+			self.buffer.ingest_data_stream(
+				self.observation
+			)
+		)
+
 	def testIngestEdgeCase(self):
 		"""
 		Buffer must accept ingest at rate up to 'max ingest data rate' but
@@ -129,17 +143,10 @@ class TestBufferIngestDataStream(unittest.TestCase):
 
 		:return: No return value as this is a test :'(
 		"""
-		telescope = Telescope(
-			self.env,
-			self.observation,
-			self.buffer,
-			config=None,
-			planner=None
-		)
 
 		# test what happens when there is no ingest pipeline on cluster
+
 		original_capacity = None
-		next(self.buffer.run())
 		self.assertEqual(self.buffer.hot.capacity, original_capacity)
 
 

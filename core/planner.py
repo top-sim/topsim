@@ -60,8 +60,7 @@ class Planner(object):
 			}
 		}
 		resources = {}
-		for machine in available_resources:
-			m = available_resources[machine]
+		for m in available_resources:
 			resources[m.id] = {
 				"flops": m.cpu,
 				"rates": m.bandwidth,

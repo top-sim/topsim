@@ -132,20 +132,27 @@ class Telescope:
 						observation.name,
 						self.env.now
 					)
-				if self.scheduler.check_ingest_capacity(observation):
-					ret = self.scheduler.allocate_ingest(
-						observation, self.pipelines
-					)
-					observation.status = self.begin_observation(observation)
-					plan_trigger = self.env.process(
-						self.planner.run(observation)
-					)
-					yield plan_trigger
-					retval = self.scheduler.allocate_ingest(observation)
-					logger.info(
-						'Telescope is now using %s arrays', self.telescope_use
-					)
-				# If an observation is running and we want to stop it
+					# Observation is ready - is the Buffer/Cluster?
+					if self.scheduler.check_ingest_capacity(
+							observation,
+						self.pipelines
+					):
+						observation.status = self.begin_observation(observation)
+						# plan_trigger = self.env.process(
+						# 	self.planner.run(observation)
+						# )
+						# yield plan_trigger
+						logger.info(
+							'telescope is now using %s arrays',
+							self.telescope_use
+						)
+						ret = self.env.process(self.scheduler.allocate_ingest(
+								observation, self.pipelines
+						))
+						if ret:
+							observation.total_data_size +=\
+								observation.ingest_data_rate
+
 				elif observation.is_finished(
 						self.env.now,
 						self.telescope_status
@@ -154,8 +161,10 @@ class Telescope:
 					logger.info(
 						'Telescope is now using %s arrays', self.telescope_use
 					)
+				else:
+					continue
 
-		yield self.env.timeout(1)
+			yield self.env.timeout(1)
 
 	def begin_observation(self, observation):
 		self.telescope_use += observation.demand
@@ -319,7 +328,7 @@ def process_telescope_config(telescope_config):
 	total_arrays = config['telescope']['total_arrays']
 	pipelines = config['telescope']['pipelines']
 	observations = []
-	for observation in config['observations']:
+	for observation in config['telescope']['observations']:
 		try:
 			o = Observation(
 				name=observation['name'],

@@ -33,6 +33,7 @@ class Scheduler(object):
 		self.buffer = buffer
 		self.current_plan = None
 		self.scheduler_status = SchedulerStatus.SLEEP
+		self.ingest_observation = None
 
 	def run(self):
 		self.scheduler_status = SchedulerStatus.RUNNING
@@ -127,20 +128,33 @@ class Scheduler(object):
 		"""
 
 		pipeline_demand = pipelines[observation.type]['demand']
-		while observation.status is RunStatus.RUNNING:
-			cluster_ingest = self.env.process(
-				self.cluster.provision_ingest_resources(
-					pipeline_demand,
-					observation.duration
+		self.ingest_observation = observation
+		# We do an off-by-one check here, because the first time we run the
+		# loop we will be one timestep ahead.
+		time_left = observation.duration - 1
+		while True:
+			if self.ingest_observation.status is RunStatus.WAITING:
+				cluster_ingest = self.env.process(
+					self.cluster.provision_ingest_resources(
+						pipeline_demand,
+						observation.duration
+					)
 				)
-			)
+				ret = self.env.process(
+					self.buffer.ingest_data_stream(
+						observation,
+					)
+				)
+				self.ingest_observation.status = RunStatus.RUNNING
 
-			buffer_ingest = self.env.process(
-				self.buffer.ingest_data_stream(
-					observation
-				)
-			)
-			yield self.env.timeout(1)
+			if self.ingest_observation.status is RunStatus.RUNNING:
+				if time_left > 0:
+					time_left -= 1
+				else:
+					break
+
+
+			yield self.env.timeout(1, value=True)
 
 	#
 	# def add_workflow(self, workflow):
