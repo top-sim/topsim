@@ -127,7 +127,7 @@ class TestSchedulerIngest(unittest.TestCase):
 		self.assertEqual(5,len(self.cluster.available_resources))
 		# After 1 timestep, data in the HotBuffer should be 2
 		self.assertEqual(498,self.buffer.hot.current_capacity)
-		self.env.run(until=114)
+		self.env.run(until=11)
 		self.assertEqual(10, len(self.cluster.available_resources))
 		self.assertEqual(5, len(self.cluster.finished_tasks))
 		self.assertEqual(480, self.buffer.hot.current_capacity)

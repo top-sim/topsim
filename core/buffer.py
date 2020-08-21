@@ -127,6 +127,8 @@ class Buffer(object):
 				1, value=hotbuffer_capacity
 			)
 
+		self.waiting_observation_list.append(observation)
+
 
 class HotBuffer:
 	def __init__(self, capacity, max_ingest_data_rate):
@@ -153,7 +155,6 @@ class HotBuffer:
 			self.current_capacity -= incoming_datarate
 			logger.debug("Current HotBuffer capacity is %s @ %s",
 						 self.current_capacity, time)
-			return True
 
 
 	def cold_buffer_data_request(self, observation):

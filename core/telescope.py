@@ -137,7 +137,7 @@ class Telescope:
 							observation,
 						self.pipelines
 					):
-						observation.status = self.begin_observation(observation)
+						ret = self.begin_observation(observation)
 						# plan_trigger = self.env.process(
 						# 	self.planner.run(observation)
 						# )
@@ -146,9 +146,11 @@ class Telescope:
 							'telescope is now using %s arrays',
 							self.telescope_use
 						)
-						ret = self.env.process(self.scheduler.allocate_ingest(
+						process = self.env.process(
+							self.scheduler.allocate_ingest(
 								observation, self.pipelines
 						))
+						# observation.status = ret
 						if ret:
 							observation.total_data_size +=\
 								observation.ingest_data_rate

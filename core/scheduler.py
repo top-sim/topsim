@@ -147,16 +147,17 @@ class Scheduler(object):
 				)
 				self.ingest_observation.status = RunStatus.RUNNING
 
-			if self.ingest_observation.status is RunStatus.RUNNING:
+			elif self.ingest_observation.status is RunStatus.RUNNING:
 				if time_left > 0:
 					time_left -= 1
 				else:
+					self.ingest_observation.run_status = RunStatus.FINISHED
 					break
 
 
 			yield self.env.timeout(1, value=True)
 
-	#
+
 	# def add_workflow(self, workflow):
 	# 	print("Adding", workflow, "to workflows")
 	# 	self.observations_for_processing.append(workflow)

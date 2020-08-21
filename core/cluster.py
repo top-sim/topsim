@@ -67,22 +67,6 @@ class Cluster(object):
 						machine.run(task)
 			yield self.env.timeout(1)
 
-	def ingest_pipeline_provision(self, observation, ingest_time):
-		"""
-		For a given observation (param), we  will take up a certain amount
-		of the system resources for a set period of time for 'ingest'
-		computation. This will likely be  almost all the time, but the
-		resources that are selected may change based on the observation
-		(e.g. larger telescope demand = more resources)
-
-		When coordinating with the buffer, we want to pass to the buffer the
-		amount of data produced by the ingest pipeline every timese:p
-
-		:param observation:
-		:return:
-		"""
-
-		return True
 
 	def check_ingest_capacity(self, pipeline_demand):
 		"""
@@ -140,6 +124,7 @@ class Cluster(object):
 			machine = resources[x]
 			pairs.append((machine, tasks[x]))
 
+		self.ingest = True
 		while True:
 			for pair in pairs:
 				(machine, task) = pair
