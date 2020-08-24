@@ -24,6 +24,22 @@ logger = logging.getLogger(__name__)
 
 
 class Scheduler(object):
+	"""
+
+	Parameters
+	----------
+	env : Simpy.Environment object
+		The simulation Environment
+
+	buffer : core.buffer.Buffer object
+		The SDP buffer used in the simulation
+
+	cluster : core.cluster.Cluster object
+		The Cluster instance used for the simluation
+
+	Attributes
+	----------
+	"""
 	def __init__(self, env, buffer, cluster, algorithm):
 		self.env = env
 		self.algorithm = algorithm
@@ -32,28 +48,34 @@ class Scheduler(object):
 		self.cluster = cluster
 		self.buffer = buffer
 		self.current_plan = None
-		self.scheduler_status = SchedulerStatus.SLEEP
+		self.status = SchedulerStatus.SLEEP
 		self.ingest_observation = None
 
 	def run(self):
-		self.scheduler_status = SchedulerStatus.RUNNING
-		while True:
+		if self.status is not SchedulerStatus.RUNNING:
+			raise RuntimeError("Scheduler has not been initialised! Call init")
+		logger.debug("Scheduler starting up...")
+		while self.status is SchedulerStatus.RUNNING:
 			# AT THE END OF THE SIMULATION, WE GET STUCK HERE. NEED TO EXIT
-			if self.buffer.waiting_observation_list \
-				or self.waiting_observations \
-				or self.cluster.running_tasks:
+			if self.buffer.workflow_ready_observations \
+				or self.waiting_observations:
 
 				for observation in self.buffer.waiting_observation_list:
+					self.buffer.request_data_from(observation)
 					if observation not in self.waiting_observations:
 						self.waiting_observations.append(observation)
+
 				allocation = self.allocate_tasks()
+
 				if allocation:
 					logger.info("Successfully allocated")
 
 			if len(self.waiting_observations) == 0 \
-				and self.scheduler_status == SchedulerStatus.SHUTDOWN:
+				and self.status == SchedulerStatus.SHUTDOWN:
 				logger.debug("No more waiting workflows")
 				break
+
+			logger.debug("Scheduler Status: %s", self.status)
 			yield self.env.timeout(1)
 
 	def start_ingest_pipelines(self, observation, pipeline):
@@ -163,14 +185,13 @@ class Scheduler(object):
 	# 	self.observations_for_processing.append(workflow)
 	# 	print("Waiting workflows", self.observations_for_processing
 
-	def init_scheduler(self):
-		self.scheduler_status = SchedulerStatus.RUNNING
-		return True
+	def init(self):
+		self.status = SchedulerStatus.RUNNING
+		return self.status
 
-
-	def shutdown_scheduler(self):
-		self.scheduler_status = SchedulerStatus.SHUTDOWN
-		return True
+	def shutdown(self):
+		self.status = SchedulerStatus.SHUTDOWN
+		return self.status
 
 	def print_state(self):
 		# Change this to 'workflows scheduled/workflows unscheduled'
@@ -184,6 +205,7 @@ class Scheduler(object):
 		# Min -scheduling time
 		minst = -1
 		# TODO new method 'check_for_ready_observations)
+
 		if not self.current_plan:
 			for observation in self.waiting_observations:
 				st = observation.plan.start_time

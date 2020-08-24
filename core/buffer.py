@@ -41,6 +41,10 @@ class BufferQueue:
 
 
 class Buffer(object):
+	"""
+
+	"""
+
 	def __init__(self, env, cluster, config):
 		self.env = env
 		self.cluster = cluster
@@ -52,22 +56,17 @@ class Buffer(object):
 			raise
 		self.hardware = {}
 		self.observations_for_processing = BufferQueue()
+		self.buffer_alloc = {}
+		self.workflow_ready_observations = []
 		self.waiting_observation_list = []
 		self.workflow_plans = {}
 		self.new_observation = 0
 
 	def run(self):
 		while True:
-			# if self.cluster.ingest:
-			# 	observation = self.cluster.ingest_observation
-			# 	logger.debug(
-			# # 		"Attempting to add observation %s to buffer",
-			# # 		observation.name)
-			# # 	observation.data = self.ingest_data_stream(observation)
-			# 	# Observation is only 'added_to_buffer' once the data
-			# 	# has been completely added
-			# 	if observation.status == RunStatus.FINISHED:
-			# 		self.add(observation)
+			for observation in self.cold.observations:
+				if observation not in self.workflow_ready_observations:
+					self.workflow_ready_observations.append(observation)
 			yield self.env.timeout(1)
 
 	def check_buffer_capacity(self, observation):
@@ -91,13 +90,41 @@ class Buffer(object):
 		logger.debug('Observations in buffer %', self.waiting_observation_list)
 
 	def request_data_from(self, observation):
-		logger.info("Removing observation from buffer at time %s")
-		data_transfer_time = 0
-		# This will take time, so we need to timeout
-		yield self.env.timeout(data_transfer_time)
-		self.waiting_observation_list.remove(observation)
-		# In the future we will be able to interrupt this
-		return True
+		"""
+		Called when the scheduler is requesting data for workflow processing.
+
+		This method 'moves' the observation data from the HotBuffer to the
+		ColdBuffer, at a rate of  ColdBuffer.max_data_rate.
+
+		----------
+		observation : core.telescope.Observation object
+
+			The observation that is stored in the HotBuffer, to be moved
+
+		Returns
+		-------
+
+		"""
+		logger.debug("Removing observation from buffer at time %s")
+		if observation not in self.waiting_observation_list:
+			raise RuntimeError
+		observation_size = observation.duration * observation.ingest_data_rate
+		data_transfer_time = observation_size / self.cold.max_data_rate
+
+		time_left = data_transfer_time-1
+		while True > 0:
+			self.hot.current_capacity += self.cold.max_data_rate
+			self.cold.current_capacity -= self.cold.max_data_rate
+
+			if time_left > 0:
+				time_left -= 1
+			else:
+				break
+
+			yield self.env.timeout(1)
+
+		self.cold.observations.append(observation)
+		self.buffer_alloc[observation] = 'cold'
 
 	def ingest_data_stream(self, observation):
 		"""
@@ -111,7 +138,11 @@ class Buffer(object):
 			The observation we are attempting to ingest
 
 		"""
-		time_left = observation.duration-1
+		time_left = observation.duration - 1
+		if observation.status is RunStatus.WAITING:
+			raise RuntimeError(
+				"Observation must be marked RUNNING before ingest begins!"
+			)
 		while observation.status == RunStatus.RUNNING:
 
 			hotbuffer_capacity = self.hot.process_incoming_data_stream(
@@ -128,6 +159,7 @@ class Buffer(object):
 			)
 
 		self.waiting_observation_list.append(observation)
+		self.buffer_alloc[observation] = 'hot'
 
 
 class HotBuffer:
@@ -135,6 +167,7 @@ class HotBuffer:
 		self.total_capacity = capacity
 		self.current_capacity = self.total_capacity
 		self.max_ingest_data_rate = max_ingest_data_rate
+		self.stored_observations = []
 
 	def process_incoming_data_stream(self, incoming_datarate, time):
 		"""
@@ -157,14 +190,6 @@ class HotBuffer:
 						 self.current_capacity, time)
 
 
-	def cold_buffer_data_request(self, observation):
-		"""
-		The cold buffer will request data from the observation
-		:param The observation for which the data is being requested
-		:return: The
-		"""
-
-
 class ColdBuffer:
 	def __init__(self, capacity, max_data_rate):
 		"""
@@ -174,6 +199,7 @@ class ColdBuffer:
 		self.total_capacity = capacity
 		self.current_capacity = self.total_capacity
 		self.max_data_rate = max_data_rate
+		self.observations = []
 
 
 def process_buffer_config(spec):
@@ -204,4 +230,3 @@ def process_buffer_config(spec):
 	)
 
 	return hot, cold
-

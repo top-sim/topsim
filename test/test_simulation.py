@@ -10,6 +10,7 @@ logging.basicConfig(level='DEBUG')
 logger = logging.getLogger(__name__)
 
 
+@unittest.skip
 class TestSimulation(unittest.TestCase):
 	"""docstring for TestSimulation"unittest.TestCase"""
 

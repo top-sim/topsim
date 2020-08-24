@@ -20,7 +20,7 @@ import simpy
 
 from common import data as test_data
 from core.planner import Planner
-from core.telescope import Telescope, Observation
+from core.telescope import Telescope, Observation, RunStatus
 from core.buffer import Buffer
 from core.cluster import Cluster
 
@@ -29,7 +29,6 @@ OBS_START_TME = 0
 OBS_DURATION = 10
 OBS_DEMAND = 15
 OBS_WORKFLOW = test_data.test_buffer_workflow
-MACHINE_CONFIG = test_data.machine_config
 PLAN_ALGORITHM = test_data.planning_algorithm
 
 CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
@@ -105,7 +104,7 @@ class TestBufferIngestDataStream(unittest.TestCase):
 		:return: Nothing
 		"""
 		self.env = simpy.Environment()
-		self.cluster = Cluster(self.env, MACHINE_CONFIG)
+		self.cluster = Cluster(self.env, CLUSTER_CONFIG)
 		self.buffer = Buffer(self.env, self.cluster, BUFFER_CONFIG)
 		self.observation = Observation(
 			name='test_observation',
@@ -124,12 +123,37 @@ class TestBufferIngestDataStream(unittest.TestCase):
 		timesteps, the HotBuffer.currect_capacity will have reduced
 		n*observation_ingest_rate.
 		"""
+		self.observation.status = RunStatus.RUNNING
 
 		ret = self.env.process(
 			self.buffer.ingest_data_stream(
 				self.observation
 			)
 		)
+		self.env.run(until=1)
+		self.assertEqual(495, self.buffer.hot.current_capacity)
+		self.env.run(until=10)
+		self.assertEqual(450, self.buffer.hot.current_capacity)
+
+	def testIngestObservationNotRunning(self):
+		"""
+		The buffer won't ingest if the observation is not marked as
+		RunStatus.RUNNING
+		"""
+
+		self.assertEqual(RunStatus.WAITING, self.observation.status)
+		self.env.process(self.buffer.ingest_data_stream(self.observation))
+		# self.assertRaises(
+		# 	RuntimeError, self.env.process, self.buffer.ingest_data_stream(
+		# 		self.observation
+		# 	)
+		# )
+
+		self.assertRaises(
+			RuntimeError, self.env.run, until=1
+		)
+
+		# self.assertEqual(500, self.buffer.hot.current_capacity)
 
 	def testIngestEdgeCase(self):
 		"""
@@ -146,27 +170,67 @@ class TestBufferIngestDataStream(unittest.TestCase):
 
 		# test what happens when there is no ingest pipeline on cluster
 
-		original_capacity = None
-		self.assertEqual(self.buffer.hot.capacity, original_capacity)
-
-
-class TestColdBufferWorkflowStream(unittest.TestCase):
+class TestColdBufferRequests(unittest.TestCase):
 
 	def setUp(self):
 		self.env = simpy.Environment()
-		self.cluster = Cluster(self.env, MACHINE_CONFIG)
-		self.buffer = Buffer(self.env, self.cluster)
-		self.observation = Observation('scheduler_observation',
-									   OBS_START_TME,
-									   OBS_DURATION,
-									   OBS_DEMAND,
-									   OBS_WORKFLOW)
+		self.cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
 
-		self.planner = Planner(self.env, PLAN_ALGORITHM, MACHINE_CONFIG)
+		self.buffer = Buffer(
+			env=self.env, cluster=self.cluster, config=BUFFER_CONFIG
+		)
+		self.planner = Planner(self.env, PLAN_ALGORITHM,self.cluster)
+		self.observation = Observation(
+			'scheduler_observation',
+			OBS_START_TME,
+			OBS_DURATION,
+			OBS_DEMAND,
+			OBS_WORKFLOW,
+			type='continuum',
+			data_rate=2
+		)
 
 	def tearDown(self):
 		pass
 
+	def testHotColdInteraction(self):
+		"""
+		Testing the results of running 'buffer.request_data_from(observation)'.
+
+		Returns
+		-------
+		"""
+
+		# Prelimns
+		self.observation.status = RunStatus.RUNNING
+		self.env.process(self.buffer.ingest_data_stream(self.observation))
+		self.env.run(until=10)
+		self.assertEqual(480, self.buffer.hot.current_capacity)
+
+		# Moving data from one to the other
+		self.assertEqual(250, self.buffer.cold.current_capacity)
+		self.env.process(self.buffer.request_data_from(self.observation))
+		self.env.run(until=15)
+		self.assertEqual(240, self.buffer.cold.current_capacity)
+		self.assertEqual(490, self.buffer.hot.current_capacity)
+		self.env.run(until=40)
+		self.assertEqual(230, self.buffer.cold.current_capacity)
+		self.assertEqual(500, self.buffer.hot.current_capacity)
+		self.assertListEqual([self.observation], self.buffer.cold.observations)
+
+	def testHotColdErrors(self):
+		"""
+		We haven't processed the observation yet, so there shouldn't be
+		anything in the Hot Buffer to request
+		"""
+		self.env.process(self.buffer.request_data_from(self.observation))
+		self.assertRaises(
+			RuntimeError,
+			self.env.run,until=10,
+		)
+
+
+	@unittest.skip
 	def testWorkflowAddedToQueue(self):
 		"""
 		We only add a workflow to the queue once an observation has finished

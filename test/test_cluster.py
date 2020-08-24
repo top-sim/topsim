@@ -112,9 +112,9 @@ class TestIngest(unittest.TestCase):
 		self.assertEqual(5, len(self.cluster.running_tasks))
 		self.env.run(until=10)
 		self.assertEqual(5, len(self.cluster.available_resources))
-		self.env.run(until=11)
+		self.env.run(until=20)
 		self.assertEqual(10,len(self.cluster.available_resources))
-		self.assertEqual(20.0,self.env.now)
+		self.assertEqual(20,self.env.now)
 
 	def run_ingest(self, duration,demand):
 		retval = self.cluster.provision_ingest_resources(

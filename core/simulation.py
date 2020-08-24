@@ -15,11 +15,11 @@ for it to be put in here, but as we are retroactively adding unit tests, this wi
 the rest of the unittests. 
 """
 import logging
+
 logger = logging.getLogger(__name__)
 
 
 class Simulation(object):
-
 	"""
 	The Simulation class is a wrapper for all Actors; we start the simulation
 	through the simulation class, which in turn invokes the initial Actors and
@@ -27,7 +27,10 @@ class Simulation(object):
 	finished.
 	"""
 
-	def __init__(self, env, telescope_config, telescopemax, machine_config,salgorithm,palgorithm, event_file, visualisation=False):
+	def __init__(
+			self, env, telescope_config, telescopemax, machine_config,
+			buffer_config,
+			salgorithm, palgorithm, event_file, visualisation=False):
 		"""
 		:param env:
 		:param telescope_config:
@@ -46,14 +49,16 @@ class Simulation(object):
 		if visualisation:
 			self.visualiser = Visualiser(self)
 		# Process necessary config files
-		observations = _process_telescope_config(telescope_config)
 
 		# Initiaise Actor and Resource objects
 		self.cluster = Cluster(env, machine_config)
-		self.buffer = Buffer(env, self.cluster)
+		self.buffer = Buffer(env, self.cluster, config=buffer_config)
 		self.planner = Planner(env, palgorithm, machine_config)
-		self.telescope = Telescope(env, observations, self.buffer, telescopemax, self.planner)
-		self.scheduler = Scheduler(env, salgorithm, self.buffer, self.cluster, self.telescope)
+		self.scheduler = Scheduler(env, salgorithm, self.buffer, self.cluster)
+		self.telescope = Telescope(
+			env=self.env, config=telescope_config,
+			planner=self.planner, scheduler=self.scheduler
+		)
 
 	def start(self, runtime=150):
 		# Starting monitor process before task_broker process
@@ -86,28 +91,6 @@ class Simulation(object):
 			return True
 		else:
 			return False
-
-
-def _process_telescope_config(telescope_config):
-	observations = []
-	infile = open(telescope_config)
-	config = pd.read_csv(infile)
-	# config.
-	# Format is name, start, duration, demand, filename
-	for i in range(len(config)):
-		obs = config.iloc[i, :]
-		observation = Observation(
-			obs['name'],
-			int(obs['start']),
-			int(obs['duration']),
-			int(obs['demand']),
-			obs['filename']
-		)
-		observations.append(observation)
-	infile.close()
-	return observations
-
-
 
 
 def _process_workflow_config(workflow):

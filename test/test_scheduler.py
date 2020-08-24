@@ -17,8 +17,6 @@ import unittest
 import simpy
 import logging
 
-logging.basicConfig(level="DEBUG")
-logger = logging.getLogger(__name__)
 from algorithms.scheduling import FifoAlgorithm
 
 from core.telescope import Observation, Telescope
@@ -31,6 +29,10 @@ from algorithms.scheduling import FifoAlgorithm
 
 from common import data as test_data
 
+logging.basicConfig(level="DEBUG")
+logger = logging.getLogger(__name__)
+
+OBSERVATION_CONFIG = 'test/data/config/observations.json'
 BUFFER_CONFIG = 'test/data/config/buffer.json'
 CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
 # Globals
@@ -119,24 +121,32 @@ class TestSchedulerIngest(unittest.TestCase):
 		)
 		observation.status = RunStatus.WAITING
 		status = self.env.process(self.scheduler.allocate_ingest(
-					observation,
-					pipelines
-				)
+			observation,
+			pipelines
+		)
 		)
 		self.env.run(until=1)
-		self.assertEqual(5,len(self.cluster.available_resources))
+		self.assertEqual(5, len(self.cluster.available_resources))
 		# After 1 timestep, data in the HotBuffer should be 2
-		self.assertEqual(498,self.buffer.hot.current_capacity)
+		self.assertEqual(498, self.buffer.hot.current_capacity)
 		self.env.run(until=11)
 		self.assertEqual(10, len(self.cluster.available_resources))
 		self.assertEqual(5, len(self.cluster.finished_tasks))
 		self.assertEqual(480, self.buffer.hot.current_capacity)
 
 
+"""
+TODO 
+Global DAG internalisation needs work (unimplemented as it currently stands)
+Maybe this is implicit? I.e. we visualise it but there is no explicit 
+concept of it in the function of the simulation? 
 
+Scheduler post-ingest calculations and start-times that we need to iron out
 
-
-
+* Movement from hot-buffer to cold buffer
+* Data 'provisioning' for initial workflow node
+* Machine 'provisioning' for the workflow based on Cluster and GLOBAL DAG
+"""
 
 @unittest.skip
 class TestSchedulerFIFO(unittest.TestCase):
@@ -146,19 +156,26 @@ class TestSchedulerFIFO(unittest.TestCase):
 		sched_algorithm = FifoAlgorithm()
 		self.planner = Planner(self.env, test_data.planning_algorithm,
 							   test_data.machine_config)
-		self.cluster = Cluster(test_data.machine_config)
-		self.buffer = Buffer(self.env, self.cluster)
-		self.observations = [Observation('scheduler_observation',
-										 OBS_START_TME,
-										 OBS_DURATION,
-										 OBS_DEMAND,
-										 OBS_WORKFLOW)]
+		self.cluster = Cluster(self.env, CLUSTER_CONFIG)
+		self.buffer = Buffer(self.env, self.cluster, BUFFER_CONFIG)
+		self.observations = [
+			Observation(
+				'scheduler_observation',
+				OBS_START_TME,
+				OBS_DURATION,
+				OBS_DEMAND,
+				OBS_WORKFLOW,
+				type='continuum',
+				data_rate=5
+			)
+		]
 		telescopemax = 36  # maximum number of antennas
 
-		self.telescope = Telescope(self.env, self.observations, self.buffer,
-								   telescopemax, self.planner)
+		self.telescope = Telescope(
+			self.env, OBSERVATION_CONFIG, self.scheduler, self.planner
+		)
 		self.scheduler = Scheduler(self.env, sched_algorithm, self.buffer,
-								   self.cluster, self.telescope)
+								   self.cluster)
 
 	def tearDown(self):
 		pass
@@ -206,9 +223,9 @@ class TestSchedulerFIFO(unittest.TestCase):
 		while test_flag:
 			next(self.algorithms.run())
 
-	# Now that a single workflow has been taken from the buffer and added to the list of workflows, we can schedule
-	#
-	# print(self.env.now)
-	# self.algorithms.process_workflows()
+# Now that a single workflow has been taken from the buffer and added to the list of workflows, we can schedule
+#
+# print(self.env.now)
+# self.algorithms.process_workflows()
 
-	# process_workflows() is passing the workflow
+# process_workflows() is passing the workflow

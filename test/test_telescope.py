@@ -68,6 +68,7 @@ class TestTelescopeIngest(unittest.TestCase):
 		)
 		self.assertEqual(0, telescope.telescope_use)
 		self.env.process(telescope.run())
+		self.scheduler.init()
 		self.env.process(self.scheduler.run())
 		self.env.run(until=1)
 		self.assertEqual(36, telescope.telescope_use)

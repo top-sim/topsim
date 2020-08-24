@@ -13,15 +13,16 @@ logger = logging.getLogger(__name__)
 
 # BUFFER_OFFSET = config_data.buffer_offset
 # from core.telescope import Observation
-"""
-The Planner is our interface with static scheduling algorithms. It provides 
-an interface to other libraries and selects the library based on the provided 
-algorithms based to the _init_. Currently, the SHADOW library is the only 
-library that the Planner is aligned with; this may change in the future.  
-"""
 
 
 class Planner(object):
+	"""
+	The Planner is our interface with static scheduling algorithms. It provides
+	an interface to other libraries and selects the library based on the provided
+	algorithms based to the _init_. Currently, the SHADOW library is the only
+	library that the Planner is aligned with; this may change in the future.
+	"""
+
 	def __init__(self, env, algorithm, cluster):
 		self.env = env
 		self.cluster = cluster
@@ -170,7 +171,7 @@ class Task(object):
 		self.flops = 0
 		self.memory = 0
 		self.io = 0
-
+	#
 	# def __lt__(self, other):
 	# 	return self.exec_order < other.exec_order
 	#
