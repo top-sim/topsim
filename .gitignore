@@ -1,9 +1,9 @@
 .idea/
-_archive/playground/.ipynb_checkpoints
-_archive/playground/new-logs
-_archive/playground/notebooks
-_archive/playground/agents
-_archive/playground/tensorboard
+.archive/playground/.ipynb_checkpoints
+.archive/playground/new-logs
+.archive/playground/notebooks
+.archive/playground/agents
+.archive/playground/tensorboard
 .DS_Store
 
 # Byte-compiled / optimized / DLL files
@@ -67,3 +67,5 @@ target/
 
 # Trace Files from running the simulation
 sim.trace
+
+*.ipynb_checkpoints
