@@ -7,7 +7,7 @@ import sys
 
 sys.path.append('..')
 
-from core.machine import MachineConfig
+from topsim.core import MachineConfig
 from _archive.playground.algorithm import RandomAlgorithm
 from _archive.playground.algorithm import Tetris
 from _archive.playground.algorithm import FirstFitAlgorithm

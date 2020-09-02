@@ -1,15 +1,15 @@
-from core.algorithm import Algorithm
+from topsim.core.algorithm import Algorithm
 
 
-class DRF(Algorithm):
+class FirstFitAlgorithm(Algorithm):
     def __call__(self, cluster, clock):
         machines = cluster.machines
-        unfinished_tasks = cluster.unfinished_tasks
+        tasks = cluster.tasks_which_has_waiting_instance
         candidate_task = None
         candidate_machine = None
 
         for machine in machines:
-            for task in unfinished_tasks:
+            for task in tasks:
                 if machine.accommodate(task):
                     candidate_machine = machine
                     candidate_task = task

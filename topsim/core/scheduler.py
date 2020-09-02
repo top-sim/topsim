@@ -12,13 +12,10 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-from queue import PriorityQueue
 import logging
 from enum import Enum
-import numpy as np
-from core.algorithm import Algorithm
-from core.telescope import Observation, RunStatus
-from core.planner import TaskStatus,WorkflowStatus
+from topsim.core.telescope import RunStatus
+from topsim.core.planner import TaskStatus,WorkflowStatus
 
 logger = logging.getLogger(__name__)
 

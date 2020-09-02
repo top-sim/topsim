@@ -15,12 +15,12 @@
 
 import logging
 import json
-import common.config
-from core.telescope import RunStatus
+import topsim.common.config
+from topsim.core.telescope import RunStatus
 
 logger = logging.getLogger(__name__)
 
-BUFFER_OFFSET = common.config.BUFFER_TIME_OFFSET
+BUFFER_OFFSET = topsim.common.config.BUFFER_TIME_OFFSET
 
 
 class BufferQueue:
@@ -42,7 +42,16 @@ class BufferQueue:
 
 class Buffer(object):
 	"""
+	Parameters
+	----------
+	env : core.Simpy.Environment object
+		The simulation environment
 
+	Attributes
+	---------
+
+	Methods
+	-------
 	"""
 
 	def __init__(self, env, cluster, config):

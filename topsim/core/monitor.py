@@ -18,7 +18,7 @@ class Monitor(object):
 			# time.sleep(0.5)
 			state = {
 				'timestamp': self.env.now,
-				# 'cluster_state': self.simulation.cluster.state,
+				'cluster_state': self.simulation.cluster.print_state(),
 				'telescope_state': self.simulation.telescope.print_state(),
 				'scheduler_state': self.simulation.scheduler.print_state()
 			}
@@ -30,7 +30,7 @@ class Monitor(object):
 
 		state = {
 			'timestamp': self.env.now,
-			# 'cluster_state': self.simulation.cluster.state,
+			'cluster_state': self.simulation.cluster.print_state(),
 			'telescope_state': self.simulation.telescope.print_state(),
 			'scheduler_state': self.simulation.scheduler.print_state()
 		}

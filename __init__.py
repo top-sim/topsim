@@ -1,4 +1,4 @@
-# Copyright (C) 4/8/20 RW Bunney
+# Copyright (C) 2/9/20 RW Bunney
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,9 +12,3 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
-
-# TODO Buffer needs more specifications - data transfer times/latency/bandwidth
-# TODO Need specification on buffer makeup
-

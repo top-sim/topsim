@@ -19,10 +19,9 @@ Basic simulation, with minimal Observation Plan and dummy observation workflows
 
 import simpy
 
-from algorithms.scheduling import FifoAlgorithm
-from core.simulation import Simulation
-import common.data as test_data
-
+from topsim.algorithms import FifoAlgorithm
+from topsim.core.simulation import Simulation
+from topsim import common as test_data
 
 workflow_file = 'test/data/daliuge_pipeline_test.json'
 event_file = 'sim.trace'

@@ -1,6 +1,3 @@
-from core.config import *
-
-
 class WorkflowPlan(object):
 	"""
 	WorkflowPlans are used within the Planner, SchedulerA Actors and Cluster Resource. They are higher-level than the

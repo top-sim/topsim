@@ -16,15 +16,13 @@ import unittest
 import simpy
 import os
 
-from core.planner import Planner
-from core.cluster import Cluster
-from core.telescope import Observation
+from topsim.core.planner import Planner
+from topsim.core.cluster import Cluster
+from topsim.core.telescope import Observation
 
-from algorithms.scheduling import FifoAlgorithm
+from topsim.algorithms.scheduling import FifoAlgorithm
 
-from common import data as test_data
-
-current_dir = os.path.abspath('.')
+current_dir = os.path.abspath('')
 
 # Globals
 OBS_START_TME = 0

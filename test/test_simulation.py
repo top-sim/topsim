@@ -1,32 +1,67 @@
 import unittest
 import simpy
-
-from core.simulation import Simulation
-from algorithms.scheduling import FifoAlgorithm
-from common import data as test_data
 import logging
+
+from topsim.core.simulation import Simulation
+from topsim.algorithms.scheduling import FifoAlgorithm
 
 logging.basicConfig(level='DEBUG')
 logger = logging.getLogger(__name__)
 
+TELESCOPE_CONFIG = 'test/data/config/observations.json'
+CLUSTER_CONFIG = 'test/data/config/basic_spec-10.json'
+BUFFER_CONFIG = 'test/data/config/buffer.json'
+EVENT_FILE = 'test/data/output/sim.trace'
 
-@unittest.skip
-class TestSimulation(unittest.TestCase):
-	"""docstring for TestSimulation"unittest.TestCase"""
+
+class TestSimulationConfig(unittest.TestCase):
+
+	"""
+	docstring for TestSimulation"unittest.TestCase
+	"""
 
 	def setUp(self):
-		env = None
 		# tel = Telescope(env, buffer_obj, config, planner)
-		event_file = test_data.event_file
-		planning_algorithm = test_data.planning_algorithm
-		env = simpy.Environment()
-		tmax = 36  # for starters, we will define telescope configuration as simply number of arrays that exist
-		sched_algorithm = FifoAlgorithm()
-		self.simulation = Simulation(env, test_data.telescope_config, tmax, test_data.machine_config,
-									 sched_algorithm, planning_algorithm, event_file)
+		self.event_file = EVENT_FILE
+		self.env = simpy.Environment()
+		self.planning_algorithm = 'heft'
+		self.scheduling_algorithm = FifoAlgorithm()
 
 	def tearDown(self):
 		pass
 
-	def testBasicRun(self):
-		self.simulation.start(runtime=60)
+	def testBasicConfig(self):
+		simulation = Simulation(
+			self.env,
+			TELESCOPE_CONFIG,
+			CLUSTER_CONFIG,
+			BUFFER_CONFIG,
+			self.planning_algorithm,
+			self.scheduling_algorithm,
+			EVENT_FILE,
+			visualisation=False
+		)
+		self.assertTrue(36, simulation.telescope.total_arrays)
+
+
+# @unittest.skip
+class TestSimulationRuntime(unittest.TestCase):
+
+	def setUp(self) -> None:
+		event_file = EVENT_FILE
+		env = simpy.Environment()
+		planning_algorithm = 'heft'
+		scheduling_algorithm = FifoAlgorithm()
+		self.simulation = Simulation(
+			env,
+			TELESCOPE_CONFIG,
+			CLUSTER_CONFIG,
+			BUFFER_CONFIG,
+			planning_algorithm,
+			scheduling_algorithm,
+			EVENT_FILE,
+			visualisation=False
+		)
+
+	def testLimitedRuntime(self):
+		self.simulation.start(runtime=10)

@@ -1,8 +1,8 @@
 import simpy
-from core.cluster import Cluster
-from core.scheduler import Scheduler
-from core.buffer import Broker
-from core.simulation import Simulation
+from topsim.core.cluster import Cluster
+from topsim.core import Scheduler
+from topsim.core.buffer import Broker
+from topsim.core.simulation import Simulation
 
 
 class Episode(object):

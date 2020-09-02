@@ -1,5 +1,4 @@
-from core.config import *
-from core.planner import TaskStatus
+from topsim.core.planner import TaskStatus
 
 class Task(object):
     def __init__(self, env, job, task_config):

@@ -1,5 +1,5 @@
 import numpy as np
-from core.algorithm import Algorithm
+from topsim.core.algorithm import Algorithm
 
 
 class Tetris(Algorithm):

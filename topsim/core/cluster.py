@@ -1,10 +1,6 @@
-import json
-import copy
-from core.machine import Machine,Status
-from core import config
-from queue import Queue, PriorityQueue
+from topsim.core import config
 
-from core.planner import Task, TaskStatus
+from topsim.core.planner import Task, TaskStatus
 
 
 class Cluster(object):
@@ -186,6 +182,7 @@ class Cluster(object):
 			tasks.append(t)
 		return tasks
 
+
 	def availability(self):
 		""" Returns
 		-------
@@ -220,3 +217,8 @@ class Cluster(object):
 			if machine.current_task:
 				efficiency += 1
 		return efficiency
+
+	def print_state(self):
+		return {
+			'machines': [machine.print_state() for machine in self.machines]
+		}

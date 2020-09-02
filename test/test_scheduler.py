@@ -17,17 +17,15 @@ import unittest
 import simpy
 import logging
 
-from algorithms.scheduling import FifoAlgorithm
+from topsim.core.telescope import Observation, Telescope
+from topsim.core.scheduler import Scheduler
+from topsim.core.cluster import Cluster
+from topsim.core.planner import Planner
+from topsim.core.buffer import Buffer
+from topsim.core.telescope import RunStatus
+from topsim.algorithms.scheduling import FifoAlgorithm
 
-from core.telescope import Observation, Telescope
-from core.scheduler import Scheduler
-from core.cluster import Cluster
-from core.planner import Planner
-from core.buffer import Buffer
-from core.telescope import RunStatus
-from algorithms.scheduling import FifoAlgorithm
-
-from common import data as test_data
+from topsim.common import data as test_data
 
 logging.basicConfig(level="DEBUG")
 logger = logging.getLogger(__name__)

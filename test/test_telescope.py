@@ -15,13 +15,12 @@
 
 import unittest
 import simpy
-import json
 
-from core.telescope import Telescope
-from core.scheduler import Scheduler
-from core.buffer import Buffer
-from core.cluster import Cluster
-from core.planner import Planner
+from topsim.core.telescope import Telescope
+from topsim.core.scheduler import Scheduler
+from topsim.core.buffer import Buffer
+from topsim.core.cluster import Cluster
+from topsim.core.planner import Planner
 
 OBSERVATION_CONFIG = 'test/data/config/observations.json'
 CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"

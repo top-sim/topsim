@@ -1,7 +1,7 @@
 from enum import Enum
 
 # TODO need I/O information here
-from core.planner import TaskStatus
+from topsim.core.planner import TaskStatus
 
 
 class Status(Enum):
@@ -12,7 +12,7 @@ class Status(Enum):
 
 
 class Machine(object):
-	def __init__(self, id, cpu, memory, disk,bandwidth):
+	def __init__(self, id, cpu, memory, disk, bandwidth):
 		self.id = id
 		self.cpu = cpu
 		self.memory = memory
@@ -67,8 +67,8 @@ class Machine(object):
 
 	def accommodate(self, task):
 		return self.cpu >= task.task_config.flops and \
-			self.memory >= task.task_config.memory and \
-			self.disk >= task.task_config.io
+			   self.memory >= task.task_config.memory and \
+			   self.disk >= task.task_config.io
 
 	def state_summary(self):
 		return {
@@ -83,6 +83,14 @@ class Machine(object):
 
 	def __repr__(self):
 		return str(self.id)
+
+	def print_state(self):
+		return {
+			'id': self.id,
+			'cpu': self.cpu,
+			'memory': self.memory,
+			'disk': self.disk,
+		}
 
 
 def utilisation_policy(machine):

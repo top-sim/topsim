@@ -18,9 +18,9 @@ import logging
 import json
 import simpy
 
-from core.cluster import Cluster
-from core.telescope import Observation
-from core.planner import TaskStatus
+from topsim.core.cluster import Cluster
+from topsim.core.telescope import Observation
+from topsim.core.planner import TaskStatus
 
 logging.basicConfig(level="DEBUG")
 logger = logging.getLogger(__name__)

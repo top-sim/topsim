@@ -18,11 +18,11 @@ import json
 
 import simpy
 
-from common import data as test_data
-from core.planner import Planner
-from core.telescope import Telescope, Observation, RunStatus
-from core.buffer import Buffer
-from core.cluster import Cluster
+from topsim.common import data as test_data
+from topsim.core.planner import Planner
+from topsim.core.telescope import Observation, RunStatus
+from topsim.core.buffer import Buffer
+from topsim.core.cluster import Cluster
 
 # Globals
 OBS_START_TME = 0

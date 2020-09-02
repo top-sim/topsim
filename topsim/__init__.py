@@ -1,4 +1,4 @@
-# Copyright (C) 20/8/20 RW Bunney
+# Copyright (C) 2/9/20 RW Bunney
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

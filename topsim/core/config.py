@@ -1,6 +1,6 @@
 import json
-from core.telescope import Telescope, Observation
-from core.machine import Machine
+from topsim.core.telescope import Observation
+from topsim.core.machine import Machine
 import pandas as pd
 
 
