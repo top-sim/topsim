@@ -1,4 +1,0 @@
-name,start,duration,demand,filename
-emu,0,10,36,test/data/workflow_config.json
-dingo,10,15,18,test/data/daliuge_continuum.json
-vat,20,30,18,test/data/workflow_config.json

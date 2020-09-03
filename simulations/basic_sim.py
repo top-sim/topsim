@@ -19,7 +19,7 @@ Basic simulation, with minimal Observation Plan and dummy observation workflows
 
 import simpy
 
-from topsim.algorithms import FifoAlgorithm
+from topsim.algorithms.scheduling import FifoAlgorithm
 from topsim.core.simulation import Simulation
 from topsim import common as test_data
 
