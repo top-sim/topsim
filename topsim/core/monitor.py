@@ -20,7 +20,8 @@ class Monitor(object):
 				'timestamp': self.env.now,
 				'cluster_state': self.simulation.cluster.print_state(),
 				'telescope_state': self.simulation.telescope.print_state(),
-				'scheduler_state': self.simulation.scheduler.print_state()
+				'scheduler_state': self.simulation.scheduler.print_state(),
+				'buffer_state': self.simulation.buffer.print_state()
 			}
 
 			logger.debug("Storing state %s", self.simulation.scheduler.print_state())

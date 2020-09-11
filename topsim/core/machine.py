@@ -1,7 +1,7 @@
 from enum import Enum
 
 # TODO need I/O information here
-from topsim.core.planner import TaskStatus
+from topsim.core.task import TaskStatus
 
 
 class Status(Enum):

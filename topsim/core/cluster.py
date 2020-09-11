@@ -1,6 +1,6 @@
 from topsim.core import config
 
-from topsim.core.planner import Task, TaskStatus
+from topsim.core.task import Task, TaskStatus
 
 
 class Cluster(object):

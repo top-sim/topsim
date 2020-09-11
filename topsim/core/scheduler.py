@@ -15,7 +15,8 @@
 import logging
 from enum import Enum
 from topsim.core.telescope import RunStatus
-from topsim.core.planner import TaskStatus,WorkflowStatus
+from topsim.core.planner import WorkflowStatus
+from topsim.core.task import TaskStatus
 
 logger = logging.getLogger(__name__)
 

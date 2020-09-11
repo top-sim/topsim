@@ -30,6 +30,7 @@ class Simulation(object):
 	Methods
 	-------
 
+    
 
 	Raises
 	------
@@ -82,7 +83,7 @@ class Simulation(object):
 			* There is nothing left in the Buffer
 			* The Scheduler is not waiting to allocate machines to resources
 			* There are not tasks still running on the cluster.
-
+		
 
 		Parameters
 		----------

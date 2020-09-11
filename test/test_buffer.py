@@ -134,6 +134,10 @@ class TestBufferIngestDataStream(unittest.TestCase):
 		self.assertEqual(495, self.buffer.hot.current_capacity)
 		self.env.run(until=10)
 		self.assertEqual(450, self.buffer.hot.current_capacity)
+		self.assertEqual(
+			self.buffer.hot.stored_observations[0],
+			self.observation
+		)
 
 	def testIngestObservationNotRunning(self):
 		"""

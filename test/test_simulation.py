@@ -42,7 +42,7 @@ class TestSimulationConfig(unittest.TestCase):
 			visualisation=False
 		)
 		self.assertTrue(36, simulation.telescope.total_arrays)
-
+           
 
 # @unittest.skip
 class TestSimulationRuntime(unittest.TestCase):
@@ -64,4 +64,4 @@ class TestSimulationRuntime(unittest.TestCase):
 		)
 
 	def testLimitedRuntime(self):
-		self.simulation.start(runtime=10)
+		self.simulation.start(runtime=60)

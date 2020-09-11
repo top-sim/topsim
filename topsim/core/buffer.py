@@ -73,7 +73,7 @@ class Buffer(object):
 
 	def run(self):
 		while True:
-			for observation in self.cold.observations:
+			for observation in self.hot.observations:
 				if observation not in self.workflow_ready_observations:
 					self.workflow_ready_observations.append(observation)
 			yield self.env.timeout(1)
@@ -135,6 +135,17 @@ class Buffer(object):
 		self.cold.observations.append(observation)
 		self.buffer_alloc[observation] = 'cold'
 
+	def print_state(self):
+		return {
+			'workflow ready obs':self.workflow_ready_observations,
+			'hotbuffer_capacity':self.hot.current_capacity,
+			'hotbuffer_stored_obsevations':
+				[x.name for x in self.hot.stored_observations],
+			'cold_buffer_storage': self.cold.current_capacity,
+			'cold_buffer_observations':
+				[x.name for x in self.cold.observations]
+		}
+
 	def ingest_data_stream(self, observation):
 		"""
 		Buffer ingests the data stream from the Ingest pipelines. the data
@@ -168,7 +179,7 @@ class Buffer(object):
 			)
 
 		self.waiting_observation_list.append(observation)
-		self.buffer_alloc[observation] = 'hot'
+		self.hot.stored_observations.append(observation)
 
 
 class HotBuffer:
@@ -197,6 +208,9 @@ class HotBuffer:
 			self.current_capacity -= incoming_datarate
 			logger.debug("Current HotBuffer capacity is %s @ %s",
 						 self.current_capacity, time)
+
+		return self.current_capacity
+
 
 
 class ColdBuffer:

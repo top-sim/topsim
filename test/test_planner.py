@@ -53,6 +53,40 @@ class TestPlannerConfig(unittest.TestCase):
 		)
 
 
+class TestWorkflowPlan(unittest.TestCase):
+
+	def setUp(self):
+		self.env = simpy.Environment()
+		self.cluster = Cluster(self.env, CLUSTER_CONFIG)
+		self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
+		self.observation = Observation(
+			'planner_observation',
+			OBS_START_TME,
+			OBS_DURATION,
+			OBS_DEMAND,
+			OBS_WORKFLOW,
+			type=None,
+			data_rate=None
+		)
+
+	def tearDown(self):
+		pass
+
+	def testWorkflowPlanCreation(self):
+		plan = self.planner.plan(
+			self.observation.name,
+			self.observation.workflow,
+			'heft'
+		)
+		expected_exec_order = [0, 5, 3, 4, 2, 1, 6, 8, 7, 9]
+		self.assertEqual(len(plan.tasks), len(expected_exec_order))
+		for x in range(len(plan.tasks)):
+			self.assertEqual(plan.tasks[x].id, expected_exec_order[x])
+		# Get taskid 5
+		task5_comp = plan.tasks[5].flops
+		self.assertEqual(task5_comp, 92000)
+
+
 @unittest.skip
 class TestPlanner(unittest.TestCase):
 
@@ -98,37 +132,3 @@ class TestPlanner(unittest.TestCase):
 
 	def testIncorrectParameters(self):
 		pass
-
-
-class TestWorkflowPlan(unittest.TestCase):
-
-	def setUp(self):
-		self.env = simpy.Environment()
-		self.cluster = Cluster(self.env, CLUSTER_CONFIG)
-		self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
-		self.observation = Observation(
-			'planner_observation',
-			OBS_START_TME,
-			OBS_DURATION,
-			OBS_DEMAND,
-			OBS_WORKFLOW,
-			type=None,
-			data_rate=None
-		)
-
-	def tearDown(self):
-		pass
-
-	def testWorkflowPlanCreation(self):
-		plan = self.planner.plan(
-			self.observation.name,
-			self.observation.workflow,
-			'heft'
-		)
-		expected_exec_order = [0, 5, 3, 4, 2, 1, 6, 8, 7, 9]
-		self.assertEqual(len(plan.tasks), len(expected_exec_order))
-		for x in range(len(plan.tasks)):
-			self.assertEqual(plan.tasks[x].id, expected_exec_order[x])
-		# Get taskid 5
-		task5_comp = plan.tasks[5].flops
-		self.assertEqual(task5_comp, 92000)
