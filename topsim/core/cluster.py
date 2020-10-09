@@ -204,6 +204,13 @@ class Cluster(object):
 
 		return ustilisation
 
+	def stop_task(self, task):
+		if self.running_tasks.remove(task) and \
+			self.finished_tasks.append(task):
+			return True
+		else:
+			raise Exception
+
 	# TODO Place holder method
 	def efficiency(self):
 		"""

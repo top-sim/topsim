@@ -25,7 +25,34 @@ class Simulation(object):
 
 	Parameters
 	----------
+	env : simpy.Environment bject
+		This is how the TOpSim simulation maintains state across the
+		different actors, and interfaces with the simpy processes.
 
+	telescope_config: str
+		This is a path to the telescope config that follows the TOpSim config
+		specification (JSON). This file will be parsed in the Telescope class
+		constructure
+
+	cluster_config: str
+		Path to the HPC cluster config that forms the computing component of
+		the SDP
+
+	buffer_config: str
+		Path to the buffer configuration
+
+	planning_algorithm: Object
+		instance of the planning algorithm class interface as defined in
+		algorithms.examples/
+
+	scheduling_algorithm: object
+		instance of the core.algorithm interface
+
+	event_file: str
+		Path to the output file that stores execution of simulation.
+
+	visualisation: bool
+		If visualisation is required, True; else, False
 
 	Methods
 	-------

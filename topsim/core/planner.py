@@ -80,7 +80,9 @@ class Planner(object):
 class WorkflowStatus(int, Enum):
 	UNSCHEDULED = 1
 	SCHEDULED = 2
-	FINISHED = 3
+	ON_TIME = 3
+	DELAYED = 4
+	FINISHED = 5
 
 
 class WorkflowPlan(object):
@@ -121,6 +123,7 @@ class WorkflowPlan(object):
 		self.start_time = None
 		self.priority = 0
 		self.status = WorkflowStatus.UNSCHEDULED
+		self.delayed = None
 
 	def __lt__(self, other):
 		return self.priority < other.priority

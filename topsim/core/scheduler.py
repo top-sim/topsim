@@ -197,7 +197,23 @@ class Scheduler(object):
 			'observations_for_processing': [observation.plan.id for observation in self.waiting_observations]
 		}
 
+	# TODO ALLOCATE TASKS NEEDS A CHANGE. THere is too much code in one function,
+	#  we need to split this up more.
+
 	def allocate_tasks(self):
+		"""
+		Allocate tasks calls a number of methods to allocate tasks according to
+		the self.algorithm attribute. This takes the current simulation clock time
+		(env.now), the cluster, and the workflow plan as a parameter and
+		returns an allocation if necessary.
+
+		This function returns the current progress of the workflows on the
+		cluster as a list. This list is then passed to the Telescope to
+		help with it's observation decisions.
+		Returns
+		-------
+
+		"""
 		logger.debug('Attempting to schedule workflow to cluster')
 
 		# Min -scheduling time
@@ -218,6 +234,7 @@ class Scheduler(object):
 					)
 
 		# TODO new method 'clean_up_processed_workflow'
+
 		if self.current_plan.status is WorkflowStatus.FINISHED:
 			# TODO wrap this into a function moving forward
 			self.waiting_observations.remove(self.current_observation)
@@ -248,7 +265,7 @@ class Scheduler(object):
 			)
 
 			while True:
-				machine, task = self.algorithm(
+				machine, task, status = self.algorithm(
 					self.cluster, self.env.now, self.current_plan
 				)
 				if machine is None or task is None:
@@ -257,6 +274,7 @@ class Scheduler(object):
 					# Runs the task on the machie
 					# task.machine = machine
 					task.task_status = TaskStatus.SCHEDULED
+
 					machine.run(task)
 					if task.task_status is TaskStatus.SCHEDULED:
 						self.cluster.running_tasks.append(task)

@@ -47,7 +47,11 @@ class FifoAlgorithm(Algorithm):
 		# Schedule as we go
 		for t in self.cluster.running_tasks:
 			# Check if the running tasks have finished
+			# TODO check if expected run time is the same as the 'assigned'
+			#  runtime (i.e. we have a 'delay'); if not, we have a delay and
+			# we need to return 'current workflow execution status'
 			if t.task_status is TaskStatus.FINISHED:
+				self.cluster.stop_task(t)
 				self.cluster.running_tasks.remove(t)
 				self.cluster.finished_tasks.append(t)
 				workflow_plan.tasks.remove(t)
@@ -60,6 +64,9 @@ class FifoAlgorithm(Algorithm):
 			# Allocate the first element in the Task list:
 			if t.task_status is TaskStatus.UNSCHEDULED and t.est + workflow_plan.start_time <= clock:
 				# Check if task has any predecessors:
+				# TODO check to make sure that the Machine is unoccupied; if
+				#  it is occupied, then we are DELAYED and need to
+				#  communicate this
 				if not t.pred:
 					# The first task
 					return t.machine_id, t
@@ -72,10 +79,14 @@ class FifoAlgorithm(Algorithm):
 						# One of the predecessors of 't' is still running
 						return None, None
 					else:
-						return t.machine_id, t
+						return t.machine_id, t, workflow_plan.status
 
 		return None, None
 
+def check_workflow_progress(cluster, workflow_plan):
+	for t in cluster.running_tasks:
+		if t.current_finish_time > t.estimated_finish_time:
+			return WorkflowStatus.DELAYED
 
 class GlobalDagDelayHeuristic(Algorithm):
 

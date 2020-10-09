@@ -191,6 +191,48 @@ class Telescope:
 				return True
 		return False
 
+	def make_greedy_decision(self):
+		"""
+		This method acts as a 'greedy' decision maker, with the following
+		policies:
+
+			* If there is space in the buffer and cluster, and there is
+			enough room on the telescope, schedule the observation
+			* If there is a delay, drop the lowest priority observation from
+			the plan.
+				* If all observations are of the same priority, drop the
+				shortest
+				* If all observations are of the same length, drop the one
+				with the highest data requirement
+		Returns
+		-------
+
+		"""
+
+
+	def make_delay_conscious_decision(self):
+		"""
+		This method takes into account delays on the telescope and acts to
+		improve the science output based on the delays
+		This will change based on whether we are in a Global or Independent
+		DAG model.
+
+		Independent DAG model - drop things
+
+		Global DAG model - we reschedule based on current awareness of the
+		cluster and the delays (with a buffer).
+			This means we update our global plan, with the workflows
+			potentially being interleaved more effectively as a result of the delay.
+
+		Then, based on this re-planning, we determine the delay %; if it's still
+		over, we follow the greedy approach
+
+		Returns
+		-------
+
+		"""
+		return None
+
 	def print_state(self):
 		return {
 			'telescope_in_use': self.telescope_status,

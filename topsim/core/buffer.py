@@ -73,9 +73,8 @@ class Buffer(object):
 
 	def run(self):
 		while True:
-			for observation in self.hot.observations:
-				if observation not in self.workflow_ready_observations:
-					self.workflow_ready_observations.append(observation)
+			if self.hot.has_waiting_observations():
+				self.cold.request_hot_observations()
 			yield self.env.timeout(1)
 
 	def check_buffer_capacity(self, observation):
@@ -100,6 +99,8 @@ class Buffer(object):
 
 	def request_data_from(self, observation):
 		"""
+
+		TODO this should change
 		Called when the scheduler is requesting data for workflow processing.
 
 		This method 'moves' the observation data from the HotBuffer to the
@@ -151,7 +152,8 @@ class Buffer(object):
 		Buffer ingests the data stream from the Ingest pipelines. the data
 		is what is added to the 'hot' buffer every timestep
 		That is - the observation.ingest_data_rate is a per-timestep value
-
+		Timestep is the current timeout (in this scenario, it's specsoified as
+		1 unit of time).
 		Parameters
 		----------
 		observation : core.Telescope.Observation object
@@ -189,15 +191,27 @@ class HotBuffer:
 		self.max_ingest_data_rate = max_ingest_data_rate
 		self.stored_observations = []
 
+	def has_waiting_observations(self):
+		if self.stored_observations:
+			return True
+		else:
+			return False
+
 	def process_incoming_data_stream(self, incoming_datarate, time):
 		"""
 		During Ingest, the buffer will coordinate the incoming data from
 		the observation. This is a sanity check function to make sure the
 		hot buffer has capacity to accept the incoming data.
 
-		:param incoming_datarate: The amount of data-per-timestep the telescope
+		Parameters
+		-----------
+		incoming_datarate: The amount of data-per-timestep the telescope
 		is producing
-		:return: True if the data can be processed - false if it cannot
+
+
+		Returns
+		-----------
+		True if the data can be processed - false if it cannot
 		"""
 		if incoming_datarate > self.max_ingest_data_rate:
 			raise ValueError(
@@ -223,6 +237,12 @@ class ColdBuffer:
 		self.current_capacity = self.total_capacity
 		self.max_data_rate = max_data_rate
 		self.observations = []
+
+	def request_hot_observations(self):
+		return None
+
+	def process_data(self):
+		return None
 
 
 def process_buffer_config(spec):
@@ -253,3 +273,4 @@ def process_buffer_config(spec):
 	)
 
 	return hot, cold
+

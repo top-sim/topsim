@@ -204,7 +204,13 @@ class TestColdBufferRequests(unittest.TestCase):
 		Returns
 		-------
 		"""
-
+		# TODO THIS NEED TO CHANGE
+		# TODO Hot Cold transfer should be automatic, not instigated by the
+		#  scheduler. THis ensures that the scheduler only needs to check the
+		#  cold buffer, and that movement of data from the hot buffer to the
+		#  cold buffer is 'automatic' (that is, once data has been through
+		#  the hot buffer completely and INGEST run on that data, we can move
+		#  it to a large buffer store).
 		# Prelimns
 		self.observation.status = RunStatus.RUNNING
 		self.env.process(self.buffer.ingest_data_stream(self.observation))
@@ -233,8 +239,6 @@ class TestColdBufferRequests(unittest.TestCase):
 			self.env.run,until=10,
 		)
 
-
-	@unittest.skip
 	def testWorkflowAddedToQueue(self):
 		"""
 		We only add a workflow to the queue once an observation has finished
@@ -247,7 +251,7 @@ class TestColdBufferRequests(unittest.TestCase):
 		next(self.planner.run(self.observation))
 		# Buffer observation queue should be empty
 		self.assertTrue(self.buffer.observations_for_processing.empty())
-		self.buffer.add_observation_to_waiting_workflows(self.observation)
+		# self.buffer.add_observation_to_waiting_workflows(self.observation)
 		self.assertTrue(self.buffer.observations_for_processing.size() == 1)
 #
 # # Get the observation and check we have applied the buffer offset
