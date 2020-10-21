@@ -1,0 +1,58 @@
+{
+    "header" : {
+        "time": false
+    },
+    "graph": {
+       "directed": true,
+        "multigraph": false,
+        "calc": true,
+        "graph": {
+            "node_default": {},
+            "edge_default": {}
+        },
+        "nodes": [
+            {
+                "comp": 2,
+                "id": 0
+            },
+            {
+                "comp": 2,
+                "id": 1
+            },
+            {
+                "comp": 2,
+                "id": 2
+            },
+            {
+                "comp": 2,
+                "id": 3
+            },
+            {
+                "comp": 2,
+                "id": 4
+            }
+        ],
+        "links": [
+            {
+                "data_size": 1,
+                "source": 0,
+                "target": 1
+            },
+            {
+                "data_size": 1,
+                "source": 1,
+                "target": 2
+            },
+            {
+                "data_size": 1,
+                "source": 2,
+                "target": 3
+            },
+            {
+                "data_size": 1,
+                "source": 3,
+                "target": 4
+            }
+        ]
+    }
+}

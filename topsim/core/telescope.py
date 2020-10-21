@@ -56,6 +56,10 @@ class Telescope:
 	total_arrays :
 
 	pipelines : dict
+		dictionary of the different pipelines that may be observed with this
+		telescope setup. pipelines have a name associated with them, and an
+		associated cluster-demand, which is the number of machines used during
+		execution of the INGEST pipeline
 
 	observations : list
 

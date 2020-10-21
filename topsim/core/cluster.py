@@ -96,7 +96,7 @@ class Cluster(object):
 	def provision_ingest_resources(self, demand, duration):
 		"""
 		Based on the requirements of the pipeline, provision a certain
-		number of resources
+		number of resources for ingest
 
 		Parameters
 		----------

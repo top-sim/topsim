@@ -1,0 +1,39 @@
+{
+	"telescope": {
+		"total_arrays": 36,
+		"pipelines": {
+			"continuum": {
+				"demand": 1
+			}
+		},
+		"observations": [
+			{
+				"name": "first",
+				"start": 0,
+				"duration": 1,
+				"demand": 36,
+				"workflow": "test/data/basic-workflow-data/basic_workflow_config.json",
+				"type": "spectral",
+				"data_product_rate": 5
+			},
+			{
+				"name": "second",
+				"start": 2,
+				"duration": 1,
+				"demand": 36,
+				"workflow": "test/data/config/basic_workflow_config.json",
+				"type": "spectral",
+				"data_product_rate": 5
+			},
+			{
+				"name": "third",
+				"start": 4,
+				"duration": 1,
+				"demand": 36,
+				"workflow": "test/data/config/basic_workflow_config.json",
+				"type": "spectral",
+				"data_product_rate": 5
+			}
+		]
+	}
+}

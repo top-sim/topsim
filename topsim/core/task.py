@@ -19,6 +19,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class TaskStatus(Enum):
 	UNSCHEDULED = 1
 	SCHEDULED = 2
@@ -33,8 +34,8 @@ class Task(object):
 	their priority.
 	"""
 
-	# NB I don't want tasks to have null defaults; should we improve on this by initialising
-	# everything in a task at once?
+	# NB I don't want tasks to have null defaults; should we improve on this
+	# by initialising everything in a task at once?
 	def __init__(self, tid, env):
 		"""
 		:param tid: ID of the Task object
@@ -51,8 +52,10 @@ class Task(object):
 		self.exec_order = None
 		self.task_status = TaskStatus.UNSCHEDULED
 		self.pred = None
+		self.expected_finish_time = None
 		self.finished_timestamp = None
 		self.started_timestamp = None
+		self.delay = None
 
 		# Machine information that is less important
 		# currently (will update this in future versions)
