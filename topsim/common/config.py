@@ -20,4 +20,3 @@ during execution of a simulation.
 
 BUFFER_TIME_OFFSET = 5
 TRACEFILE = "sim.trace"
-

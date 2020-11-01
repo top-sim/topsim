@@ -21,26 +21,29 @@ import simpy
 
 from topsim.algorithms.scheduling import FifoAlgorithm
 from topsim.core.simulation import Simulation
-from topsim import common as test_data
 
-workflow_file = 'test/data/daliuge_pipeline_test.json'
-event_file = 'sim.trace'
-planning_algorithm = 'heft'
+
+BASIC_WORKFLOW = 'test/basic-workflow-data/basic_workflow_config.json'
+BASIC_CLUSTER = 'test/basic-workflow-data/basic_config.json'
+BASIC_BUFFER = 'test/basic-workflow-data/basic_buffer.json'
+BASIC_TELESCOPE = 'test/basic-workflow-data/basic_observation_plan.json'
+
+EVENT_FILE = 'topsim/simulations/output/sim.trace'
+
 # env = simpy.RealtimeEnvironment(factor=0.5, strict=False)
 env = simpy.Environment()
-tmax = 36  # for starters, we will define telescope configuration as simply number of arrays that exist
-salgorithm = FifoAlgorithm()
-vis = False
-
-# TODO move things like 'heft' into a 'common' file which has SchedulingAlgorithm.HEFT = 'heft' etc.
+event_file = EVENT_FILE
+planning_algorithm = 'heft'
+scheduling_algorithm = FifoAlgorithm()
 simulation = Simulation(
 	env,
-	test_data.telescope_config,
-	tmax,
-	test_data.machine_config,
-	salgorithm,
-	'heft',
-	event_file,
-	vis
+	BASIC_TELESCOPE,
+	BASIC_CLUSTER,
+	BASIC_BUFFER,
+	planning_algorithm,
+	scheduling_algorithm,
+	EVENT_FILE,
+	visualisation=False
 )
+
 simulation.start(-1)

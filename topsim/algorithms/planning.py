@@ -20,3 +20,9 @@ we will pull in the shadow framework and wrap it in a planning algorithm class
 """
 
 # Todo - wrap Shadow functionality in here
+
+
+#  TODO introduce a 'default' batch-scheduling planning algorithm,
+#  which allocates all resources that a job will use over its duration. This
+#  'schedule' will then have a topological sort and fifo algorithm for the
+#  workflow.

@@ -16,6 +16,7 @@
 import numpy as np
 from enum import Enum
 
+
 class DelayModel:
     """
     The delay model is the delay or failure model for tasks in a workflow.
@@ -51,4 +52,3 @@ class DelayModel:
         delay = None
         index = self.probability
         return delay
-

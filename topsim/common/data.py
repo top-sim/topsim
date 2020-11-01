@@ -30,9 +30,6 @@ test_scheduler_workflow = 'test/data/workflow_config.json'
 test_buffer_workflow = 'test/data/workflow_config.json'
 test_plan_workflow = 'test/data/workflow_config.json'
 
-
 # Extra time added to the start time of an observation workflow  when it enters the buffer
 # This is to account for I/O and overheads
 buffer_offset = 5
-
-

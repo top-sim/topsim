@@ -20,4 +20,3 @@ This module is an interface layer between SHADOW and TOPSim.
 TOpSim core modules should only be reliant on other core modules
 and Python standard modules (and Simpy, of course).
 """
-

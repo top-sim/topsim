@@ -16,80 +16,81 @@
 from enum import Enum
 import logging
 
-
 logger = logging.getLogger(__name__)
 
 
 class TaskStatus(Enum):
-	UNSCHEDULED = 1
-	SCHEDULED = 2
-	RUNNING = 3
-	FINISHED = 4
+    UNSCHEDULED = 1
+    SCHEDULED = 2
+    RUNNING = 3
+    FINISHED = 4
 
 
 class Task(object):
-	"""
-	Tasks have priorities inheritted from the workflows from which they are arrived; once
-	they arrive on the cluster queue, they are workflow agnositc, and are processed according to
-	their priority.
-	"""
+    """
+    Tasks have priorities inheritted from the workflows from which they are arrived; once
+    they arrive on the cluster queue, they are workflow agnositc, and are processed according to
+    their priority.
+    """
 
-	# NB I don't want tasks to have null defaults; should we improve on this
-	# by initialising everything in a task at once?
-	def __init__(self, tid, env):
-		"""
-		:param tid: ID of the Task object
-		:param env: Simulation environment to which the task will be added, and where it will run as a process
-		"""
-		self.id = tid
-		self.env = env
-		self.est = 0
-		self.eft = 0
-		self.ast = -1
-		self.aft = -1
-		self.machine_id = None
-		self.duration = None
-		self.exec_order = None
-		self.task_status = TaskStatus.UNSCHEDULED
-		self.pred = None
-		self.expected_finish_time = None
-		self.finished_timestamp = None
-		self.started_timestamp = None
-		self.delay = None
+    # NB I don't want tasks to have null defaults; should we improve on this
+    # by initialising everything in a task at once?
+    def __init__(self, tid, env):
+        """
+        :param tid: ID of the Task object
+        :param env: Simulation environment to which the task will be added, and where it will run as a process
+        """
+        self.id = tid
+        self.env = env
+        self.est = 0
+        self.eft = 0
+        self.ast = -1
+        self.aft = -1
+        self.machine_id = None
+        self.duration = None
+        self.exec_order = None
+        self.task_status = TaskStatus.UNSCHEDULED
+        self.pred = None
+        self.expected_finish_time = None
+        self.finished_timestamp = None
+        self.started_timestamp = None
+        self.delay = None
 
-		# Machine information that is less important
-		# currently (will update this in future versions)
+        # Machine information that is less important
+        # currently (will update this in future versions)
 
-		self.flops = 0
-		self.memory = 0
-		self.io = 0
-	#
-	# def __lt__(self, other):
-	# 	return self.exec_order < other.exec_order
-	#
-	# def __eq__(self, other):
-	# 	return self.exec_order == other.exec_order
-	#
-	# def __gt__(self, other):
-	# 	return self.exec_order > other.exec_order
+        self.flops = 0
+        self.memory = 0
+        self.io = 0
 
-	def __hash__(self):
-		return hash(self.id)
+    #
+    # def __lt__(self, other):
+    # 	return self.exec_order < other.exec_order
+    #
+    # def __eq__(self, other):
+    # 	return self.exec_order == other.exec_order
+    #
+    # def __gt__(self, other):
+    # 	return self.exec_order > other.exec_order
 
-	def do_work(self):
-		yield self.env.timeout(self.duration)
-		self.finished_timestamp = self.env.now
-		logger.debug('%s finished at %s', self.id, self.finished_timestamp)
-		self.task_status = TaskStatus.FINISHED
-	# self.machine.stop_task(self)
+    def __hash__(self):
+        return hash(self.id)
 
-	def run(self):
-		self.started_timestamp = self.env.now
-		logger.debug('%s started at %s', self.id, self.started_timestamp)
-		self.task_status = TaskStatus.RUNNING
-		process = self.env.process(self.do_work())
-		if process:
-			return self.task_status
-		else:
-			raise RuntimeError(
-				'Task {0} failed to execute normally'.format(self))
+    def do_work(self):
+        yield self.env.timeout(self.duration)
+        self.finished_timestamp = self.env.now
+        logger.debug('%s finished at %s', self.id, self.finished_timestamp)
+        self.task_status = TaskStatus.FINISHED
+
+    # self.machine.stop_task(self)
+
+    def run(self):
+        self.started_timestamp = self.env.now
+        logger.debug('%s started at %s', self.id, self.started_timestamp)
+        self.task_status = TaskStatus.RUNNING
+        process = self.env.process(self.do_work())
+        if process:
+            return self.task_status
+        else:
+            raise RuntimeError(
+                'Task {0} failed to execute normally'.format(self))

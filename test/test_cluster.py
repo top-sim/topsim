@@ -38,116 +38,116 @@ OBS_WORKFLOW = "test/data/config/workflow_config.json"
 
 class TestClusterConfig(unittest.TestCase):
 
-	def setUp(self):
-		self.env = simpy.Environment()
+    def setUp(self):
+        self.env = simpy.Environment()
 
-	def testClusterConfigFileExists(self):
-		"""
-		Initialise a Cluster object with the machine config file
-		"""
-		cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
-		# This is a homogeneous file, so each flops value should be 95
-		for machine in cluster.machines:
-			# machine is an object instance of Machine
-			self.assertEqual(84, machine.cpu)
-			self.assertEqual(10, machine.bandwidth)
+    def testClusterConfigFileExists(self):
+        """
+        Initialise a Cluster object with the machine config file
+        """
+        cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
+        # This is a homogeneous file, so each flops value should be 95
+        for machine in cluster.machines:
+            # machine is an object instance of Machine
+            self.assertEqual(84, machine.cpu)
+            self.assertEqual(10, machine.bandwidth)
 
-	def testClusterConfigNoFile(self):
-		"""
-		Attempt to initialise a cluster with the wrong file
-		:return: None
-		"""
-		config = CLUSTER_NOFILE
-		self.assertRaises(
-			FileNotFoundError, Cluster, self.env, config
-		)
+    def testClusterConfigNoFile(self):
+        """
+        Attempt to initialise a cluster with the wrong file
+        :return: None
+        """
+        config = CLUSTER_NOFILE
+        self.assertRaises(
+            FileNotFoundError, Cluster, self.env, config
+        )
 
-	def testClusterConfigIncorrectJSON(self):
-		config = CLUSTER_INCORRECT_JSON
-		self.assertRaises(
-			KeyError, Cluster, self.env, config
-		)
+    def testClusterConfigIncorrectJSON(self):
+        config = CLUSTER_INCORRECT_JSON
+        self.assertRaises(
+            KeyError, Cluster, self.env, config
+        )
 
-	def testClusterConfigNotJSON(self):
-		config = CLUSTER_NOT_JSON
-		self.assertRaises(
-			json.JSONDecodeError, Cluster, self.env, config
-		)
+    def testClusterConfigNotJSON(self):
+        config = CLUSTER_NOT_JSON
+        self.assertRaises(
+            json.JSONDecodeError, Cluster, self.env, config
+        )
 
 
 class TestIngest(unittest.TestCase):
 
-	def setUp(self) -> None:
-		self.env = simpy.Environment()
-		self.cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
-		self.observation = Observation(
-			'planner_observation',
-			OBS_START_TME,
-			OBS_DURATION,
-			OBS_DEMAND,
-			OBS_WORKFLOW,
-			type=None,
-			data_rate=None
-		)
+    def setUp(self) -> None:
+        self.env = simpy.Environment()
+        self.cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
+        self.observation = Observation(
+            'planner_observation',
+            OBS_START_TME,
+            OBS_DURATION,
+            OBS_DEMAND,
+            OBS_WORKFLOW,
+            type=None,
+            data_rate=None
+        )
 
-	def testClusterCheckIngest(self):
-		retval = self.cluster.check_ingest_capacity(pipeline_demand=5)
-		self.assertTrue(retval)
+    def testClusterCheckIngest(self):
+        retval = self.cluster.check_ingest_capacity(pipeline_demand=5)
+        self.assertTrue(retval)
 
-	def testClusterProvisionIngest(self):
-		duration = self.observation.duration
-		pipeline_demand = 5
-		self.env.process(self.cluster.run())
-		peek = self.env.peek()
-		self.env.process(self.cluster.provision_ingest_resources(
-			pipeline_demand,
-			duration)
-		)
-		self.env.run(until=1)
-		self.assertEqual(1, self.env.now)
-		# self.process(self.run_ingest(duration,pipeline_demand))
-		# for task in self.cluster.running_tasks:
-		#  	self.assertEqual(TaskStatus.RUNNING, task.task_status)
-		self.assertEqual(5, len(self.cluster.available_resources))
-		self.assertEqual(5, len(self.cluster.running_tasks))
-		self.env.run(until=10)
-		self.assertEqual(5, len(self.cluster.available_resources))
-		self.env.run(until=20)
-		self.assertEqual(10,len(self.cluster.available_resources))
-		self.assertEqual(20,self.env.now)
+    def testClusterProvisionIngest(self):
+        duration = self.observation.duration
+        pipeline_demand = 5
+        self.env.process(self.cluster.run())
+        peek = self.env.peek()
+        self.env.process(self.cluster.provision_ingest_resources(
+            pipeline_demand,
+            duration)
+        )
+        self.env.run(until=1)
+        self.assertEqual(1, self.env.now)
+        # self.process(self.run_ingest(duration,pipeline_demand))
+        # for task in self.cluster.running_tasks:
+        #  	self.assertEqual(TaskStatus.RUNNING, task.task_status)
+        self.assertEqual(5, len(self.cluster.available_resources))
+        self.assertEqual(5, len(self.cluster.running_tasks))
+        self.env.run(until=10)
+        self.assertEqual(5, len(self.cluster.available_resources))
+        self.env.run(until=20)
+        self.assertEqual(10, len(self.cluster.available_resources))
+        self.assertEqual(20, self.env.now)
 
-	def run_ingest(self, duration,demand):
-		retval = self.cluster.provision_ingest_resources(
-			demand,
-			duration
-		)
-		for task in self.cluster.running_tasks:
-			self.assertEqual(TaskStatus.SCHEDULED, task.task_status)
+    def run_ingest(self, duration, demand):
+        retval = self.cluster.provision_ingest_resources(
+            demand,
+            duration
+        )
+        for task in self.cluster.running_tasks:
+            self.assertEqual(TaskStatus.SCHEDULED, task.task_status)
 
 
 class TestCluster(unittest.TestCase):
 
-	def setUp(self):
-		pass
+    def setUp(self):
+        pass
 
-	def tearDown(self):
-		pass
+    def tearDown(self):
+        pass
 
-	def testClusterQueue(self):
-		env = simpy.Environment()
-		env.process(self.run_env(env))
-		env.run(until=20)
+    def testClusterQueue(self):
+        env = simpy.Environment()
+        env.process(self.run_env(env))
+        env.run(until=20)
 
-	def run_env(self, env):
-		i = 0
-		while i < 15:
-			logger.debug(env.now)
-			if env.now == 5:
-				env.process(self.secret(env))
-			i += 1
-			yield env.timeout(1)
+    def run_env(self, env):
+        i = 0
+        while i < 15:
+            logger.debug(env.now)
+            if env.now == 5:
+                env.process(self.secret(env))
+            i += 1
+            yield env.timeout(1)
 
-	def secret(self, env):
-		logger.debug('Started secret business @ {0}'.format(env.now))
-		yield env.timeout(4)
-		logger.debug('Finished secret business @ {0}'.format(env.now))
+    def secret(self, env):
+        logger.debug('Started secret business @ {0}'.format(env.now))
+        yield env.timeout(4)
+        logger.debug('Finished secret business @ {0}'.format(env.now))

@@ -46,12 +46,12 @@ scheduling_algorithm = FifoAlgorithm()
 env = simpy.Environment()
 
 simulation = Simulation(
-	env,
-	TELESCOPE_CONFIG,
-	CLUSTER_CONFIG,
-	BUFFER_CONFIG,
-	planning_algorithm,
-	scheduling_algorithm,
-	EVENT_FILE,
-	visualisation=False
+    env,
+    TELESCOPE_CONFIG,
+    CLUSTER_CONFIG,
+    BUFFER_CONFIG,
+    planning_algorithm,
+    scheduling_algorithm,
+    EVENT_FILE,
+    visualisation=False
 )

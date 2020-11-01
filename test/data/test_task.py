@@ -24,10 +24,9 @@ CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
 
 class TestTaskInit(unittest.TestCase):
 
-	def setUp(self):
-		self.env = simpy.Environment()
-		self.cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
+    def setUp(self):
+        self.env = simpy.Environment()
+        self.cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
 
-	def test_task_setup(self):
-
-		task = Task(0, env=self.env)
+    def test_task_setup(self):
+        task = Task(0, env=self.env)
