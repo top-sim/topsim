@@ -1,6 +1,7 @@
 {
 	"telescope": {
 		"total_arrays": 36,
+		"max_ingest_resource": 5,
 		"pipelines": {
 			"continuum": {
 				"demand": 5

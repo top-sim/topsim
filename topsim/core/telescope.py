@@ -7,7 +7,7 @@ import json
 
 from enum import Enum
 
-logging.basicConfig(level="INFO")
+logging.basicConfig(level="DEBUG")
 LOGGER = logging.getLogger(__name__)
 
 
@@ -86,10 +86,12 @@ class Telescope:
     ):
         self.env = env
         try:
-            self.total_arrays, self.pipelines, self.observations = \
-                process_telescope_config(
-                    config
-                )
+            (
+                self.total_arrays,
+                self.pipelines,
+                self.observations,
+                self.max_ingest
+            ) = process_telescope_config(config)
         except OSError:
             raise
         self.scheduler = scheduler
@@ -139,7 +141,8 @@ class Telescope:
                     # Observation is ready - is the Buffer/Cluster?
                     if self.scheduler.check_ingest_capacity(
                             observation,
-                            self.pipelines
+                            self.pipelines,
+                            self.max_ingest
                     ):
                         ret = self.begin_observation(observation)
                         # plan_trigger = self.env.process(
@@ -154,7 +157,6 @@ class Telescope:
                             self.scheduler.allocate_ingest(
                                 observation, self.pipelines
                             ))
-                        # observation.status = ret
                         if ret:
                             observation.total_data_size += \
                                 observation.ingest_data_rate
@@ -334,7 +336,7 @@ class Observation(object):
             return False
 
     def is_finished(self, current_time, telescope_status):
-        if current_time > self.start + self.duration \
+        if current_time >= self.start + self.duration \
                 and telescope_status \
                 and (self.status is not RunStatus.FINISHED):
             return True
@@ -389,8 +391,8 @@ def process_telescope_config(telescope_config):
             observations.append(o)
         except KeyError:
             raise
-
-    return total_arrays, pipelines, observations
+    max_ingest_resources = config['telescope']['max_ingest_resources']
+    return total_arrays, pipelines, observations, max_ingest_resources
 
 
 # {

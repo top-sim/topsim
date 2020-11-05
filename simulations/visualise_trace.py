@@ -15,6 +15,7 @@
 
 
 import json
+import seaborn as sns
 
 tracefile = 'test/data/output/sim.trace'
 

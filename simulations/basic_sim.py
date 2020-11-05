@@ -18,17 +18,20 @@ Basic simulation, with minimal Observation Plan and dummy observation workflows
 """
 
 import simpy
+import logging
 
 from topsim.algorithms.scheduling import FifoAlgorithm
 from topsim.core.simulation import Simulation
 
+logging.basicConfig(level="DEBUG")
+LOGGER = logging.getLogger(__name__)
 
 BASIC_WORKFLOW = 'test/basic-workflow-data/basic_workflow_config.json'
 BASIC_CLUSTER = 'test/basic-workflow-data/basic_config.json'
 BASIC_BUFFER = 'test/basic-workflow-data/basic_buffer.json'
 BASIC_TELESCOPE = 'test/basic-workflow-data/basic_observation_plan.json'
 
-EVENT_FILE = 'topsim/simulations/output/sim.trace'
+EVENT_FILE = 'simulations/output/sim.trace'
 
 # env = simpy.RealtimeEnvironment(factor=0.5, strict=False)
 env = simpy.Environment()
@@ -46,4 +49,4 @@ simulation = Simulation(
 	visualisation=False
 )
 
-simulation.start(-1)
+simulation.start(10)

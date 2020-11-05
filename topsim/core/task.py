@@ -77,10 +77,10 @@ class Task(object):
         return hash(self.id)
 
     def do_work(self):
-        yield self.env.timeout(self.duration)
+        yield self.env.timeout(self.duration-1)
         self.finished_timestamp = self.env.now
         logger.debug('%s finished at %s', self.id, self.finished_timestamp)
-        self.task_status = TaskStatus.FINISHED
+        return TaskStatus.FINISHED
 
     # self.machine.stop_task(self)
 
@@ -89,8 +89,8 @@ class Task(object):
         logger.debug('%s started at %s', self.id, self.started_timestamp)
         self.task_status = TaskStatus.RUNNING
         process = self.env.process(self.do_work())
-        if process:
-            return self.task_status
-        else:
-            raise RuntimeError(
-                'Task {0} failed to execute normally'.format(self))
+        # if process:
+        #     return self.task_status
+        # else:
+        #     raise RuntimeError(
+        #         'Task {0} failed to execute normally'.format(self))

@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 # from core.telescope import Observation
 
 
-class Planner(object):
+class Planner:
     """
     The Planner is our interface with static scheduling algorithms. It provides
     an interface to other libraries and selects the library based on the provided
@@ -85,7 +85,7 @@ class WorkflowStatus(int, Enum):
     FINISHED = 5
 
 
-class WorkflowPlan(object):
+class WorkflowPlan:
     """
     WorkflowPlans are used within the Planner, SchedulerA Actors and Cluster Resource. They are higher-level than the
     shadow library representation, as they are a storage component of scheduled tasks, rather than directly representing
@@ -106,7 +106,8 @@ class WorkflowPlan(object):
         self.tasks = []
         task_order = []
 
-        # The solution object is now how we get information on allocatiosn from SHADOW
+        # The solution object is now how we get information on allocatiosn
+        # from SHADOW
 
         for task in self.solution.task_allocations:
             allocation = self.solution.task_allocations.get(task)

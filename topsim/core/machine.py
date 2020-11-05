@@ -22,17 +22,13 @@ class Machine(object):
         self.transfer_flag = False
         self.current_task = None
 
-    def run(self, task):
+    def run(self, task, env):
         # return True
         while True:
-            self.run_task(task)
             if task.task_status is TaskStatus.SCHEDULED:
-                run_status = task.run()
-            if task.task_status is TaskStatus.RUNNING:
-                yield task.env.timeout(1)
-            if task.task_status is TaskStatus.FINISHED:
+                ret = yield env.process(task.do_work())
                 self.stop_task(task)
-                break
+                return ret
 
     def run_task(self, task_instance):
         self.cpu -= task_instance.flops

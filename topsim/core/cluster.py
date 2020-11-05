@@ -27,7 +27,6 @@ class Cluster:
 
     def __init__(self, env, spec):
         """
-
         :param env:
         :param spec:
         """
@@ -37,13 +36,22 @@ class Cluster:
         except OSError:
             raise
         self.dmachine = {machine.id: machine for machine in self.machines}
-        self.available_resources = [machine for machine in self.machines]
 
-        self.occupied_resources = []
-        self.ingest_resources = []
-        self.running_tasks = []
-        self.finished_tasks = []
-        self.waiting_tasks = []
+        self.resources = {
+            'ingest': [],
+            'occupied': [],
+            'available': [machine for machine in self.machines]
+        }
+        self.tasks = {
+            'running': [],
+            'finished': [],
+            'waiting': [],
+        }
+        self.ingest = {
+            'status': False,
+            'pipeline': None,
+            'observation': None
+        }
         self.ingest = False
         self.finished_workflows = []
         self.ingest_pipeline = None
@@ -52,18 +60,18 @@ class Cluster:
 
     def run(self):
         while True:
-            if len(self.waiting_tasks) > 0:
-                for task in self.waiting_tasks:
+            if len(self.tasks['waiting']) > 0:
+                for task in self.tasks['waiting']:
                     if task.task_status is TaskStatus.FINISHED:
-                        self.waiting_tasks.remove(task)
-                        self.finished_tasks.append(task)
+                        self.tasks['waiting'].remove(task)
+                        self.tasks['finished'].append(task)
                     if task.est >= self.env.now:
                         machine = self.dmachine[task.machine.id]
-                        self.running_tasks.append(task)
+                        self.tasks['running'].append(task)
                         machine.run(task)
             yield self.env.timeout(1)
 
-    def check_ingest_capacity(self, pipeline_demand):
+    def check_ingest_capacity(self, pipeline_demand, max_ingest_resources):
         """
         Check if the Cluster has the machine capacity to process the
         observation Ingest pipeline
@@ -72,6 +80,8 @@ class Cluster:
         an ingest pipeline that is set out in the Telescope. This pipeline type
         determines the number of machines in the cluster, and the duration,
         which must be reserved for the observation.
+
+        The cluster also has a maximum number of ingest
 
         Parameters
         ----------
@@ -87,7 +97,9 @@ class Cluster:
         # Pipeline demand is the number of machines required for the pipeline
         # Length is how long the pipeline will take to
         # ingest/observation will take
-        if len(self.available_resources) >= pipeline_demand:
+
+        if len(self.resources['available']) >= pipeline_demand \
+                and len(self.resources['ingest']) < max_ingest_resources:
             return True
         else:
             return False
@@ -109,40 +121,41 @@ class Cluster:
         """
 
         tasks = self._generate_ingest_tasks(demand, duration)
-        # Generate machine/task pairs
-        pairs = []
-        resources = self.available_resources[:demand]
-        self.available_resources = self.available_resources[demand:]
-        self.ingest_resources = resources
 
-        for x in range(demand):
-            machine = resources[x]
-            pairs.append((machine, tasks[x]))
+        # TODO Ingest is currently occuring when there is already something
+        #  being ingested - this shouldn't happen
+
+        ## TODO Introduce a check to make sure that we only ingest on a
+        # MAXIMUM number of cluster machines - otherwise we could
+        # theoreticall use up the entire cluster ingesting!
+
+        pairs = []
+        self.resources['ingest'].extend(self.resources['available'][:demand])
+        self.resources['available'] = self.resources['available'][demand:]
+
+        for i, machine in enumerate(self.resources['ingest']):
+            pairs.append((machine, tasks[i]))
 
         self.ingest = True
         while True:
             for pair in pairs:
                 (machine, task) = pair
-                if task not in self.running_tasks:
-                    self.running_tasks.append(task)
-                    self.env.process(machine.run(task))
-                # status = machine.current_task.task_status
-                # task.task_status=val
+                if task not in self.tasks['running']:
+                    self.tasks['running'].append(task)
+                    ret = yield self.env.process(machine.run(task, self.env))
+                    if ret:
+                        task.task_status = ret
+                        self.tasks['running'].remove(task)
+                        self.tasks['finished'].append(task)
+                        self.resources['available'].append(machine)
+                        self.resources['ingest'].remove(machine)
                 else:
                     break
-            # yield self.env.timeout(1)
-            yield self.env.timeout(1)
-            for pair in pairs:
-                (machine, task) = pair
-                if task.task_status is TaskStatus.FINISHED:
-                    self.running_tasks.remove(task)
-                    self.finished_tasks.append(task)
-                    self.available_resources.append(machine)
-                    self.ingest_resources.remove(machine)
-                    continue
-            if len(self.ingest_resources) == 0:
+            if len(self.resources['ingest']) == 0:
                 # We've finished ingest
                 break
+
+        return True
 
     # return True
 
@@ -154,7 +167,7 @@ class Cluster:
     # task.length = length
     # self.cluster.allocate_task(task, machine)
     # if task.task_status is TaskStatus.SCHEDULED:
-    # 	self.cluster.running_tasks.append(task)
+    # 	self.cluster.running.append(task)
 
     def _generate_ingest_tasks(self, demand, duration):
         """
@@ -200,8 +213,8 @@ class Cluster:
         return ustilisation
 
     def stop_task(self, task):
-        if self.running_tasks.remove(task) and \
-                self.finished_tasks.append(task):
+        if self.running.remove(task) and \
+                self.tasks['finished'].append(task):
             return True
         else:
             raise Exception

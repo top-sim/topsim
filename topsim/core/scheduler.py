@@ -88,7 +88,7 @@ class Scheduler:
         # in fact, we don't even take observation as a parameter anymore. 
         yield self.env.process(self.buffer.run(observation))
 
-    def check_ingest_capacity(self, observation, pipelines):
+    def check_ingest_capacity(self, observation, pipelines, max_ingest):
         """
         Check the cluster and buffer to ensure that we have enough capacity
         to run the INGEST pipeline for the provided observation
@@ -117,7 +117,7 @@ class Scheduler:
 
         cluster_capacity = False
         pipeline_demand = pipelines[observation.type]['demand']
-        if self.cluster.check_ingest_capacity(pipeline_demand):
+        if self.cluster.check_ingest_capacity(pipeline_demand, max_ingest):
             logger.debug(
                 "Cluster is able to process ingest for observation %s",
                 observation.name
@@ -136,14 +136,16 @@ class Scheduler:
         ---------
         observation : core.Telescope.Observation object
             The observation from which we are starting Ingest
+
+        pipelines : dict
+            dictionary storing the different pipeline types supported for the
+            current simulation:
+
+            pipelines[observation type][demand]
+
         Returns
         -------
             True/False
-
-        Yields
-        ------
-        buffer_trigger : Simpy.Environment.Process
-            Yields a process to the buffer, which will add the Buffer
 
         Raises
         ------
@@ -154,7 +156,7 @@ class Scheduler:
         # We do an off-by-one check here, because the first time we run the
         # loop we will be one timestep ahead.
         time_left = observation.duration - 1
-        while True:
+        while self.ingest_observation.status is not RunStatus.FINISHED:
             if self.ingest_observation.status is RunStatus.WAITING:
                 cluster_ingest = self.env.process(
                     self.cluster.provision_ingest_resources(
@@ -175,8 +177,8 @@ class Scheduler:
                 else:
                     self.ingest_observation.run_status = RunStatus.FINISHED
                     break
+            yield self.env.timeout(1)
 
-            yield self.env.timeout(1, value=True)
 
     # def add_workflow(self, workflow):
     # 	print("Adding", workflow, "to workflows")

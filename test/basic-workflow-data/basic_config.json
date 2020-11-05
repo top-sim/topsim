@@ -7,16 +7,19 @@
 			"range": 0,
 			"heterogeneity": 0,
 			"multiplier": 0
-		},
-		"system": {
-			"resources": {
-				"cat0_m0": {
-					"flops": 1.0,
-					"rates": 1.0
-				},
-				"cat1_m1": {
-					"flops": 2.0,
-					"rates": 1.0
-				}
-			}
 		}
+	},
+	"system": {
+		"resources": {
+			"cat0_m0": {
+				"flops": 1.0,
+				"rates": 1.0
+			},
+			"cat1_m1": {
+				"flops": 2.0,
+				"rates": 1.0
+			}
+		},
+		"bandwidth": 1.0
+	}
+}
