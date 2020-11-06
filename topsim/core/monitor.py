@@ -2,7 +2,6 @@ import json
 import logging
 import time
 
-logging.basicConfig(level='INFO')
 logger = logging.getLogger(__name__)
 
 

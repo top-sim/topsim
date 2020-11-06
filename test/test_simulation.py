@@ -82,7 +82,7 @@ class TestSimulationBasicSetup(unittest.TestCase):
         scheduling_algorithm = FifoAlgorithm()
         self.simulation = Simulation(
             env,
-            BASIC_TELESCOPE,
+            BASIC_PLAN,
             BASIC_CLUSTER,
             BASIC_BUFFER,
             planning_algorithm,

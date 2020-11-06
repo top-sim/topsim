@@ -50,9 +50,9 @@ class Cluster:
         self.ingest = {
             'status': False,
             'pipeline': None,
-            'observation': None
+            'observation': None,
+            'completed': 0
         }
-        self.ingest = False
         self.finished_workflows = []
         self.ingest_pipeline = None
         self.ingest_obervation = None
@@ -122,13 +122,6 @@ class Cluster:
 
         tasks = self._generate_ingest_tasks(demand, duration)
 
-        # TODO Ingest is currently occuring when there is already something
-        #  being ingested - this shouldn't happen
-
-        ## TODO Introduce a check to make sure that we only ingest on a
-        # MAXIMUM number of cluster machines - otherwise we could
-        # theoreticall use up the entire cluster ingesting!
-
         pairs = []
         self.resources['ingest'].extend(self.resources['available'][:demand])
         self.resources['available'] = self.resources['available'][demand:]
@@ -136,7 +129,7 @@ class Cluster:
         for i, machine in enumerate(self.resources['ingest']):
             pairs.append((machine, tasks[i]))
 
-        self.ingest = True
+        self.ingest['status'] = True
         while True:
             for pair in pairs:
                 (machine, task) = pair
@@ -152,6 +145,7 @@ class Cluster:
                 else:
                     break
             if len(self.resources['ingest']) == 0:
+                self.ingest['completed'] += 1
                 # We've finished ingest
                 break
 

@@ -18,5 +18,6 @@ This file contains all globals and configuration values that one may want to cha
 during execution of a simulation.
 """
 
+TIMESTEP = 1
 BUFFER_TIME_OFFSET = 5
 TRACEFILE = "sim.trace"

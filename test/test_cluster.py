@@ -75,31 +75,6 @@ class TestClusterConfig(unittest.TestCase):
         )
 
 
-BASIC_WORKFLOW = 'test/basic-workflow-data/basic_workflow_config.json'
-BASIC_CLUSTER = 'test/basic-workflow-data/basic_config.json'
-BASIC_BUFFER = 'test/basic-workflow-data/basic_buffer.json'
-BASIC_TELESCOPE = 'test/basic-workflow-data/basic_observation_plan.json'
-
-
-class TestBasicIngest(unittest.TestCase):
-
-    def setUp(self):
-        self.env = simpy.Environment()
-        self.cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
-        self.observation = Observation(
-            'basic_ingest_observation',
-            start=0,
-            duration=1,
-            demand=1,
-            workflow='BASIC_WORKFLOW',
-            type=None,
-            data_rate=None
-        )
-
-    def testClusterIngest(self):
-        self.assertEqual(0, self.env.now)
-
-
 class TestIngest(unittest.TestCase):
 
     def setUp(self) -> None:

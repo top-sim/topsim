@@ -15,12 +15,12 @@
 
 import logging
 import json
-import topsim.common.config
+from topsim.common.globals import TIMESTEP
 from topsim.core.telescope import RunStatus
 
 logger = logging.getLogger(__name__)
 
-BUFFER_OFFSET = topsim.common.config.BUFFER_TIME_OFFSET
+BUFFER_OFFSET = topsim.common.globals.BUFFER_TIME_OFFSET
 
 
 class BufferQueue:
@@ -74,7 +74,7 @@ class Buffer:
     def run(self):
         while True:
             if self.hot.has_waiting_observations():
-                self.cold.request_hot_observations()
+                self.move_hot_to_cold()
             yield self.env.timeout(1)
 
     def check_buffer_capacity(self, observation):
@@ -87,6 +87,18 @@ class Buffer:
 
     def ingest_data_dump(self, data):
         pass
+
+    def move_hot_to_cold(self):
+
+        return True
+
+    def has_observations_ready_for_processing(self):
+
+        return True
+
+    def get_observations_ready_for_processing(self):
+        l = []
+        return l
 
     def add(self, observation):
         logger.info(
@@ -131,7 +143,7 @@ class Buffer:
             else:
                 break
 
-            yield self.env.timeout(1)
+            yield self.env.timeout(TIMESTEP)
 
         self.cold.observations.append(observation)
         self.buffer_alloc[observation] = 'cold'
@@ -237,7 +249,14 @@ class ColdBuffer:
         self.max_data_rate = max_data_rate
         self.observations = []
 
+    def add_observation(self, observation):
+        self.observations.append(observation)
+        self.current_capacity =- observation.total_data_size
+        # TODO need to yield timeout of how long it takes for the observation
+        #  data to move between buffer
+
     def request_hot_observations(self):
+
         return None
 
     def process_data(self):

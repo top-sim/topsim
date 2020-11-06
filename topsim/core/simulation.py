@@ -136,6 +136,7 @@ class Simulation:
 
         self.scheduler.init()
         self.env.process(self.scheduler.run())
+        self.env.process(self.buffer.run())
         # Calling env.run() invokes the processes passed in init_process()
         if runtime > 0:
             self.env.run(until=runtime)

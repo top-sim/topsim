@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import logging
 from enum import Enum
+from topsim.common.globals import TIMESTEP
 from topsim.core.telescope import RunStatus
 from topsim.core.planner import WorkflowStatus
 from topsim.core.task import TaskStatus
@@ -51,11 +52,23 @@ class Scheduler:
         self.ingest_observation = None
 
     def run(self):
+        """
+
+
+        Yields
+        -------
+        Timeout of common.config.TIMESTEP.
+        """
         if self.status is not SchedulerStatus.RUNNING:
             raise RuntimeError("Scheduler has not been initialised! Call init")
         logger.debug("Scheduler starting up...")
         while self.status is SchedulerStatus.RUNNING:
+            logger.info('Time on Scheduler: {0}'.format(self.env.now))
             # AT THE END OF THE SIMULATION, WE GET STUCK HERE. NEED TO EXIT
+            if self.buffer.has_observations_ready_for_processing():
+                self.waiting_observations.extend(
+                    self.buffer.get_observations_ready_for_processing()
+                )
             if self.buffer.workflow_ready_observations \
                     or self.waiting_observations:
 
@@ -75,7 +88,7 @@ class Scheduler:
                 break
 
             logger.debug("Scheduler Status: %s", self.status)
-            yield self.env.timeout(1)
+            yield self.env.timeout(TIMESTEP)
 
     def start_ingest_pipelines(self, observation, pipeline):
 
@@ -202,6 +215,9 @@ class Scheduler:
 
     # TODO ALLOCATE TASKS NEEDS A CHANGE. THere is too much code in one function,
     #  we need to split this up more.
+    def process_observation_allocations(self):
+        return True
+
 
     def allocate_tasks(self):
         """
