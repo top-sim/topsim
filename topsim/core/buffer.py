@@ -20,7 +20,6 @@ from topsim.core.telescope import RunStatus
 
 logger = logging.getLogger(__name__)
 
-BUFFER_OFFSET = topsim.common.globals.BUFFER_TIME_OFFSET
 
 
 class BufferQueue:
@@ -105,7 +104,7 @@ class Buffer:
             "%s data to buffer at time %s", observation.name, self.env.now
         )
         # This will take time
-        observation.plan.start_time = self.env.now + BUFFER_OFFSET
+        observation.plan.start_time = self.env.now
         self.waiting_observation_list.append(observation)
         logger.debug('Observations in buffer %', self.waiting_observation_list)
 
