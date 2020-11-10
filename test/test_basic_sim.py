@@ -60,6 +60,7 @@ class TestBasicIngest(unittest.TestCase):
         self.assertEqual(
             2, self.simulation.cluster.ingest['completed']
         )
+        self.simulation.start(runtime=10)
 
     def testBufferIngest(self):
         self.assertEqual(0, self.simulation.env.now)

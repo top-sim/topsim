@@ -122,6 +122,8 @@ class TestBufferIngestDataStream(unittest.TestCase):
         Scheduler. The changes we expect in this are simple - after n
         timesteps, the HotBuffer.currect_capacity will have reduced
         n*observation_ingest_rate.
+
+        We test a couple of requirements here.
         """
         self.observation.status = RunStatus.RUNNING
 
@@ -133,10 +135,30 @@ class TestBufferIngestDataStream(unittest.TestCase):
         self.env.run(until=1)
         self.assertEqual(495, self.buffer.hot.current_capacity)
         self.env.run(until=10)
+        self.assertEqual(self.env.now, 10)
         self.assertEqual(450, self.buffer.hot.current_capacity)
         self.assertEqual(
             self.buffer.hot.stored_observations[0],
             self.observation
+        )
+
+    def testIngestPrerequisites(self):
+        """
+        In order to call ingest_data_stream, the observation must be marked as
+        "RunStatus.RUNNING" - otherwise we will  be processing an observation
+        that hasn't started!
+
+        -------
+
+        """
+        ret = self.env.process(
+            self.buffer.ingest_data_stream(
+                self.observation
+            )
+        )
+
+        self.assertRaises(
+            RuntimeError, self.env.run, until=1
         )
 
     def testIngestObservationNotRunning(self):
@@ -169,13 +191,42 @@ class TestBufferIngestDataStream(unittest.TestCase):
         the telescope and the cluster so these actors also need to work
         together in some way, which this test will also attempt to do .
 
-        :return: No return value as this is a test :'(
+        """
+        self.observation.status = RunStatus.RUNNING
+
+        self.observation.ingest_data_rate = 20
+        ret = self.env.process(
+            self.buffer.ingest_data_stream(
+                self.observation
+            )
+        )
+        self.assertRaises(ValueError, self.env.run, until=1)
+
+    def test_ingest_capacity_checks(self):
         """
 
-    # test what happens when there is no ingest pipeline on cluster
+        The buffer checks the hot and cold buffer for capacity;
+        need to make sure that if either the hot buffer or the cold buffer do
+        not have enough room for the observation, it is not scheduled.
+
+        Returns
+        -------
+
+        """
+
+        self.buffer.hot.current_capacity = 2
+        self.assertFalse(
+            self.buffer.check_buffer_capacity(self.observation)
+        )
+
+        self.buffer.hot.current_capacity = 100
+        self.buffer.cold.current_capacity = 1
+        self.assertFalse(
+            self.buffer.check_buffer_capacity(self.observation)
+        )
 
 
-class TestColdBufferRequests(unittest.TestCase):
+class TestBufferRequests(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
@@ -198,21 +249,18 @@ class TestColdBufferRequests(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def testHotColdInteraction(self):
+    def test_buffer_hot_to_cold(self):
         """
-        Testing the results of running 'buffer.request_data_from(observation)'.
+        This tests an ingest, and then, once we have a successful ingest,
+        the movement from one buffer to the other.
+
+        Using the current situation, we should have the observation finished by
+        timestep [TBC], and then the observation moved across by timestep [TBC]
 
         Returns
         -------
+
         """
-        # TODO THIS NEED TO CHANGE
-        # TODO Hot Cold transfer should be automatic, not instigated by the
-        #  scheduler. THis ensures that the scheduler only needs to check the
-        #  cold buffer, and that movement of data from the hot buffer to the
-        #  cold buffer is 'automatic' (that is, once data has been through
-        #  the hot buffer completely and INGEST run on that data, we can move
-        #  it to a large buffer store).
-        # Prelimns
         self.observation.status = RunStatus.RUNNING
         self.env.process(self.buffer.ingest_data_stream(self.observation))
         self.env.run(until=10)
@@ -220,15 +268,102 @@ class TestColdBufferRequests(unittest.TestCase):
 
         # Moving data from one to the other
         self.assertEqual(250, self.buffer.cold.current_capacity)
-        self.env.process(self.buffer.request_data_from(self.observation))
+        self.assertTrue(self.observation in
+                         self.buffer.hot.stored_observations)
+        self.env.process(self.buffer.move_hot_to_cold())
         self.env.run(until=15)
         self.assertEqual(240, self.buffer.cold.current_capacity)
         self.assertEqual(490, self.buffer.hot.current_capacity)
-        self.env.run(until=40)
+        self.env.run(until=50)
         self.assertEqual(230, self.buffer.cold.current_capacity)
         self.assertEqual(500, self.buffer.hot.current_capacity)
         self.assertListEqual([self.observation], self.buffer.cold.observations)
 
+    def test_hot_transfer_observation(self):
+        """
+        When passed an observation, over a period of time ensure that the
+        complete data set is removed.
+
+        Only when all data has finished being transferred do we add the
+        observation to ColdBuffer.observations.
+
+        Observation duration is 10; ingest rate is 5.
+
+        Observation.total_data_size => 50
+
+        ColdBuffer.max_data_rate => 2; therefore
+
+        Time until Observation is moved => 25.
+
+        Returns
+        -------
+        """
+
+        self.observation.total_data_size = 50
+        data_left_to_transfer = self.observation.total_data_size
+        self.buffer.hot.stored_observations.append(self.observation)
+        data_left_to_transfer = self.buffer.hot.transfer_observation(
+            self.observation,
+            self.buffer.cold.max_data_rate,
+            data_left_to_transfer
+        )
+        self.assertEqual(48, data_left_to_transfer)
+        self.assertTrue(self.observation in self.buffer.hot.stored_observations)
+        timestep = 24
+        while data_left_to_transfer > 0:
+            data_left_to_transfer = self.buffer.hot.transfer_observation(
+                self.observation,
+                self.buffer.cold.max_data_rate,
+                data_left_to_transfer
+            )
+        self.assertEqual(0, data_left_to_transfer)
+        self.assertFalse(
+            self.observation in self.buffer.hot.stored_observations
+        )
+
+    def test_cold_receive_data(self):
+        """
+        When passed an observation, over a period of time ensure that the
+        complete data set is added to the Cold Buffer.
+
+        Only when all data has finished being transferred do we add the
+        observation to ColdBuffer.observations.
+
+        Observation duration is 10; ingest rate is 5.
+
+        Observation.total_data_size => 50
+
+        ColdBuffer.max_data_rate => 2; therefore
+
+        Time until Observation is moved => 25.
+
+        Returns
+        -------
+        """
+        self.observation.total_data_size = 50
+        data_left_to_transfer = self.observation.total_data_size
+        data_left_to_transfer = self.buffer.cold.receive_observation(
+            self.observation,
+            data_left_to_transfer
+        )
+        self.assertEqual(48, data_left_to_transfer)
+        self.assertFalse(
+            self.observation in self.buffer.cold.observations['stored']
+        )
+
+        while data_left_to_transfer > 0:
+            data_left_to_transfer = self.buffer.cold.receive_observation(
+                self.observation,
+                data_left_to_transfer
+            )
+        self.assertTrue(
+            self.observation in self.buffer.cold.observations['stored']
+        )
+        self.assertEqual(None, self.buffer.cold.observations['transfer'])
+
+
+
+    @unittest.skip("Function not implemented")
     def testHotColdErrors(self):
         """
         We haven't processed the observation yet, so there shouldn't be
@@ -240,6 +375,7 @@ class TestColdBufferRequests(unittest.TestCase):
             self.env.run, until=10,
         )
 
+    @unittest.skip("Functionality has changed")
     def testWorkflowAddedToQueue(self):
         """
         We only add a workflow to the queue once an observation has finished

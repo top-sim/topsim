@@ -21,7 +21,6 @@ from topsim.core.telescope import RunStatus
 logger = logging.getLogger(__name__)
 
 
-
 class BufferQueue:
     def __init__(self):
         self._queue = []
@@ -74,22 +73,18 @@ class Buffer:
         while True:
             if self.hot.has_waiting_observations():
                 self.move_hot_to_cold()
-            yield self.env.timeout(1)
+            yield self.env.timeout(TIMESTEP)
 
     def check_buffer_capacity(self, observation):
         size = observation.ingest_data_rate * observation.duration
         if self.hot.current_capacity - size < 0 \
-                and self.cold.current_capacity - size < 0:
+                or self.cold.current_capacity - size < 0:
             return False
         else:
             return True
 
     def ingest_data_dump(self, data):
         pass
-
-    def move_hot_to_cold(self):
-
-        return True
 
     def has_observations_ready_for_processing(self):
 
@@ -108,10 +103,9 @@ class Buffer:
         self.waiting_observation_list.append(observation)
         logger.debug('Observations in buffer %', self.waiting_observation_list)
 
-    def request_data_from(self, observation):
+    def move_hot_to_cold(self):
         """
 
-        TODO this should change
         Called when the scheduler is requesting data for workflow processing.
 
         This method 'moves' the observation data from the HotBuffer to the
@@ -126,37 +120,40 @@ class Buffer:
         -------
 
         """
-        logger.debug("Removing observation from buffer at time %s")
-        if observation not in self.waiting_observation_list:
-            raise RuntimeError
-        observation_size = observation.duration * observation.ingest_data_rate
-        data_transfer_time = observation_size / self.cold.max_data_rate
+        if len(self.hot.stored_observations) < 1:
+            raise RuntimeError(
+                "No observations in Hot Buffer"
+            )
+        current_obs = self.hot.stored_observations.pop(0)
+        data_left_to_transfer = current_obs.total_data_size
+        while True:
+            logger.debug("Removing observation from buffer at time %s")
+            observation_size = \
+                current_obs.duration * current_obs.ingest_data_rate
 
-        time_left = data_transfer_time - 1
-        while True > 0:
-            self.hot.current_capacity += self.cold.max_data_rate
-            self.cold.current_capacity -= self.cold.max_data_rate
+            # data_transfer_time = observation_size / self.cold.max_data_rate
+            #
+            # time_left = data_transfer_time - 1
+            check = self.cold.receive_observation(
+                current_obs,
+                data_left_to_transfer
+            )
 
-            if time_left > 0:
-                time_left -= 1
-            else:
+            data_left_to_transfer = self.hot.transfer_observation(
+                current_obs, self.cold.max_data_rate, data_left_to_transfer
+            )
+
+            if check != data_left_to_transfer:
+                raise RuntimeError(
+                    "Hot and Cold Buffer receiving data at a differen rate"
+                )
+
+            if data_left_to_transfer == 0:
                 break
 
             yield self.env.timeout(TIMESTEP)
 
-        self.cold.observations.append(observation)
-        self.buffer_alloc[observation] = 'cold'
-
-    def print_state(self):
-        return {
-            'workflow ready obs': self.workflow_ready_observations,
-            'hotbuffer_capacity': self.hot.current_capacity,
-            'hotbuffer_stored_obsevations':
-                [x.name for x in self.hot.stored_observations],
-            'cold_buffer_storage': self.cold.current_capacity,
-            'cold_buffer_observations':
-                [x.name for x in self.cold.observations]
-        }
+        self.buffer_alloc[current_obs] = 'cold'
 
     def ingest_data_stream(self, observation):
         """
@@ -178,21 +175,30 @@ class Buffer:
             )
         while observation.status == RunStatus.RUNNING:
 
-            hotbuffer_capacity = self.hot.process_incoming_data_stream(
+            self.hot.process_incoming_data_stream(
                 observation.ingest_data_rate,
                 self.env.now
             )
             if time_left > 0:
                 time_left -= 1
             else:
+                self.waiting_observation_list.append(observation)
+                self.hot.stored_observations.append(observation)
                 break
 
-            yield self.env.timeout(
-                1, value=hotbuffer_capacity
-            )
+            yield self.env.timeout(TIMESTEP)
 
-        self.waiting_observation_list.append(observation)
-        self.hot.stored_observations.append(observation)
+
+    def print_state(self):
+        return {
+            'workflow ready obs': self.workflow_ready_observations,
+            'hotbuffer_capacity': self.hot.current_capacity,
+            'hotbuffer_stored_obsevations':
+                [x.name for x in self.hot.stored_observations],
+            'cold_buffer_storage': self.cold.current_capacity,
+            'cold_buffer_observations':
+                [x.name for x in self.cold.observations]
+        }
 
 
 class HotBuffer:
@@ -236,6 +242,22 @@ class HotBuffer:
 
         return self.current_capacity
 
+    def transfer_observation(self, observation, transfer_rate, residual_data):
+        """
+        Parameters
+        ----------
+        
+        Returns
+        -------
+        residual_data : int
+            The amount of data left to transfer
+        """
+        self.current_capacity += transfer_rate
+        residual_data -= transfer_rate
+        if residual_data == 0:
+            self.stored_observations.remove(observation)
+        return residual_data
+
 
 class ColdBuffer:
     def __init__(self, capacity, max_data_rate):
@@ -246,20 +268,22 @@ class ColdBuffer:
         self.total_capacity = capacity
         self.current_capacity = self.total_capacity
         self.max_data_rate = max_data_rate
-        self.observations = []
+        self.observations = {
+            'stored': [],
+            'transfer': None
+        }
 
-    def add_observation(self, observation):
-        self.observations.append(observation)
-        self.current_capacity =- observation.total_data_size
+    def receive_observation(self, observation, residual_data):
+        self.observations['transfer'] = observation
+        self.current_capacity -= self.max_data_rate
+        residual_data -= self.max_data_rate
+        if residual_data == 0:
+            self.observations['transfer'] = None
+            self.observations['stored'].append(observation)
+        return residual_data
+
         # TODO need to yield timeout of how long it takes for the observation
         #  data to move between buffer
-
-    def request_hot_observations(self):
-
-        return None
-
-    def process_data(self):
-        return None
 
 
 def process_buffer_config(spec):
