@@ -54,7 +54,7 @@ class Planner:
         # "flops": 84,
         # "rates": 10
         # "costs": 0.7
-        available_resources = self.cluster.available_resources
+        available_resources = self.cluster.resources['available']
         dictionary = {
             "system": {
                 "resources": None,
@@ -134,3 +134,6 @@ class WorkflowPlan:
 
     def __gt__(self, other):
         return self.priority > other.priority
+
+    def is_finished(self):
+        return self.status == WorkflowStatus.FINISHED

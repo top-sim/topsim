@@ -86,7 +86,11 @@ class Cluster:
         Parameters
         ----------
         pipeline_demand :  int
-            The number of
+            The number of machines in the cluster required to run ingest
+            pipeline
+
+        max_ingest_resources : int
+            The number of resources that may be allowed
 
         Returns
         -------
@@ -130,24 +134,28 @@ class Cluster:
             pairs.append((machine, tasks[i]))
 
         self.ingest['status'] = True
+        curr_tasks = {}
         while True:
             for pair in pairs:
                 (machine, task) = pair
                 if task not in self.tasks['running']:
                     self.tasks['running'].append(task)
-                    ret = yield self.env.process(machine.run(task, self.env))
-                    if ret:
-                        task.task_status = ret
-                        self.tasks['running'].remove(task)
-                        self.tasks['finished'].append(task)
-                        self.resources['available'].append(machine)
-                        self.resources['ingest'].remove(machine)
-                else:
-                    break
+                    ret = self.env.process(machine.run(task, self.env))
+                    curr_tasks[task] = ret
+                if curr_tasks[task].triggered:
+                    task.task_status = TaskStatus.FINISHED
+                    self.tasks['running'].remove(task)
+                    self.tasks['finished'].append(task)
+                    self.resources['available'].append(machine)
+                    self.resources['ingest'].remove(machine)
+                    # break
             if len(self.resources['ingest']) == 0:
                 self.ingest['completed'] += 1
+                self.ingest['status'] = False
                 # We've finished ingest
                 break
+            else:
+                yield self.env.timeout(duration-1)
 
         return True
 
@@ -207,7 +215,7 @@ class Cluster:
         return ustilisation
 
     def stop_task(self, task):
-        if self.running.remove(task) and \
+        if self.tasks['running'].remove(task) and \
                 self.tasks['finished'].append(task):
             return True
         else:
@@ -228,6 +236,13 @@ class Cluster:
         return efficiency
 
     def print_state(self):
+        self.resources
+        self.tasks
+        self.ingest
+
         return {
-            'machines': [machine.print_state() for machine in self.machines]
+            'machines': [machine.print_state() for machine in self.machines],
+            'resources': repr(self.resources),
+            'tasks': repr(self.tasks),
+            'ingest': repr(self.ingest)
         }

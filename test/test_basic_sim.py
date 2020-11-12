@@ -22,7 +22,7 @@ import simpy
 from topsim.core.simulation import Simulation
 from topsim.algorithms.scheduling import FifoAlgorithm
 
-logging.basicConfig(level="DEBUG")
+logging.basicConfig(level="INFO")
 logger = logging.getLogger(__name__)
 
 EVENT_FILE = 'test/basic-workflow-data/output/sim.trace'
@@ -53,14 +53,22 @@ class TestBasicIngest(unittest.TestCase):
     def testClusterIngest(self):
         self.assertEqual(0, self.env.now)
         self.simulation.start(runtime=1)
+        self.assertEqual(1, self.simulation.cluster.ingest['completed'])
         self.assertEqual(
             0, len(self.simulation.cluster.resources['ingest'])
         )
-        self.simulation.start(runtime=2)
+        self.simulation.start(runtime=3)
         self.assertEqual(
             2, self.simulation.cluster.ingest['completed']
         )
-        self.simulation.start(runtime=10)
+        # self.simulation.start(runtime=6)
+        # self.assertEqual(
+        #     2, self.simulation.cluster.ingest['completesd']
+        # )
+        # self.assertEqual(
+        #     self.simulation.telescope.RunStatus.FINISHED,
+        #     self.simulation.telescope.observations[2].RunStatus
+        # )s
 
     def testBufferIngest(self):
         self.assertEqual(0, self.simulation.env.now)
@@ -68,7 +76,26 @@ class TestBasicIngest(unittest.TestCase):
         self.assertEqual(
             5, self.simulation.buffer.hot.current_capacity
         )
+        self.simulation.start(runtime=10)
+        self.assertEqual(
+            10, self.simulation.buffer.hot.current_capacity
+        )
+        # # self.assertEqual(
+        #     5, self.simulation.buffer.cold.current_capacity
+        # )
+        # self.assertEqual(
+        #     1,
+        #     len(self.simulation.buffer.hot.observations["stored"])
+        # )
+        #
 
-        ## TODO THE BUFFER DOES NOT MOVE FROM HOT TO COLD BUFFER STORAGE
-        ## IT ALSO INCORRECTLY STATES THAT WE HAVE SPACE WHEN WE DECIDEDLY DO
-        # NOT
+    def testSchedulerRunTime(self):
+        self.assertEqual(0, self.simulation.env.now)
+        self.simulation.start(runtime=2)
+        self.assertEqual(
+            1, len(self.simulation.buffer.cold.observations['stored'])
+        )
+        self.simulation.start(runtime=10)
+        self.assertEqual(
+            0, len(self.simulation.buffer.cold.observations['stored'])
+        )

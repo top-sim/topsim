@@ -56,7 +56,7 @@ class FifoAlgorithm(Algorithm):
 
         # Iterate through immediate predecessors and check that they are finished
         # Schedule as we go
-        for t in self.cluster.running_tasks:
+        for t in self.cluster.tasks['running']:
             # Check if the running tasks have finished
             # TODO check if expected run time is the same as the 'assigned'
             #  runtime (i.e. we have a 'delay'); if not, we have a delay and
@@ -73,14 +73,15 @@ class FifoAlgorithm(Algorithm):
         # Check if there is an overlap between the two sets
         for t in tasks:
             # Allocate the first element in the Task list:
-            if t.task_status is TaskStatus.UNSCHEDULED and t.est + workflow_plan.start_time <= clock:
+            if t.task_status is TaskStatus.UNSCHEDULED and \
+                    t.est + workflow_plan.start_time <= clock:
                 # Check if task has any predecessors:
                 # TODO check to make sure that the Machine is unoccupied; if
                 #  it is occupied, then we are DELAYED and need to
                 #  communicate this
                 if not t.pred:
-                    # The first task
-                    return t.machine_id, t
+                    machine = self.cluster.dmachine[t.machine_id.id]
+                    return machine, t, workflow_plan.status
                 # The task has predecessors
                 else:
                     pred = set(t.pred)
@@ -90,9 +91,10 @@ class FifoAlgorithm(Algorithm):
                         # One of the predecessors of 't' is still running
                         return None, None
                     else:
-                        return t.machine_id, t, workflow_plan.status
+                        machine = self.cluster.dmachine[t.machine_id]
+                        return machine, t, workflow_plan.status
 
-        return None, None
+        return None, None, workflow_plan.status
 
 
 def check_workflow_progress(cluster, workflow_plan):

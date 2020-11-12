@@ -138,7 +138,7 @@ class TestBufferIngestDataStream(unittest.TestCase):
         self.assertEqual(self.env.now, 10)
         self.assertEqual(450, self.buffer.hot.current_capacity)
         self.assertEqual(
-            self.buffer.hot.stored_observations[0],
+            self.buffer.hot.observations["stored"][0],
             self.observation
         )
 
@@ -269,15 +269,19 @@ class TestBufferRequests(unittest.TestCase):
         # Moving data from one to the other
         self.assertEqual(250, self.buffer.cold.current_capacity)
         self.assertTrue(self.observation in
-                         self.buffer.hot.stored_observations)
+                         self.buffer.hot.observations["stored"])
         self.env.process(self.buffer.move_hot_to_cold())
         self.env.run(until=15)
         self.assertEqual(240, self.buffer.cold.current_capacity)
         self.assertEqual(490, self.buffer.hot.current_capacity)
-        self.env.run(until=50)
+        self.env.run(until=20)
         self.assertEqual(230, self.buffer.cold.current_capacity)
+        self.env.run(until=22)
         self.assertEqual(500, self.buffer.hot.current_capacity)
-        self.assertListEqual([self.observation], self.buffer.cold.observations)
+        self.assertEqual(230, self.buffer.cold.current_capacity)
+        self.assertListEqual(
+            [self.observation], self.buffer.cold.observations['stored']
+        )
 
     def test_hot_transfer_observation(self):
         """
@@ -298,17 +302,20 @@ class TestBufferRequests(unittest.TestCase):
         Returns
         -------
         """
-
+        self.buffer.hot.current_capacity = 450
         self.observation.total_data_size = 50
         data_left_to_transfer = self.observation.total_data_size
-        self.buffer.hot.stored_observations.append(self.observation)
+        self.buffer.hot.observations["stored"].append(self.observation)
         data_left_to_transfer = self.buffer.hot.transfer_observation(
             self.observation,
             self.buffer.cold.max_data_rate,
             data_left_to_transfer
         )
         self.assertEqual(48, data_left_to_transfer)
-        self.assertTrue(self.observation in self.buffer.hot.stored_observations)
+        self.assertTrue(
+            self.observation in self.buffer.hot.observations["stored"]
+        )
+        self.assertEqual(452, self.buffer.hot.current_capacity)
         timestep = 24
         while data_left_to_transfer > 0:
             data_left_to_transfer = self.buffer.hot.transfer_observation(
@@ -317,9 +324,7 @@ class TestBufferRequests(unittest.TestCase):
                 data_left_to_transfer
             )
         self.assertEqual(0, data_left_to_transfer)
-        self.assertFalse(
-            self.observation in self.buffer.hot.stored_observations
-        )
+        self.assertEqual(500, self.buffer.hot.current_capacity)
 
     def test_cold_receive_data(self):
         """
@@ -361,21 +366,7 @@ class TestBufferRequests(unittest.TestCase):
         )
         self.assertEqual(None, self.buffer.cold.observations['transfer'])
 
-
-
-    @unittest.skip("Function not implemented")
-    def testHotColdErrors(self):
-        """
-        We haven't processed the observation yet, so there shouldn't be
-        anything in the Hot Buffer to request
-        """
-        self.env.process(self.buffer.request_data_from(self.observation))
-        self.assertRaises(
-            RuntimeError,
-            self.env.run, until=10,
-        )
-
-    @unittest.skip("Functionality has changed")
+    # @unittest.skip("Functionality has changed")
     def testWorkflowAddedToQueue(self):
         """
         We only add a workflow to the queue once an observation has finished
@@ -386,10 +377,8 @@ class TestBufferRequests(unittest.TestCase):
         # Calling planner.run() will store the generate plan in the observation object
         # calling next() runs the iterator immediately after generator is called
         next(self.planner.run(self.observation))
+        self.assertTrue(self.observation.plan is not None)
         # Buffer observation queue should be empty
-        self.assertTrue(self.buffer.observations_for_processing.empty())
-        # self.buffer.add_observation_to_waiting_workflows(self.observation)
-        self.assertTrue(self.buffer.observations_for_processing.size() == 1)
 #
 # # Get the observation and check we have applied the buffer offset
 # self.assertTrue(self.observation.start > OBS_START_TME + OBS_DURATION)

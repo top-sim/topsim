@@ -77,6 +77,7 @@ class Task(object):
         return hash(self.id)
 
     def do_work(self):
+        self.task_status = TaskStatus.RUNNING
         yield self.env.timeout(self.duration-1)
         self.finished_timestamp = self.env.now
         logger.debug('%s finished at %s', self.id, self.finished_timestamp)

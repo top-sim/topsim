@@ -30,6 +30,8 @@ OBS_DURATION = 10
 OBS_DEMAND = 15
 
 PLAN_ALGORITHM = 'heft'
+
+HEFT_CLUSTER_CONFIG = "test/data/config/system_config.json"
 CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
 
 MACHINE_CONFIG = None
@@ -87,23 +89,23 @@ class TestWorkflowPlan(unittest.TestCase):
         self.assertEqual(task5_comp, 92000)
 
 
-@unittest.skip
 class TestPlanner(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
         sched_algorithm = FifoAlgorithm()
-        self.planner = Planner(self.env, PLAN_ALGORITHM, MACHINE_CONFIG)
-        self.cluster = Cluster(self.env, CLUSTER_CONFIG)
-        # self.buffer = Buffer(self.env, self.cluster)
-        # self.algorithms = Scheduler(self.env,
-        # sched_algorithm, self.buffer, self.cluster)
-        self.observation = Observation('planner_observation',
-                                       OBS_START_TME,
-                                       OBS_DURATION,
-                                       OBS_DEMAND,
-                                       OBS_WORKFLOW)
-        pass
+        self.cluster = Cluster(self.env, HEFT_CLUSTER_CONFIG)
+        self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
+        self.observation = Observation(
+            'planner_observation',
+            OBS_START_TME,
+            OBS_DURATION,
+            OBS_DEMAND,
+            OBS_WORKFLOW,
+            type=None,
+            data_rate=None
+        )
+
 
     def tearDown(self):
         pass
@@ -117,7 +119,7 @@ class TestPlanner(unittest.TestCase):
                                  self.observation.workflow, PLAN_ALGORITHM)
         self.assertEqual(plan.id,
                          'planner_observation')  # Expected ID for the workflow
-        self.assertEqual(plan.makespan,
+        self.assertEqual(plan.solution.makespan,
                          98)  # Expected makespan for the given graph
 
     def testPlannerRun(self):

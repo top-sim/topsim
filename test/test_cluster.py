@@ -91,7 +91,18 @@ class TestIngest(unittest.TestCase):
         )
 
     def testClusterCheckIngest(self):
-        retval = self.cluster.check_ingest_capacity(pipeline_demand=5)
+        """
+        Need to determine that the cluster is able to deal with the pipeline
+        requirement
+
+        in addition, need to check that we are not going over the maximum
+        number of resources that can be feasibly allocated to ingest.
+        Returns
+        -------
+
+        """
+        max_ingest = 5
+        retval = self.cluster.check_ingest_capacity(5, max_ingest)
         self.assertTrue(retval)
 
     def testClusterProvisionIngest(self):
@@ -108,12 +119,12 @@ class TestIngest(unittest.TestCase):
         # self.process(self.run_ingest(duration,pipeline_demand))
         # for task in self.cluster.running_tasks:
         #  	self.assertEqual(TaskStatus.RUNNING, task.task_status)
-        self.assertEqual(5, len(self.cluster.available_resources))
-        self.assertEqual(5, len(self.cluster.running_tasks))
+        self.assertEqual(5, len(self.cluster.resources['available']))
+        self.assertEqual(5, len(self.cluster.tasks['running']))
         self.env.run(until=10)
-        self.assertEqual(5, len(self.cluster.available_resources))
+        self.assertEqual(5, len(self.cluster.resources['available']))
         self.env.run(until=20)
-        self.assertEqual(10, len(self.cluster.available_resources))
+        self.assertEqual(10, len(self.cluster.resources['available']))
         self.assertEqual(20, self.env.now)
 
     def run_ingest(self, duration, demand):
@@ -121,7 +132,7 @@ class TestIngest(unittest.TestCase):
             demand,
             duration
         )
-        for task in self.cluster.running_tasks:
+        for task in self.cluster.tasks['running']:
             self.assertEqual(TaskStatus.SCHEDULED, task.task_status)
 
 

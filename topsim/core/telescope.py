@@ -7,7 +7,6 @@ import json
 
 from enum import Enum
 
-logging.basicConfig(level="DEBUG")
 LOGGER = logging.getLogger(__name__)
 
 
@@ -127,7 +126,6 @@ class Telescope:
         self.env.timeout(1)
             A single simulation timestep
         """
-
         while self.has_observations_to_process():
             for observation in self.observations:
                 capacity = self.total_arrays - self.telescope_use
@@ -145,9 +143,9 @@ class Telescope:
                             self.max_ingest
                     ):
                         ret = self.begin_observation(observation)
-                        # plan_trigger = self.env.process(
-                        # 	self.planner.run(observation)
-                        # )
+                        self.env.process(
+                            self.planner.run(observation)
+                        )
                         # yield plan_trigger
                         LOGGER.info(
                             'telescope is now using %s arrays',
@@ -157,9 +155,6 @@ class Telescope:
                             self.scheduler.allocate_ingest(
                                 observation, self.pipelines
                             ))
-                        if ret:
-                            observation.total_data_size += \
-                                observation.ingest_data_rate
 
                 elif observation.is_finished(
                         self.env.now,

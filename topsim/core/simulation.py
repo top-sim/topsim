@@ -91,7 +91,7 @@ class Simulation:
 
         self.cluster = Cluster(env, cluster_config)
         self.buffer = Buffer(env, self.cluster, config=buffer_config)
-        self.planner = Planner(env, planning_algorithm, cluster_config)
+        self.planner = Planner(env, planning_algorithm, self.cluster)
         self.scheduler = Scheduler(
             env, self.buffer, self.cluster, scheduling_algorithm
         )
@@ -147,9 +147,4 @@ class Simulation:
         LOGGER.info("Simulation Finished @ %s", self.env.now)
 
     def is_finished(self):
-        return bool(
-            len(self.telescope.observations) == 0
-            and self.buffer.observations_for_processing.empty()
-            and len(self.scheduler.waiting_observations) == 0
-            and len(self.cluster.running_tasks) == 0
-        )
+        return False

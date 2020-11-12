@@ -63,24 +63,18 @@ class Scheduler:
             raise RuntimeError("Scheduler has not been initialised! Call init")
         logger.debug("Scheduler starting up...")
         while self.status is SchedulerStatus.RUNNING:
+
             logger.info('Time on Scheduler: {0}'.format(self.env.now))
             # AT THE END OF THE SIMULATION, WE GET STUCK HERE. NEED TO EXIT
             if self.buffer.has_observations_ready_for_processing():
-                self.waiting_observations.extend(
-                    self.buffer.get_observations_ready_for_processing()
-                )
-            if self.buffer.workflow_ready_observations \
-                    or self.waiting_observations:
+                if self.current_observation is None:
+                    obs = self.buffer.next_observation_for_processing()
+                    self.current_observation = obs
 
-                for observation in self.buffer.waiting_observation_list:
-                    self.buffer.request_data_from(observation)
-                    if observation not in self.waiting_observations:
-                        self.waiting_observations.append(observation)
+                    allocation = self.allocate_tasks()
 
-                allocation = self.allocate_tasks()
-
-                if allocation:
-                    logger.info("Successfully allocated")
+                    if allocation:
+                        logger.info("Successfully allocated")
 
             if len(self.waiting_observations) == 0 \
                     and self.status == SchedulerStatus.SHUTDOWN:
@@ -188,15 +182,9 @@ class Scheduler:
                 if time_left > 0:
                     time_left -= 1
                 else:
-                    self.ingest_observation.run_status = RunStatus.FINISHED
+                    # self.ingest_observation.run_status = RunStatus.FINISHED
                     break
             yield self.env.timeout(1)
-
-
-    # def add_workflow(self, workflow):
-    # 	print("Adding", workflow, "to workflows")
-    # 	self.observations_for_processing.append(workflow)
-    # 	print("Waiting workflows", self.observations_for_processing
 
     def init(self):
         self.status = SchedulerStatus.RUNNING
@@ -213,13 +201,47 @@ class Scheduler:
                                             in self.waiting_observations]
         }
 
-    # TODO ALLOCATE TASKS NEEDS A CHANGE. THere is too much code in one function,
-    #  we need to split this up more.
-    def process_observation_allocations(self):
-        return True
-
-
     def allocate_tasks(self):
+        """
+        For the current observation, we need to allocate tasks to machines
+        based on:
+
+            * The plan that has been generated
+            * The result of the scheduler's decision based on the current
+            cluster state, and the original plan.
+        Returns
+        -------
+
+        """
+        minst = -1
+        if self.current_observation is None:
+            return False
+        elif self.current_plan is None:
+            self.current_plan = self.current_observation.plan
+
+        self.current_plan.start_time = self.env.now
+
+        if self.current_plan.is_finished():
+            if self.buffer.mark_observation_finished(self.current_observation):
+                self.current_plan = None
+                self.current_observation = None
+
+        while True:
+            machine, task, status = self.algorithm(
+                self.cluster, self.env.now, self.current_plan
+            )
+            self.current_plan.status = status
+            if machine is None or task is None:
+                break
+            else:
+                # Runs the task on the machie
+                # task.machine = machine
+                task.task_status = TaskStatus.SCHEDULED
+                self.env.process(machine.run(task, self.env))
+                # if task.task_status is TaskStatus.SCHEDULED:
+                #     self.cluster.running_tasks.append(task)
+
+    def old_allocate_tasks(self):
         """
         Allocate tasks calls a number of methods to allocate tasks according to
         the self.algorithm attribute. This takes the current simulation clock time
@@ -238,7 +260,10 @@ class Scheduler:
         # Min -scheduling time
         minst = -1
         # TODO new method 'check_for_ready_observations)
-
+        if self.current_observation is None:
+            return False
+        if self.current_plan is None:
+            return False
         if not self.current_plan:
             for observation in self.waiting_observations:
                 st = observation.plan.start_time
