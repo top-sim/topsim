@@ -51,9 +51,31 @@ class Scheduler:
         self.status = SchedulerStatus.SLEEP
         self.ingest_observation = None
 
+    def init(self):
+        """
+        Set the SchedulerStatus to RUNNING.
+        This allows us to check the Scheduler status in the simulator; if
+        there is nothing left the schedule, we may finish the simulation.
+
+        Returns
+        -------
+        self.status : topsim.core.scheduler.SchedulerStatus
+            SchedulerStatus.RUNNING for all calls to init()
+        """
+        self.status = SchedulerStatus.RUNNING
+        return self.status
+
+    def shutdown(self):
+        self.status = SchedulerStatus.SHUTDOWN
+        return self.status
+
     def run(self):
         """
+        Starts the 'per-TIMESTEP' process loop for the Scheduler actor.
 
+        The Scheduler coordinates interaction between the Telescope, Buffer,
+        and Cluster. The Telescope should not *see* the Buffer or Cluster; all
+        communication must be transferred through the scheduler.
 
         Yields
         -------
@@ -71,10 +93,10 @@ class Scheduler:
                     obs = self.buffer.next_observation_for_processing()
                     self.current_observation = obs
 
-                    allocation = self.allocate_tasks()
+                allocation = self.allocate_tasks()
 
-                    if allocation:
-                        logger.info("Successfully allocated")
+                if allocation:
+                    logger.info("Successfully allocated")
 
             if len(self.waiting_observations) == 0 \
                     and self.status == SchedulerStatus.SHUTDOWN:
@@ -186,14 +208,6 @@ class Scheduler:
                     break
             yield self.env.timeout(1)
 
-    def init(self):
-        self.status = SchedulerStatus.RUNNING
-        return self.status
-
-    def shutdown(self):
-        self.status = SchedulerStatus.SHUTDOWN
-        return self.status
-
     def print_state(self):
         # Change this to 'workflows scheduled/workflows unscheduled'
         return {
@@ -201,7 +215,7 @@ class Scheduler:
                                             in self.waiting_observations]
         }
 
-    def allocate_tasks(self):
+    def allocate_tasks(self, test=False):
         """
         For the current observation, we need to allocate tasks to machines
         based on:
@@ -219,6 +233,12 @@ class Scheduler:
         elif self.current_plan is None:
             self.current_plan = self.current_observation.plan
 
+        if self.current_plan is None:
+            raise RuntimeError(
+                "Observation should have pre-plan; Planner actor has "
+                "failed at runtime."
+            )
+
         self.current_plan.start_time = self.env.now
 
         if self.current_plan.is_finished():
@@ -226,9 +246,11 @@ class Scheduler:
                 self.current_plan = None
                 self.current_observation = None
 
-        while True:
+        while not test:
             machine, task, status = self.algorithm(
-                self.cluster, self.env.now, self.current_plan
+                cluster=self.cluster,
+                clock=self.env.now,
+                workflow_plan=self.current_plan
             )
             self.current_plan.status = status
             if machine is None or task is None:
@@ -321,7 +343,7 @@ class Scheduler:
                     # task.machine = machine
                     task.task_status = TaskStatus.SCHEDULED
 
-                    machine.run(task)
+                    ret = self.env.process(machine.run(task))
                     if task.task_status is TaskStatus.SCHEDULED:
                         self.cluster.running_tasks.append(task)
 

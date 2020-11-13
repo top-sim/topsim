@@ -33,6 +33,7 @@ logger = logging.getLogger(__name__)
 # which does allocation when we are on time. Otherwise, we go to the scheduler?
 # I think we keep it simple at the moment and maintain the current approach.
 
+
 class FifoAlgorithm(Algorithm):
     def __init__(self, threshold=0.8):
         self.threshold = threshold
@@ -42,7 +43,6 @@ class FifoAlgorithm(Algorithm):
 
     def __call__(self, cluster, clock, workflow_plan):
         """
-
         :param cluster:
         :param clock:
         :param workflow_plan: a (Workflow-id, workflow-plan) tuple.
@@ -54,7 +54,8 @@ class FifoAlgorithm(Algorithm):
         # tasks = cluster.tasks_which_has_waiting_instance
         tasks = workflow_plan.tasks
 
-        # Iterate through immediate predecessors and check that they are finished
+        # Iterate through immediate predecessors and check that they are
+        # finished
         # Schedule as we go
         for t in self.cluster.tasks['running']:
             # Check if the running tasks have finished
@@ -85,7 +86,7 @@ class FifoAlgorithm(Algorithm):
                 # The task has predecessors
                 else:
                     pred = set(t.pred)
-                    running = set([t.id for t in cluster.running_tasks])
+                    running = set([t.id for t in cluster.tasks['running']])
                     # Check if there is an overlap between the two sets
                     if pred & running:
                         # One of the predecessors of 't' is still running
@@ -98,7 +99,7 @@ class FifoAlgorithm(Algorithm):
 
 
 def check_workflow_progress(cluster, workflow_plan):
-    for t in cluster.running_tasks:
+    for t in cluster.tasks['running']:
         if t.current_finish_time > t.estimated_finish_time:
             return WorkflowStatus.DELAYED
 

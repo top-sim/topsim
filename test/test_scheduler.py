@@ -33,11 +33,15 @@ logger = logging.getLogger(__name__)
 OBSERVATION_CONFIG = 'test/data/config/observations.json'
 BUFFER_CONFIG = 'test/data/config/buffer.json'
 CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
+
+HEFT_CLUSTER_CONFIG = 'test/data/config/system_config.json'
+HEFT_WORKFLOW = 'test/data/config/workflow_config.json'
 # Globals
 OBS_START_TME = 0
 OBS_DURATION = 10
 OBS_DEMAND = 15
-OBS_WORKFLOW = test_data.test_scheduler_workflow
+OBS_WORKFLOW = "test/data/config/workflow_config.json"
+PLANNING_ALGORITHM = 'heft'
 
 
 class TestSchedulerRandom(unittest.TestCase):
@@ -77,18 +81,26 @@ class TestSchedulerIngest(unittest.TestCase):
             type="continuum",
             data_rate=2
         )
+
+        max_ingest = 5
+
         # There should be capacity
         self.assertEqual(0.0, self.env.now)
-        ret = self.scheduler.check_ingest_capacity(observation, pipelines)
+        ret = self.scheduler.check_ingest_capacity(
+            observation, pipelines, max_ingest
+        )
         self.assertTrue(ret)
 
         # Let's remove capacity to check it returns false
-        tmp = self.cluster.available_resources
-        self.cluster.available_resources = self.cluster.available_resources[:3]
-        ret = self.scheduler.check_ingest_capacity(observation, pipelines)
+        tmp = self.cluster.resources['available']
+        self.cluster.resources['available'] = self.cluster.resources[
+                                                  'available'][:3]
+        ret = self.scheduler.check_ingest_capacity(
+            observation, pipelines, max_ingest
+        )
         self.assertFalse(ret)
-        self.cluster.available_resources = tmp
-        self.assertEqual(10, len(self.cluster.available_resources))
+        self.cluster.resources['available'] = tmp
+        self.assertEqual(10, len(self.cluster.resources['available']))
 
     def testSchedulerProvisionsIngest(self):
         """
@@ -103,7 +115,7 @@ class TestSchedulerIngest(unittest.TestCase):
                 "demand": 5
             }
         }
-
+        max_ingest = 5
         observation = Observation(
             'planner_observation',
             OBS_START_TME,
@@ -113,24 +125,30 @@ class TestSchedulerIngest(unittest.TestCase):
             type="continuum",
             data_rate=2
         )
+
         ready_status = self.scheduler.check_ingest_capacity(
             observation,
-            pipelines
+            pipelines,
+            max_ingest
         )
+        self.env.process(self.cluster.run())
+        self.env.process(self.buffer.run())
         observation.status = RunStatus.WAITING
         status = self.env.process(self.scheduler.allocate_ingest(
             observation,
             pipelines
         )
         )
+
         self.env.run(until=1)
-        self.assertEqual(5, len(self.cluster.available_resources))
+        self.assertEqual(5, len(self.cluster.resources['available']))
         # After 1 timestep, data in the HotBuffer should be 2
         self.assertEqual(498, self.buffer.hot.current_capacity)
-        self.env.run(until=11)
-        self.assertEqual(10, len(self.cluster.available_resources))
-        self.assertEqual(5, len(self.cluster.finished_tasks))
-        self.assertEqual(480, self.buffer.hot.current_capacity)
+        self.env.run(until=20)
+        self.assertEqual(10, len(self.cluster.resources['available']))
+        self.assertEqual(5, len(self.cluster.tasks['finished']))
+        self.assertEqual(500, self.buffer.hot.current_capacity)
+        self.assertEqual(230, self.buffer.cold.current_capacity)
 
 
 """
@@ -147,15 +165,14 @@ Scheduler post-ingest calculations and start-times that we need to iron out
 """
 
 
-@unittest.skip
 class TestSchedulerFIFO(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
         sched_algorithm = FifoAlgorithm()
-        self.planner = Planner(self.env, test_data.planning_algorithm,
-                               test_data.machine_config)
-        self.cluster = Cluster(self.env, CLUSTER_CONFIG)
+        self.cluster = Cluster(self.env, HEFT_CLUSTER_CONFIG)
+        self.planner = Planner(self.env, PLANNING_ALGORITHM,
+                               self.cluster)
         self.buffer = Buffer(self.env, self.cluster, BUFFER_CONFIG)
         self.observations = [
             Observation(
@@ -165,66 +182,51 @@ class TestSchedulerFIFO(unittest.TestCase):
                 OBS_DEMAND,
                 OBS_WORKFLOW,
                 type='continuum',
-                data_rate=5
+                data_rate=2
             )
         ]
-        telescopemax = 36  # maximum number of antennas
-
+        self.scheduler = Scheduler(self.env, self.buffer,
+                                   self.cluster, sched_algorithm)
         self.telescope = Telescope(
             self.env, OBSERVATION_CONFIG, self.scheduler, self.planner
         )
-        self.scheduler = Scheduler(self.env, sched_algorithm, self.buffer,
-                                   self.cluster)
 
     def tearDown(self):
         pass
 
-    def testSchedulerDecision(self):
-        # algorithms.make_decision() will do something interesting only when we add a workflow plan to the
-        # buffer.
-        next(self.planner.run(self.observations[0]))
-        #  Observation is what we are interested in with the algorithms, because the observation stores the plan;
-        #  The observation object is what is stored in the buffer's 'observations_for_processing' queue.
-        self.buffer.add_observation_to_waiting_workflows(self.observations[0])
-
-        '''
-        Lets start doing algorithms things!
-        IT is important to note that the algorithms is only effective within the context of a simulation,
-        as it is directly affected by calls to env.now; this means we need to run a mini-simulation in this
-        test - which we can 'simulate' - haha - by using the enviroment and clever timeouts.
-        We get an observaiton into the buffer, the algorithms makes a decision - what then?
-        We use check_buffer to update the workflows in the algorithms workflow list
-        This is called every time-step in the simulation, and is how we add workflow plans to the schedulers list
-        '''
-
-        test_flag = True
-        self.env.process(self.scheduler.run())
-        self.env.run(until=1)
-        print(self.env.now)
-        # We should be able to get this working nicely
+    def test_allocate_tasks(self):
         """
-        For this experiment, we are running the scheduler on a single observation, and getting it 
-        to allocate a task to the required machine. the first task should be scheduled at T = 0, 
-        so at t = 1, we should check to make sure that the target has been scheduled, and that it is on the appropriate 
-        machine
+        allocate_tasks assumes we have:
+
+            * An observation stored in the ColdBuffer
+            * A plan stored for that observation
+            * Access to a scheduling algorithm (in this case, FifoAlgorithm).
+
+        Need to check:
+            * If there is no current observation, we can't do anthing
+            * If there is an observation, but no plan, we assign the
+            observation planto the current_plan.
+            * Once things are running, we make sure things are being
+            scheduled onto the right machines
+            * They should also be running for the correct period of time.
         """
-        # Generate list of IDs
-        expected_machine = "cat2_m2"
-        expected_task_no = 0
-        self.assertTrue(self.cluster.running_tasks)
-        for m in self.cluster.machines:
-            if m.id == expected_machine:
-                self.assertEqual(m.current_task.id, expected_task_no)
-        # Need to assert that there is something in cluster.running_tasks
-        # first element of running tasks should be the first task
-        self.env.run(until=100)
-        print(self.env.now)
-        while test_flag:
-            next(self.algorithms.run())
 
-# Now that a single workflow has been taken from the buffer and added to the list of workflows, we can schedule
-#
-# print(self.env.now)
-# self.algorithms.process_workflows()
+        self.assertFalse(self.scheduler.allocate_tasks())
 
-# process_workflows() is passing the workflow
+        curr_obs = self.observations[0]
+        self.scheduler.current_observation = curr_obs
+        self.assertRaises(RuntimeError, self.scheduler.allocate_tasks)
+        self.env.process(self.planner.run(self.scheduler.current_observation))
+        self.env.run(1)
+        self.scheduler.allocate_tasks(test=True)
+        self.assertListEqual(
+            [0, 2, 3, 1, 5, 4, 6, 8, 7, 9],
+            [a.task.tid for a in self.scheduler.current_plan.exec_order]
+        )
+        # self.scheduler.init()
+        self.buffer.cold.observations['stored'].append(curr_obs)
+        self.scheduler.allocate_tasks()
+        self.env.run(until=5)
+        self.assertEqual(1,len(self.cluster.tasks['running']))
+
+
