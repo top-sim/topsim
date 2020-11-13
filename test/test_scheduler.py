@@ -220,7 +220,7 @@ class TestSchedulerFIFO(unittest.TestCase):
         self.env.run(1)
         self.scheduler.allocate_tasks(test=True)
         self.assertListEqual(
-            [0, 2, 3, 1, 5, 4, 6, 8, 7, 9],
+            [0, 3, 2, 4, 1, 5, 6, 8, 7, 9],
             [a.task.tid for a in self.scheduler.current_plan.exec_order]
         )
         # self.scheduler.init()
