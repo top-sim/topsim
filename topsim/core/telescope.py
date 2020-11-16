@@ -233,11 +233,18 @@ class Telescope:
         """
         return None
 
+    def observations_waiting(self):
+        return sum(
+            [1 if x.status is not RunStatus.FINISHED
+             else 0
+             for x in self.observations]
+        )
+
     def print_state(self):
         return {
             'telescope_in_use': self.telescope_status,
             'telescope_arrays_used': self.telescope_use,
-            'observations_waiting': len(self.observations)
+            'observations_waiting': self.observations_waiting()
         }
 
 

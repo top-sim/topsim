@@ -18,8 +18,8 @@ import json
 from topsim.common.globals import TIMESTEP
 from topsim.core.telescope import RunStatus
 
-
 LOGGER = logging.getLogger(__name__)
+
 
 #
 # class BufferQueue:
@@ -86,7 +86,7 @@ class Buffer:
     def check_buffer_capacity(self, observation):
         size = observation.ingest_data_rate * observation.duration
         if self.hot.current_capacity - size < 0 \
-                or self.cold.current_capacity - size < 0:
+                or not self.cold.has_capacity(size):
             return False
         else:
             return True
@@ -154,6 +154,8 @@ class Buffer:
         current_obs = self.hot.observation_for_transfer()
         # current_obs = self.hot.observations['transfer']
         data_left_to_transfer = current_obs.total_data_size
+        if not self.cold.has_capacity(data_left_to_transfer):
+            return False
         while True:
             LOGGER.debug("Removing observation from buffer at time %s")
             observation_size = \
@@ -182,6 +184,7 @@ class Buffer:
             yield self.env.timeout(TIMESTEP)
 
         self.buffer_alloc[current_obs] = 'cold'
+        return True
 
     def ingest_data_stream(self, observation):
         """
@@ -219,15 +222,16 @@ class Buffer:
             yield self.env.timeout(TIMESTEP)
 
     def print_state(self):
-        return {
-            'workflow ready obs': self.workflow_ready_observations,
-            'hotbuffer_capacity': self.hot.current_capacity,
-            'hotbuffer_stored_obsevations':
-                [x.name for x in self.hot.observations["stored"]],
-            'cold_buffer_storage': self.cold.current_capacity,
-            'cold_buffer_observations':
-                [x for x in self.cold.observations]
-        }
+        return (
+                "hotbuffer_capacity: {}\n".format(self.hot.current_capacity)
+                + "hotbuffer_stored_obsevations: {}\n".format(
+                    [x.name for x in self.hot.observations["stored"]]
+                )
+                + "cold_buffer_storage: {}\n".format(self.cold.current_capacity)
+                + "cold_buffer_observations:{}\n".format(
+                    [x for x in self.cold.observations]
+                )
+        )
 
 
 class HotBuffer:
@@ -314,8 +318,14 @@ class ColdBuffer:
             'transfer': None
         }
 
+    def has_capacity(self, observation_size):
+        return (
+                self.current_capacity - observation_size >= 0
+        )
+
     def receive_observation(self, observation, residual_data):
         self.observations['transfer'] = observation
+
         self.current_capacity -= self.max_data_rate
         residual_data -= self.max_data_rate
         if residual_data == 0:

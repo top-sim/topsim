@@ -17,13 +17,14 @@
 import json
 import seaborn as sns
 
-tracefile = 'test/data/output/sim.trace'
+tracefile = 'simulations/output/sim.trace'
 
 with open(tracefile, 'r') as infile:
 	trace = json.load(infile)
 
 for timestamp in trace:
 	print('Time @ {}'.format(timestamp['timestamp']))
+
 	print('\tcluster_state:')
 	for element in timestamp['cluster_state']:
 		for m in timestamp['cluster_state']['machines']:

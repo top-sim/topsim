@@ -13,7 +13,7 @@ class Monitor(object):
         self.events = []
 
     def run(self):
-        while not self.simulation.is_finished():
+        while True:
             logger.debug('SimTime=%s', self.env.now)
             # time.sleep(0.5)
             state = {
@@ -27,8 +27,8 @@ class Monitor(object):
             logger.debug("Storing state %s",
                          self.simulation.scheduler.print_state())
             self.events.append(state)
-            yield self.env.timeout(1)
             self.write_to_file()
+            yield self.env.timeout(1)
 
         state = {
             'timestamp': self.env.now,
