@@ -1,3 +1,5 @@
+import pandas as pd
+
 from enum import Enum
 
 # TODO need I/O information here
@@ -70,10 +72,20 @@ class Machine(object):
     def state_summary(self):
         return {
             'id': self.id,
-            'cpu': self.cpu / self.cpu_capacity,
-            'memory': self.memory / self.memory_capacity,
-            'disk': self.disk / self.disk_capacity,
+            'cpu': self.cpu,
+            'memory': self.memory,
+            'disk': self.disk
         }
+
+    def to_df(self):
+        d = {
+            'id': [self.id],
+            'cpu': [self.cpu],
+            'memory': [self.memory],
+            'disk': [self.disk]
+        }
+        df = pd.DataFrame.from_dict(d)
+        return df
 
     def __eq__(self, other):
         return isinstance(other, Machine) and other.id == self.id

@@ -23,7 +23,7 @@ import logging
 from topsim.algorithms.scheduling import FifoAlgorithm
 from topsim.core.simulation import Simulation
 
-logging.basicConfig(level="DEBUG")
+logging.basicConfig(level="WARNING")
 LOGGER = logging.getLogger(__name__)
 
 BASIC_WORKFLOW = 'test/basic-workflow-data/basic_workflow_config.json'

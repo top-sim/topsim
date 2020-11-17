@@ -1,5 +1,6 @@
-from topsim.core import config
+import pandas as pd
 
+from topsim.core import config
 from topsim.core.task import Task, TaskStatus
 
 
@@ -234,6 +235,18 @@ class Cluster:
             if machine.current_task:
                 efficiency += 1
         return efficiency
+
+    def to_df(self):
+        df = pd.DataFrame()
+        df['available_resources'] = [len(self.resources['available'])]
+        df['occupied_resources'] = [len(self.resources['occupied'])]
+        df['ingest_resources'] = [len(self.resources['ingest'])]
+
+        df['running_tasks'] = [len(self.tasks['running'])]
+        df['finished_tasks'] = [len(self.tasks['finished'])]
+        df['waiting_tasks'] = [len(self.tasks['waiting'])]
+
+        return df
 
     def print_state(self):
         self.resources

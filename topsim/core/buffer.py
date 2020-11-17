@@ -15,6 +15,8 @@
 
 import logging
 import json
+import pandas as pd
+
 from topsim.common.globals import TIMESTEP
 from topsim.core.telescope import RunStatus
 
@@ -222,16 +224,38 @@ class Buffer:
             yield self.env.timeout(TIMESTEP)
 
     def print_state(self):
-        return (
-                "hotbuffer_capacity: {}\n".format(self.hot.current_capacity)
-                + "hotbuffer_stored_obsevations: {}\n".format(
-                    [x.name for x in self.hot.observations["stored"]]
-                )
-                + "cold_buffer_storage: {}\n".format(self.cold.current_capacity)
-                + "cold_buffer_observations:{}\n".format(
-                    [x for x in self.cold.observations]
-                )
-        )
+        return {
+            "hotbuffer_capacity": self.hot.current_capacity,
+            "hotbuffer_stored_obsevations":
+                [x.name for x in self.hot.observations["stored"]],
+            "cold_buffer_storage": self.cold.current_capacity,
+            "cold_buffer_observations":
+                [x for x in self.cold.observations]
+        }
+
+    def to_df(self):
+        df = pd.DataFrame()
+        df['hotbuffer_total_capacity'] = [self.hot.total_capacity]
+        df['hotbuffer_current_capacity'] = [self.hot.current_capacity]
+        df['hotbuffer_stored_observations'] = [len(
+            self.hot.observations['stored']
+        )]
+        if self.hot.observations['transfer']:
+            df['hot_transfer_observations'] = [1]
+        else:
+            df['hot_transfer_observations'] = [0]
+
+        df['coldbuffer_total_capacity'] = [self.cold.total_capacity]
+        df['coldbuffer_current_capacity'] = [self.cold.current_capacity]
+        df['coldbuffer_stored_observations'] = [len(
+            self.cold.observations['stored']
+        )]
+        if self.cold.observations['transfer']:
+            df['cold_transfer_observations'] = [1]
+        else:
+            df['cold_transfer_observations'] = [0]
+
+        return df
 
 
 class HotBuffer:

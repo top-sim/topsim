@@ -16,14 +16,22 @@
 
 import json
 import seaborn as sns
+import numpy as np
+import pandas as pd
 
 tracefile = 'simulations/output/sim.trace'
+pickle = 'simulations/output/sim.trace.pkl'
 
 with open(tracefile, 'r') as infile:
 	trace = json.load(infile)
 
+df_buffer = pd.DataFrame()
+df_telescope = pd.DataFrame
+
+df = pd.read_pickle(pickle)
+
 for timestamp in trace:
-	print('Time @ {}'.format(timestamp['timestamp']))
+	# print('Time @ {}'.format(timestamp['timestamp']))
 
 	print('\tcluster_state:')
 	for element in timestamp['cluster_state']:
