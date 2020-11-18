@@ -371,7 +371,7 @@ class ColdBuffer:
         return len(self.observations['stored']) > 0
 
     def next_observation_for_processing(self):
-        return self.observations['stored'].pop()
+        return self.observations['stored'][0]
 
     def remove(self, observation):
         if observation in self.observations['stored']:

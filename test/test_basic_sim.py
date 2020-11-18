@@ -57,9 +57,9 @@ class TestBasicIngest(unittest.TestCase):
         self.assertEqual(
             0, len(self.simulation.cluster.resources['ingest'])
         )
-        self.simulation.start(runtime=3)
+        self.simulation.resume(until=3)
         self.assertEqual(
-            2, self.simulation.cluster.ingest['completed']
+            3, self.simulation.cluster.ingest['completed']
         )
         # self.simulation.start(runtime=6)
         # self.assertEqual(
@@ -76,18 +76,28 @@ class TestBasicIngest(unittest.TestCase):
         self.assertEqual(
             5, self.simulation.buffer.hot.current_capacity
         )
-        self.simulation.start(runtime=10)
+        self.simulation.resume(until=2)
         self.assertEqual(
-            10, self.simulation.buffer.hot.current_capacity
+            5, self.simulation.buffer.hot.current_capacity
         )
-        # # self.assertEqual(
-        #     5, self.simulation.buffer.cold.current_capacity
-        # )
-        # self.assertEqual(
-        #     1,
-        #     len(self.simulation.buffer.hot.observations["stored"])
-        # )
-        #
+        self.assertEqual(
+            5, self.simulation.buffer.cold.current_capacity
+        )
+        self.assertEqual(
+            1,
+            len(self.simulation.buffer.hot.observations["stored"])
+        )
+        self.simulation.resume(until=3)
+        self.assertEqual(5, self.simulation.buffer.hot.current_capacity)
+        self.assertEqual(0, self.simulation.buffer.cold.current_capacity)
+        self.assertEqual(
+            1,
+            len(self.simulation.buffer.hot.observations["stored"])
+        )
+        self.assertEqual(
+            2,
+            len(self.simulation.buffer.cold.observations["stored"])
+        )
 
     def testSchedulerRunTime(self):
         self.assertEqual(0, self.simulation.env.now)
@@ -95,7 +105,7 @@ class TestBasicIngest(unittest.TestCase):
         self.assertEqual(
             1, len(self.simulation.buffer.cold.observations['stored'])
         )
-        self.simulation.start(runtime=10)
+        self.simulation.resume(runtime=10)
         self.assertEqual(
             0, len(self.simulation.buffer.cold.observations['stored'])
         )

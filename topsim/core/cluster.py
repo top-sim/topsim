@@ -52,7 +52,13 @@ class Cluster:
             'status': False,
             'pipeline': None,
             'observation': None,
-            'completed': 0
+            'completed': 0,
+            'demand': 0
+        }
+        self.usage_data = {
+            'occupied': 0,
+            'ingest': 0,
+            'available': len(self.resources['available'])
         }
         self.finished_workflows = []
         self.ingest_pipeline = None
@@ -61,6 +67,10 @@ class Cluster:
 
     def run(self):
         while True:
+            if not self.ingest['status']:
+                self.usage_data['ingest'] = 0
+                self.usage_data['available'] += self.ingest['demand']
+                self.ingest['demand'] = 0
             if len(self.tasks['waiting']) > 0:
                 for task in self.tasks['waiting']:
                     if task.task_status is TaskStatus.FINISHED:
@@ -131,10 +141,16 @@ class Cluster:
         self.resources['ingest'].extend(self.resources['available'][:demand])
         self.resources['available'] = self.resources['available'][demand:]
 
+        self.usage_data['available'] = len(
+            self.resources['available']
+        )
+        self.usage_data['ingest'] = len(self.resources['ingest'])
+
         for i, machine in enumerate(self.resources['ingest']):
             pairs.append((machine, tasks[i]))
 
         self.ingest['status'] = True
+        self.ingest['demand'] = demand
         curr_tasks = {}
         while True:
             for pair in pairs:
@@ -156,7 +172,7 @@ class Cluster:
                 # We've finished ingest
                 break
             else:
-                yield self.env.timeout(duration-1)
+                yield self.env.timeout(duration - 1)
 
         return True
 
@@ -238,9 +254,9 @@ class Cluster:
 
     def to_df(self):
         df = pd.DataFrame()
-        df['available_resources'] = [len(self.resources['available'])]
-        df['occupied_resources'] = [len(self.resources['occupied'])]
-        df['ingest_resources'] = [len(self.resources['ingest'])]
+        df['available_resources'] = [self.usage_data['available']]
+        df['occupied_resources'] = [self.usage_data['occupied']]
+        df['ingest_resources'] = [self.usage_data['ingest']]
 
         df['running_tasks'] = [len(self.tasks['running'])]
         df['finished_tasks'] = [len(self.tasks['finished'])]

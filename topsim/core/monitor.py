@@ -25,20 +25,30 @@ class Monitor(object):
                 'scheduler_state': self.simulation.scheduler.print_state(),
                 'buffer_state': self.simulation.buffer.print_state()
             }
-            cluster = self.simulation.cluster.to_df()
-            buffer = self.simulation.buffer.to_df()
-            machines = state['cluster_state']
+
+            self.df = self.df.append(
+                self.collate_actor_dataframes(), ignore_index=True
+            )
 
             logger.debug("Storing state %s",
                          self.simulation.scheduler.print_state())
             self.events.append(state)
             self.write_to_file()
-            self.df = self.df.append(cluster,ignore_index=True)
-            x = [buffer, self.df]
-            self.df = self.df.join(buffer, how='outer')
+            # self.df = self.df.append(cluster)
+            # x = [buffer, self.df]
+            # self.df = self.df.merge(buffer, how='left',sort=False)
             self.df.to_pickle("{}.pkl".format(self.event_file))
             yield self.env.timeout(1)
 
     def write_to_file(self):
         with open(self.event_file, 'w+') as f:
             json.dump(self.events, f, indent=4)
+
+    def collate_actor_dataframes(self):
+        df = pd.DataFrame()
+        cluster = self.simulation.cluster.to_df()
+        buffer = self.simulation.buffer.to_df()
+        telescope = self.simulation.telescope.to_df()
+        df = df.join([cluster, buffer, telescope], how='outer')
+        return df
+

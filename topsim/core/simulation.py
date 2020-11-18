@@ -103,6 +103,8 @@ class Simulation:
             scheduler=self.scheduler
         )
 
+        self.running = False
+
     def start(self, runtime=150):
         """
         Run the simulation, either for the specified runtime, OR until the
@@ -125,7 +127,13 @@ class Simulation:
         -------
 
         """
-
+        if self.running:
+            raise RuntimeError(
+                "start() has already been called!"
+                "Use resume() to continue a simulation that is already in "
+                "progress."
+            )
+        self.running = True
         if self.event_file is not None:
             self.env.process(self.monitor.run())
         if self.visualisation:
@@ -145,6 +153,30 @@ class Simulation:
                 self.env.run()
 
         LOGGER.info("Simulation Finished @ %s", self.env.now)
+
+    def resume(self, until):
+        """
+        Resume a simulation for a period of time
+        Useful for testing purposes, as we do not re-initialise the process
+        calls as we used to in Simulation.start()
+        Parameters
+        ----------
+        until : int
+            The (non-inclusive) Simpy.env.now timestep that we want to
+            continue to in the simulation
+
+        Returns
+        -------
+        self.env.now : float
+            The current time in the simulation
+        """
+        if not self.running:
+            raise RuntimeError(
+                "Simulation has not been started! call start() to initialise "
+                "the process stack."
+            )
+        self.env.run(until=until)
+
 
     def is_finished(self):
         return False

@@ -1,6 +1,7 @@
 # import simpy
 # from core.planner import Planner
 # import config_data
+import pandas as pd
 import logging
 # CHANGE THIS TO GET DEBUG VALUES FROM LOGS
 import json
@@ -240,12 +241,26 @@ class Telescope:
              for x in self.observations]
         )
 
+    def observations_finished(self):
+        return sum(
+            [1 if x.status is RunStatus.FINISHED
+             else 0
+             for x in self.observations]
+        )
+
     def print_state(self):
         return {
             'telescope_in_use': self.telescope_status,
             'telescope_arrays_used': self.telescope_use,
             'observations_waiting': self.observations_waiting()
         }
+
+    def to_df(self):
+        df = pd.DataFrame()
+        df['observations_waiting'] = [self.observations_waiting()]
+        df['observations_finished'] = [self.observations_waiting()]
+        df['telescope_status'] = [self.telescope_status]
+        return df
 
 
 class Observation(object):

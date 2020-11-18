@@ -11,29 +11,29 @@
 			{
 				"name": "first",
 				"start": 0,
-				"duration": 2,
+				"duration": 1,
 				"demand": 36,
 				"workflow": "test/basic-workflow-data/basic_workflow_config.json",
 				"type": "continuum",
-				"data_product_rate": 2.5
+				"data_product_rate":5
 			},
 			{
 				"name": "second",
-				"start": 2,
-				"duration": 2,
+				"start": 1,
+				"duration": 1,
 				"demand": 36,
 				"workflow": "test/basic-workflow-data/basic_workflow_config.json",
 				"type": "continuum",
-				"data_product_rate": 2.5
+				"data_product_rate": 5
 			},
 			{
 				"name": "third",
-				"start": 4,
-				"duration": 2,
+				"start": 2,
+				"duration": 1,
 				"demand": 36,
 				"workflow": "test/basic-workflow-data/basic_workflow_config.json",
 				"type": "continuum",
-				"data_product_rate": 2.5
+				"data_product_rate": 5
 			}
 		]
 	}
