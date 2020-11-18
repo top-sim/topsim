@@ -157,6 +157,8 @@ class Buffer:
         # current_obs = self.hot.observations['transfer']
         data_left_to_transfer = current_obs.total_data_size
         if not self.cold.has_capacity(data_left_to_transfer):
+            self.hot.observations['stored'].append(current_obs)
+            self.hot.observations['transfer'] = None
             return False
         while True:
             LOGGER.debug("Removing observation from buffer at time %s")
@@ -240,7 +242,7 @@ class Buffer:
         df['hotbuffer_stored_observations'] = [len(
             self.hot.observations['stored']
         )]
-        if self.hot.observations['transfer']:
+        if self.hot.observations['transfer'] is not None:
             df['hot_transfer_observations'] = [1]
         else:
             df['hot_transfer_observations'] = [0]
@@ -250,7 +252,7 @@ class Buffer:
         df['coldbuffer_stored_observations'] = [len(
             self.cold.observations['stored']
         )]
-        if self.cold.observations['transfer']:
+        if self.cold.observations['transfer'] is not None:
             df['cold_transfer_observations'] = [1]
         else:
             df['cold_transfer_observations'] = [0]

@@ -258,7 +258,7 @@ class Telescope:
     def to_df(self):
         df = pd.DataFrame()
         df['observations_waiting'] = [self.observations_waiting()]
-        df['observations_finished'] = [self.observations_waiting()]
+        df['observations_finished'] = [self.observations_finished()]
         df['telescope_status'] = [self.telescope_status]
         return df
 
