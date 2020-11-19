@@ -97,6 +97,15 @@ class Buffer:
         pass
 
     def has_observations_ready_for_processing(self):
+        """
+        Observations that are available for processing must come from the
+        ColdBuffer.
+
+
+        Returns
+        -------
+
+        """
         return self.cold.has_stored_observations()
 
     def next_observation_for_processing(self):
@@ -157,6 +166,8 @@ class Buffer:
         # current_obs = self.hot.observations['transfer']
         data_left_to_transfer = current_obs.total_data_size
         if not self.cold.has_capacity(data_left_to_transfer):
+            # We cannot actually transfer the observation due to size
+            # constraints
             self.hot.observations['stored'].append(current_obs)
             self.hot.observations['transfer'] = None
             return False

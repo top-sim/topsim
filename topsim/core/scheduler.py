@@ -246,6 +246,7 @@ class Scheduler:
                 self.current_plan = None
                 self.current_observation = None
 
+        tasks = {}
         while not test:
             machine, task, status = self.algorithm(
                 cluster=self.cluster,
@@ -253,13 +254,17 @@ class Scheduler:
                 workflow_plan=self.current_plan
             )
             self.current_plan.status = status
-            if machine is None or task is None:
+            if (machine is None
+                    or task is None
+                    or status is WorkflowStatus.FINISHED):
                 break
             else:
                 # Runs the task on the machie
                 # task.machine = machine
                 task.task_status = TaskStatus.SCHEDULED
-                self.env.process(machine.run(task, self.env))
+                ret = self.env.process(
+                    self.cluster.allocate_task_to_cluster(task, machine)
+                )
                 # if task.task_status is TaskStatus.SCHEDULED:
                 #     self.cluster.running_tasks.append(task)
 

@@ -49,4 +49,4 @@ simulation = Simulation(
 	visualisation=False
 )
 
-simulation.start(10)
+simulation.start(20)

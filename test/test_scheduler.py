@@ -226,7 +226,7 @@ class TestSchedulerFIFO(unittest.TestCase):
         # self.scheduler.init()
         self.buffer.cold.observations['stored'].append(curr_obs)
         self.scheduler.allocate_tasks()
-        self.env.run(until=5)
+        self.env.run(until=2)
         self.assertEqual(1,len(self.cluster.tasks['running']))
 
 

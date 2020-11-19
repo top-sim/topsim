@@ -2,7 +2,7 @@ import pandas as pd
 
 from topsim.core import config
 from topsim.core.task import Task, TaskStatus
-
+from topsim.common.globals import TIMESTEP
 
 class Cluster:
     """
@@ -58,7 +58,8 @@ class Cluster:
         self.usage_data = {
             'occupied': 0,
             'ingest': 0,
-            'available': len(self.resources['available'])
+            'available': len(self.resources['available']),
+            'running_tasks': 0
         }
         self.finished_workflows = []
         self.ingest_pipeline = None
@@ -70,6 +71,7 @@ class Cluster:
             if not self.ingest['status']:
                 self.usage_data['ingest'] = 0
                 self.usage_data['available'] += self.ingest['demand']
+                self.usage_data['running_tasks'] -= self.ingest['demand']
                 self.ingest['demand'] = 0
             if len(self.tasks['waiting']) > 0:
                 for task in self.tasks['waiting']:
@@ -151,6 +153,8 @@ class Cluster:
 
         self.ingest['status'] = True
         self.ingest['demand'] = demand
+
+        self.usage_data['running_tasks'] = self.ingest['demand']
         curr_tasks = {}
         while True:
             for pair in pairs:
@@ -176,17 +180,26 @@ class Cluster:
 
         return True
 
-    # return True
+    def allocate_task_to_cluster(self, task, machine):
+        """
+        Receive task from scheduler for allocation to specified machine
 
-    # Mark resources as 'in-use' for the given pipeline.
-    # Runs the task on the machie
-    # Create a 'dummy' task for each machine, of the duration of the
-    # Observation
-
-    # task.length = length
-    # self.cluster.allocate_task(task, machine)
-    # if task.task_status is TaskStatus.SCHEDULED:
-    # 	self.cluster.running.append(task)
+        Returns
+        -------
+        True if task successfully completed
+        """
+        ret = None
+        while True:
+            if task not in self.tasks['running']:
+                self.tasks['running'].append(task)
+                self.usage_data['running_tasks'] += 1
+                ret = self.env.process(machine.run(task, self.env))
+            if ret.triggered:
+                self.tasks['running'].remove(task)
+                self.tasks['finished'].append(task)
+                break
+            else:
+                yield self.env.timeout(TIMESTEP)
 
     def _generate_ingest_tasks(self, demand, duration):
         """
@@ -258,7 +271,7 @@ class Cluster:
         df['occupied_resources'] = [self.usage_data['occupied']]
         df['ingest_resources'] = [self.usage_data['ingest']]
 
-        df['running_tasks'] = [len(self.tasks['running'])]
+        df['running_tasks'] = [self.usage_data['running_tasks']]
         df['finished_tasks'] = [len(self.tasks['finished'])]
         df['waiting_tasks'] = [len(self.tasks['waiting'])]
 
