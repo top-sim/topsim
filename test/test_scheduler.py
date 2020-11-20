@@ -251,11 +251,11 @@ class TestSchedulerFIFO(unittest.TestCase):
         self.assertEqual(3, len(self.cluster.tasks['running']))
         self.env.run(until=98)
         self.assertEqual(9, self.cluster.tasks['running'][0].id)
-        self.env.run(until=100)
+        self.env.run(until=101)
         self.assertEqual(10, len(self.cluster.tasks['finished']))
         self.assertEqual(0, len(self.cluster.tasks['running']))
-        # self.assertEqual(None,
-        #                  self.scheduler.current_observation)
+        self.assertEqual(None,
+                         self.scheduler.current_observation)
 
 
 

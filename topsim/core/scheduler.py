@@ -243,8 +243,16 @@ class Scheduler:
                 self.current_plan = None
                 self.current_observation = None
 
+        # # Check if the running tasks have finished
+        # # TODO check if expected run time is the same as the 'assigned'
+        # #  runtime (i.e. we have a 'delay'); if not, we have a delay and
+        # # we need to return 'current workflow execution status'
+
         tasks = {}
         while not test:
+            for t in self.current_plan.tasks:
+                if t.task_status is TaskStatus.FINISHED:
+                    self.current_plan.tasks.remove(t)
             machine, task, status = self.algorithm(
                 cluster=self.cluster,
                 clock=self.env.now,
@@ -268,6 +276,8 @@ class Scheduler:
                 ret = self.env.process(
                     self.cluster.allocate_task_to_cluster(task, machine)
                 )
+
+
 
 
     def old_allocate_tasks(self):
