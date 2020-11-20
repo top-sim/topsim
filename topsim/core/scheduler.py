@@ -93,10 +93,7 @@ class Scheduler:
                     obs = self.buffer.next_observation_for_processing()
                     self.current_observation = obs
 
-                allocation = self.allocate_tasks()
-
-                if allocation:
-                    logger.info("Successfully allocated")
+                    self.env.process(self.allocate_tasks())
 
             if len(self.waiting_observations) == 0 \
                     and self.status == SchedulerStatus.SHUTDOWN:
@@ -254,10 +251,16 @@ class Scheduler:
                 workflow_plan=self.current_plan
             )
             self.current_plan.status = status
-            if (machine is None
-                    or task is None
-                    or status is WorkflowStatus.FINISHED):
-                break
+            if status is WorkflowStatus.FINISHED:
+                if self.buffer.mark_observation_finished(
+                     self.current_observation
+                ):
+                    self.current_plan = None
+                    self.current_observation = None
+                    break
+            elif (machine is None
+                    or task is None):
+                yield self.env.timeout(TIMESTEP)
             else:
                 # Runs the task on the machie
                 # task.machine = machine
@@ -265,8 +268,7 @@ class Scheduler:
                 ret = self.env.process(
                     self.cluster.allocate_task_to_cluster(task, machine)
                 )
-                # if task.task_status is TaskStatus.SCHEDULED:
-                #     self.cluster.running_tasks.append(task)
+
 
     def old_allocate_tasks(self):
         """

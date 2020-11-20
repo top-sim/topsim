@@ -20,7 +20,7 @@ import logging
 from topsim.core.telescope import Observation, Telescope
 from topsim.core.scheduler import Scheduler
 from topsim.core.cluster import Cluster
-from topsim.core.planner import Planner
+from topsim.core.planner import Planner, WorkflowStatus
 from topsim.core.buffer import Buffer
 from topsim.core.telescope import RunStatus
 from topsim.algorithms.scheduling import FifoAlgorithm
@@ -209,24 +209,54 @@ class TestSchedulerFIFO(unittest.TestCase):
             * Once things are running, we make sure things are being
             scheduled onto the right machines
             * They should also be running for the correct period of time.
+
+        The allocations for the HEFT algorithm are (in sorted order):
+            id - mid    - (ast,aft)
+            0 - cat2_m2 - (0,11)
+            3 - cat2_m2 - (11,21)
+            2 - cat2_m2 - (21,30)
+            4 - cat1_m1 - (22, 40)
+            1 - cat0_m0 - (29,42)
+            5 - cat2_m2 - (30,45)
+            6 - cat2_m2 - (45, 55)
+            8 - cat2_m2 - (58, 71)
+            7 - cat0_m0 - (60, 61)
+            9 - cat0_m0 - (84,98)
+
         """
 
-        self.assertFalse(self.scheduler.allocate_tasks())
+        # self.assertFalse(self.scheduler.allocate_tasks())
 
         curr_obs = self.observations[0]
         self.scheduler.current_observation = curr_obs
-        self.assertRaises(RuntimeError, self.scheduler.allocate_tasks)
+        gen = self.scheduler.allocate_tasks()
+        self.assertRaises(RuntimeError, next, gen)
         self.env.process(self.planner.run(self.scheduler.current_observation))
+        self.env.process(self.scheduler.allocate_tasks(test=True))
         self.env.run(1)
-        self.scheduler.allocate_tasks(test=True)
         self.assertListEqual(
             [0, 3, 2, 4, 1, 5, 6, 8, 7, 9],
             [a.task.tid for a in self.scheduler.current_plan.exec_order]
         )
-        # self.scheduler.init()
         self.buffer.cold.observations['stored'].append(curr_obs)
-        self.scheduler.allocate_tasks()
+        self.env.process(self.scheduler.allocate_tasks())
         self.env.run(until=2)
-        self.assertEqual(1,len(self.cluster.tasks['running']))
+        self.assertEqual(1, len(self.cluster.tasks['running']))
+        self.env.run(until=12)
+        self.assertEqual(1, len(self.cluster.tasks['running']))
+        self.env.run(until=15)
+        self.assertEqual(3, self.cluster.tasks['running'][0].id)
+        self.assertEqual(1, len(self.cluster.resources['occupied']))
+        self.env.run(until=31)
+        self.assertEqual(3, len(self.cluster.tasks['running']))
+        self.env.run(until=98)
+        self.assertEqual(9, self.cluster.tasks['running'][0].id)
+        self.env.run(until=100)
+        self.assertEqual(10, len(self.cluster.tasks['finished']))
+        self.assertEqual(0, len(self.cluster.tasks['running']))
+        # self.assertEqual(None,
+        #                  self.scheduler.current_observation)
+
+
 
 

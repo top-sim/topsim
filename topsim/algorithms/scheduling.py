@@ -92,7 +92,7 @@ class FifoAlgorithm(Algorithm):
                         # One of the predecessors of 't' is still running
                         return None, None
                     else:
-                        machine = self.cluster.dmachine[t.machine_id]
+                        machine = self.cluster.dmachine[t.machine_id.id]
                         return machine, t, workflow_plan.status
 
         return None, None, workflow_plan.status

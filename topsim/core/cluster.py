@@ -192,11 +192,15 @@ class Cluster:
         while True:
             if task not in self.tasks['running']:
                 self.tasks['running'].append(task)
+                self.resources['occupied'].append(machine)
+                self.resources['available'].append(machine)
                 self.usage_data['running_tasks'] += 1
                 ret = self.env.process(machine.run(task, self.env))
             if ret.triggered:
                 self.tasks['running'].remove(task)
                 self.tasks['finished'].append(task)
+                self.resources['occupied'].remove(machine)
+                self.resources['available'].append(machine)
                 break
             else:
                 yield self.env.timeout(TIMESTEP)
