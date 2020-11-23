@@ -14,6 +14,7 @@ from topsim.core.visualiser import Visualiser
 from topsim.core.telescope import Telescope
 from topsim.core.buffer import Buffer
 from topsim.core.planner import Planner
+from topsim.algorithms.scheduling import FifoAlgorithm
 
 LOGGER = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ class Simulation:
         instance of the core.algorithm interface
 
     event_file: str
-        Path to the output file that stores execution of simulation.
+        Path to the output file that stsores execution of simulation.
 
     visualisation: bool
         If visualisation is required, True; else, False
@@ -95,7 +96,6 @@ class Simulation:
         self.scheduler = Scheduler(
             env, self.buffer, self.cluster, scheduling_algorithm
         )
-
         self.telescope = Telescope(
             env=self.env,
             config=telescope_config,

@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import logging
+import pandas as pd
 
 from topsim.core.algorithm import Algorithm
 from topsim.core.planner import WorkflowStatus
@@ -42,15 +43,14 @@ class FifoAlgorithm(Algorithm):
     def parse_workflow_plan(self):
         pass
 
-    def __call__(self, cluster, clock, workflow_plan):
+    def __call__(self,cluster, clock, workflow_plan):
         """
         :param cluster:
         :param clock:
         :param workflow_plan: a (Workflow-id, workflow-plan) tuple.
         :return:
         """
-        self.cluster = cluster
-        machines = self.cluster.machines
+        machines = cluster.machines
         workflow_id = workflow_plan.id
         # tasks = cluster.tasks_which_has_waiting_instance
         tasks = workflow_plan.tasks
@@ -69,7 +69,7 @@ class FifoAlgorithm(Algorithm):
                 #  it is occupied, then we are DELAYED and need to
                 #  communicate this
                 if not t.pred:
-                    machine = self.cluster.dmachine[t.machine_id.id]
+                    machine = cluster.dmachine[t.machine_id.id]
                     workflow_plan.status = WorkflowStatus.SCHEDULED
                     return machine, t, workflow_plan.status
                 # The task has predecessors
@@ -81,7 +81,7 @@ class FifoAlgorithm(Algorithm):
                         # One of the predecessors of 't' is still running
                         return None, None
                     else:
-                        machine = self.cluster.dmachine[t.machine_id.id]
+                        machine = cluster.dmachine[t.machine_id.id]
                         return machine, t, workflow_plan.status
 
         if len(workflow_plan.tasks) == 0:
@@ -89,6 +89,10 @@ class FifoAlgorithm(Algorithm):
             logger.debug("is finished %s", workflow_id)
 
         return None, None, workflow_plan.status
+
+    def to_df(self):
+        df = pd.DataFrame()
+        return df
 
 
 def check_workflow_progress(cluster, workflow_plan):
@@ -104,3 +108,7 @@ class GlobalDagDelayHeuristic(Algorithm):
 
     def __call__(self, cluster, clock, workflow_plan):
         return None, None, workflow_plan.status
+
+    def to_df(self):
+        df = pd.DataFrame()
+        return df

@@ -24,7 +24,7 @@ class TestSimulationConfig(unittest.TestCase):
         self.event_file = EVENT_FILE
         self.env = simpy.Environment()
         self.planning_algorithm = 'heft'
-        self.scheduling_algorithm = FifoAlgorithm()
+        self.scheduling_algorithm = FifoAlgorithm
 
     def tearDown(self):
         pass

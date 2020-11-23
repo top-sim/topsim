@@ -21,6 +21,7 @@ the results are reproducible and bundled effectively.
 import threading
 import numpy as np
 
+from topsim.core.simulation import Simulation as TopsimSimulation
 
 class ExperimentRunner:
     """
@@ -45,13 +46,36 @@ class ExperimentRunner:
             self.sim_sequence.append(simulations)
 
     def run(self):
+        """
+        Begins a threaded run of experiments based on the experiments outlined
+        in self.sim_sequence
+        Returns
+        -------
+        True if successful; False otherwise.
+        """
         splits = np.array_split(self.sim_sequence, self.threads)
         for sequence in splits:
             t = threading.Thread(target=self.run_sim_sequence, args=sequence)
+            t.run()
 
-    def run_sim_sequence(self, sequence):
+    @staticmethod
+    def run_sim_sequence(sequence):
+        """
+        Runs a set of experiments from the sequence.
+        Parameters
+        ----------
+        self
+        sequence : list
+            A sequence of experiments
+
+        Returns
+        -------
+
+        """
         for sim in sequence:
             sim.run(-1)
+
+        return True
 
 
 class Experiment:
@@ -84,6 +108,15 @@ class Experiment:
         multiplicity of specifications in a controlled variable.
 
     independents : dict
+        Independents is a dictionary of variables that match
+
+    Attributes
+    ----------
+    Attributes reflect the parameters passed to __init__()
+
+    Methods
+    --------
+    generate_simulation_from_parameters
 
 
     """
@@ -93,3 +126,30 @@ class Experiment:
             raise RuntimeError("Experiment has not got adequate information")
         self.controls = controls
         self.independents = independents
+
+    def generate_simulation_from_parameters(self):
+        """
+        Based on the control and independent variables specified in
+        constructor, produce a sequence of simulations that iterate
+        through the independent variables.
+        Returns
+        -------
+        A sequence of simulations.
+        """
+        sequence = []
+        for curr_exp in self.independents:
+            sequence.append(self._init_simulation(curr_exp))
+        return sequence
+
+    @staticmethod
+    def _init_simulation(independent,controls):
+        """
+        Initialise a topsim.core.simulation.Simulation object based on
+        a given set of independent variables.
+        Returns
+        -------
+        """
+        sim = independent
+
+        return sim
+
