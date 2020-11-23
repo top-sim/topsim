@@ -5,7 +5,7 @@ import logging
 from topsim.core.simulation import Simulation
 from topsim.algorithms.scheduling import FifoAlgorithm
 
-logging.basicConfig(level='DEBUG')
+logging.basicConfig(level='WARNING')
 logger = logging.getLogger(__name__)
 
 TELESCOPE_CONFIG = 'test/data/config/observations.json'

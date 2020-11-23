@@ -21,12 +21,13 @@ from topsim.core.task import TaskStatus
 
 logger = logging.getLogger(__name__)
 
+
 # TODO Update Algorithm class inheritance structure
 # TODO Algorithm returns allocation based on algorithm and current state.
 # TODO this is a Tuple
 # TODO 'algorithm_object_instance.process_allocation(current_plan)'
 
-#TODO Algorithms should 'process_plan' and then also have an 'if things
+# TODO Algorithms should 'process_plan' and then also have an 'if things
 # aren't going according to plan, go to dynamic scheduling.
 
 # This could be something we do in the 'scheduler' - process_plan_allocation,
@@ -69,7 +70,7 @@ class FifoAlgorithm(Algorithm):
                 #  communicate this
                 if not t.pred:
                     machine = self.cluster.dmachine[t.machine_id.id]
-                    workflow_plan.status=WorkflowStatus.SCHEDULED
+                    workflow_plan.status = WorkflowStatus.SCHEDULED
                     return machine, t, workflow_plan.status
                 # The task has predecessors
                 else:
@@ -100,3 +101,6 @@ class GlobalDagDelayHeuristic(Algorithm):
     """
     Implementation of the bespoke Delay heuristic I have been working on
     """
+
+    def __call__(self, cluster, clock, workflow_plan):
+        return None, None, workflow_plan.status

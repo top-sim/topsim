@@ -22,7 +22,7 @@ import simpy
 from topsim.core.simulation import Simulation
 from topsim.algorithms.scheduling import FifoAlgorithm
 
-logging.basicConfig(level="INFO")
+logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
 EVENT_FILE = 'test/basic-workflow-data/output/sim.trace'
@@ -105,7 +105,7 @@ class TestBasicIngest(unittest.TestCase):
         self.assertEqual(
             1, len(self.simulation.buffer.cold.observations['stored'])
         )
-        self.simulation.resume(runtime=10)
+        self.simulation.resume(until=10)
         self.assertEqual(
-            0, len(self.simulation.buffer.cold.observations['stored'])
+            2, len(self.simulation.buffer.cold.observations['stored'])
         )

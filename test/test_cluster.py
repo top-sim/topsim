@@ -22,7 +22,7 @@ from topsim.core.cluster import Cluster
 from topsim.core.telescope import Telescope, Observation
 from topsim.core.task import TaskStatus
 
-logging.basicConfig(level="DEBUG")
+logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
 CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"

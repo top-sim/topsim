@@ -27,7 +27,7 @@ from topsim.algorithms.scheduling import FifoAlgorithm
 
 from topsim.common import data as test_data
 
-logging.basicConfig(level="DEBUG")
+logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
 OBSERVATION_CONFIG = 'test/data/config/observations.json'
