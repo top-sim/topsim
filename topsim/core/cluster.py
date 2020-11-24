@@ -4,6 +4,7 @@ from topsim.core import config
 from topsim.core.task import Task, TaskStatus
 from topsim.common.globals import TIMESTEP
 
+
 class Cluster:
     """
     A class used to represent the Cluster, the abstract representation
@@ -59,7 +60,8 @@ class Cluster:
             'occupied': 0,
             'ingest': 0,
             'available': len(self.resources['available']),
-            'running_tasks': 0
+            'running_tasks': 0,
+            'finished_tasks': 0
         }
         self.finished_workflows = []
         self.ingest_pipeline = None
@@ -72,6 +74,7 @@ class Cluster:
                 self.usage_data['ingest'] = 0
                 self.usage_data['available'] += self.ingest['demand']
                 self.usage_data['running_tasks'] -= self.ingest['demand']
+                self.usage_data['finished_tasks'] += self.ingest['demand']
                 self.ingest['demand'] = 0
             if len(self.tasks['waiting']) > 0:
                 for task in self.tasks['waiting']:
@@ -189,6 +192,7 @@ class Cluster:
         True if task successfully completed
         """
         ret = None
+
         while True:
             if task not in self.tasks['running']:
                 self.tasks['running'].append(task)
@@ -198,10 +202,12 @@ class Cluster:
                 ret = self.env.process(machine.run(task, self.env))
             if ret.triggered:
                 self.tasks['running'].remove(task)
+                self.usage_data['running_tasks'] -= 1
                 self.tasks['finished'].append(task)
+                self.usage_data['finished_tasks'] += 1
                 self.resources['occupied'].remove(machine)
                 self.resources['available'].append(machine)
-                task.task_status=TaskStatus.FINISHED
+                task.task_status = TaskStatus.FINISHED
                 break
             else:
                 yield self.env.timeout(TIMESTEP)
@@ -277,8 +283,8 @@ class Cluster:
         df['ingest_resources'] = [self.usage_data['ingest']]
 
         df['running_tasks'] = [self.usage_data['running_tasks']]
-        df['finished_tasks'] = [len(self.tasks['finished'])]
-        df['waiting_tasks'] = [len(self.tasks['waiting'])]
+        df['finished_tasks'] = [self.usage_data['finished_tasks']]
+        # df['waiting_tasks'] = [len(self.tasks['waiting'])]
 
         return df
 

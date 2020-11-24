@@ -50,6 +50,7 @@ class Scheduler:
         self.current_plan = None
         self.status = SchedulerStatus.SLEEP
         self.ingest_observation = None
+        self.observation_queue = []
 
     def init(self):
         """
@@ -92,16 +93,24 @@ class Scheduler:
                 if self.current_observation is None:
                     obs = self.buffer.next_observation_for_processing()
                     self.current_observation = obs
+                    ret = self.env.process(self.allocate_tasks())
 
-                    self.env.process(self.allocate_tasks())
-
-            if len(self.waiting_observations) == 0 \
+            if len(self.observation_queue) == 0 \
                     and self.status == SchedulerStatus.SHUTDOWN:
                 logger.debug("No more waiting workflows")
                 break
 
             logger.debug("Scheduler Status: %s", self.status)
             yield self.env.timeout(TIMESTEP)
+
+    def cluster_capacity_for_alloc(self):
+        """
+        For the next observation on the queue, make sure that the cluster is
+        able to process the workflow.
+        Returns
+        -------
+
+        """
 
     def start_ingest_pipelines(self, observation, pipeline):
 
@@ -259,7 +268,16 @@ class Scheduler:
                 workflow_plan=self.current_plan
             )
             self.current_plan.status = status
-            if status is WorkflowStatus.FINISHED:
+            # if status is WorkflowStatus.FINISHED:
+            #     if self.buffer.mark_observation_finished(
+            #          self.current_observation
+            #     ):
+            #         self.current_plan = None
+            #         self.current_observation = None
+            #         break
+
+            if (machine is None and task is None and status is
+                    WorkflowStatus.FINISHED):
                 if self.buffer.mark_observation_finished(
                      self.current_observation
                 ):
@@ -276,6 +294,7 @@ class Scheduler:
                 ret = self.env.process(
                     self.cluster.allocate_task_to_cluster(task, machine)
                 )
+        yield self.env.timeout(TIMESTEP)
 
 
 
