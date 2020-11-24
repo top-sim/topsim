@@ -53,6 +53,17 @@ class Buffer:
     """
 
     def __init__(self, env, cluster, config):
+        """
+
+        Parameters
+        ----------
+        env : simpy.Environment
+            The environment object for the Simulation
+        cluster : topsim.core.cluster.Cluster
+            Cluster (Actor) object for the simulation
+        config : str
+            path to the Buffer JSON configuration file
+        """
         self.env = env
         self.cluster = cluster
         # We are reading this from a file, check it works
@@ -66,6 +77,18 @@ class Buffer:
         self.waiting_observation_list = []
 
     def run(self):
+        """
+        This is the main process of the Buffer to have it running continually
+        during the simulation.
+
+        At each timestep, the buffer checks if there is an observation stored
+        on the HotBuffer, and schedules it to move to longer-term storage on
+        the cold buffer, in order to make room for new ingest/observations.
+
+        Yields
+        -------
+        A simpy.env.timeout() of duration topsim.common.globals.TIMESTEP
+        """
         while True:
             LOGGER.info(
                 "HotBuffer: %s \nColdBuffer: %s",
@@ -77,6 +100,21 @@ class Buffer:
             yield self.env.timeout(TIMESTEP)
 
     def check_buffer_capacity(self, observation):
+        """
+        Determines if there is capacity in both the Hot and Cold Buffers
+
+        Parameters
+        ----------
+        observation : topsim.core.telescope.Observation
+            The observation intended to be added to the buffer
+
+        Returns
+        -------
+        True :
+            If both buffers have capacity
+        False :
+            If at least one buffer does not have capacity
+        """
         size = observation.ingest_data_rate * observation.duration
         if self.hot.current_capacity - size < 0 \
                 or not self.cold.has_capacity(size):
@@ -131,15 +169,6 @@ class Buffer:
         """
         return self.cold.remove(observation)
 
-    def add(self, observation):
-        LOGGER.info(
-            "%s data to buffer at time %s", observation.name, self.env.now
-        )
-        # This will take time
-        observation.plan.start_time = self.env.now
-        self.waiting_observation_list.append(observation)
-        LOGGER.debug('Observations in buffer %s', self.waiting_observation_list)
-
     def move_hot_to_cold(self):
         """
 
@@ -171,16 +200,15 @@ class Buffer:
             self.hot.observations['transfer'] = None
             return False
         while True:
-            LOGGER.debug("Removing observation from buffer at time %s")
-            observation_size = \
-                current_obs.duration * current_obs.ingest_data_rate
-
             # data_transfer_time = observation_size / self.cold.max_data_rate
             #
             # time_left = data_transfer_time - 1
 
             if data_left_to_transfer <= 0:
                 break
+
+            LOGGER.debug("Removing observation from buffer at time %s",
+                         self.env.now)
 
             check = self.cold.receive_observation(
                 current_obs,
@@ -246,6 +274,15 @@ class Buffer:
         }
 
     def to_df(self):
+        """
+        Return a pandas.DataFrame that represents the state of the
+        Buffer and its attributes at the current timestep
+
+        Returns
+        -------
+        current_state : pandas.DataFrame()
+            A DataFrame (1xn) table of the current state of the Buffers.
+        """
         current_state = pd.DataFrame()
         current_state['hotbuffer_total_capacity'] = [self.hot.total_capacity]
         current_state['hotbuffer_current_capacity'] = [
@@ -275,6 +312,15 @@ class Buffer:
 
 
 class HotBuffer:
+    """
+    HotBuffer represents the ingest-facing part of the Buffer. Observation
+    data is intended to stay in the HotBuffer only temporarily, and ideally
+    is moved to the ColdBuffer as soon as possible.
+
+    Transition to the ColBuffer is not instantaneous; rather it depends on
+    the data rate supported by the ColdBuffer, which may be defined
+    differently to the HotBuffer based on the Buffer config JSON.
+    """
     def __init__(self, capacity, max_ingest_data_rate):
         self.total_capacity = capacity
         self.current_capacity = self.total_capacity
