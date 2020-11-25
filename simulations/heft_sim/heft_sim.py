@@ -21,10 +21,34 @@ time delay on storing and ingest.
 This also involves the planning and execution of a more complex workflow;
 namely, the original HEFT workflow from Topcuoglu 2000.
 """
+import simpy
 
-HEFT_CLUSTER_CONFIG = 'test/data/config/system_config.json'
+from topsim.algorithms.scheduling import FifoAlgorithm
+from topsim.core.simulation import Simulation
+
+CLUSTER_CONFIG = 'test/data/config/basic_spec-10.json'
 HEFT_WORKFLOW = 'test/data/config/workflow_config.json'
 
-OBSERVATION_CONFIG = 'test/data/config/observations.json'
+OBSERVATION_CONFIG = 'test/data/config/single_observation_config.json'
 BUFFER_CONFIG = 'test/data/config/buffer.json'
+
+EVENT_FILE = 'simulations/output/heft_sim.trace'
+
+env = simpy.Environment()
+
+planning_algorithm = 'heft'
+scheduling_algorithm = FifoAlgorithm()
+
+simulation = Simulation(
+    env,
+    OBSERVATION_CONFIG,
+    CLUSTER_CONFIG,
+    BUFFER_CONFIG,
+    planning_algorithm,
+    scheduling_algorithm,
+    EVENT_FILE,
+    visualisation=False
+)
+
+simulation.start(500)
 
