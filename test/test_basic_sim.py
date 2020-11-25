@@ -22,7 +22,7 @@ import simpy
 from topsim.core.simulation import Simulation
 from topsim.algorithms.scheduling import FifoAlgorithm
 
-logging.basicConfig(level="DEBUG")
+logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
 EVENT_FILE = 'test/basic-workflow-data/output/sim.trace'
@@ -47,7 +47,6 @@ class TestBasicIngest(unittest.TestCase):
             planning_algorithm,
             scheduling_algorithm,
             EVENT_FILE,
-            visualisation=False
         )
 
     def testClusterIngest(self):
@@ -110,7 +109,7 @@ class TestBasicIngest(unittest.TestCase):
         )
         self.simulation.resume(until=8)
         self.simulation.resume(until=9)
-        self.assertEqual(1, len(self.simulation.cluster.tasks['running']))
+        self.assertEqual(0, len(self.simulation.cluster.tasks['running']))
         self.simulation.resume(until=10)
         self.simulation.resume(until=11)
         self.assertEqual(

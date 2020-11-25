@@ -10,7 +10,6 @@ import logging
 from topsim.core.monitor import Monitor
 from topsim.core.scheduler import Scheduler
 from topsim.core.cluster import Cluster
-from topsim.core.visualiser import Visualiser
 from topsim.core.telescope import Telescope
 from topsim.core.buffer import Buffer
 from topsim.core.planner import Planner
@@ -75,17 +74,13 @@ class Simulation:
             planning_algorithm,
             scheduling_algorithm,
             event_file,
-            visualisation=False
     ):
 
         self.env = env
         # Event file setup
         self.event_file = event_file
-        self.visualisation = visualisation
         if event_file is not None:
             self.monitor = Monitor(self)
-        if visualisation:
-            self.visualiser = Visualiser(self)
         # Process necessary config files
 
         # Initiaise Actor and Resource objects
@@ -136,8 +131,6 @@ class Simulation:
         self.running = True
         if self.event_file is not None:
             self.env.process(self.monitor.run())
-        if self.visualisation:
-            self.env.process(self.visualiser.run())
 
         self.env.process(self.telescope.run())
         self.env.process(self.cluster.run())

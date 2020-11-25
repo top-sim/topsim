@@ -31,7 +31,7 @@ BASIC_CLUSTER = 'test/basic-workflow-data/basic_config.json'
 BASIC_BUFFER = 'test/basic-workflow-data/basic_buffer.json'
 BASIC_TELESCOPE = 'test/basic-workflow-data/basic_observation_plan.json'
 
-EVENT_FILE = 'simulations/output/sim.trace'
+EVENT_FILE = 'simulations/basic_sim/output/sim.trace'
 
 # env = simpy.RealtimeEnvironment(factor=0.5, strict=False)
 env = simpy.Environment()
@@ -46,7 +46,6 @@ simulation = Simulation(
 	planning_algorithm,
 	scheduling_algorithm,
 	EVENT_FILE,
-	visualisation=False
 )
 
 simulation.start(25)

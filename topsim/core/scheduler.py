@@ -283,10 +283,10 @@ class Scheduler:
             else:
                 # Runs the task on the machie
                 # task.machine = machine
-                task.task_status = TaskStatus.SCHEDULED
                 ret = self.env.process(
                     self.cluster.allocate_task_to_cluster(task, machine)
                 )
+                task.task_status = TaskStatus.SCHEDULED
         yield self.env.timeout(TIMESTEP)
 
     def find_appropriate_machine_in_cluster(self, machine_id):

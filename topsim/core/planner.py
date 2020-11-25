@@ -117,7 +117,9 @@ class WorkflowPlan:
             taskobj.duration = taskobj.eft - taskobj.est
             taskobj.machine_id = allocation.machine
             taskobj.flops = task.flops_demand
-            taskobj.pred = list(workflow.graph.predecessors(task))
+            taskobj.pred = [
+                x.tid for x in list(workflow.graph.predecessors(task))
+            ]
             self.tasks.append(taskobj)
         self.tasks.sort(key=lambda x: x.est)
         self.exec_order = self.solution.execution_order

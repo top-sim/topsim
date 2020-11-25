@@ -197,8 +197,9 @@ class Cluster:
             if task not in self.tasks['running']:
                 self.tasks['running'].append(task)
                 self.resources['occupied'].append(machine)
-                self.resources['available'].append(machine)
+                self.resources['available'].remove(machine)
                 self.usage_data['running_tasks'] += 1
+                task.task_status = TaskStatus.SCHEDULED
                 ret = self.env.process(machine.run(task, self.env))
             if ret.triggered:
                 self.tasks['running'].remove(task)
@@ -211,6 +212,21 @@ class Cluster:
                 break
             else:
                 yield self.env.timeout(TIMESTEP)
+
+    def is_occupied(self, machine):
+        """
+        Check if the machine is occupied
+        Parameters
+        ----------
+        machine : topsim.core.machine.Machine
+            The machine with which we are concerned.
+
+        Returns
+        -------
+
+        """
+        return (machine in self.resources['occupied']
+                or machine in self.resources['ingest'])
 
     def _generate_ingest_tasks(self, demand, duration):
         """

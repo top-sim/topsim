@@ -38,7 +38,6 @@ class TestSimulationConfig(unittest.TestCase):
             self.planning_algorithm,
             self.scheduling_algorithm,
             EVENT_FILE,
-            visualisation=False
         )
         self.assertTrue(36, simulation.telescope.total_arrays)
 
@@ -59,7 +58,6 @@ class TestSimulationRuntime(unittest.TestCase):
             planning_algorithm,
             scheduling_algorithm,
             EVENT_FILE,
-            visualisation=False
         )
 
     def testLimitedRuntime(self):
@@ -88,5 +86,4 @@ class TestSimulationBasicSetup(unittest.TestCase):
             planning_algorithm,
             scheduling_algorithm,
             EVENT_FILE,
-            visualisation=False
         )

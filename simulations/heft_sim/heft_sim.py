@@ -32,7 +32,7 @@ HEFT_WORKFLOW = 'test/data/config/workflow_config.json'
 OBSERVATION_CONFIG = 'test/data/config/single_observation_config.json'
 BUFFER_CONFIG = 'test/data/config/buffer.json'
 
-EVENT_FILE = 'simulations/output/heft_sim.trace'
+EVENT_FILE = 'simulations/heft_sim/output/heft_sim.trace'
 
 env = simpy.Environment()
 
@@ -47,7 +47,6 @@ simulation = Simulation(
     planning_algorithm,
     scheduling_algorithm,
     EVENT_FILE,
-    visualisation=False
 )
 
 simulation.start(500)
