@@ -80,8 +80,8 @@ class TestTelescopeIngest(unittest.TestCase):
         self.assertEqual(460, self.buffer.hot.current_capacity)
         self.env.run(until=12)
         self.assertEqual(0, telescope.telescope_use)
-        self.assertEqual(5, len(self.cluster.resources['available']))
-        self.assertEqual(0, len(self.cluster.tasks['finished']))
+        self.assertEqual(10, len(self.cluster.resources['available']))
+        self.assertEqual(5, len(self.cluster.tasks['finished']))
     # self.assertEqual(1, len(self.scheduler.waiting_observations))
 
 

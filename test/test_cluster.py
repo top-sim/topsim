@@ -127,6 +127,9 @@ class TestIngest(unittest.TestCase):
         self.assertEqual(10, len(self.cluster.resources['available']))
         self.assertEqual(20, self.env.now)
 
+    def test_cluster_ingest_complex_pipelin(self):
+        pass
+
     def run_ingest(self, duration, demand):
         retval = self.cluster.provision_ingest_resources(
             demand,

@@ -78,6 +78,9 @@ class Task(object):
 
     def do_work(self):
         self.task_status = TaskStatus.RUNNING
+        # if self.id == 'ingest-t0':
+        #     self.duration += 5
+
         yield self.env.timeout(self.duration-1)
         self.finished_timestamp = self.env.now
         logger.debug('%s finished at %s', self.id, self.finished_timestamp)

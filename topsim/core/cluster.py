@@ -162,28 +162,33 @@ class Cluster:
         while True:
             for pair in pairs:
                 (machine, task) = pair
-                if task not in self.tasks['running']:
-                    self.tasks['running'].append(task)
-                    ret = self.env.process(machine.run(task, self.env))
-                    curr_tasks[task] = ret
-                if curr_tasks[task].triggered:
-                    task.task_status = TaskStatus.FINISHED
-                    self.tasks['running'].remove(task)
-                    self.tasks['finished'].append(task)
-                    self.resources['available'].append(machine)
-                    self.resources['ingest'].remove(machine)
-                    # break
+                # if task not in self.tasks['running']:
+                #     self.tasks['running'].append(task)
+                ret = self.env.process(
+                    self.allocate_task_to_cluster(task, machine, ingest=True)
+                )
             if len(self.resources['ingest']) == 0:
                 self.ingest['completed'] += 1
                 self.ingest['status'] = False
                 # We've finished ingest
                 break
             else:
-                yield self.env.timeout(duration - 1)
+                break
+        yield self.env.timeout(TIMESTEP)
 
-        return True
+    def clean_up_ingest(self):
+        """
+        Once we finished 'provision ingest', we want to update the cluster
+        status before starting the new timestep
 
-    def allocate_task_to_cluster(self, task, machine):
+        Returns
+        -------
+
+        """
+        self.ingest['completed'] += 1
+        self.ingest['status'] = False
+
+    def allocate_task_to_cluster(self, task, machine, ingest=False):
         """
         Receive task from scheduler for allocation to specified machine
 
@@ -196,8 +201,11 @@ class Cluster:
         while True:
             if task not in self.tasks['running']:
                 self.tasks['running'].append(task)
-                self.resources['occupied'].append(machine)
-                self.resources['available'].remove(machine)
+                if not ingest:
+                    # Ingest resources are allocated in bulk, so we do that
+                    # elsewhere
+                    self.resources['occupied'].append(machine)
+                    self.resources['available'].remove(machine)
                 self.usage_data['running_tasks'] += 1
                 task.task_status = TaskStatus.SCHEDULED
                 ret = self.env.process(machine.run(task, self.env))
@@ -206,7 +214,10 @@ class Cluster:
                 self.usage_data['running_tasks'] -= 1
                 self.tasks['finished'].append(task)
                 self.usage_data['finished_tasks'] += 1
-                self.resources['occupied'].remove(machine)
+                if ingest:
+                    self.resources['ingest'].remove(machine)
+                else:
+                    self.resources['occupied'].remove(machine)
                 self.resources['available'].append(machine)
                 task.task_status = TaskStatus.FINISHED
                 break
@@ -244,7 +255,7 @@ class Cluster:
         """
         tasks = []
         for i in range(demand):
-            t = Task(i, env=self.env)
+            t = Task("ingest-t{0}".format(i), env=self.env)
             t.duration = duration
             t.task_status = TaskStatus.SCHEDULED
             tasks.append(t)

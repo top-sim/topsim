@@ -210,9 +210,12 @@ class Scheduler:
                 if time_left > 0:
                     time_left -= 1
                 else:
-                    # self.ingest_observation.run_status = RunStatus.FINISHED
                     break
             yield self.env.timeout(1)
+
+        if RunStatus.FINISHED:
+            self.cluster.clean_up_ingest()
+
 
     def print_state(self):
         # Change this to 'workflows scheduled/workflows unscheduled'

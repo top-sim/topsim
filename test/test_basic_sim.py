@@ -51,26 +51,32 @@ class TestBasicIngest(unittest.TestCase):
 
     def testClusterIngest(self):
         self.assertEqual(0, self.env.now)
-        self.simulation.start(runtime=1)
-        self.assertEqual(1, self.simulation.cluster.ingest['completed'])
-        self.assertEqual(
-            0, len(self.simulation.cluster.resources['ingest'])
-        )
-        self.simulation.resume(until=3)
-        self.assertEqual(
-            3, self.simulation.cluster.ingest['completed']
-        )
-        self.assertEqual(
-            3, len(self.simulation.cluster.tasks['finished'])
-        )
-        # self.simulation.start(runtime=6)
+        # self.simulation.start(runtime=1)
+        # # self.assertEqual(1, len(self.simulation.cluster.resources['available']))
+        # # self.assertEqual(1, len(self.simulation.cluster.resources['ingest']))
+        # # self.assertEqual(1,len(self.simulation.cluster.tasks['running']))
+        # self.simulation.resume(until=2)
+        # # self.assertEqual(2, len(self.simulation.cluster.resources['available']))
+        # # self.assertEqual(
+        # #     0, len(self.simulation.cluster.resources['ingest'])
+        # # )
+        # self.simulation.resume(until=3)
+        # # self.assertEqual(
+        # #     3, len(self.simulation.cluster.tasks['finished'])
+        # # )
+        # #
+        # self.simulation.resume(until=5)
         # self.assertEqual(
-        #     2, self.simulation.cluster.ingest['completesd']
+        #     3, self.simulation.cluster.ingest['completed']
         # )
-        # self.assertEqual(
-        #     self.simulation.telescope.RunStatus.FINISHED,
-        #     self.simulation.telescope.observations[2].RunStatus
-        # )
+        self.simulation.start(runtime=6)
+        self.assertEqual(
+            2, self.simulation.cluster.ingest['completed']
+        )
+        self.assertEqual(
+            self.simulation.telescope.RunStatus.WAITING,
+            self.simulation.telescope.observations[2].RunStatus
+        )
 
     def testBufferIngest(self):
         self.assertEqual(0, self.simulation.env.now)
@@ -109,7 +115,7 @@ class TestBasicIngest(unittest.TestCase):
         )
         self.simulation.resume(until=8)
         self.simulation.resume(until=9)
-        self.assertEqual(0, len(self.simulation.cluster.tasks['running']))
+        self.assertEqual(1, len(self.simulation.cluster.tasks['running']))
         self.simulation.resume(until=10)
         self.simulation.resume(until=11)
         self.assertEqual(
