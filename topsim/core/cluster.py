@@ -72,9 +72,9 @@ class Cluster:
         while True:
             if not self.ingest['status']:
                 self.usage_data['ingest'] = 0
-                self.usage_data['available'] += self.ingest['demand']
-                self.usage_data['running_tasks'] -= self.ingest['demand']
-                self.usage_data['finished_tasks'] += self.ingest['demand']
+                # self.usage_data['available'] += self.ingest['demand']
+                # self.usage_data['running_tasks'] -= self.ingest['demand']
+                # self.usage_data['finished_tasks'] += self.ingest['demand']
                 self.ingest['demand'] = 0
             if len(self.tasks['waiting']) > 0:
                 for task in self.tasks['waiting']:
@@ -206,7 +206,9 @@ class Cluster:
                     # elsewhere
                     self.resources['occupied'].append(machine)
                     self.resources['available'].remove(machine)
-                self.usage_data['running_tasks'] += 1
+                    self.usage_data['available'] -= 1
+
+                    self.usage_data['running_tasks'] += 1
                 task.task_status = TaskStatus.SCHEDULED
                 ret = self.env.process(machine.run(task, self.env))
             if ret.triggered:
@@ -219,6 +221,7 @@ class Cluster:
                 else:
                     self.resources['occupied'].remove(machine)
                 self.resources['available'].append(machine)
+                self.usage_data['available'] += 1
                 task.task_status = TaskStatus.FINISHED
                 break
             else:

@@ -50,6 +50,5 @@ simulation = Simulation(
 )
 
 simulation.start(11)
-simulation.resume(14)
-simulation.resume(20)
-x=5
+# simulation.resume(14)
+simulation.resume(150)

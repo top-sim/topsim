@@ -20,6 +20,7 @@ import unittest
 import logging
 import simpy
 from topsim.core.simulation import Simulation
+from topsim.core.telescope import RunStatus
 from topsim.algorithms.scheduling import FifoAlgorithm
 
 logging.basicConfig(level="WARNING")
@@ -50,32 +51,34 @@ class TestBasicIngest(unittest.TestCase):
         )
 
     def testClusterIngest(self):
+        """
+        The basic ingest represents the edge cases for timing and scheduling
+        within the simulation, as demonstrated in this test.
+
+        There are a couple of edge cases that occur here, especially when we
+        consider that we have only 2 resources; one of these will be taken by
+        ingest, meaning that we cannot start an observation until 1 timestep
+        AFTER an ingest has finished, because the telescope will check before
+        that task is successfully removed from the cluster.
+
+        This is why we run for 6 seconds and only process 2 observations.
+
+        After we've observed 2 observations, we reach capacity on the
+        cold-buffer so we are unable to observe any more.
+
+        Returns
+        -------
+
+        """
         self.assertEqual(0, self.env.now)
-        # self.simulation.start(runtime=1)
-        # # self.assertEqual(1, len(self.simulation.cluster.resources['available']))
-        # # self.assertEqual(1, len(self.simulation.cluster.resources['ingest']))
-        # # self.assertEqual(1,len(self.simulation.cluster.tasks['running']))
-        # self.simulation.resume(until=2)
-        # # self.assertEqual(2, len(self.simulation.cluster.resources['available']))
-        # # self.assertEqual(
-        # #     0, len(self.simulation.cluster.resources['ingest'])
-        # # )
-        # self.simulation.resume(until=3)
-        # # self.assertEqual(
-        # #     3, len(self.simulation.cluster.tasks['finished'])
-        # # )
-        # #
-        # self.simulation.resume(until=5)
-        # self.assertEqual(
-        #     3, self.simulation.cluster.ingest['completed']
-        # )
         self.simulation.start(runtime=6)
         self.assertEqual(
             2, self.simulation.cluster.ingest['completed']
         )
+
         self.assertEqual(
-            self.simulation.telescope.RunStatus.WAITING,
-            self.simulation.telescope.observations[2].RunStatus
+            RunStatus.FINISHED,
+            self.simulation.telescope.observations[1].status
         )
 
     def testBufferIngest(self):
@@ -86,22 +89,18 @@ class TestBasicIngest(unittest.TestCase):
         )
         self.simulation.resume(until=2)
         self.assertEqual(
-            5, self.simulation.buffer.hot.current_capacity
+            10, self.simulation.buffer.hot.current_capacity
         )
         self.assertEqual(
             5, self.simulation.buffer.cold.current_capacity
         )
         self.assertEqual(
             1,
-            len(self.simulation.buffer.hot.observations["stored"])
+            len(self.simulation.buffer.cold.observations["stored"])
         )
         self.simulation.resume(until=3)
-        self.assertEqual(5, self.simulation.buffer.hot.current_capacity)
+        self.assertEqual(10, self.simulation.buffer.hot.current_capacity)
         self.assertEqual(0, self.simulation.buffer.cold.current_capacity)
-        self.assertEqual(
-            1,
-            len(self.simulation.buffer.hot.observations["stored"])
-        )
         self.assertEqual(
             2,
             len(self.simulation.buffer.cold.observations["stored"])
@@ -115,7 +114,7 @@ class TestBasicIngest(unittest.TestCase):
         )
         self.simulation.resume(until=8)
         self.simulation.resume(until=9)
-        self.assertEqual(1, len(self.simulation.cluster.tasks['running']))
+        self.assertEqual(0, len(self.simulation.cluster.tasks['running']))
         self.simulation.resume(until=10)
         self.simulation.resume(until=11)
         self.assertEqual(
