@@ -15,6 +15,7 @@ from topsim.core.buffer import Buffer
 from topsim.core.planner import Planner
 from topsim.algorithms.scheduling import FifoAlgorithm
 
+logging.basicConfig(level="WARNING")
 LOGGER = logging.getLogger(__name__)
 
 
@@ -128,6 +129,7 @@ class Simulation:
                 "Use resume() to continue a simulation that is already in "
                 "progress."
             )
+
         self.running = True
         if self.event_file is not None:
             self.env.process(self.monitor.run())
@@ -138,7 +140,7 @@ class Simulation:
         self.scheduler.init()
         self.env.process(self.scheduler.run())
         self.env.process(self.buffer.run())
-        # Calling env.run() invokes the processes passed in init_process()
+
         if runtime > 0:
             self.env.run(until=runtime)
         else:

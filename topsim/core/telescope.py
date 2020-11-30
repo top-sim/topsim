@@ -232,7 +232,6 @@ class Telescope:
         -------
 
         """
-        return None
 
     def observations_waiting(self):
         return sum(
@@ -410,16 +409,6 @@ def process_telescope_config(telescope_config):
             raise
     max_ingest_resources = config['telescope']['max_ingest_resources']
     return total_arrays, pipelines, observations, max_ingest_resources
-
-
-# {
-# 	"name": "emu",
-# 	"start": 0,
-# 	"duration": 10,
-# 	"demand": 36,
-# 	"workflow": "continuum",
-# 	"data_product_rate": 4
-# },
 
 
 class RunStatus(str, Enum):
