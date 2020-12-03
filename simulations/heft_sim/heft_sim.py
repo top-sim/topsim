@@ -26,11 +26,11 @@ import simpy
 from topsim.algorithms.scheduling import FifoAlgorithm
 from topsim.core.simulation import Simulation
 
-CLUSTER_CONFIG = 'test/data/config/basic_spec-10.json'
-HEFT_WORKFLOW = 'test/data/config/workflow_config.json'
+CLUSTER_CONFIG = 'simulations/heft_sim/input/basic_spec-10.json'
+HEFT_WORKFLOW = 'simulations/heft_sim/input/workflow_config.json'
 
-OBSERVATION_CONFIG = 'test/data/config/single_observation_config.json'
-BUFFER_CONFIG = 'test/data/config/buffer.json'
+OBSERVATION_CONFIG = 'simulations/heft_sim/input/single_observation_config.json'
+BUFFER_CONFIG = 'simulations/heft_sim/input/buffer.json'
 
 EVENT_FILE = 'simulations/heft_sim/output/heft_sim.trace'
 
@@ -50,5 +50,4 @@ simulation = Simulation(
 )
 
 simulation.start(11)
-# simulation.resume(14)
-simulation.resume(150)
+simulation.resume(115)

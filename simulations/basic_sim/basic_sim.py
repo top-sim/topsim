@@ -26,10 +26,10 @@ from topsim.core.simulation import Simulation
 logging.basicConfig(level="WARNING")
 LOGGER = logging.getLogger(__name__)
 
-BASIC_WORKFLOW = 'test/basic-workflow-data/basic_workflow_config.json'
-BASIC_CLUSTER = 'test/basic-workflow-data/basic_config.json'
-BASIC_BUFFER = 'test/basic-workflow-data/basic_buffer.json'
-BASIC_TELESCOPE = 'test/basic-workflow-data/basic_observation_plan.json'
+BASIC_WORKFLOW = 'simulations/basic_sim/input/basic_workflow_config.json'
+BASIC_CLUSTER = 'simulations/basic_sim/input/basic_config.json'
+BASIC_BUFFER = 'simulations/basic_sim/input/basic_buffer.json'
+BASIC_TELESCOPE = 'simulations/basic_sim/input/basic_telescope.json'
 
 EVENT_FILE = 'simulations/basic_sim/output/sim.trace'
 
@@ -48,4 +48,5 @@ simulation = Simulation(
 	EVENT_FILE,
 )
 
-simulation.start(25)
+simulation.start(16)
+simulation.resume(17)

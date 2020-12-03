@@ -72,6 +72,8 @@ class Task(object):
     #
     # def __gt__(self, other):
     # 	return self.exec_order > other.exec_order
+    def __repr__(self):
+        return str(self.id)
 
     def __hash__(self):
         return hash(self.id)
