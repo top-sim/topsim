@@ -28,3 +28,23 @@ TopSim:
 * Networkx
 * matplotlib
 * pandas 
+
+TOpSim's tests and sample simulations also use the SHADOW scheduling
+ framework, which can be found at https://github.com/myxie/shadow. 
+
+## Installing TOpSIm
+
+It is best to install TOpSim using a virtual environment from `virtualenv
+`. Running and installation using the `setup.py` file should be enough
+ to ensure that you are able to use the full codebase: 
+ 
+ ```python
+python setup.py install
+```
+
+To test all requirements are installed, run the tests using: 
+
+```python
+python -m unittest discover test
+```
+
