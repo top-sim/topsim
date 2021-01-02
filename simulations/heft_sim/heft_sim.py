@@ -26,8 +26,9 @@ import simpy
 from topsim.algorithms.scheduling import FifoAlgorithm
 from topsim.core.simulation import Simulation
 
+
 CLUSTER_CONFIG = 'simulations/heft_sim/input/basic_spec-10.json'
-HEFT_WORKFLOW = 'simulations/heft_sim/input/workflow_config.json'
+HEFT_WORKFLOW = 'simulations/heft_sim/input/workflow_config_heft_sim.json'
 
 OBSERVATION_CONFIG = 'simulations/heft_sim/input/single_observation_config.json'
 BUFFER_CONFIG = 'simulations/heft_sim/input/buffer.json'
@@ -36,7 +37,7 @@ EVENT_FILE = 'simulations/heft_sim/output/heft_sim.trace'
 
 env = simpy.Environment()
 
-planning_algorithm = 'heft'
+planning_algorithm = 'pheft'
 scheduling_algorithm = FifoAlgorithm()
 
 simulation = Simulation(

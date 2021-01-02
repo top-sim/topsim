@@ -15,36 +15,57 @@
 
 
 import json
-import seaborn as sns
 import numpy as np
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-tracefile = 'simulations/output/sim.trace'
-pickle = 'simulations/output/sim.trace.pkl'
 
-with open(tracefile, 'r') as infile:
-	trace = json.load(infile)
+sns.set_style("darkgrid")
+# tracefile = 'simulations/heft_sim/output/sim.trace'
+heft_pickle = 'simulations/heft_sim/output/heft_sim.trace-heft.pkl'
+pheft_pickle = 'simulations/heft_sim/output/heft_sim.trace-pheft.pkl'
+# with open(tracefile, 'r') as infile:
+# 	trace = json.load(infile)
 
-df_buffer = pd.DataFrame()
-df_telescope = pd.DataFrame
+df_heft = pd.read_pickle(heft_pickle)
+df_pheft = pd.read_pickle(pheft_pickle)
 
-df = pd.read_pickle(pickle)
+fig, axs = plt.subplots(nrows=2, ncols=2)
 
-for timestamp in trace:
-	# print('Time @ {}'.format(timestamp['timestamp']))
+sns.lineplot(
+    data=df_heft, x=df_heft.index, y="running_tasks", ax=axs[0, 0]
+)
+sns.lineplot(
+    data=df_heft, x=df_heft.index, y="available_resources", ax=axs[0, 1]
+)
+sns.lineplot(
+    data=df_heft, x=df_heft.index, y="ingest_resources", ax=axs[0, 1]
+)
+sns.lineplot(
+    data=df_heft, x=df_heft.index, y="hotbuffer_current_capacity", ax=axs[1, 0]
+)
+sns.lineplot(
+    data=df_heft, x=df_heft.index, y="coldbuffer_current_capacity", ax=axs[1, 1]
+)
 
-	print('\tcluster_state:')
-	for element in timestamp['cluster_state']:
-		for m in timestamp['cluster_state']['machines']:
-			print('\t\t{}'.format(m))
-	print('\ttelescope_state:')
-	for element in timestamp['telescope_state']:
-		print('\t\t{}: {}'.format(
-			element, timestamp['telescope_state'][element]
-		))
-	print('\tscheduler_state:')
-	print('\t\t{}'.format(timestamp['scheduler_state']))
-	print('\t{}'.format(timestamp['buffer_state']))
-	for element in timestamp['buffer_state']:
-		print('\t\t{}'.format(timestamp['buffer_state'][element]))
+plt.show()
 
+# for timestamp in trace:
+# 	# print('Time @ {}'.format(timestamp['timestamp']))
+#
+# 	print('\tcluster_state:')
+# 	for element in timestamp['cluster_state']:
+# 		for m in timestamp['cluster_state']['machines']:
+# 			print('\t\t{}'.format(m))
+# 	print('\ttelescope_state:')
+# 	for element in timestamp['telescope_state']:
+# 		print('\t\t{}: {}'.format(
+# 			element, timestamp['telescope_state'][element]
+# 		))
+# 	print('\tscheduler_state:')
+# 	print('\t\t{}'.format(timestamp['scheduler_state']))
+# 	print('\t{}'.format(timestamp['buffer_state']))
+# 	for element in timestamp['buffer_state']:
+# 		print('\t\t{}'.format(timestamp['buffer_state'][element]))
+#

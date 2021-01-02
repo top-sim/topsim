@@ -37,7 +37,8 @@ class Monitor(object):
             # self.df = self.df.append(cluster)
             # x = [buffer, self.df]
             # self.df = self.df.merge(buffer, how='left',sort=False)
-            self.df.to_pickle("{}.pkl".format(self.event_file))
+            alg = self.simulation.planner.algorithm
+            self.df.to_pickle("{0}-{1}.pkl".format(self.event_file,alg))
             yield self.env.timeout(1)
 
     def write_to_file(self):

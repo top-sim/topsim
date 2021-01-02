@@ -40,6 +40,7 @@ class Task(object):
         :param tid: ID of the Task object
         :param env: Simulation environment to which the task will be added, and where it will run as a process
         """
+
         self.id = tid
         self.env = env
         self.est = 0

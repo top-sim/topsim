@@ -8,6 +8,7 @@ from topsim.core.task import Task
 from shadow.models.workflow import Workflow as ShadowWorkflow
 from shadow.models.environment import Environment as ShadowEnvironment
 from shadow.algorithms.heuristic import heft as shadow_heft
+from shadow.algorithms.heuristic import pheft as shadow_pheft
 
 logger = logging.getLogger(__name__)
 
@@ -96,6 +97,8 @@ class WorkflowPlan:
         self.id = wid
         if algorithm is 'heft':
             self.solution = shadow_heft(workflow)
+        elif algorithm is 'pheft':
+            self.solution = shadow_pheft(workflow)
         else:
             sys.exit("Other algorithms are not supported")
 
