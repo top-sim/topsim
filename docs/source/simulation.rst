@@ -14,4 +14,6 @@ initialised prior to a simulations;
 There are a number of requirements that must be True for an observation to
 commence on the telescope:
 
-*ljjjkjk
+Simulation Setup and configuration
+==================================
+

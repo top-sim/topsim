@@ -18,6 +18,17 @@ from topsim.algorithms.scheduling import FifoAlgorithm
 logging.basicConfig(level="WARNING")
 LOGGER = logging.getLogger(__name__)
 
+class Config:
+    """
+    Process the configuration of the current simulation
+    """
+    # TODO Move to a single-JSON config file. 
+    def __init__(self, instrument, cluster, buffer, planning, scheduling):
+        self.instrument = instrument
+        self.cluster = cluster
+        self.buffer = buffer
+        self.planning = planning
+        self.scheduling = scheduling
 
 class Simulation:
     """
@@ -61,7 +72,6 @@ class Simulation:
     -------
 
 
-
     Raises
     ------
     """
@@ -69,19 +79,22 @@ class Simulation:
     def __init__(
             self,
             env,
-            telescope_config,
-            cluster_config,
-            buffer_config,
-            planning_algorithm,
-            scheduling_algorithm,
-            event_file,
+            config
+            # telescope_config,
+            # cluster_config,
+            # buffer_config,
+            # planning_algorithm,
+            # scheduling_algorithm,
+            # event_file = 'sim.trace',
     ):
 
         self.env = env
+
+        if 'telescope' not in config:
+            raise KeyError('Parameter "config" needs element ')
         # Event file setup
-        self.event_file = event_file
         if event_file is not None:
-            self.monitor = Monitor(self)
+            self.monitor = Monitor(self,event_file)
         # Process necessary config files
 
         # Initiaise Actor and Resource objects
@@ -131,9 +144,7 @@ class Simulation:
             )
 
         self.running = True
-        if self.event_file is not None:
-            self.env.process(self.monitor.run())
-
+        self.env.process(self.monitor.run())
         self.env.process(self.telescope.run())
         self.env.process(self.cluster.run())
 
@@ -175,3 +186,7 @@ class Simulation:
 
     def is_finished(self):
         return False
+
+    @staticmethod
+    def _split_monolithic_config(self, json):
+        return json

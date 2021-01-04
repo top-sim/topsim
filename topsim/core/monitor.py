@@ -7,10 +7,10 @@ logger = logging.getLogger(__name__)
 
 
 class Monitor(object):
-    def __init__(self, simulation):
+    def __init__(self, simulation,event_file):
         self.simulation = simulation
         self.env = simulation.env
-        self.event_file = simulation.event_file
+        self.event_file = event_file
         self.events = []
         self.df = pd.DataFrame()
 
