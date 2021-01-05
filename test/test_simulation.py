@@ -12,7 +12,7 @@ TELESCOPE_CONFIG = 'test/data/config/observations.json'
 CLUSTER_CONFIG = 'test/data/config/basic_spec-10.json'
 BUFFER_CONFIG = 'test/data/config/buffer.json'
 EVENT_FILE = 'test/data/output/sim.trace'
-
+CONFIG = 'test/data/config/basic_simulation'
 
 class TestSimulationConfig(unittest.TestCase):
     """
@@ -25,6 +25,7 @@ class TestSimulationConfig(unittest.TestCase):
         self.env = simpy.Environment()
         self.planning_algorithm = 'heft'
         self.scheduling_algorithm = FifoAlgorithm
+        self.algorithm_map = {'heft': 'heft', 'fifo': FifoAlgorithm}
 
     def tearDown(self):
         pass

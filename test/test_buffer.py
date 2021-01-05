@@ -19,6 +19,7 @@ import json
 import simpy
 
 from topsim.common import data as test_data
+from topsim.core.config import Config
 from topsim.core.planner import Planner
 from topsim.core.telescope import Observation, RunStatus
 from topsim.core.buffer import Buffer
@@ -31,25 +32,22 @@ OBS_DEMAND = 15
 OBS_WORKFLOW = test_data.test_buffer_workflow
 PLAN_ALGORITHM = test_data.planning_algorithm
 
-CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
-BUFFER_CONFIG = 'test/data/config/buffer.json'
-BUFFER_NOFILE = "test/data/config/buffer_config.json"  # Does not exist
-BUFFER_INCORRECT_JSON = "test/data/config/sneaky.json"
-BUFFER_NOT_JSON = "test/data/config/oops.txt"
+CONFIG = "test/data/config/basic_simulation.json"
 
 
 class TestBufferConfig(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
-        self.cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
+        self.config = Config(CONFIG)
+        self.cluster = Cluster(env=self.env, config=self.config)
 
     def testHotBufferConfig(self):
         """
         Process the Hot Buffer section of the config file
         """
         buffer = Buffer(
-            env=self.env, cluster=self.cluster, config=BUFFER_CONFIG
+            env=self.env, cluster=self.cluster, config=self.config
         )
         self.assertEqual(500, buffer.hot.total_capacity)
         self.assertEqual(500, buffer.hot.current_capacity)
@@ -61,33 +59,11 @@ class TestBufferConfig(unittest.TestCase):
         :return:
         """
         buffer = Buffer(
-            env=self.env, cluster=self.cluster, config=BUFFER_CONFIG
+            env=self.env, cluster=self.cluster, config=self.config
         )
         self.assertEqual(250, buffer.cold.total_capacity)
         self.assertEqual(250, buffer.cold.current_capacity)
         self.assertEqual(2, buffer.cold.max_data_rate)
-
-    def testBufferConfigNoFile(self):
-        """
-        Attempt to initialise a cluster with the wrong file
-        :return: None
-        """
-        config = BUFFER_NOFILE
-        self.assertRaises(
-            FileNotFoundError, Buffer, self.env, self.cluster, config
-        )
-
-    def testBufferConfigIncorrectJSON(self):
-        config = BUFFER_INCORRECT_JSON
-        self.assertRaises(
-            KeyError, Buffer, self.env, self.cluster, config
-        )
-
-    def testBufferConfigNotJSON(self):
-        config = BUFFER_NOT_JSON
-        self.assertRaises(
-            json.JSONDecodeError, Buffer, self.env, self.cluster, config
-        )
 
 
 class TestBufferIngestDataStream(unittest.TestCase):
@@ -104,8 +80,9 @@ class TestBufferIngestDataStream(unittest.TestCase):
         :return: Nothing
         """
         self.env = simpy.Environment()
-        self.cluster = Cluster(self.env, CLUSTER_CONFIG)
-        self.buffer = Buffer(self.env, self.cluster, BUFFER_CONFIG)
+        self.config = Config(CONFIG)
+        self.cluster = Cluster(env=self.env, config=self.config)
+        self.buffer = Buffer(self.env, self.cluster, self.config)
         self.observation = Observation(
             name='test_observation',
             start=OBS_START_TME,
@@ -230,10 +207,11 @@ class TestBufferRequests(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
-        self.cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
+        self.config = Config(CONFIG)
+        self.cluster = Cluster(env=self.env, config=self.config)
 
         self.buffer = Buffer(
-            env=self.env, cluster=self.cluster, config=BUFFER_CONFIG
+            env=self.env, cluster=self.cluster, config=self.config
         )
         self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
         self.observation = Observation(

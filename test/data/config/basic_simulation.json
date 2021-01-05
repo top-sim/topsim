@@ -1,0 +1,108 @@
+{
+	"instrument": {
+		"telescope": {
+			"total_arrays": 36,
+			"max_ingest_resources": 5,
+			"pipelines": {
+				"continuum": {
+					"demand": 5
+				},
+				"spectral": {
+					"demand": 10
+				},
+				"pulsar": {
+					"demand": 5
+				}
+			},
+		"observations": [
+			{
+				"name": "emu",
+				"start": 0,
+				"duration": 10,
+				"demand": 36,
+				"workflow": "test/data/config/workflow_config.json",
+				"type": "continuum",
+				"data_product_rate": 4
+			},
+			{
+				"name": "dingo",
+				"start": 15,
+				"duration": 20,
+				"demand": 18,
+				"workflow": "test/data/config/workflow_config.json",
+				"type": "spectral",
+				"data_product_rate": 5
+			}
+		]
+		}
+	},
+	"cluster": {
+		"header": {
+			"time": "false",
+			"gen_specs": {
+				"file": "recipes/routput/basic_spec-10.json",
+				"seed": 20,
+				"range": "[(50, 100)]",
+				"heterogeneity": 1.0,
+				"multiplier": 1
+			}
+		},
+		"system": {
+			"resources": {
+				"cat0_m0": {
+					"flops": 84,
+					"rates": 10
+				},
+				"cat0_m1": {
+					"flops": 84,
+					"rates": 10
+				},
+				"cat0_m2": {
+					"flops": 84,
+					"rates": 10
+				},
+				"cat0_m3": {
+					"flops": 84,
+					"rates": 10
+				},
+				"cat0_m4": {
+					"flops": 84,
+					"rates": 10
+				},
+				"cat0_m5": {
+					"flops": 84,
+					"rates": 10
+				},
+				"cat0_m6": {
+					"flops": 84,
+					"rates": 10
+				},
+				"cat0_m7": {
+					"flops": 84,
+					"rates": 10
+				},
+				"cat0_m8": {
+					"flops": 84,
+					"rates": 10
+				},
+				"cat0_m9": {
+					"flops": 84,
+					"rates": 10
+				}
+			},
+			"bandwidth": 1.0
+		}
+	},
+	"buffer": {
+		"hot": {
+			"capacity": 500,
+			"max_ingest_rate": 5
+		},
+		"cold": {
+			"capacity": 250,
+			"max_data_rate": 2
+		}
+	},
+	"planning": "heft",
+	"scheduling": "fifo"
+}

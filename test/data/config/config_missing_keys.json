@@ -1,0 +1,13 @@
+{
+	"instrument": {
+		"not_a_telescope": {}
+	},
+	"cluster": {
+		"not_a_cluster": {}
+	},
+	"buffer": {
+		"not_a_buffer": {}
+	},
+	"planning": "",
+	"scheduling": ""
+}

@@ -61,14 +61,14 @@ class Buffer:
             The environment object for the Simulation
         cluster : topsim.core.cluster.Cluster
             Cluster (Actor) object for the simulation
-        config : str
-            path to the Buffer JSON configuration file
+        config : topsim.core.config.Config
+            Config object
         """
         self.env = env
         self.cluster = cluster
         # We are reading this from a file, check it works
         try:
-            self.hot, self.cold = process_buffer_config(config)
+            self.hot, self.cold = config.parse_buffer_config()
         except OSError:
             print("Error processing Buffer config file")
             raise
@@ -95,6 +95,7 @@ class Buffer:
                 self.hot.current_capacity,
                 self.cold.current_capacity
             )
+
             if self.hot.has_waiting_observations():
                 self.env.process(self.move_hot_to_cold())
             yield self.env.timeout(TIMESTEP)

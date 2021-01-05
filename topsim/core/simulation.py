@@ -7,6 +7,8 @@ finished.
 
 
 import logging
+import json
+from topsim.core.config import Config
 from topsim.core.monitor import Monitor
 from topsim.core.scheduler import Scheduler
 from topsim.core.cluster import Cluster
@@ -18,17 +20,6 @@ from topsim.algorithms.scheduling import FifoAlgorithm
 logging.basicConfig(level="WARNING")
 LOGGER = logging.getLogger(__name__)
 
-class Config:
-    """
-    Process the configuration of the current simulation
-    """
-    # TODO Move to a single-JSON config file. 
-    def __init__(self, instrument, cluster, buffer, planning, scheduling):
-        self.instrument = instrument
-        self.cluster = cluster
-        self.buffer = buffer
-        self.planning = planning
-        self.scheduling = scheduling
 
 class Simulation:
     """
@@ -79,13 +70,9 @@ class Simulation:
     def __init__(
             self,
             env,
-            config
-            # telescope_config,
-            # cluster_config,
-            # buffer_config,
-            # planning_algorithm,
-            # scheduling_algorithm,
-            # event_file = 'sim.trace',
+            config,
+            algorithm_map,
+            event_file
     ):
 
         self.env = env
@@ -98,7 +85,7 @@ class Simulation:
         # Process necessary config files
 
         # Initiaise Actor and Resource objects
-
+        cfg = Config(config)
         self.cluster = Cluster(env, cluster_config)
         self.buffer = Buffer(env, self.cluster, config=buffer_config)
         self.planner = Planner(env, planning_algorithm, self.cluster)

@@ -16,6 +16,7 @@
 import unittest
 import simpy
 
+from topsim.core.config import Config
 from topsim.core.telescope import Telescope
 from topsim.core.scheduler import Scheduler
 from topsim.core.buffer import Buffer
@@ -25,14 +26,15 @@ from topsim.core.planner import Planner
 OBSERVATION_CONFIG = 'test/data/config/observations.json'
 CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
 BUFFER_CONFIG = 'test/data/config/buffer.json'
-
+CONFIG = 'test/data/config/basic_simulation.json'
 
 class TestTelescopeConfig(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
-        cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
-        buffer = Buffer(env=self.env, cluster=cluster, config=BUFFER_CONFIG)
+        self.config = Config(CONFIG)
+        cluster = Cluster(env=self.env, config=self.config)
+        buffer = Buffer(env=self.env, cluster=cluster, config=self.config)
         self.scheduler = Scheduler(
             env=self.env, buffer=buffer, cluster=cluster, algorithm=None
         )
@@ -40,7 +42,7 @@ class TestTelescopeConfig(unittest.TestCase):
 
     def testTelescopeBasicConfig(self):
         telescope = Telescope(
-            env=self.env, config=OBSERVATION_CONFIG,
+            env=self.env, config=self.config,
             planner=None, scheduler=self.scheduler
         )
         self.assertEqual(36, telescope.total_arrays)
@@ -51,9 +53,11 @@ class TestTelescopeIngest(unittest.TestCase):
 
     def setUp(self) -> None:
         self.env = simpy.Environment()
-        self.cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
+        self.config = Config(CONFIG)
+
+        self.cluster = Cluster(env=self.env, config=self.config)
         self.buffer = Buffer(env=self.env, cluster=self.cluster,
-                             config=BUFFER_CONFIG)
+                             config=self.config)
         self.scheduler = Scheduler(
             env=self.env, buffer=self.buffer, cluster=self.cluster,
             algorithm=None
@@ -62,7 +66,7 @@ class TestTelescopeIngest(unittest.TestCase):
 
     def testIngest(self):
         telescope = Telescope(
-            env=self.env, config=OBSERVATION_CONFIG,
+            env=self.env, config=self.config,
             planner=self.planner, scheduler=self.scheduler
         )
         self.assertEqual(0, telescope.telescope_use)

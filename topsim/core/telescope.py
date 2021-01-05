@@ -40,13 +40,13 @@ class Telescope:
     env : Simpy.Environment object
         The simulation environment
 
-    config : str
-        Path string to the JSON configuration file
+    config : core.config.Config object
+        Config object with stored simulation configuration
 
-    planner :  core.Planner object
+    planner :  core.planner.Planner object
         The Planner actor for the current simulation
 
-    scheduler : core.Scheduler object
+    scheduler : core.scheduler.Scheduler object
         The Scheduler actor for the current simulation
 
     Attributes
@@ -91,7 +91,7 @@ class Telescope:
                 self.pipelines,
                 self.observations,
                 self.max_ingest
-            ) = process_telescope_config(config)
+            ) = config.parse_telescope_config()
         except OSError:
             raise
         self.scheduler = scheduler
@@ -127,6 +127,7 @@ class Telescope:
         self.env.timeout(1)
             A single simulation timestep
         """
+
         while self.has_observations_to_process():
             for observation in self.observations:
                 capacity = self.total_arrays - self.telescope_use

@@ -18,6 +18,7 @@ import logging
 import json
 import simpy
 
+from topsim.core.config import Config
 from topsim.core.cluster import Cluster
 from topsim.core.telescope import Telescope, Observation
 from topsim.core.task import TaskStatus
@@ -29,7 +30,7 @@ CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
 CLUSTER_NOFILE = "test/data/config/cluster_config.json"  # Does not exist
 CLUSTER_INCORRECT_JSON = "test/data/config/sneaky.json"
 CLUSTER_NOT_JSON = "test/data/config/oops.txt"
-
+CONFIG = "test/data/cluster/basic_simulation.json"
 OBS_START_TME = 0
 OBS_DURATION = 10
 OBS_DEMAND = 15
@@ -45,41 +46,22 @@ class TestClusterConfig(unittest.TestCase):
         """
         Initialise a Cluster object with the machine config file
         """
-        cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
+        config = Config(CONFIG)
+        cluster = Cluster(env=self.env, config=config)
         # This is a homogeneous file, so each flops value should be 95
         for machine in cluster.machines:
             # machine is an object instance of Machine
             self.assertEqual(84, machine.cpu)
             self.assertEqual(10, machine.bandwidth)
 
-    def testClusterConfigNoFile(self):
-        """
-        Attempt to initialise a cluster with the wrong file
-        :return: None
-        """
-        config = CLUSTER_NOFILE
-        self.assertRaises(
-            FileNotFoundError, Cluster, self.env, config
-        )
-
-    def testClusterConfigIncorrectJSON(self):
-        config = CLUSTER_INCORRECT_JSON
-        self.assertRaises(
-            KeyError, Cluster, self.env, config
-        )
-
-    def testClusterConfigNotJSON(self):
-        config = CLUSTER_NOT_JSON
-        self.assertRaises(
-            json.JSONDecodeError, Cluster, self.env, config
-        )
-
 
 class TestIngest(unittest.TestCase):
 
     def setUp(self) -> None:
         self.env = simpy.Environment()
-        self.cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
+        config = Config(CONFIG)
+
+        self.cluster = Cluster(env=self.env, config=config)
         self.observation = Observation(
             'planner_observation',
             OBS_START_TME,

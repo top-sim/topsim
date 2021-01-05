@@ -17,6 +17,7 @@ import unittest
 import simpy
 import logging
 
+from topsim.core.config import Config
 from topsim.core.telescope import Observation, Telescope
 from topsim.core.scheduler import Scheduler
 from topsim.core.cluster import Cluster
@@ -30,12 +31,8 @@ from topsim.common import data as test_data
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
-OBSERVATION_CONFIG = 'test/data/config/observations.json'
-BUFFER_CONFIG = 'test/data/config/buffer.json'
-CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
-
-HEFT_CLUSTER_CONFIG = 'test/data/config/system_config.json'
-HEFT_WORKFLOW = 'test/data/config/workflow_config.json'
+CONFIG = "test/data/config/basic_simulation.json"
+HEFT_CONFIG = "test/data/config/heft_single_observation_simulation.json"
 # Globals
 OBS_START_TME = 0
 OBS_DURATION = 10
@@ -57,6 +54,7 @@ class TestSchedulerIngest(unittest.TestCase):
 
     def setUp(self) -> None:
         self.env = simpy.Environment()
+        config = Config(CONFIG)
         self.cluster = Cluster(self.env, CLUSTER_CONFIG)
         self.buffer = Buffer(self.env, self.cluster, BUFFER_CONFIG)
         self.scheduler = Scheduler(
@@ -170,10 +168,11 @@ class TestSchedulerFIFO(unittest.TestCase):
     def setUp(self):
         self.env = simpy.Environment()
         sched_algorithm = FifoAlgorithm()
-        self.cluster = Cluster(self.env, HEFT_CLUSTER_CONFIG)
+        config = Config(HEFT_CONFIG)
+        self.cluster = Cluster(self.env, config)
         self.planner = Planner(self.env, PLANNING_ALGORITHM,
                                self.cluster)
-        self.buffer = Buffer(self.env, self.cluster, BUFFER_CONFIG)
+        self.buffer = Buffer(self.env, self.cluster, config)
         self.observations = [
             Observation(
                 'scheduler_observation',
@@ -188,7 +187,7 @@ class TestSchedulerFIFO(unittest.TestCase):
         self.scheduler = Scheduler(self.env, self.buffer,
                                    self.cluster, sched_algorithm)
         self.telescope = Telescope(
-            self.env, OBSERVATION_CONFIG, self.scheduler, self.planner
+            self.env, config, self.scheduler, self.planner
         )
 
     def tearDown(self):

@@ -12,13 +12,13 @@ class Cluster:
 
     Attributes
     ----------
-    says_str : str
+    machines : dict
         a formatted string to print out what the animal says
-    name : str
+    resources : dict
         the name of the animal
-    sound : str
+    tasks : dict
         the sound that the animal makes
-    num_legs : int
+    ingest : int
         the number of legs the animal has (default 4)
 
     Methods
@@ -27,16 +27,12 @@ class Cluster:
         Prints the animals name and what sound it makes
     """
 
-    def __init__(self, env, spec):
+    def __init__(self, env, config):
         """
         :param env:
         :param spec:
         """
-        try:
-            self.machines, self.system_bandwidth = \
-                config.process_machine_config(spec)
-        except OSError:
-            raise
+        self.machines, self.system_bandwidth = config.parse_cluster_config()
         self.dmachine = {machine.id: machine for machine in self.machines}
 
         self.resources = {
