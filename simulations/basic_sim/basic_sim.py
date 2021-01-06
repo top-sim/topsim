@@ -26,26 +26,20 @@ from topsim.core.simulation import Simulation
 logging.basicConfig(level="WARNING")
 LOGGER = logging.getLogger(__name__)
 
-BASIC_WORKFLOW = 'simulations/basic_sim/input/basic_workflow_config.json'
-BASIC_CLUSTER = 'simulations/basic_sim/input/basic_config.json'
-BASIC_BUFFER = 'simulations/basic_sim/input/basic_buffer.json'
-BASIC_TELESCOPE = 'simulations/basic_sim/input/basic_telescope.json'
-
+BASIC_CONFIG = 'simulations/basic_sim/input/basic_simulation.json'
 EVENT_FILE = 'simulations/basic_sim/output/sim.trace'
 
 # env = simpy.RealtimeEnvironment(factor=0.5, strict=False)
 env = simpy.Environment()
 event_file = EVENT_FILE
 planning_algorithm = 'heft'
-scheduling_algorithm = FifoAlgorithm()
+scheduling_algorithm = FifoAlgorithm
+algorith_map = {'heft':planning_algorithm, 'fifo': scheduling_algorithm}
 simulation = Simulation(
 	env,
-	BASIC_TELESCOPE,
-	BASIC_CLUSTER,
-	BASIC_BUFFER,
-	planning_algorithm,
-	scheduling_algorithm,
-	EVENT_FILE,
+	BASIC_CONFIG,
+	algorith_map,
+	EVENT_FILE
 )
 
 simulation.start(16)
