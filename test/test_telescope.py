@@ -26,7 +26,7 @@ from topsim.core.planner import Planner
 OBSERVATION_CONFIG = 'test/data/config/observations.json'
 CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
 BUFFER_CONFIG = 'test/data/config/buffer.json'
-CONFIG = 'test/data/config/basic_simulation.json'
+CONFIG = 'test/data/config/standard_simulation.json'
 
 class TestTelescopeConfig(unittest.TestCase):
 

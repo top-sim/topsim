@@ -22,7 +22,7 @@ import json
 
 from topsim.core.config import Config
 
-CONFIG = "test/data/cluster/basic_simulation.json"
+CONFIG = "test/data/config/standard_simulation.json"
 NOFILE = "test/data/config/cluster_config.json"  # Does not exist
 INCORRECT_JSON = "test/data/config/sneaky.json"
 NOT_JSON = "test/data/config/oops.txt"

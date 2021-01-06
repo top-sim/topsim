@@ -14,17 +14,26 @@
 					"demand": 5
 				}
 			},
-			"observations": [
-				{
-					"name": "emu",
-					"start": 0,
-					"duration": 10,
-					"demand": 36,
-					"workflow": "test/data/config/workflow_config.json",
-					"type": "continuum",
-					"data_product_rate": 2
-				}
-			]
+		"observations": [
+			{
+				"name": "emu",
+				"start": 0,
+				"duration": 10,
+				"demand": 36,
+				"workflow": "test/data/config/workflow_config_heft_sim.json",
+				"type": "continuum",
+				"data_product_rate": 4
+			},
+			{
+				"name": "dingo",
+				"start": 15,
+				"duration": 20,
+				"demand": 18,
+				"workflow": "test/data/config/workflow_config_heft_sim.json",
+				"type": "spectral",
+				"data_product_rate": 5
+			}
+		]
 		}
 	},
 	"cluster": {

@@ -26,11 +26,7 @@ from topsim.core.task import TaskStatus
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
-CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
-CLUSTER_NOFILE = "test/data/config/cluster_config.json"  # Does not exist
-CLUSTER_INCORRECT_JSON = "test/data/config/sneaky.json"
-CLUSTER_NOT_JSON = "test/data/config/oops.txt"
-CONFIG = "test/data/cluster/basic_simulation.json"
+CONFIG = "test/data/config/standard_simulation.json"
 OBS_START_TME = 0
 OBS_DURATION = 10
 OBS_DEMAND = 15

@@ -20,11 +20,12 @@
 					"start": 0,
 					"duration": 10,
 					"demand": 36,
-					"workflow": "test/data/config/workflow_config_heft_sim.json",
+					"workflow": "test/data/config/workflow_config.json",
 					"type": "continuum",
 					"data_product_rate": 2
 				}
 			]
+		}
 	},
 	"cluster": {
 		"header": {

@@ -31,7 +31,8 @@ from topsim.common import data as test_data
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
-CONFIG = "test/data/config/basic_simulation.json"
+CONFIG = "test/data/config/standard_simulation.json"
+INTEGRATION = "test/data/config/integration_simulation.json"
 HEFT_CONFIG = "test/data/config/heft_single_observation_simulation.json"
 # Globals
 OBS_START_TME = 0
@@ -55,33 +56,22 @@ class TestSchedulerIngest(unittest.TestCase):
     def setUp(self) -> None:
         self.env = simpy.Environment()
         config = Config(CONFIG)
-        self.cluster = Cluster(self.env, CLUSTER_CONFIG)
-        self.buffer = Buffer(self.env, self.cluster, BUFFER_CONFIG)
+        self.cluster = Cluster(self.env, config)
+        self.buffer = Buffer(self.env, self.cluster, config)
         self.scheduler = Scheduler(
             self.env, self.buffer, self.cluster, FifoAlgorithm
         )
+        planner = None
+        self.telescope = Telescope(self.env, config, planner, self.scheduler)
 
     def testSchdulerCheckIngestReady(self):
         """
         Check the return status of check_ingest_capacity is correct
         """
-        pipelines = {
-            "continuum": {
-                "demand": 5
-            }
-        }
-        observation = Observation(
-            'planner_observation',
-            OBS_START_TME,
-            OBS_DURATION,
-            OBS_DEMAND,
-            OBS_WORKFLOW,
-            type="continuum",
-            data_rate=2
-        )
+        pipelines = self.telescope.pipelines
+        observation = self.telescope.observations[0]
 
-        max_ingest = 5
-
+        max_ingest = self.telescope.max_ingest
         # There should be capacity
         self.assertEqual(0.0, self.env.now)
         ret = self.scheduler.check_ingest_capacity(
@@ -108,21 +98,9 @@ class TestSchedulerIngest(unittest.TestCase):
         Returns
         -------
         """
-        pipelines = {
-            "continuum": {
-                "demand": 5
-            }
-        }
-        max_ingest = 5
-        observation = Observation(
-            'planner_observation',
-            OBS_START_TME,
-            OBS_DURATION,
-            OBS_DEMAND,
-            OBS_WORKFLOW,
-            type="continuum",
-            data_rate=2
-        )
+        pipelines = self.telescope.pipelines
+        max_ingest = self.telescope.max_ingest
+        observation = self.telescope.observations[0]
 
         ready_status = self.scheduler.check_ingest_capacity(
             observation,
@@ -132,21 +110,22 @@ class TestSchedulerIngest(unittest.TestCase):
         self.env.process(self.cluster.run())
         self.env.process(self.buffer.run())
         observation.status = RunStatus.WAITING
-        status = self.env.process(self.scheduler.allocate_ingest(
-            observation,
-            pipelines
-        )
+        status = self.env.process(
+            self.scheduler.allocate_ingest(
+                observation,
+                pipelines
+            )
         )
 
         self.env.run(until=1)
         self.assertEqual(5, len(self.cluster.resources['available']))
         # After 1 timestep, data in the HotBuffer should be 2
-        self.assertEqual(498, self.buffer.hot.current_capacity)
-        self.env.run(until=20)
+        self.assertEqual(496, self.buffer.hot.current_capacity)
+        self.env.run(until=30)
         self.assertEqual(10, len(self.cluster.resources['available']))
         self.assertEqual(5, len(self.cluster.tasks['finished']))
         self.assertEqual(500, self.buffer.hot.current_capacity)
-        self.assertEqual(230, self.buffer.cold.current_capacity)
+        self.assertEqual(210, self.buffer.cold.current_capacity)
 
 
 """
@@ -173,17 +152,6 @@ class TestSchedulerFIFO(unittest.TestCase):
         self.planner = Planner(self.env, PLANNING_ALGORITHM,
                                self.cluster)
         self.buffer = Buffer(self.env, self.cluster, config)
-        self.observations = [
-            Observation(
-                'scheduler_observation',
-                OBS_START_TME,
-                OBS_DURATION,
-                OBS_DEMAND,
-                OBS_WORKFLOW,
-                type='continuum',
-                data_rate=2
-            )
-        ]
         self.scheduler = Scheduler(self.env, self.buffer,
                                    self.cluster, sched_algorithm)
         self.telescope = Telescope(
@@ -226,7 +194,7 @@ class TestSchedulerFIFO(unittest.TestCase):
 
         # self.assertFalse(self.scheduler.allocate_tasks())
 
-        curr_obs = self.observations[0]
+        curr_obs = self.telescope.observations[0]
         self.scheduler.current_observation = curr_obs
         gen = self.scheduler.allocate_tasks()
         self.assertRaises(RuntimeError, next, gen)
@@ -260,34 +228,38 @@ class TestSchedulerFIFO(unittest.TestCase):
 class TestSchedulerIntegration(unittest.TestCase):
 
     def setUp(self):
-
         self.env = simpy.Environment()
-        self.cluster = Cluster(self.env, CLUSTER_CONFIG)
-        self.buffer = Buffer(self.env, self.cluster, BUFFER_CONFIG)
+        config = Config(INTEGRATION)
+        self.cluster = Cluster(self.env, config)
+        self.buffer = Buffer(self.env, self.cluster, config)
         self.planner = Planner(self.env, PLANNING_ALGORITHM,
                                self.cluster)
 
         self.scheduler = Scheduler(
             self.env, self.buffer, self.cluster, FifoAlgorithm()
         )
+        self.telescope = Telescope(
+            self.env, config, self.planner, self.scheduler
+        )
 
     def test_FIFO_with_buffer(self):
-
-        pipelines = {
-            "continuum": {
-                "demand": 5
-            }
-        }
+        # pipelines = {
+        #     "continuum": {
+        #         "demand": 5
+        #     }
+        # }
+        pipelines = self.telescope.pipelines
         max_ingest = 5
-        observation = Observation(
-            'planner_observation',
-            OBS_START_TME,
-            OBS_DURATION,
-            OBS_DEMAND,
-            "test/data/config/workflow_config_heft_sim.json",
-            type="continuum",
-            data_rate=2
-        )
+        # observation = Observation(
+        #     'planner_observation',
+        #     OBS_START_TME,
+        #     OBS_DURATION,
+        #     OBS_DEMAND,
+        #     "test/data/config/workflow_config_heft_sim.json",
+        #     type="continuum",
+        #     data_rate=4
+        # )
+        observation = self.telescope.observations[0]
 
         ready_status = self.scheduler.check_ingest_capacity(
             observation,
@@ -311,18 +283,11 @@ class TestSchedulerIntegration(unittest.TestCase):
 
         self.assertEqual(5, len(self.cluster.resources['available']))
         # After 1 timestep, data in the HotBuffer should be 2
-        self.assertEqual(498, self.buffer.hot.current_capacity)
-        self.env.run(until=20)
+        self.assertEqual(496, self.buffer.hot.current_capacity)
+        self.env.run(until=30)
         self.assertEqual(5, len(self.cluster.tasks['finished']))
         self.assertEqual(500, self.buffer.hot.current_capacity)
-        self.assertEqual(230, self.buffer.cold.current_capacity)
-        self.env.run(until=50)
-        # self.assertGreater(
-        #     4, len(self.cluster.tasks['finished'])
-        # )
-        self.env.run(until=100)
-        self.env.run(until=121)
+        self.assertEqual(210, self.buffer.cold.current_capacity)
+        self.env.run(until=131)
 
         self.assertEqual(250, self.buffer.cold.current_capacity)
-
-

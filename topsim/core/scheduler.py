@@ -285,17 +285,13 @@ class Scheduler:
                 yield self.env.timeout(TIMESTEP)
             else:
                 # Runs the task on the machie
-                # task.machine = machine
                 ret = self.env.process(
                     self.cluster.allocate_task_to_cluster(task, machine)
                 )
                 task.task_status = TaskStatus.SCHEDULED
-        yield self.env.timeout(TIMESTEP)
+                yield self.env.timeout(TIMESTEP)
 
-    def find_appropriate_machine_in_cluster(self, machine_id):
-        for machine in self.cluster.machines:
-            if machine.id == machine_id:
-                return machine
+        yield self.env.timeout(TIMESTEP)
 
 
 class SchedulerStatus(Enum):

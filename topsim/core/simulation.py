@@ -77,8 +77,6 @@ class Simulation:
 
         self.env = env
 
-        if 'telescope' not in config:
-            raise KeyError('Parameter "config" needs element ')
         # Event file setup
         if event_file is not None:
             self.monitor = Monitor(self,event_file)
@@ -86,15 +84,17 @@ class Simulation:
 
         # Initiaise Actor and Resource objects
         cfg = Config(config)
-        self.cluster = Cluster(env, cluster_config)
-        self.buffer = Buffer(env, self.cluster, config=buffer_config)
+        self.cluster = Cluster(env, cfg)
+        self.buffer = Buffer(env, self.cluster, cfg)
+        planning_algorithm = algorithm_map[cfg.planning]
         self.planner = Planner(env, planning_algorithm, self.cluster)
+        scheduling_algorithm = algorithm_map[cfg.scheduling]()
         self.scheduler = Scheduler(
             env, self.buffer, self.cluster, scheduling_algorithm
         )
         self.telescope = Telescope(
             env=self.env,
-            config=telescope_config,
+            config=cfg,
             planner=self.planner,
             scheduler=self.scheduler
         )

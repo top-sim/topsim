@@ -16,6 +16,7 @@ import unittest
 import simpy
 import os
 
+from topsim.core.config import Config
 from topsim.core.planner import Planner
 from topsim.core.cluster import Cluster
 from topsim.core.telescope import Observation
@@ -31,9 +32,11 @@ OBS_DEMAND = 15
 
 PLAN_ALGORITHM = 'heft'
 
+
 HEFT_CLUSTER_CONFIG = "test/data/config/system_config.json"
 CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
-
+CONFIG = "test/data/config/standard_simulation.json"
+HEFT_CONFIG = "test/data/config/heft_single_observation_simulation.json"
 MACHINE_CONFIG = None
 OBS_WORKFLOW = "test/data/config/workflow_config.json"
 
@@ -42,7 +45,8 @@ class TestPlannerConfig(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
-        self.cluster = Cluster(env=self.env, spec=CLUSTER_CONFIG)
+        config = Config(CONFIG)
+        self.cluster = Cluster(env=self.env, config=config)
 
     def testPlannerBasicConfig(self):
         planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
@@ -59,7 +63,8 @@ class TestWorkflowPlan(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
-        self.cluster = Cluster(self.env, CLUSTER_CONFIG)
+        config = Config(CONFIG)
+        self.cluster = Cluster(self.env, config=config)
         self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
         self.observation = Observation(
             'planner_observation',
@@ -94,7 +99,8 @@ class TestPlanner(unittest.TestCase):
     def setUp(self):
         self.env = simpy.Environment()
         sched_algorithm = FifoAlgorithm()
-        self.cluster = Cluster(self.env, HEFT_CLUSTER_CONFIG)
+        config = Config(HEFT_CONFIG)
+        self.cluster = Cluster(self.env, config)
         self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
         self.observation = Observation(
             'planner_observation',

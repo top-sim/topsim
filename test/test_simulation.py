@@ -2,6 +2,7 @@ import unittest
 import simpy
 import logging
 
+from topsim.core.config import Config
 from topsim.core.simulation import Simulation
 from topsim.algorithms.scheduling import FifoAlgorithm
 
@@ -12,7 +13,8 @@ TELESCOPE_CONFIG = 'test/data/config/observations.json'
 CLUSTER_CONFIG = 'test/data/config/basic_spec-10.json'
 BUFFER_CONFIG = 'test/data/config/buffer.json'
 EVENT_FILE = 'test/data/output/sim.trace'
-CONFIG = 'test/data/config/basic_simulation'
+CONFIG = 'test/data/config/standard_simulation.json'
+
 
 class TestSimulationConfig(unittest.TestCase):
     """
@@ -23,8 +25,6 @@ class TestSimulationConfig(unittest.TestCase):
         # tel = Telescope(env, buffer_obj, config, planner)
         self.event_file = EVENT_FILE
         self.env = simpy.Environment()
-        self.planning_algorithm = 'heft'
-        self.scheduling_algorithm = FifoAlgorithm
         self.algorithm_map = {'heft': 'heft', 'fifo': FifoAlgorithm}
 
     def tearDown(self):
@@ -33,12 +33,9 @@ class TestSimulationConfig(unittest.TestCase):
     def testBasicConfig(self):
         simulation = Simulation(
             self.env,
-            TELESCOPE_CONFIG,
-            CLUSTER_CONFIG,
-            BUFFER_CONFIG,
-            self.planning_algorithm,
-            self.scheduling_algorithm,
-            EVENT_FILE,
+            CONFIG,
+            self.algorithm_map,
+            self.event_file
         )
         self.assertTrue(36, simulation.telescope.total_arrays)
 
@@ -49,16 +46,12 @@ class TestSimulationRuntime(unittest.TestCase):
     def setUp(self) -> None:
         event_file = EVENT_FILE
         env = simpy.Environment()
-        planning_algorithm = 'heft'
-        scheduling_algorithm = FifoAlgorithm()
+        algorithm_map = {'heft': 'heft', 'fifo': FifoAlgorithm}
         self.simulation = Simulation(
             env,
-            TELESCOPE_CONFIG,
-            CLUSTER_CONFIG,
-            BUFFER_CONFIG,
-            planning_algorithm,
-            scheduling_algorithm,
-            EVENT_FILE,
+            CONFIG,
+            algorithm_map,
+            event_file
         )
 
     def testLimitedRuntime(self):
@@ -71,20 +64,17 @@ BASIC_CLUSTER = 'test/basic-workflow-data/basic_config.json'
 BASIC_BUFFER = 'test/basic-workflow-data/basic_buffer.json'
 BASIC_PLAN = 'test/basic-workflow-data/basic_observation_plan.json'
 
+BASIC_CONFIG = 'test/basic-workflow-data/basic_simulation.json'
+
 
 class TestSimulationBasicSetup(unittest.TestCase):
 
     def setUp(self) -> None:
-        event_file = EVENT_FILE
         env = simpy.Environment()
-        planning_algorithm = 'heft'
-        scheduling_algorithm = FifoAlgorithm()
+        algorithm_map = {'heft': 'heft', 'fifo': FifoAlgorithm}
         self.simulation = Simulation(
             env,
-            BASIC_PLAN,
-            BASIC_CLUSTER,
-            BASIC_BUFFER,
-            planning_algorithm,
-            scheduling_algorithm,
+            BASIC_CONFIG,
+            algorithm_map,
             EVENT_FILE,
         )

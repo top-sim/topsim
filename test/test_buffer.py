@@ -29,10 +29,10 @@ from topsim.core.cluster import Cluster
 OBS_START_TME = 0
 OBS_DURATION = 10
 OBS_DEMAND = 15
-OBS_WORKFLOW = test_data.test_buffer_workflow
-PLAN_ALGORITHM = test_data.planning_algorithm
+OBS_WORKFLOW = 'test/data/config/workflow_config.json'
+PLAN_ALGORITHM = 'heft'
 
-CONFIG = "test/data/config/basic_simulation.json"
+CONFIG = "test/data/config/standard_simulation.json"
 
 
 class TestBufferConfig(unittest.TestCase):

@@ -31,7 +31,7 @@ BASIC_WORKFLOW = 'test/basic-workflow-data/basic_workflow_config.json'
 BASIC_CLUSTER = 'test/basic-workflow-data/basic_config.json'
 BASIC_BUFFER = 'test/basic-workflow-data/basic_buffer.json'
 BASIC_PLAN = 'test/basic-workflow-data/basic_observation_plan.json'
-
+BASIC_CONFIG = 'test/basic-workflow-data/basic_simulation.json'
 
 class TestBasicIngest(unittest.TestCase):
 
@@ -39,15 +39,12 @@ class TestBasicIngest(unittest.TestCase):
         event_file = EVENT_FILE
         self.env = simpy.Environment()
         planning_algorithm = 'heft'
-        scheduling_algorithm = FifoAlgorithm()
+        algorithm_map = {'heft':'heft', 'fifo': FifoAlgorithm}
         self.simulation = Simulation(
             self.env,
-            BASIC_PLAN,
-            BASIC_CLUSTER,
-            BASIC_BUFFER,
-            planning_algorithm,
-            scheduling_algorithm,
-            EVENT_FILE,
+            BASIC_CONFIG,
+            algorithm_map,
+            event_file
         )
 
     def testClusterIngest(self):
