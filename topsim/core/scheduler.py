@@ -19,7 +19,7 @@ from topsim.core.telescope import RunStatus
 from topsim.core.planner import WorkflowStatus
 from topsim.core.task import TaskStatus
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class Scheduler:
@@ -84,10 +84,10 @@ class Scheduler:
         """
         if self.status is not SchedulerStatus.RUNNING:
             raise RuntimeError("Scheduler has not been initialised! Call init")
-        logger.debug("Scheduler starting up...")
+        LOGGER.debug("Scheduler starting up...")
         while self.status is SchedulerStatus.RUNNING:
 
-            logger.info('Time on Scheduler: {0}'.format(self.env.now))
+            LOGGER.info('Time on Scheduler: {0}'.format(self.env.now))
             # AT THE END OF THE SIMULATION, WE GET STUCK HERE. NEED TO EXIT
             if self.buffer.has_observations_ready_for_processing():
                 if self.current_observation is None:
@@ -97,10 +97,10 @@ class Scheduler:
 
             if len(self.observation_queue) == 0 \
                     and self.status == SchedulerStatus.SHUTDOWN:
-                logger.debug("No more waiting workflows")
+                LOGGER.debug("No more waiting workflows")
                 break
 
-            logger.debug("Scheduler Status: %s", self.status)
+            LOGGER.debug("Scheduler Status: %s", self.status)
             yield self.env.timeout(TIMESTEP)
 
     def cluster_capacity_for_alloc(self):
@@ -147,13 +147,13 @@ class Scheduler:
 
         buffer_capacity = False
         if self.buffer.check_buffer_capacity(observation):
-            logger.debug("Buffer has enough capacity for %s", observation.name)
+            LOGGER.debug("Buffer has enough capacity for %s", observation.name)
             buffer_capacity = True
 
         cluster_capacity = False
         pipeline_demand = pipelines[observation.type]['demand']
         if self.cluster.check_ingest_capacity(pipeline_demand, max_ingest):
-            logger.debug(
+            LOGGER.debug(
                 "Cluster is able to process ingest for observation %s",
                 observation.name
             )
@@ -216,7 +216,6 @@ class Scheduler:
         if RunStatus.FINISHED:
             self.cluster.clean_up_ingest()
 
-
     def print_state(self):
         # Change this to 'workflows scheduled/workflows unscheduled'
         return {
@@ -262,6 +261,8 @@ class Scheduler:
 
         tasks = {}
         while not test:
+            # curr_allocs protects against duplicated scheduled variables
+            curr_allocs = []
             for t in self.current_plan.tasks:
                 if t.task_status is TaskStatus.FINISHED:
                     self.current_plan.tasks.remove(t)
@@ -275,20 +276,30 @@ class Scheduler:
             if (machine is None and task is None and status is
                     WorkflowStatus.FINISHED):
                 if self.buffer.mark_observation_finished(
-                     self.current_observation
+                        self.current_observation
                 ):
                     self.current_plan = None
                     self.current_observation = None
                     break
             elif (machine is None
-                    or task is None):
+                  or task is None):
                 yield self.env.timeout(TIMESTEP)
             else:
                 # Runs the task on the machie
-                ret = self.env.process(
-                    self.cluster.allocate_task_to_cluster(task, machine)
-                )
-                task.task_status = TaskStatus.SCHEDULED
+                # task.machine = machine
+                if machine not in curr_allocs:
+                    ret = self.env.process(
+                        self.cluster.allocate_task_to_cluster(task, machine)
+                    )
+                    task.task_status = TaskStatus.SCHEDULED
+                    curr_allocs.append(machine)
+                else:
+                    LOGGER.debug(
+                        'Two different tasks have been allocated the '
+                        'same machine at the same time. This should '
+                        'be avoided in your algorithm!'
+                    )
+                    continue
                 yield self.env.timeout(TIMESTEP)
 
         yield self.env.timeout(TIMESTEP)

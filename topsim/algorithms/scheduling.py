@@ -61,6 +61,8 @@ class FifoAlgorithm(Algorithm):
         # Schedule as we go
         # Check if there is an overlap between the two sets
 
+        curr_allocs = []
+
         for t in tasks:
             # Allocate the first element in the Task list:
             if t.task_status is TaskStatus.UNSCHEDULED and \
