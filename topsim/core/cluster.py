@@ -219,7 +219,8 @@ class Cluster:
                 self.resources['available'].append(machine)
                 self.usage_data['available'] += 1
                 task.task_status = TaskStatus.FINISHED
-                break
+                return task.task_status
+                # break
             else:
                 yield self.env.timeout(TIMESTEP)
 

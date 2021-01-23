@@ -13,6 +13,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""
+    TestSchedulerIngest:
+    Uses basic_simulation.json
+        Cluster is 10 machines, each with 84 flops and 10 data rate
+        2 observations, both with a workflow_config.json
+
+    TestSchedulerFIFO:
+        This uses the 'classic' HEFT workflow, and a HEFT system config
+        Cluster is only 3 machines
+
+    TestIntegration:
+        This uses a modified workflow_config.
+"""
+
 import unittest
 import simpy
 import logging

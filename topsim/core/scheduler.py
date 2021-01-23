@@ -260,6 +260,7 @@ class Scheduler:
         # # we need to return 'current workflow execution status'
 
         tasks = {}
+        allocation_triggers = []
         while not test:
             # curr_allocs protects against duplicated scheduled variables
             curr_allocs = []
@@ -291,6 +292,7 @@ class Scheduler:
                     ret = self.env.process(
                         self.cluster.allocate_task_to_cluster(task, machine)
                     )
+                    allocation_triggers.append(ret)
                     task.task_status = TaskStatus.SCHEDULED
                     curr_allocs.append(machine)
                 else:
