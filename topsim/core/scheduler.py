@@ -15,7 +15,7 @@
 import logging
 from enum import Enum
 from topsim.common.globals import TIMESTEP
-from topsim.core.telescope import RunStatus
+from topsim.core.instrument import RunStatus
 from topsim.core.planner import WorkflowStatus
 from topsim.core.task import TaskStatus
 

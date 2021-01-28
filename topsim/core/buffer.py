@@ -33,7 +33,7 @@ import json
 import pandas as pd
 
 from topsim.common.globals import TIMESTEP
-from topsim.core.telescope import RunStatus
+from topsim.core.instrument import RunStatus
 
 LOGGER = logging.getLogger(__name__)
 

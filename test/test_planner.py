@@ -19,9 +19,9 @@ import os
 from topsim.core.config import Config
 from topsim.core.planner import Planner
 from topsim.core.cluster import Cluster
-from topsim.core.telescope import Observation
+from topsim.core.instrument import Observation
 
-from topsim.algorithms.scheduling import FifoAlgorithm
+from topsim.user.scheduling import FifoAlgorithm
 
 current_dir = os.path.abspath('')
 

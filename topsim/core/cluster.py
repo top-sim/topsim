@@ -1,6 +1,5 @@
 import pandas as pd
 
-from topsim.core import config
 from topsim.core.task import Task, TaskStatus
 from topsim.common.globals import TIMESTEP
 

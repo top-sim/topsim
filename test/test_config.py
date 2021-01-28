@@ -21,6 +21,7 @@ import unittest
 import json
 
 from topsim.core.config import Config
+from topsim.user.telescope import Telescope
 
 CONFIG = "test/data/config/standard_simulation.json"
 NOFILE = "test/data/config/cluster_config.json"  # Does not exist
@@ -61,7 +62,7 @@ class TestActorConfigIncorrectJSON(unittest.TestCase):
 
     def test_instrument_config_incorrect_json(self):
         self.assertRaises(
-            KeyError, self.config.parse_telescope_config
+            KeyError, self.config.parse_instrument_config, Telescope.name
         )
 
     def test_buffer_config_incorrect_json(self):

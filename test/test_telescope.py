@@ -17,7 +17,7 @@ import unittest
 import simpy
 
 from topsim.core.config import Config
-from topsim.core.telescope import Telescope
+from topsim.user.telescope import Telescope
 from topsim.core.scheduler import Scheduler
 from topsim.core.buffer import Buffer
 from topsim.core.cluster import Cluster

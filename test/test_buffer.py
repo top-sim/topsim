@@ -21,7 +21,7 @@ import simpy
 from topsim.common import data as test_data
 from topsim.core.config import Config
 from topsim.core.planner import Planner
-from topsim.core.telescope import Observation, RunStatus
+from topsim.core.instrument import Observation, RunStatus
 from topsim.core.buffer import Buffer
 from topsim.core.cluster import Cluster
 

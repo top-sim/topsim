@@ -12,10 +12,8 @@ from topsim.core.config import Config
 from topsim.core.monitor import Monitor
 from topsim.core.scheduler import Scheduler
 from topsim.core.cluster import Cluster
-from topsim.core.telescope import Telescope
 from topsim.core.buffer import Buffer
 from topsim.core.planner import Planner
-from topsim.algorithms.scheduling import FifoAlgorithm
 
 logging.basicConfig(level="WARNING")
 LOGGER = logging.getLogger(__name__)
@@ -71,6 +69,7 @@ class Simulation:
             self,
             env,
             config,
+            instrument,
             algorithm_map,
             event_file
     ):
@@ -92,7 +91,7 @@ class Simulation:
         self.scheduler = Scheduler(
             env, self.buffer, self.cluster, scheduling_algorithm
         )
-        self.telescope = Telescope(
+        self.instrument = instrument(
             env=self.env,
             config=cfg,
             planner=self.planner,
@@ -132,7 +131,7 @@ class Simulation:
 
         self.running = True
         self.env.process(self.monitor.run())
-        self.env.process(self.telescope.run())
+        self.env.process(self.instrument.run())
         self.env.process(self.cluster.run())
 
         self.scheduler.init()

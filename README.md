@@ -48,3 +48,5 @@ To test all requirements are installed, run the tests using:
 python -m unittest discover test
 ```
 
+## Running your first simulation 
+

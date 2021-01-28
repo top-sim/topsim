@@ -20,7 +20,7 @@ import simpy
 
 from topsim.core.config import Config
 from topsim.core.cluster import Cluster
-from topsim.core.telescope import Telescope, Observation
+from topsim.core.instrument import Observation
 from topsim.core.task import TaskStatus
 
 logging.basicConfig(level="WARNING")

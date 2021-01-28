@@ -4,8 +4,8 @@ import logging
 
 from topsim.core.config import Config
 from topsim.core.simulation import Simulation
-from topsim.algorithms.scheduling import FifoAlgorithm
-
+from topsim.user.scheduling import FifoAlgorithm
+from topsim.user.telescope import Telescope
 logging.basicConfig(level='WARNING')
 logger = logging.getLogger(__name__)
 
@@ -26,6 +26,7 @@ class TestSimulationConfig(unittest.TestCase):
         self.event_file = EVENT_FILE
         self.env = simpy.Environment()
         self.algorithm_map = {'heft': 'heft', 'fifo': FifoAlgorithm}
+        self.instrument = Telescope
 
     def tearDown(self):
         pass
@@ -34,10 +35,11 @@ class TestSimulationConfig(unittest.TestCase):
         simulation = Simulation(
             self.env,
             CONFIG,
+            self.instrument,
             self.algorithm_map,
             self.event_file
         )
-        self.assertTrue(36, simulation.telescope.total_arrays)
+        self.assertTrue(36, simulation.instrument.total_arrays)
 
 
 # @unittest.skip
@@ -50,6 +52,7 @@ class TestSimulationRuntime(unittest.TestCase):
         self.simulation = Simulation(
             env,
             CONFIG,
+            Telescope,
             algorithm_map,
             event_file
         )
@@ -75,6 +78,7 @@ class TestSimulationBasicSetup(unittest.TestCase):
         self.simulation = Simulation(
             env,
             BASIC_CONFIG,
+            Telescope,
             algorithm_map,
             EVENT_FILE,
         )

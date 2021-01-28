@@ -1,5 +1,21 @@
+# Copyright (C) 2020 RW Bunney
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
 import json
-from topsim.core.telescope import Observation
+from topsim.core.instrument import Observation
 from topsim.core.machine import Machine
 from topsim.core.buffer import HotBuffer, ColdBuffer
 import pandas as pd
@@ -78,12 +94,12 @@ class Config:
         bandwidth = self.cluster['system']['bandwidth']
         return machine_list, bandwidth
 
-    def parse_telescope_config(self):
+    def parse_instrument_config(self,instrument_name):
         cfg = self.instrument
-        total_arrays = cfg['telescope']['total_arrays']
-        pipelines = cfg['telescope']['pipelines']
+        total_arrays = cfg[instrument_name]['total_arrays']
+        pipelines = cfg[instrument_name]['pipelines']
         observations = []
-        for observation in cfg['telescope']['observations']:
+        for observation in cfg[instrument_name]['observations']:
             try:
                 o = Observation(
                     name=observation['name'],
@@ -97,7 +113,7 @@ class Config:
                 observations.append(o)
             except KeyError:
                 raise
-        max_ingest_resources = cfg['telescope']['max_ingest_resources']
+        max_ingest_resources = cfg[instrument_name]['max_ingest_resources']
         return total_arrays, pipelines, observations, max_ingest_resources
 
     def parse_buffer_config(self):

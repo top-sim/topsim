@@ -32,15 +32,14 @@ import simpy
 import logging
 
 from topsim.core.config import Config
-from topsim.core.telescope import Observation, Telescope
+from topsim.user.telescope import Telescope
 from topsim.core.scheduler import Scheduler
 from topsim.core.cluster import Cluster
-from topsim.core.planner import Planner, WorkflowStatus
+from topsim.core.planner import Planner
 from topsim.core.buffer import Buffer
-from topsim.core.telescope import RunStatus
-from topsim.algorithms.scheduling import FifoAlgorithm
+from topsim.core.instrument import RunStatus
 
-from topsim.common import data as test_data
+from topsim.user.scheduling import FifoAlgorithm
 
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)

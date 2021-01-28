@@ -21,7 +21,7 @@ class Monitor(object):
             state = {
                 # 'timestamp': self.env.now,
                 'cluster_state': self.simulation.cluster.print_state(),
-                'telescope_state': self.simulation.telescope.print_state(),
+                'instrument_state': self.simulation.instrument.print_state(),
                 'scheduler_state': self.simulation.scheduler.print_state(),
                 'buffer_state': self.simulation.buffer.print_state()
             }
@@ -49,7 +49,7 @@ class Monitor(object):
         df = pd.DataFrame()
         cluster = self.simulation.cluster.to_df()
         buffer = self.simulation.buffer.to_df()
-        telescope = self.simulation.telescope.to_df()
-        df = df.join([cluster, buffer, telescope], how='outer')
+        instrument = self.simulation.instrument.to_df()
+        df = df.join([cluster, buffer, instrument], how='outer')
         return df
 

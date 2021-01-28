@@ -24,9 +24,9 @@ namely, the original HEFT workflow from Topcuoglu 2000.
 
 import simpy
 
-from topsim.algorithms.scheduling import FifoAlgorithm
+from topsim.user.scheduling import FifoAlgorithm
+from topsim.user.telescope import Telescope
 from topsim.core.simulation import Simulation
-
 
 CLUSTER_CONFIG = 'simulations/heft_sim/input/basic_spec-10.json'
 HEFT_WORKFLOW = 'simulations/heft_sim/input/workflow_config_heft_sim.json'
@@ -41,12 +41,13 @@ env = simpy.Environment()
 
 planning_algorithm = 'heft'
 scheduling_algorithm = FifoAlgorithm
-
+instrument = Telescope
 
 simulation = Simulation(
-    env,
-    CONFIG,
-    algorithm_map = {'pheft':'pheft', 'heft':'heft', 'fifo': FifoAlgorithm},
+    env=env,
+    config=CONFIG,
+    instrument=instrument,
+    algorithm_map={'pheft': 'pheft', 'heft': 'heft', 'fifo': FifoAlgorithm},
     event_file=EVENT_FILE,
 )
 

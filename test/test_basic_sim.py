@@ -16,12 +16,15 @@
 """
 Test an entire run-through simulation to make sure all the 'bits' fit in place
 """
+
 import unittest
 import logging
 import simpy
 from topsim.core.simulation import Simulation
-from topsim.core.telescope import RunStatus
-from topsim.algorithms.scheduling import FifoAlgorithm
+from topsim.core.instrument import RunStatus
+
+from topsim.user.scheduling import FifoAlgorithm
+from topsim.user.telescope import Telescope
 
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
@@ -33,6 +36,7 @@ BASIC_BUFFER = 'test/basic-workflow-data/basic_buffer.json'
 BASIC_PLAN = 'test/basic-workflow-data/basic_observation_plan.json'
 BASIC_CONFIG = 'test/basic-workflow-data/basic_simulation.json'
 
+
 class TestBasicIngest(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -43,6 +47,7 @@ class TestBasicIngest(unittest.TestCase):
         self.simulation = Simulation(
             self.env,
             BASIC_CONFIG,
+            Telescope,
             algorithm_map,
             event_file
         )
@@ -75,7 +80,7 @@ class TestBasicIngest(unittest.TestCase):
 
         self.assertEqual(
             RunStatus.FINISHED,
-            self.simulation.telescope.observations[1].status
+            self.simulation.instrument.observations[1].status
         )
 
     def testBufferIngest(self):
