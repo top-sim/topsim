@@ -111,7 +111,7 @@ class WorkflowPlan:
 
         # The solution object is now how we get information on allocatiosn
         # from SHADOW
-
+        # TODO Need to generate a unique TID that is tied to the Observation
         for task in self.solution.task_allocations:
             allocation = self.solution.task_allocations.get(task)
             taskobj = Task(task.tid, env)

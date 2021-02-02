@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 
 sns.set_style("darkgrid")
 # tracefile = 'simulations/heft_sim/output/sim.trace'
-heft_pickle = 'simulations/heft_sim/output/heft_sim.trace-heft.pkl'
+heft_pickle = 'simulations/real_time/real_time.trace-heft.pkl'
 pheft_pickle = 'simulations/heft_sim/output/heft_sim.trace-pheft.pkl'
 # with open(tracefile, 'r') as infile:
 # 	trace = json.load(infile)

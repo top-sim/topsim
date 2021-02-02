@@ -6,25 +6,28 @@
 			"pipelines": {
 				"continuum": {
 					"demand": 5
-				},
-				"spectral": {
-					"demand": 10
-				},
-				"pulsar": {
-					"demand": 5
 				}
 			},
-			"observations": [
-				{
-					"name": "emu",
-					"start": 0,
-					"duration": 10,
-					"demand": 36,
-					"workflow": "simulations/heft_sim/input/workflow_config_heft_sim.json",
-					"type": "continuum",
-					"data_product_rate": 2
-				}
-			]
+		"observations": [
+			{
+				"name": "emu",
+				"start": 0,
+				"duration": 10,
+				"demand": 36,
+				"workflow": "simulations/real_time/workflow_config_heft_sim.json",
+				"type": "continuum",
+				"data_product_rate": 5
+			},
+			{
+				"name": "dingo",
+				"start": 11,
+				"duration": 10,
+				"demand": 36,
+				"workflow": "simulations/real_time/workflow_config_heft_sim.json",
+				"type": "continuum",
+				"data_product_rate": 5
+			}
+		]
 		}
 	},
 	"cluster": {
@@ -86,12 +89,12 @@
 	},
 	"buffer": {
 		"hot": {
-			"capacity": 500,
+			"capacity": 50,
 			"max_ingest_rate": 5
 		},
 		"cold": {
-			"capacity": 250,
-			"max_data_rate": 2
+			"capacity": 50,
+			"max_data_rate": -1
 		}
 	},
 	"planning": "heft",

@@ -197,6 +197,7 @@ class Buffer:
         if not self.cold.has_capacity(data_left_to_transfer):
             # We cannot actually transfer the observation due to size
             # constraints
+            #TODO create an object method to update the hot buffer
             self.hot.observations['stored'].append(current_obs)
             self.hot.observations['transfer'] = None
             return False
@@ -373,12 +374,16 @@ class HotBuffer:
             The amount of data left to transfer
         """
 
-        if transfer_rate < 0:
-            raise RuntimeError("Transfer rate must be positive")
         if self.observations['transfer'] is None:
             self.observations['transfer'] = observation
-        self.current_capacity += transfer_rate
-        residual_data -= transfer_rate
+        # We are doing a 'real-time' simulation, which means we treat the hot
+        # and cold buffers as one buffer.
+        if transfer_rate < 0:
+            self.current_capacity += observation.total_data_size
+            residual_data -= observation.total_data_size
+        else:
+            self.current_capacity += transfer_rate
+            residual_data -= transfer_rate
         if residual_data == 0:
             self.observations['transfer'] = None
         return residual_data
@@ -463,9 +468,13 @@ class ColdBuffer:
         """
 
         self.observations['transfer'] = observation
+        if self.max_data_rate > 0:
+            self.current_capacity -= self.max_data_rate
+            residual_data -= self.max_data_rate
+        elif self.max_data_rate < 0:
+            self.current_capacity -= observation.total_data_size
+            residual_data -= observation.total_data_size
 
-        self.current_capacity -= self.max_data_rate
-        residual_data -= self.max_data_rate
         if residual_data == 0:
             self.observations['transfer'] = None
             self.observations['stored'].append(observation)
@@ -510,49 +519,3 @@ class ColdBuffer:
             self.observations['stored'].remove(observation)
             return True
         return False
-
-
-def process_buffer_config(spec):
-    """
-    Reads the buffer config file and initialises HotBuffer and ColdBuffer
-    objects based on the JSON data.
-
-    Parameters
-    ----------
-    spec : str
-        The str file path of the input JSON config file
-
-    Raises
-    ------
-
-    Returns
-    -------
-
-    """
-    try:
-        with open(spec, 'r') as infile:
-            config = json.load(infile)
-    except OSError:
-        LOGGER.warning("File %s not found", spec)
-        raise
-    except json.JSONDecodeError:
-        LOGGER.warning("Please check file is in JSON Format")
-        raise
-    try:
-        'hot' in config and 'cold' in config
-    except KeyError:
-        LOGGER.warning(
-            "'system' is not in %s, check your JSON is correctly formatted",
-            config
-        )
-        raise
-    hot = HotBuffer(
-        capacity=config['hot']['capacity'],
-        max_ingest_data_rate=config['hot']['max_ingest_rate']
-    )
-    cold = ColdBuffer(
-        capacity=config['cold']['capacity'],
-        max_data_rate=config['cold']['max_data_rate']
-    )
-
-    return hot, cold

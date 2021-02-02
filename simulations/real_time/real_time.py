@@ -28,9 +28,9 @@ from topsim.user.scheduling import FifoAlgorithm
 from topsim.user.telescope import Telescope
 from topsim.core.simulation import Simulation
 
-EVENT_FILE = 'simulations/heft_sim/output/heft_sim.trace'
+EVENT_FILE = 'simulations/real_time/real_time.trace'
+CONFIG = 'simulations/real_time/real_time.json'
 
-CONFIG = 'simulations/heft_sim/input/heft_single_observation_simulation.json'
 env = simpy.Environment()
 
 planning_algorithm = 'heft'
@@ -46,4 +46,4 @@ simulation = Simulation(
 )
 
 simulation.start(11)
-simulation.resume(115)
+simulation.resume(300)

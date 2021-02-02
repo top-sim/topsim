@@ -148,6 +148,7 @@ class Telescope(Instrument):
                             self.max_ingest
                     ):
                         ret = self.begin_observation(observation)
+                        observation.ast = self.env.now
                         self.env.process(
                             self.planner.run(observation)
                         )

@@ -90,6 +90,8 @@ class Observation(object):
 
         self.name = name
         self.start = start
+        self.est = start
+        self.ast = start
         self.duration = duration
         self.demand = demand
         self.status = RunStatus.WAITING
@@ -125,7 +127,7 @@ class Observation(object):
             return False
 
     def is_finished(self, current_time, telescope_status):
-        if current_time >= self.start + self.duration \
+        if current_time >= self.ast + self.duration \
                 and telescope_status \
                 and (self.status is not RunStatus.FINISHED):
             return True
