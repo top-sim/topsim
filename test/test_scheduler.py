@@ -211,11 +211,16 @@ class TestSchedulerFIFO(unittest.TestCase):
         self.scheduler.current_observation = curr_obs
         gen = self.scheduler.allocate_tasks()
         self.assertRaises(RuntimeError, next, gen)
+        l = [0, 3, 2, 4, 1,5, 6, 8, 7, 9]
+        exec_ord = [
+            curr_obs.name + '_' + str(self.env.now) + '_' + str(tid) for tid
+            in l
+        ]
         self.env.process(self.planner.run(self.scheduler.current_observation))
         self.env.process(self.scheduler.allocate_tasks(test=True))
         self.env.run(1)
         self.assertListEqual(
-            [0, 3, 2, 4, 1, 5, 6, 8, 7, 9],
+            l,
             [a.task.tid for a in self.scheduler.current_plan.exec_order]
         )
         self.buffer.cold.observations['stored'].append(curr_obs)
@@ -230,7 +235,7 @@ class TestSchedulerFIFO(unittest.TestCase):
         self.env.run(until=31)
         self.assertEqual(3, len(self.cluster.tasks['running']))
         self.env.run(until=98)
-        self.assertEqual(9, self.cluster.tasks['running'][0].id)
+        self.assertEqual(exec_ord[-1], self.cluster.tasks['running'][0].id)
         self.env.run(until=102)
         self.assertEqual(10, len(self.cluster.tasks['finished']))
         self.assertEqual(0, len(self.cluster.tasks['running']))
@@ -263,15 +268,6 @@ class TestSchedulerIntegration(unittest.TestCase):
         # }
         pipelines = self.telescope.pipelines
         max_ingest = 5
-        # observation = Observation(
-        #     'planner_observation',
-        #     OBS_START_TME,
-        #     OBS_DURATION,
-        #     OBS_DEMAND,
-        #     "test/data/config/workflow_config_heft_sim.json",
-        #     type="continuum",
-        #     data_rate=4
-        # )
         observation = self.telescope.observations[0]
 
         ready_status = self.scheduler.check_ingest_capacity(
@@ -279,7 +275,6 @@ class TestSchedulerIntegration(unittest.TestCase):
             pipelines,
             max_ingest
         )
-
         self.env.process(self.cluster.run())
         self.env.process(self.buffer.run())
         self.scheduler.init()

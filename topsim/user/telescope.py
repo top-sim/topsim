@@ -263,7 +263,15 @@ class Telescope(Instrument):
         df = pd.DataFrame()
         df['observations_waiting'] = [self.observations_waiting()]
         df['observations_finished'] = [self.observations_finished()]
+        df['observations_delayed'] = [self._calc_observation_delay()]
         df['telescope_status'] = [self.telescope_status]
         return df
 
-
+    def _calc_observation_delay(self):
+        cum_delay = 0
+        for observation in self.observations:
+            if self.env.now >= observation.est and (
+                    observation.status == RunStatus.WAITING
+            ):
+                cum_delay += self.env.now - observation.est
+        return cum_delay

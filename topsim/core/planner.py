@@ -93,8 +93,8 @@ class WorkflowPlan:
     the DAG nature of the workflow. This is why the tasks are stored in queues.
     """
 
-    def __init__(self, wid, workflow, algorithm, env):
-        self.id = wid
+    def __init__(self, observation, workflow, algorithm, env):
+        self.id = observation
         if algorithm is 'heft':
             self.solution = shadow_heft(workflow)
         elif algorithm is 'pheft':
@@ -114,14 +114,17 @@ class WorkflowPlan:
         # TODO Need to generate a unique TID that is tied to the Observation
         for task in self.solution.task_allocations:
             allocation = self.solution.task_allocations.get(task)
-            taskobj = Task(task.tid, env)
+            tid = self._create_observation_task_id(task.tid, env)
+            taskobj = Task(tid, env)
             taskobj.est = allocation.ast
             taskobj.eft = allocation.aft
             taskobj.duration = taskobj.eft - taskobj.est
             taskobj.machine_id = allocation.machine
             taskobj.flops = task.flops_demand
             taskobj.pred = [
-                x.tid for x in list(workflow.graph.predecessors(task))
+                self._create_observation_task_id(x.tid, env) for x in list(
+                    workflow.graph.predecessors(task)
+                )
             ]
             self.tasks.append(taskobj)
         self.tasks.sort(key=lambda x: x.est)
@@ -130,6 +133,9 @@ class WorkflowPlan:
         self.priority = 0
         self.status = WorkflowStatus.UNSCHEDULED
         self.delayed = None
+
+    def _create_observation_task_id(self, tid, env):
+        return self.id + '_' + str(env.now) + '_' + str(tid)
 
     def __lt__(self, other):
         return self.priority < other.priority

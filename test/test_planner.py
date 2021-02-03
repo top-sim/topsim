@@ -80,6 +80,7 @@ class TestWorkflowPlan(unittest.TestCase):
         pass
 
     def testWorkflowPlanCreation(self):
+        time = self.env.now
         plan = self.planner.plan(
             self.observation.name,
             self.observation.workflow,
@@ -88,7 +89,12 @@ class TestWorkflowPlan(unittest.TestCase):
         expected_exec_order = [0, 5, 3, 4, 2, 1, 6, 8, 7, 9]
         self.assertEqual(len(plan.tasks), len(expected_exec_order))
         for x in range(len(plan.tasks)):
-            self.assertEqual(plan.tasks[x].id, expected_exec_order[x])
+            self.assertEqual(
+                plan.tasks[x].id,
+                'planner_observation_{0}_{1}'.format(
+                    time, expected_exec_order[x]
+                )
+            )
         # Get taskid 5
         task5_comp = plan.tasks[5].flops
         self.assertEqual(task5_comp, 92000)
@@ -130,7 +136,8 @@ class TestPlanner(unittest.TestCase):
 
     def testPlannerRun(self):
         next(self.planner.run(self.observation))
-        # because run() is a generator (we call yield for simpy), we use(next()) to 'get the return value',
+        # because run() is a generator (we call yield for simpy),
+        # we use(next()) to 'get the return value',
         # and thus run the rest of the code in run()
         # next(val)
         self.assertTrue(self.observation.plan is not None)
