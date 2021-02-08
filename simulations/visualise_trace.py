@@ -42,12 +42,12 @@ sns.lineplot(
 sns.lineplot(
     data=df_heft, x=df_heft.index, y="ingest_resources", ax=axs[0, 1]
 )
-sns.lineplot(
-    data=df_heft, x=df_heft.index, y="hotbuffer_current_capacity", ax=axs[1, 0]
-)
-sns.lineplot(
-    data=df_heft, x=df_heft.index, y="coldbuffer_current_capacity", ax=axs[1, 1]
-)
+# sns.lineplot(
+#     data=df_heft, x=df_heft.index, y="hotbuffer_current_capacity", ax=axs[1, 0]
+# )
+# sns.lineplot(
+#     data=df_heft, x=df_heft.index, y="coldbuffer_current_capacity", ax=axs[1, 1]
+# )
 
 plt.show()
 

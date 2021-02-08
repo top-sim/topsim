@@ -89,6 +89,8 @@ class Observation(object):
                  data_rate):
 
         self.name = name
+        self.buffer_id = 0
+        self.cluster_id = 'default'
         self.start = start
         self.est = start
         self.ast = start

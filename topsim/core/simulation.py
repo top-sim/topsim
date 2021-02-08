@@ -134,7 +134,7 @@ class Simulation:
         self.env.process(self.instrument.run())
         self.env.process(self.cluster.run())
 
-        self.scheduler.init()
+        self.scheduler.start()
         self.env.process(self.scheduler.run())
         self.env.process(self.buffer.run())
 

@@ -69,8 +69,8 @@ class Config:
 
     def parse_cluster_config(self):
         try:
-          self.cluster['system'] and self.cluster['system']['resources'] \
-            and self.cluster['system']['bandwidth']
+            (self.cluster['system'] and self.cluster['system']['resources']
+             and self.cluster['system']['bandwidth'])
         except KeyError:
             LOGGER.warning(
                 "'system' is not in %s, check your JSON is correctly formatted",
@@ -94,7 +94,7 @@ class Config:
         bandwidth = self.cluster['system']['bandwidth']
         return machine_list, bandwidth
 
-    def parse_instrument_config(self,instrument_name):
+    def parse_instrument_config(self, instrument_name):
         cfg = self.instrument
         total_arrays = cfg[instrument_name]['total_arrays']
         pipelines = cfg[instrument_name]['pipelines']
@@ -127,7 +127,7 @@ class Config:
             max_data_rate=config['cold']['max_data_rate']
         )
 
-        return hot, cold
+        return {0: hot}, {0:cold}
 
 
 class TaskInstanceConfig(object):

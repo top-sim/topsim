@@ -87,32 +87,32 @@ class TestBasicIngest(unittest.TestCase):
         self.assertEqual(0, self.simulation.env.now)
         self.simulation.start(runtime=1)
         self.assertEqual(
-            5, self.simulation.buffer.hot.current_capacity
+            5, self.simulation.buffer.hot[0].current_capacity
         )
         self.simulation.resume(until=2)
         self.assertEqual(
-            10, self.simulation.buffer.hot.current_capacity
+            10, self.simulation.buffer.hot[0].current_capacity
         )
         self.assertEqual(
-            5, self.simulation.buffer.cold.current_capacity
+            5, self.simulation.buffer.cold[0].current_capacity
         )
         self.assertEqual(
             1,
-            len(self.simulation.buffer.cold.observations["stored"])
+            len(self.simulation.buffer.cold[0].observations["stored"])
         )
         self.simulation.resume(until=3)
-        self.assertEqual(10, self.simulation.buffer.hot.current_capacity)
-        self.assertEqual(0, self.simulation.buffer.cold.current_capacity)
+        self.assertEqual(10, self.simulation.buffer.hot[0].current_capacity)
+        self.assertEqual(0, self.simulation.buffer.cold[0].current_capacity)
         self.assertEqual(
             2,
-            len(self.simulation.buffer.cold.observations["stored"])
+            len(self.simulation.buffer.cold[0].observations["stored"])
         )
 
     def testSchedulerRunTime(self):
         self.assertEqual(0, self.simulation.env.now)
         self.simulation.start(runtime=2)
         self.assertEqual(
-            1, len(self.simulation.buffer.cold.observations['stored'])
+            1, len(self.simulation.buffer.cold[0].observations['stored'])
         )
         self.simulation.resume(until=8)
         self.simulation.resume(until=9)
@@ -120,6 +120,6 @@ class TestBasicIngest(unittest.TestCase):
         self.simulation.resume(until=10)
         self.simulation.resume(until=11)
         self.assertEqual(
-            2, len(self.simulation.buffer.cold.observations['stored'])
+            2, len(self.simulation.buffer.cold[0].observations['stored'])
         )
 

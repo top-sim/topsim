@@ -44,15 +44,13 @@ class Scheduler:
         self.env = env
         self.algorithm = algorithm
         self.waiting_observations = []
-        self.current_observation = None
         self.cluster = cluster
         self.buffer = buffer
-        self.current_plan = None
         self.status = SchedulerStatus.SLEEP
         self.ingest_observation = None
         self.observation_queue = []
 
-    def init(self):
+    def start(self):
         """
         Set the SchedulerStatus to RUNNING.
         This allows us to check the Scheduler status in the simulator; if
@@ -82,18 +80,18 @@ class Scheduler:
         -------
         Timeout of common.config.TIMESTEP.
         """
+
         if self.status is not SchedulerStatus.RUNNING:
             raise RuntimeError("Scheduler has not been initialised! Call init")
         LOGGER.debug("Scheduler starting up...")
-        while self.status is SchedulerStatus.RUNNING:
 
+        while self.status is SchedulerStatus.RUNNING:
             LOGGER.info('Time on Scheduler: {0}'.format(self.env.now))
-            # AT THE END OF THE SIMULATION, WE GET STUCK HERE. NEED TO EXIT
             if self.buffer.has_observations_ready_for_processing():
-                if self.current_observation is None:
-                    obs = self.buffer.next_observation_for_processing()
-                    self.current_observation = obs
-                    ret = self.env.process(self.allocate_tasks())
+                obs = self.buffer.next_observation_for_processing()
+                if obs not in self.observation_queue:
+                    self.observation_queue.append(obs)
+                    ret = self.env.process(self.allocate_tasks(obs))
 
             if len(self.observation_queue) == 0 \
                     and self.status == SchedulerStatus.SHUTDOWN:
@@ -161,7 +159,7 @@ class Scheduler:
 
         return buffer_capacity and cluster_capacity
 
-    def allocate_ingest(self, observation, pipelines):
+    def allocate_ingest(self, observation, pipelines, c='default'):
         """
         Ingest is 'streaming' data to the buffer during the observation
         How we calculate how long it takes remains to be seen
@@ -223,7 +221,7 @@ class Scheduler:
                                             in self.waiting_observations]
         }
 
-    def allocate_tasks(self, test=False):
+    def allocate_tasks(self, observation, test=False):
         """
         For the current observation, we need to allocate tasks to machines
         based on:
@@ -236,23 +234,24 @@ class Scheduler:
 
         """
         minst = -1
-        if self.current_observation is None:
+        current_plan = None
+        if observation is None:
             return False
-        elif self.current_plan is None:
-            self.current_plan = self.current_observation.plan
+        elif current_plan is None:
+            current_plan = observation.plan
 
-        if self.current_plan is None:
+        if current_plan is None:
             raise RuntimeError(
                 "Observation should have pre-plan; Planner actor has "
                 "failed at runtime."
             )
 
-        self.current_plan.start_time = self.env.now
+        current_plan.start_time = self.env.now
 
-        if self.current_plan.is_finished():
-            if self.buffer.mark_observation_finished(self.current_observation):
-                self.current_plan = None
-                self.current_observation = None
+        if current_plan.is_finished():
+            if self.buffer.mark_observation_finished(observation):
+                current_plan = None
+                observation = None
 
         # # Check if the running tasks have finished
         # # TODO check if expected run time is the same as the 'assigned'
@@ -264,23 +263,24 @@ class Scheduler:
         while not test:
             # curr_allocs protects against duplicated scheduled variables
             curr_allocs = []
-            for t in self.current_plan.tasks:
+            for t in current_plan.tasks:
                 if t.task_status is TaskStatus.FINISHED:
-                    self.current_plan.tasks.remove(t)
+                    current_plan.tasks.remove(t)
             machine, task, status = self.algorithm(
                 cluster=self.cluster,
                 clock=self.env.now,
-                workflow_plan=self.current_plan
+                workflow_plan=current_plan
             )
-            self.current_plan.status = status
+            current_plan.status = status
 
             if (machine is None and task is None and status is
                     WorkflowStatus.FINISHED):
                 if self.buffer.mark_observation_finished(
-                        self.current_observation
+                        observation
                 ):
-                    self.current_plan = None
-                    self.current_observation = None
+                    self.observation_queue.remove(observation)
+                    current_plan = None
+                    observation = None
                     break
             elif (machine is None
                   or task is None):

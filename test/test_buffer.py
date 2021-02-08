@@ -34,6 +34,7 @@ PLAN_ALGORITHM = 'heft'
 
 CONFIG = "test/data/config/standard_simulation.json"
 
+BUFFER_ID = 0
 
 class TestBufferConfig(unittest.TestCase):
 
@@ -49,9 +50,9 @@ class TestBufferConfig(unittest.TestCase):
         buffer = Buffer(
             env=self.env, cluster=self.cluster, config=self.config
         )
-        self.assertEqual(500, buffer.hot.total_capacity)
-        self.assertEqual(500, buffer.hot.current_capacity)
-        self.assertEqual(5, buffer.hot.max_ingest_data_rate)
+        self.assertEqual(500, buffer.hot[BUFFER_ID].total_capacity)
+        self.assertEqual(500, buffer.hot[BUFFER_ID].current_capacity)
+        self.assertEqual(5, buffer.hot[BUFFER_ID].max_ingest_data_rate)
 
     def testColdBufferConfig(self):
         """
@@ -61,9 +62,9 @@ class TestBufferConfig(unittest.TestCase):
         buffer = Buffer(
             env=self.env, cluster=self.cluster, config=self.config
         )
-        self.assertEqual(250, buffer.cold.total_capacity)
-        self.assertEqual(250, buffer.cold.current_capacity)
-        self.assertEqual(2, buffer.cold.max_data_rate)
+        self.assertEqual(250, buffer.cold[BUFFER_ID].total_capacity)
+        self.assertEqual(250, buffer.cold[BUFFER_ID].current_capacity)
+        self.assertEqual(2, buffer.cold[BUFFER_ID].max_data_rate)
 
 
 class TestBufferIngestDataStream(unittest.TestCase):
@@ -110,12 +111,12 @@ class TestBufferIngestDataStream(unittest.TestCase):
             )
         )
         self.env.run(until=1)
-        self.assertEqual(495, self.buffer.hot.current_capacity)
+        self.assertEqual(495, self.buffer.hot[BUFFER_ID].current_capacity)
         self.env.run(until=10)
         self.assertEqual(self.env.now, 10)
-        self.assertEqual(450, self.buffer.hot.current_capacity)
+        self.assertEqual(450, self.buffer.hot[BUFFER_ID].current_capacity)
         self.assertEqual(
-            self.buffer.hot.observations["stored"][0],
+            self.buffer.hot[BUFFER_ID].observations["stored"][0],
             self.observation
         )
 
@@ -191,13 +192,13 @@ class TestBufferIngestDataStream(unittest.TestCase):
 
         """
 
-        self.buffer.hot.current_capacity = 2
+        self.buffer.hot[BUFFER_ID].current_capacity = 2
         self.assertFalse(
             self.buffer.check_buffer_capacity(self.observation)
         )
 
-        self.buffer.hot.current_capacity = 100
-        self.buffer.cold.current_capacity = 1
+        self.buffer.hot[BUFFER_ID].current_capacity = 100
+        self.buffer.cold[BUFFER_ID].current_capacity = 1
         self.assertFalse(
             self.buffer.check_buffer_capacity(self.observation)
         )
@@ -242,23 +243,23 @@ class TestBufferRequests(unittest.TestCase):
         self.observation.status = RunStatus.RUNNING
         self.env.process(self.buffer.ingest_data_stream(self.observation))
         self.env.run(until=10)
-        self.assertEqual(480, self.buffer.hot.current_capacity)
+        self.assertEqual(480, self.buffer.hot[BUFFER_ID].current_capacity)
 
         # Moving data from one to the other
-        self.assertEqual(250, self.buffer.cold.current_capacity)
+        self.assertEqual(250, self.buffer.cold[BUFFER_ID].current_capacity)
         self.assertTrue(self.observation in
-                         self.buffer.hot.observations["stored"])
-        self.env.process(self.buffer.move_hot_to_cold())
+                         self.buffer.hot[BUFFER_ID].observations["stored"])
+        self.env.process(self.buffer.move_hot_to_cold(0))
         self.env.run(until=15)
-        self.assertEqual(240, self.buffer.cold.current_capacity)
-        self.assertEqual(490, self.buffer.hot.current_capacity)
+        self.assertEqual(240, self.buffer.cold[BUFFER_ID].current_capacity)
+        self.assertEqual(490, self.buffer.hot[BUFFER_ID].current_capacity)
         self.env.run(until=20)
-        self.assertEqual(230, self.buffer.cold.current_capacity)
+        self.assertEqual(230, self.buffer.cold[BUFFER_ID].current_capacity)
         self.env.run(until=22)
-        self.assertEqual(500, self.buffer.hot.current_capacity)
-        self.assertEqual(230, self.buffer.cold.current_capacity)
+        self.assertEqual(500, self.buffer.hot[BUFFER_ID].current_capacity)
+        self.assertEqual(230, self.buffer.cold[BUFFER_ID].current_capacity)
         self.assertListEqual(
-            [self.observation], self.buffer.cold.observations['stored']
+            [self.observation], self.buffer.cold[BUFFER_ID].observations['stored']
         )
 
     def test_hot_transfer_observation(self):
@@ -280,29 +281,29 @@ class TestBufferRequests(unittest.TestCase):
         Returns
         -------
         """
-        self.buffer.hot.current_capacity = 450
+        self.buffer.hot[BUFFER_ID].current_capacity = 450
         self.observation.total_data_size = 50
         data_left_to_transfer = self.observation.total_data_size
-        self.buffer.hot.observations["stored"].append(self.observation)
-        data_left_to_transfer = self.buffer.hot.transfer_observation(
+        self.buffer.hot[BUFFER_ID].observations["stored"].append(self.observation)
+        data_left_to_transfer = self.buffer.hot[BUFFER_ID].transfer_observation(
             self.observation,
-            self.buffer.cold.max_data_rate,
+            self.buffer.cold[BUFFER_ID].max_data_rate,
             data_left_to_transfer
         )
         self.assertEqual(48, data_left_to_transfer)
         self.assertTrue(
-            self.observation in self.buffer.hot.observations["stored"]
+            self.observation in self.buffer.hot[BUFFER_ID].observations["stored"]
         )
-        self.assertEqual(452, self.buffer.hot.current_capacity)
+        self.assertEqual(452, self.buffer.hot[BUFFER_ID].current_capacity)
         timestep = 24
         while data_left_to_transfer > 0:
-            data_left_to_transfer = self.buffer.hot.transfer_observation(
+            data_left_to_transfer = self.buffer.hot[BUFFER_ID].transfer_observation(
                 self.observation,
-                self.buffer.cold.max_data_rate,
+                self.buffer.cold[BUFFER_ID].max_data_rate,
                 data_left_to_transfer
             )
         self.assertEqual(0, data_left_to_transfer)
-        self.assertEqual(500, self.buffer.hot.current_capacity)
+        self.assertEqual(500, self.buffer.hot[BUFFER_ID].current_capacity)
 
     def test_cold_receive_data(self):
         """
@@ -323,26 +324,27 @@ class TestBufferRequests(unittest.TestCase):
         Returns
         -------
         """
+
         self.observation.total_data_size = 50
         data_left_to_transfer = self.observation.total_data_size
-        data_left_to_transfer = self.buffer.cold.receive_observation(
+        data_left_to_transfer = self.buffer.cold[BUFFER_ID].receive_observation(
             self.observation,
             data_left_to_transfer
         )
         self.assertEqual(48, data_left_to_transfer)
         self.assertFalse(
-            self.observation in self.buffer.cold.observations['stored']
+            self.observation in self.buffer.cold[BUFFER_ID].observations['stored']
         )
 
         while data_left_to_transfer > 0:
-            data_left_to_transfer = self.buffer.cold.receive_observation(
+            data_left_to_transfer = self.buffer.cold[BUFFER_ID].receive_observation(
                 self.observation,
                 data_left_to_transfer
             )
         self.assertTrue(
-            self.observation in self.buffer.cold.observations['stored']
+            self.observation in self.buffer.cold[BUFFER_ID].observations['stored']
         )
-        self.assertEqual(None, self.buffer.cold.observations['transfer'])
+        self.assertEqual(None, self.buffer.cold[BUFFER_ID].observations['transfer'])
 
     # @unittest.skip("Functionality has changed")
     def testWorkflowAddedToQueue(self):

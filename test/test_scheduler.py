@@ -133,12 +133,12 @@ class TestSchedulerIngest(unittest.TestCase):
         self.env.run(until=1)
         self.assertEqual(5, len(self.cluster.resources['available']))
         # After 1 timestep, data in the HotBuffer should be 2
-        self.assertEqual(496, self.buffer.hot.current_capacity)
+        self.assertEqual(496, self.buffer.hot[0].current_capacity)
         self.env.run(until=30)
         self.assertEqual(10, len(self.cluster.resources['available']))
         self.assertEqual(5, len(self.cluster.tasks['finished']))
-        self.assertEqual(500, self.buffer.hot.current_capacity)
-        self.assertEqual(210, self.buffer.cold.current_capacity)
+        self.assertEqual(500, self.buffer.hot[0].current_capacity)
+        self.assertEqual(210, self.buffer.cold[0].current_capacity)
 
 
 """
@@ -208,23 +208,24 @@ class TestSchedulerFIFO(unittest.TestCase):
         # self.assertFalse(self.scheduler.allocate_tasks())
 
         curr_obs = self.telescope.observations[0]
-        self.scheduler.current_observation = curr_obs
-        gen = self.scheduler.allocate_tasks()
+        # self.scheduler.current_observation = curr_obs
+        gen = self.scheduler.allocate_tasks(curr_obs)
         self.assertRaises(RuntimeError, next, gen)
         l = [0, 3, 2, 4, 1,5, 6, 8, 7, 9]
         exec_ord = [
             curr_obs.name + '_' + str(self.env.now) + '_' + str(tid) for tid
             in l
         ]
-        self.env.process(self.planner.run(self.scheduler.current_observation))
-        self.env.process(self.scheduler.allocate_tasks(test=True))
+        self.scheduler.observation_queue.append(curr_obs)
+        self.env.process(self.planner.run(curr_obs))
+        self.env.process(self.scheduler.allocate_tasks(curr_obs, test=True))
         self.env.run(1)
         self.assertListEqual(
             l,
-            [a.task.tid for a in self.scheduler.current_plan.exec_order]
+            [a.task.tid for a in curr_obs.plan.exec_order]
         )
-        self.buffer.cold.observations['stored'].append(curr_obs)
-        self.env.process(self.scheduler.allocate_tasks())
+        self.buffer.cold[0].observations['stored'].append(curr_obs)
+        self.env.process(self.scheduler.allocate_tasks(curr_obs))
         self.env.run(until=2)
         self.assertEqual(1, len(self.cluster.tasks['running']))
         self.env.run(until=12)
@@ -239,8 +240,9 @@ class TestSchedulerFIFO(unittest.TestCase):
         self.env.run(until=102)
         self.assertEqual(10, len(self.cluster.tasks['finished']))
         self.assertEqual(0, len(self.cluster.tasks['running']))
-        self.assertEqual(None,
-                         self.scheduler.current_observation)
+        self.assertEqual(0, len(self.scheduler.observation_queue))
+        # self.assertEqual(None,
+        #                  self.scheduler.current_observation)
 
 
 class TestSchedulerIntegration(unittest.TestCase):
@@ -277,7 +279,7 @@ class TestSchedulerIntegration(unittest.TestCase):
         )
         self.env.process(self.cluster.run())
         self.env.process(self.buffer.run())
-        self.scheduler.init()
+        self.scheduler.start()
         self.env.process(self.scheduler.run())
 
         observation.status = RunStatus.WAITING
@@ -291,11 +293,11 @@ class TestSchedulerIntegration(unittest.TestCase):
 
         self.assertEqual(5, len(self.cluster.resources['available']))
         # After 1 timestep, data in the HotBuffer should be 2
-        self.assertEqual(496, self.buffer.hot.current_capacity)
+        self.assertEqual(496, self.buffer.hot[0].current_capacity)
         self.env.run(until=30)
         self.assertEqual(5, len(self.cluster.tasks['finished']))
-        self.assertEqual(500, self.buffer.hot.current_capacity)
-        self.assertEqual(210, self.buffer.cold.current_capacity)
+        self.assertEqual(500, self.buffer.hot[0].current_capacity)
+        self.assertEqual(210, self.buffer.cold[0].current_capacity)
         self.env.run(until=131)
 
-        self.assertEqual(250, self.buffer.cold.current_capacity)
+        self.assertEqual(250, self.buffer.cold[0].current_capacity)
