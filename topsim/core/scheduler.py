@@ -49,6 +49,7 @@ class Scheduler:
         self.status = SchedulerStatus.SLEEP
         self.ingest_observation = None
         self.observation_queue = []
+        self.schedule_status = ScheduleStatus.ONTIME
 
     def start(self):
         """
@@ -101,25 +102,17 @@ class Scheduler:
             LOGGER.debug("Scheduler Status: %s", self.status)
             yield self.env.timeout(TIMESTEP)
 
-    def cluster_capacity_for_alloc(self):
+    def scheduler_status(self):
         """
-        For the next observation on the queue, make sure that the cluster is
-        able to process the workflow.
+        The status of the scheduled observation(s) and whether or not the
+        scheduler has been delayed yet.
+
         Returns
         -------
-
+        status: Scheduler.ScheduleStatus
+            The status Enum
         """
-
-    def start_ingest_pipelines(self, observation, pipeline):
-
-        streaming_time = int(observation.duration / 2)
-        if self.buffer.check_buffer_capacity(observation.project_output):
-            yield self.env.timeout(streaming_time)
-
-        # TODO Buffer should run at beginning of simulation, and we should
-        #  add runtime checks for the buffer to mimic this functionality.
-        # in fact, we don't even take observation as a parameter anymore. 
-        yield self.env.process(self.buffer.run(observation))
+        return self.schedule_status
 
     def check_ingest_capacity(self, observation, pipelines, max_ingest):
         """
@@ -258,7 +251,6 @@ class Scheduler:
         # #  runtime (i.e. we have a 'delay'); if not, we have a delay and
         # # we need to return 'current workflow execution status'
 
-        tasks = {}
         allocation_triggers = []
         while not test:
             # curr_allocs protects against duplicated scheduled variables
@@ -279,8 +271,6 @@ class Scheduler:
                         observation
                 ):
                     self.observation_queue.remove(observation)
-                    current_plan = None
-                    observation = None
                     break
             elif (machine is None
                   or task is None):
@@ -311,3 +301,9 @@ class SchedulerStatus(Enum):
     SLEEP = 'SLEEP'
     RUNNING = 'RUNNING'
     SHUTDOWN = 'SHUTDOWN'
+
+
+class ScheduleStatus(Enum):
+    ONTIME = 'ONTIME'
+    DELAYED = 'DELAYED'
+    FAILURE = 'FAILURE'

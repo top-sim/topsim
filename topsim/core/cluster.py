@@ -78,7 +78,7 @@ class Cluster:
         while True:
             for c in self.cl:
                 if not self.clusters[c]['ingest']['status']:
-                    self.clusters[c]['usage_data']
+                    self.clusters[c]['usage_data']['ingest'] = 0
                     self.clusters[c]['ingest']['demand'] = 0
                 if self.clusters[c]['tasks']['waiting']:
                     for task in self.clusters[c]['tasks']['waiting']:
@@ -214,9 +214,17 @@ class Cluster:
                     self.clusters[c]['resources']['occupied'].append(machine)
                     self.clusters[c]['resources']['available'].remove(machine)
                     self.usage_data['available'] -= 1
-
                     self.usage_data['running_tasks'] += 1
+                    duration = round(task.flops / machine.cpu)
+                    if duration != task.duration:
+                        task.duration = duration
+
                 task.task_status = TaskStatus.SCHEDULED
+
+                # The currently-stored duration may be a result of a
+                # preliminary allocation to another machine. Here we make
+                # sure we update that.
+
                 ret = self.env.process(machine.run(task, self.env))
             if ret.triggered:
                 self.clusters[c]['tasks']['running'].remove(task)
@@ -231,7 +239,6 @@ class Cluster:
                 self.usage_data['available'] += 1
                 task.task_status = TaskStatus.FINISHED
                 return task.task_status
-                # break
             else:
                 yield self.env.timeout(TIMESTEP)
 
@@ -242,13 +249,37 @@ class Cluster:
         ----------
         machine : topsim.core.machine.Machine
             The machine with which we are concerned.
-
+        c : object
+            The identifier for the cluster that is being accessed (in the
+            event of multiple clusters). Access the 'default' cluster by
+            default (nothing needs changing in this scenario, in which only
+            one cluster is specified).
         Returns
         -------
 
         """
         return (machine in self.clusters[c]['resources']['occupied']
                 or machine in self.clusters[c]['resources']['ingest'])
+
+    # TODO
+    def find_unnoccupied_resources(self, task_reqs):
+        """
+        Return a list of unnoccupied machines that have the capacity based
+        on the task requirements. Task requirements will be any combination
+        of machine resources (FLOPs, IO, Memory).
+
+        This is intended to be used by a scheduling Actor in the event that
+        a resource identified in a WorkflowPlan is no longer available.
+
+        Parameters
+        ----------
+        task_reqs : dict
+            Dictionary of required resources for a given task.
+
+        Returns
+        -------
+
+        """
 
     def _generate_ingest_tasks(self, demand, duration):
         """
@@ -266,53 +297,12 @@ class Cluster:
         """
         tasks = []
         for i in range(demand):
-            t = Task("ingest-t{0}".format(i), env=self.env)
+            t = Task("ingest-t{0}".format(i))
             t.duration = duration
             t.task_status = TaskStatus.SCHEDULED
             tasks.append(t)
         return tasks
 
-    def availability(self):
-        """ Returns
-        -------
-        availability: what resources are available
-        """
-        availability = None
-        for machine in self.machines:
-            if machine.current_task:
-                availability += 1
-
-        return availability
-
-    def resource_use(self):
-        """Returns the utilisation of the Cluster"""
-        ustilisation = None
-        for machine in self.machines:
-            if machine.current_task:
-                ustilisation += 1
-
-        return ustilisation
-
-    def stop_task(self, task):
-        if self.clusters[c]['tasks']['running'].remove(task) and \
-                self.clusters[c]['tasks']['finished'].append(task):
-            return True
-        else:
-            raise Exception
-
-    # TODO Place holder method
-    def efficiency(self):
-        """
-
-        Returns
-        -------
-        efficiency: The efficiency of the cluster
-        """
-        efficiency = None
-        for machine in self.machines:
-            if machine.current_task:
-                efficiency += 1
-        return efficiency
 
     def to_df(self):
         df = pd.DataFrame()

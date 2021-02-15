@@ -20,9 +20,10 @@ logger = logging.getLogger(__name__)
 class Planner:
     """
     The Planner is our interface with static scheduling algorithms. It provides
-    an interface to other libraries and selects the library based on the provided
-    algorithms based to the _init_. Currently, the SHADOW library is the only
-    library that the Planner is aligned with; this may change in the future.
+    an interface to other libraries and selects the library based on the
+    provided algorithms based to the _init_. Currently, the SHADOW library is
+    the only library that the Planner is aligned with; this may change in the
+    future.
     """
 
     def __init__(self, env, algorithm, cluster):
@@ -88,9 +89,11 @@ class WorkflowStatus(int, Enum):
 
 class WorkflowPlan:
     """
-    WorkflowPlans are used within the Planner, SchedulerA Actors and Cluster Resource. They are higher-level than the
-    shadow library representation, as they are a storage component of scheduled tasks, rather than directly representing
-    the DAG nature of the workflow. This is why the tasks are stored in queues.
+    WorkflowPlans are used within the Planner, SchedulerA Actors and Cluster
+    Resource. They are higher-level than the shadow library representation,
+    as they are a storage component of scheduled tasks, rather than directly
+    representing the DAG nature of the workflow. This is why the tasks are
+    stored in queues.
     """
 
     def __init__(self, observation, workflow, algorithm, env):
@@ -115,7 +118,7 @@ class WorkflowPlan:
         for task in self.solution.task_allocations:
             allocation = self.solution.task_allocations.get(task)
             tid = self._create_observation_task_id(task.tid, env)
-            taskobj = Task(tid, env)
+            taskobj = Task(tid)
             taskobj.est = allocation.ast
             taskobj.eft = allocation.aft
             taskobj.duration = taskobj.eft - taskobj.est

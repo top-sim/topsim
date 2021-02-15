@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from enum import Enum
+from topsim.core.delay import DelayModel
 import logging
 
 logger = logging.getLogger(__name__)
@@ -35,26 +36,21 @@ class Task(object):
 
     # NB I don't want tasks to have null defaults; should we improve on this
     # by initialising everything in a task at once?
-    def __init__(self, tid, env):
+    def __init__(self, tid):
         """
         :param tid: ID of the Task object
         :param env: Simulation environment to which the task will be added, and where it will run as a process
         """
 
         self.id = tid
-        self.env = env
         self.est = 0
         self.eft = 0
         self.ast = -1
         self.aft = -1
         self.machine_id = None
         self.duration = None
-        self.exec_order = None
         self.task_status = TaskStatus.UNSCHEDULED
         self.pred = None
-        self.expected_finish_time = None
-        self.finished_timestamp = None
-        self.started_timestamp = None
         self.delay = None
 
         # Machine information that is less important
@@ -64,40 +60,30 @@ class Task(object):
         self.memory = 0
         self.io = 0
 
-    #
-    # def __lt__(self, other):
-    # 	return self.exec_order < other.exec_order
-    #
-    # def __eq__(self, other):
-    # 	return self.exec_order == other.exec_order
-    #
-    # def __gt__(self, other):
-    # 	return self.exec_order > other.exec_order
     def __repr__(self):
         return str(self.id)
 
     def __hash__(self):
         return hash(self.id)
 
-    def do_work(self):
-        self.task_status = TaskStatus.RUNNING
-        # if self.id == 'ingest-t0':
-        #     self.duration += 5
+    def do_work(self,env):
+        """
+        This runs the task on the 'cluster'. We make the task in control of
+        it's execution in order to "give it control" of delays.
 
-        yield self.env.timeout(self.duration-1)
-        self.finished_timestamp = self.env.now
-        logger.debug('%s finished at %s', self.id, self.finished_timestamp)
+        do_work() follows a trend of TOpSim code in that it yields and then
+        returns after a given duration.
+        Parameters
+        ----------
+        env
+
+        Returns
+        -------
+
+        """
+        self.task_status = TaskStatus.RUNNING
+        self.ast = env.now
+        yield env.timeout(self.duration-1)
+        self.aft = env.now
+        logger.debug('%s finished at %s', self.id, self.aft)
         return TaskStatus.FINISHED
-
-    # self.machine.stop_task(self)
-
-    def run(self):
-        self.started_timestamp = self.env.now
-        logger.debug('%s started at %s', self.id, self.started_timestamp)
-        self.task_status = TaskStatus.RUNNING
-        process = self.env.process(self.do_work())
-        # if process:
-        #     return self.task_status
-        # else:
-        #     raise RuntimeError(
-        #         'Task {0} failed to execute normally'.format(self))

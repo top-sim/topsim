@@ -29,7 +29,7 @@ class Machine(object):
         while True:
             if task.task_status is TaskStatus.SCHEDULED:
                 self.run_task(task)
-                ret = yield env.process(task.do_work())
+                ret = yield env.process(task.do_work(env))
                 self.stop_task(task)
                 return ret
 
