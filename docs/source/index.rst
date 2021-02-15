@@ -1,8 +1,6 @@
 -----------------
 TopSim
 -----------------
-.. toctree::
-   :maxdepth: 1
 
 
 Telescope OPerations Simulator (TopSim) is a simulation framework built to
@@ -36,10 +34,12 @@ resources is covered in both the :ref:`model_overview` and
 :ref:`configuration`
 sections.
 
+
 Requirements
 -------------
 .. toctree::
 	:maxdepth: 1
+	:caption: Documentation
 
 	requirements
 
@@ -60,7 +60,14 @@ Configuration and Set-up
 
 	configuration
 	runningsim
+	simulation
 
 Algorithms and *shadow* integration
 -----------------------------------
 
+
+.. toctree::
+	:maxdepth: 1
+	:caption: Reference Items
+
+	reference/index
