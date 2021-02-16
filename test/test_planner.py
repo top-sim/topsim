@@ -20,6 +20,7 @@ from topsim.core.config import Config
 from topsim.core.planner import Planner
 from topsim.core.cluster import Cluster
 from topsim.core.instrument import Observation
+from topsim.core.delay import DelayModel
 
 from topsim.user.scheduling import FifoAlgorithm
 
@@ -51,7 +52,6 @@ class TestPlannerConfig(unittest.TestCase):
     def testPlannerBasicConfig(self):
         planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
         available_resources = planner.cluster_to_shadow_format()
-        # TODO write tests for the plan
         self.assertEqual(1.0, available_resources['system']['bandwidth'])
         machine = available_resources['system']['resources']['cat0_m0']
         self.assertEqual(
@@ -100,14 +100,17 @@ class TestWorkflowPlan(unittest.TestCase):
         self.assertEqual(task5_comp, 92000)
 
 
-class TestPlanner(unittest.TestCase):
+
+
+class TestPlannerDelay(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
         sched_algorithm = FifoAlgorithm()
         config = Config(HEFT_CONFIG)
+        dm = DelayModel(0.1, "normal")
         self.cluster = Cluster(self.env, config)
-        self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
+        self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster, dm)
         self.observation = Observation(
             'planner_observation',
             OBS_START_TME,
@@ -118,29 +121,18 @@ class TestPlanner(unittest.TestCase):
             data_rate=None
         )
 
-
-    def tearDown(self):
-        pass
-
     def testShadowIntegration(self):
         pass
 
-    def testPlanReadsFromFile(self):
-        # Return a "Plan" object for provided workflow/observation
-        plan = self.planner.plan(self.observation.name,
-                                 self.observation.workflow, PLAN_ALGORITHM)
-        self.assertEqual(plan.id,
-                         'planner_observation')  # Expected ID for the workflow
-        self.assertEqual(plan.solution.makespan,
-                         98)  # Expected makespan for the given graph
-
     def testPlannerRun(self):
+        """
+        because run() is a generator (we call yield for simpy),
+        we use(next()) to 'get the return value',
+        and thus run the rest of the code in run()  next(val)
+        """
         next(self.planner.run(self.observation))
-        # because run() is a generator (we call yield for simpy),
-        # we use(next()) to 'get the return value',
-        # and thus run the rest of the code in run()
-        # next(val)
         self.assertTrue(self.observation.plan is not None)
+        self.assertTrue(0.1, self.observation.plan.tasks[0].delay.prob)
 
     def testGracefulExit(self):
         pass

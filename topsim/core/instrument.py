@@ -93,7 +93,7 @@ class Observation(object):
         self.cluster_id = 'default'
         self.start = start
         self.est = start
-        self.ast = start
+        self.ast = None
         self.duration = duration
         self.demand = demand
         self.status = RunStatus.WAITING
@@ -129,6 +129,8 @@ class Observation(object):
             return False
 
     def is_finished(self, current_time, telescope_status):
+        if self.ast is None:
+            return False
         if current_time >= self.ast + self.duration \
                 and telescope_status \
                 and (self.status is not RunStatus.FINISHED):

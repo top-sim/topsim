@@ -237,12 +237,13 @@ class TestSchedulerFIFO(unittest.TestCase):
         self.assertEqual(3, len(self.cluster.tasks['running']))
         self.env.run(until=98)
         self.assertEqual(exec_ord[-1], self.cluster.tasks['running'][0].id)
-        self.env.run(until=102)
+        self.env.run(until=106)
         self.assertEqual(10, len(self.cluster.tasks['finished']))
         self.assertEqual(0, len(self.cluster.tasks['running']))
+        self.env.run(until=107)
+        # one more cycle before we reach the point where the scheduler is
+        # able to remove the observation from the queue
         self.assertEqual(0, len(self.scheduler.observation_queue))
-        # self.assertEqual(None,
-        #                  self.scheduler.current_observation)
 
 
 class TestSchedulerIntegration(unittest.TestCase):

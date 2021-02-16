@@ -1,7 +1,8 @@
 import sys
 import logging
+import copy
+
 from enum import Enum
-# sys.path.append(path.abspath('../../shadow'))
 
 from topsim.core.task import Task
 
@@ -13,8 +14,12 @@ from shadow.algorithms.heuristic import pheft as shadow_pheft
 logger = logging.getLogger(__name__)
 
 
-# BUFFER_OFFSET = config_data.buffer_offset
-# from core.telescope import Observation
+class WorkflowStatus(int, Enum):
+    UNSCHEDULED = 1
+    SCHEDULED = 2
+    ON_TIME = 3
+    DELAYED = 4
+    FINISHED = 5
 
 
 class Planner:
@@ -26,11 +31,12 @@ class Planner:
     future.
     """
 
-    def __init__(self, env, algorithm, cluster):
+    def __init__(self, env, algorithm, cluster, delay_model=None):
         self.env = env
         self.cluster = cluster
         # self.envconfig = envconfig
         self.algorithm = algorithm
+        self.delay_model = delay_model
 
     def run(self, observation):
         # wfid = observation.name
@@ -43,7 +49,8 @@ class Planner:
         available_resources = self.cluster_to_shadow_format()
         workflow_env = ShadowEnvironment(available_resources, dictionary=True)
         workflow.add_environment(workflow_env)
-        plan = WorkflowPlan(name, workflow, algorithm, self.env)
+        plan = WorkflowPlan(name, workflow, algorithm, self.env,
+                            self.delay_model)
         return plan
 
     def cluster_to_shadow_format(self):
@@ -52,10 +59,6 @@ class Planner:
         and create a dictionary in the format required for shadow.
         :return: dictionary of machine requirements
         """
-        sdict = {}
-        # "flops": 84,
-        # "rates": 10
-        # "costs": 0.7
         available_resources = self.cluster.resources['available']
         dictionary = {
             "system": {
@@ -76,17 +79,6 @@ class Planner:
         return dictionary
 
 
-# for machine in available_resources:
-
-
-class WorkflowStatus(int, Enum):
-    UNSCHEDULED = 1
-    SCHEDULED = 2
-    ON_TIME = 3
-    DELAYED = 4
-    FINISHED = 5
-
-
 class WorkflowPlan:
     """
     WorkflowPlans are used within the Planner, SchedulerA Actors and Cluster
@@ -96,7 +88,7 @@ class WorkflowPlan:
     stored in queues.
     """
 
-    def __init__(self, observation, workflow, algorithm, env):
+    def __init__(self, observation, workflow, algorithm, env, delay_model):
         self.id = observation
         if algorithm is 'heft':
             self.solution = shadow_heft(workflow)
@@ -105,20 +97,12 @@ class WorkflowPlan:
         else:
             sys.exit("Other algorithms are not supported")
 
-        # DO Task execution things here
-        taskid = 0
-        ast = 1
-        aft = 2
         self.tasks = []
-        task_order = []
-
-        # The solution object is now how we get information on allocatiosn
-        # from SHADOW
-        # TODO Need to generate a unique TID that is tied to the Observation
         for task in self.solution.task_allocations:
             allocation = self.solution.task_allocations.get(task)
-            tid = self._create_observation_task_id(task.tid, env)
-            taskobj = Task(tid)
+            tid = self._create_observation_task_id( task.tid, env)
+            dm = copy.copy(delay_model)
+            taskobj = Task(tid, dm)
             taskobj.est = allocation.ast
             taskobj.eft = allocation.aft
             taskobj.duration = taskobj.eft - taskobj.est
@@ -135,7 +119,6 @@ class WorkflowPlan:
         self.start_time = None
         self.priority = 0
         self.status = WorkflowStatus.UNSCHEDULED
-        self.delayed = None
 
     def _create_observation_task_id(self, tid, env):
         return self.id + '_' + str(env.now) + '_' + str(tid)

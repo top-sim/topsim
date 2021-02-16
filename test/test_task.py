@@ -12,3 +12,83 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import unittest
+import copy
+import simpy
+
+from topsim.core.delay import DelayModel
+from topsim.core.task import Task, TaskStatus
+
+
+class TestTaskDelay(unittest.TestCase):
+
+    def setUp(self):
+        self.task_id = 'apricot_jam_0_10'
+        self.dm_nodelay = DelayModel(0.1, "normal")
+        self.dm_delay = DelayModel(0.3, "normal")
+        self.assertEqual(20, self.dm_nodelay.seed)
+
+        self.machine_id = 'x1'
+        self.flops = 10000
+        self.pred = []
+
+        self.env = simpy.Environment()
+
+    def testTaskWithOutDelay(self):
+        dm = copy.copy(self.dm_nodelay)
+        t = Task(self.task_id, dm)
+        t.est = 0
+        t.eft = 11
+        t.duration = t.eft - t.est
+        t.ast = 0
+        delay = t._calc_task_delay()
+        self.assertEqual(0, delay - t.duration)
+
+    def testTaskWithDelay(self):
+        dm = copy.copy(self.dm_delay)
+        t = Task(self.task_id, dm)
+        t.est = 0
+        t.eft = 11
+        t.ast = 0
+        t.duration = t.eft - t.est
+        delay = t._calc_task_delay()
+        self.assertEqual(1, delay - t.duration)
+
+    def testTaskDoWorkWithOutDelay(self):
+        dm = copy.copy(self.dm_nodelay)
+        t = Task(self.task_id, dm)
+        t.est = 0
+        t.ast = 0
+        t.eft = 11
+        t.duration = t.eft - t.est
+        self.env.process(t.do_work(self.env))
+        self.env.run()
+        self.assertEqual(11, t.aft)
+
+
+    def testTaskDoWorkWithDelay(self):
+        dm = copy.copy(self.dm_delay)
+        t = Task(self.task_id, dm)
+        t.est = 0
+        t.ast = 0
+        t.eft = 11
+        t.duration = t.eft - t.est
+        self.env.process(t.do_work(self.env))
+        self.env.run()
+        self.assertEqual(12, t.aft)
+
+
+class TaskInit(unittest.TestCase):
+
+    def setUp(self):
+        self.task_id = 'apricot_jam_0_10'
+        self.dm = None
+        self.est = 0
+        self.eft = 11
+        self.machine_id = 'x1'
+        self.flops = 10000
+        self.pred = []
+
+    def test_task_init(self):
+        t = Task(self.id, self.dm)

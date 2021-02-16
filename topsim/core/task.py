@@ -36,7 +36,7 @@ class Task(object):
 
     # NB I don't want tasks to have null defaults; should we improve on this
     # by initialising everything in a task at once?
-    def __init__(self, tid):
+    def __init__(self, tid, delay):
         """
         :param tid: ID of the Task object
         :param env: Simulation environment to which the task will be added, and where it will run as a process
@@ -51,7 +51,7 @@ class Task(object):
         self.duration = None
         self.task_status = TaskStatus.UNSCHEDULED
         self.pred = None
-        self.delay = None
+        self.delay = delay
 
         # Machine information that is less important
         # currently (will update this in future versions)
@@ -65,6 +65,8 @@ class Task(object):
 
     def __hash__(self):
         return hash(self.id)
+
+
 
     def do_work(self,env):
         """
@@ -83,7 +85,21 @@ class Task(object):
         """
         self.task_status = TaskStatus.RUNNING
         self.ast = env.now
-        yield env.timeout(self.duration-1)
+        self.eft = self.duration+self.ast
+        duration = self._calc_task_delay()
+        yield env.timeout(duration)
         self.aft = env.now
         logger.debug('%s finished at %s', self.id, self.aft)
         return TaskStatus.FINISHED
+
+    def _calc_task_delay(self):
+        """
+        Use the delay model associated with the task to generate a delay
+        Returns
+        -------
+        updated duration
+        """
+        if self.delay is not None:
+            return self.delay.generate_delay(self.duration)
+        else:
+            return self.duration

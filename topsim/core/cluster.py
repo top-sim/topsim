@@ -297,7 +297,7 @@ class Cluster:
         """
         tasks = []
         for i in range(demand):
-            t = Task("ingest-t{0}".format(i))
+            t = Task("ingest-t{0}".format(i),None)
             t.duration = duration
             t.task_status = TaskStatus.SCHEDULED
             tasks.append(t)
@@ -306,12 +306,19 @@ class Cluster:
 
     def to_df(self):
         df = pd.DataFrame()
-        df['available_resources'] = [self.usage_data['available']]
-        df['occupied_resources'] = [self.usage_data['occupied']]
-        df['ingest_resources'] = [self.usage_data['ingest']]
+        df['available_resources'] = [
+            self.clusters['default']['usage_data']['available']
+        ]
+        df['occupied_resources'] = [
+            self.clusters['default']['usage_data']['occupied']]
+        df['ingest_resources'] =[
+            self.clusters['default']['usage_data']['ingest']
+        ]
 
-        df['running_tasks'] = [self.usage_data['running_tasks']]
-        df['finished_tasks'] = [self.usage_data['finished_tasks']]
+        df['running_tasks'] = [
+            self.clusters['default']['usage_data']['running_tasks']]
+        df['finished_tasks'] = [
+            self.clusters['default']['usage_data']['finished_tasks']]
         # df['waiting_tasks'] = [len(self.tasks['waiting'])]
 
         return df

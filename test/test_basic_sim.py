@@ -73,7 +73,7 @@ class TestBasicIngest(unittest.TestCase):
 
         """
         self.assertEqual(0, self.env.now)
-        self.simulation.start(runtime=6)
+        self.simulation.start(runtime=7)
         self.assertEqual(
             2, self.simulation.cluster.ingest['completed']
         )
@@ -100,7 +100,7 @@ class TestBasicIngest(unittest.TestCase):
             1,
             len(self.simulation.buffer.cold[0].observations["stored"])
         )
-        self.simulation.resume(until=3)
+        self.simulation.resume(until=4)
         self.assertEqual(10, self.simulation.buffer.hot[0].current_capacity)
         self.assertEqual(0, self.simulation.buffer.cold[0].current_capacity)
         self.assertEqual(
@@ -115,10 +115,9 @@ class TestBasicIngest(unittest.TestCase):
             1, len(self.simulation.buffer.cold[0].observations['stored'])
         )
         self.simulation.resume(until=8)
-        self.simulation.resume(until=9)
-        self.assertEqual(0, len(self.simulation.cluster.tasks['running']))
-        self.simulation.resume(until=10)
         self.simulation.resume(until=11)
+        self.assertEqual(0, len(self.simulation.cluster.tasks['running']))
+        self.simulation.resume(until=12)
         self.assertEqual(
             2, len(self.simulation.buffer.cold[0].observations['stored'])
         )
