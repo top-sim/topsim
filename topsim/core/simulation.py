@@ -71,7 +71,8 @@ class Simulation:
             config,
             instrument,
             algorithm_map,
-            event_file
+            event_file,
+            delay=None
     ):
 
         self.env = env
@@ -86,7 +87,7 @@ class Simulation:
         self.cluster = Cluster(env, cfg)
         self.buffer = Buffer(env, self.cluster, cfg)
         planning_algorithm = algorithm_map[cfg.planning]
-        self.planner = Planner(env, planning_algorithm, self.cluster)
+        self.planner = Planner(env, planning_algorithm, self.cluster,delay)
         scheduling_algorithm = algorithm_map[cfg.scheduling]()
         self.scheduler = Scheduler(
             env, self.buffer, self.cluster, scheduling_algorithm
