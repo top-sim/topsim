@@ -22,7 +22,7 @@ project = 'TopSim'
 copyright = '2019, RW Bunney'
 author = 'RW Bunney'
 
-master_doc = 'index'
+master_doc = 'home'
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
