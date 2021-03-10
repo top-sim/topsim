@@ -258,11 +258,11 @@ class Scheduler:
             for t in current_plan.tasks:
                 if t.task_status is TaskStatus.FINISHED:
                     current_plan.tasks.remove(t)
-            machine, task, status = self.algorithm(
-                cluster=self.cluster,
-                clock=self.env.now,
-                workflow_plan=current_plan
-            )
+                machine, task, status = self.algorithm(
+                    cluster=self.cluster,
+                    clock=self.env.now,
+                    workflow_plan=current_plan
+                )
             current_plan.status = status
 
             if (machine is None and task is None and status is
@@ -282,6 +282,9 @@ class Scheduler:
                     ret = self.env.process(
                         self.cluster.allocate_task_to_cluster(task, machine)
                     )
+                    LOGGER.info("Allocation {0}-{1} made to cluster".format(
+                        task, machine
+                    ))
                     allocation_triggers.append(ret)
                     task.task_status = TaskStatus.SCHEDULED
                     curr_allocs.append(machine)

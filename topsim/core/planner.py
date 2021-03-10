@@ -10,6 +10,7 @@ from shadow.models.workflow import Workflow as ShadowWorkflow
 from shadow.models.environment import Environment as ShadowEnvironment
 from shadow.algorithms.heuristic import heft as shadow_heft
 from shadow.algorithms.heuristic import pheft as shadow_pheft
+from shadow.algorithms.heuristic import fcfs as shadow_fcfs
 
 logger = logging.getLogger(__name__)
 
@@ -94,13 +95,21 @@ class WorkflowPlan:
             self.solution = shadow_heft(workflow)
         elif algorithm is 'pheft':
             self.solution = shadow_pheft(workflow)
+        elif algorithm is 'fcfs':
+            self.solution = shadow_fcfs(workflow)
         else:
-            sys.exit("Other algorithms are not supported")
+            raise RuntimeError("Other algorithms are not supported")
+        logger.debug(
+            "Solution makespan for {0} is {1}".format(
+                algorithm, self.solution.makespan
+            )
+        )
 
+        self.eft = self.solution
         self.tasks = []
         for task in self.solution.task_allocations:
             allocation = self.solution.task_allocations.get(task)
-            tid = self._create_observation_task_id( task.tid, env)
+            tid = self._create_observation_task_id(task.tid, env)
             dm = copy.copy(delay_model)
             taskobj = Task(tid, dm)
             taskobj.est = allocation.ast

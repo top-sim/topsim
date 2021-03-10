@@ -116,7 +116,11 @@ class Buffer:
         """
         b = observation.buffer_id
         size = observation.ingest_data_rate * observation.duration
-        if self.hot[b].current_capacity - size < 0 \
+        if self.hot[b].total_capacity < size:
+            raise RuntimeError(
+                "Observation data size exceeds total Buffer capacity"
+            )
+        elif self.hot[b].current_capacity - size < 0 \
                 or not self.cold[b].has_capacity(size):
             return False
 

@@ -29,9 +29,6 @@ class Monitor(object):
             self.df = self.df.append(
                 self.collate_actor_dataframes(), ignore_index=True
             )
-
-            logger.debug("Storing state %s",
-                         self.simulation.scheduler.print_state())
             self.events.append(state)
             self.write_to_file()
             # self.df = self.df.append(cluster)

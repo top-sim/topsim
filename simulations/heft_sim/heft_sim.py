@@ -27,8 +27,10 @@ import simpy
 from topsim.user.scheduling import FifoAlgorithm
 from topsim.user.telescope import Telescope
 from topsim.core.simulation import Simulation
+from topsim.core.delay import DelayModel
 
-EVENT_FILE = 'simulations/heft_sim/output/heft_sim.trace'
+
+EVENT_FILE = 'simulations/heft_sim/output/heft_sim_delay_low.trace'
 
 CONFIG = 'simulations/heft_sim/input/heft_single_observation_simulation.json'
 env = simpy.Environment()
@@ -36,6 +38,7 @@ env = simpy.Environment()
 planning_algorithm = 'heft'
 scheduling_algorithm = FifoAlgorithm
 instrument = Telescope
+dm = DelayModel(0.5, 'normal', DelayModel.DelayDegree.LOW)
 
 simulation = Simulation(
     env=env,
@@ -43,6 +46,7 @@ simulation = Simulation(
     instrument=instrument,
     algorithm_map={'pheft': 'pheft', 'heft': 'heft', 'fifo': FifoAlgorithm},
     event_file=EVENT_FILE,
+    delay=dm
 )
 
 simulation.start(11)

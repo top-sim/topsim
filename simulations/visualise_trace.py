@@ -25,25 +25,42 @@ sns.set_style("darkgrid")
 # tracefile = 'simulations/heft_sim/output/sim.trace'
 # heft_pickle = 'simulations/real_time/real_time.trace-heft.pkl'
 heft_pickle = 'simulations/heft_sim/output/heft_sim.trace-heft.pkl'
+delay_heft_pickle = 'simulations/heft_sim/output/heft_sim_delay.trace-heft.pkl'
+delay_low_heft_pickle = 'simulations/heft_sim/output/heft_sim_delay_low.trace' \
+                       '-heft.pkl'
 # with open(tracefile, 'r') as infile:
 # 	trace = json.load(infile)
 
 df_heft = pd.read_pickle(heft_pickle)
-# df_pheft = pd.read_pickle(pheft_pickle)
+df_delay = pd.read_pickle(delay_heft_pickle)
+df_low_delay = pd.read_pickle(delay_low_heft_pickle)
 
-fig, axs = plt.subplots(nrows=2, ncols=2)
+# fig, axs = plt.subplots(nrows=1, ncols=2)
 
 sns.lineplot(
-    data=df_heft, x=df_heft.index, y="running_tasks", ax=axs[0, 0]
+    data=df_heft, x=df_heft.index, y="running_tasks",label='No Delay'
 )
 sns.lineplot(
-    data=df_heft, x=df_heft.index, y="available_resources", ax=axs[0, 1]
+    data=df_delay,x=df_delay.index, y="running_tasks", label='High Delay'
 )
 sns.lineplot(
-    data=df_heft, x=df_heft.index, y="ingest_resources", ax=axs[0, 1]
+    data=df_low_delay, x=df_low_delay.index, y="running_tasks", label='Low '
+                                                                      'Delay'
 )
 
-plt.show()
+# sns.lineplot(
+#     data=df_heft, x=df_heft.index, y="available_resources", ax=axs[1]
+# )
+#
+# sns.lineplot(
+#     data=df_delay,x=df_delay.index, y="available_resources", ax=axs[0,1]
+# )
+#
+# sns.lineplot(
+#     data=df_heft, x=df_heft.index, y="ingest_resources", ax=axs[0, 1]
+# )
+
+plt.savefig("delays.svg", format='svg')
 
 # for timestamp in trace:
 # 	# print('Time @ {}'.format(timestamp['timestamp']))

@@ -15,7 +15,6 @@ from topsim.core.cluster import Cluster
 from topsim.core.buffer import Buffer
 from topsim.core.planner import Planner
 
-logging.basicConfig(level="WARNING")
 LOGGER = logging.getLogger(__name__)
 
 
