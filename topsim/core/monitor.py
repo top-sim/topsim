@@ -19,7 +19,6 @@ class Monitor(object):
             logger.debug('SimTime=%s', self.env.now)
             # time.sleep(0.5)
             state = {
-                # 'timestamp': self.env.now,
                 'cluster_state': self.simulation.cluster.print_state(),
                 'instrument_state': self.simulation.instrument.print_state(),
                 'scheduler_state': self.simulation.scheduler.print_state(),
