@@ -149,9 +149,9 @@ class Telescope(Instrument):
                     ):
                         ret = self.begin_observation(observation)
                         observation.ast = self.env.now
-                        self.env.process(
-                            self.planner.run(observation)
-                        )
+                        # self.env.process(
+                        #     self.planner.run(observation)
+                        # )
                         # yield plan_trigger
                         LOGGER.info(
                             'telescope is now using %s arrays',
@@ -159,7 +159,7 @@ class Telescope(Instrument):
                         )
                         process = self.env.process(
                             self.scheduler.allocate_ingest(
-                                observation, self.pipelines
+                                observation, self.pipelines, self.planner
                             ))
 
                 elif observation.is_finished(

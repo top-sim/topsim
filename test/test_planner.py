@@ -19,6 +19,7 @@ import os
 from topsim.core.config import Config
 from topsim.core.planner import Planner
 from topsim.core.cluster import Cluster
+from topsim.core.buffer import Buffer
 from topsim.core.instrument import Observation
 from topsim.core.delay import DelayModel
 
@@ -48,6 +49,7 @@ class TestPlannerConfig(unittest.TestCase):
         self.env = simpy.Environment()
         config = Config(CONFIG)
         self.cluster = Cluster(env=self.env, config=config)
+        self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
 
     def testPlannerBasicConfig(self):
         planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
@@ -65,6 +67,8 @@ class TestWorkflowPlan(unittest.TestCase):
         self.env = simpy.Environment()
         config = Config(CONFIG)
         self.cluster = Cluster(self.env, config=config)
+        self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
+
         self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
         self.observation = Observation(
             'planner_observation',
@@ -81,10 +85,17 @@ class TestWorkflowPlan(unittest.TestCase):
 
     def testWorkflowPlanCreation(self):
         time = self.env.now
+        self.assertRaises(
+            RuntimeError,
+            next, self.planner.run(self.observation, self.buffer)
+        )
+        self.observation.ast = self.env.now
+
         plan = self.planner.plan(
-            self.observation.name,
+            self.observation,
             self.observation.workflow,
-            'heft'
+            'heft',
+            self.buffer
         )
         expected_exec_order = [0, 5, 3, 4, 2, 1, 6, 8, 7, 9]
         self.assertEqual(len(plan.tasks), len(expected_exec_order))
@@ -100,8 +111,6 @@ class TestWorkflowPlan(unittest.TestCase):
         self.assertEqual(task5_comp, 92000)
 
 
-
-
 class TestPlannerDelay(unittest.TestCase):
 
     def setUp(self):
@@ -109,7 +118,8 @@ class TestPlannerDelay(unittest.TestCase):
         sched_algorithm = FifoAlgorithm()
         config = Config(HEFT_CONFIG)
         dm = DelayModel(0.1, "normal")
-        self.cluster = Cluster(self.env, config)
+        self.cluster = Cluster(self.env, config=config)
+        self.buffer = Buffer(self.env, self.cluster, config)
         self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster, dm)
         self.observation = Observation(
             'planner_observation',
@@ -130,7 +140,14 @@ class TestPlannerDelay(unittest.TestCase):
         we use(next()) to 'get the return value',
         and thus run the rest of the code in run()  next(val)
         """
-        next(self.planner.run(self.observation))
+
+        self.assertRaises(
+            RuntimeError,
+            next,
+            self.planner.run(self.observation, self.buffer)
+        )
+        self.observation.ast = self.env.now
+        next(self.planner.run(self.observation, self.buffer))
         self.assertTrue(self.observation.plan is not None)
         self.assertTrue(0.1, self.observation.plan.tasks[0].delay.prob)
 

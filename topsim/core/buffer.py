@@ -71,7 +71,8 @@ class Buffer:
         except OSError:
             print("Error processing Buffer config file")
             raise
-
+        self.hot_count = len(self.hot)
+        self.cold_count = len(self.cold)
         self.waiting_observation_list = []
 
     def run(self):
@@ -272,6 +273,35 @@ class Buffer:
                 break
 
             yield self.env.timeout(TIMESTEP)
+
+    def buffer_storage_summary(self):
+        """
+        Provide other actors information on the capacity and rate details of
+        the respective buffers.
+
+        This is a nicely packaged method that avoids us interacting with the
+        values in the hot and cold buffers, which should not be accessed
+        outside the Buffer class.
+
+        Returns
+        -------
+        storage : dict
+            Dictionary comprising hot and cold buffer storage information
+
+        """
+        if self.hot_count is 1 and self.cold_count is 1:
+            return {
+                'hotbuffer': {
+                    'capacity': self.hot[0].current_capacity,
+                    'data_rate': self.hot[0].max_ingest_data_rate
+                },
+                'coldbuffer': {
+                    'capacity': self.cold[0].current_capacity,
+                    'data_rate': self.cold[0].max_data_rate
+                }
+            }
+        else:
+            raise RuntimeError(f'Multi-buffer functionality not complete')
 
     def print_state(self):
         return {

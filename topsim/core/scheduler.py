@@ -13,7 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import logging
+import pandas as pd
+
 from enum import Enum
+
 from topsim.common.globals import TIMESTEP
 from topsim.core.instrument import RunStatus
 from topsim.core.planner import WorkflowStatus
@@ -152,11 +155,10 @@ class Scheduler:
 
         return buffer_capacity and cluster_capacity
 
-    def allocate_ingest(self, observation, pipelines, c='default'):
+    def allocate_ingest(self, observation, pipelines, planner, c='default'):
         """
         Ingest is 'streaming' data to the buffer during the observation
         How we calculate how long it takes remains to be seen
-        For the time being, we will be doubling the observation time
 
         Parameters
         ---------
@@ -176,7 +178,10 @@ class Scheduler:
         Raises
         ------
         """
-
+        observation.ast = self.env.now
+        self.env.process(
+            planner.run(observation, self.buffer)
+        )
         pipeline_demand = pipelines[observation.type]['demand']
         self.ingest_observation = observation
         # We do an off-by-one check here, because the first time we run the
@@ -238,26 +243,27 @@ class Scheduler:
                 "Observation should have pre-plan; Planner actor has "
                 "failed at runtime."
             )
-
-        current_plan.start_time = self.env.now
-
+        current_plan.ast = self.env.now
+        for task in current_plan.tasks:
+            task.workflow_offset = self.env.now
         if current_plan.is_finished():
             if self.buffer.mark_observation_finished(observation):
                 current_plan = None
                 observation = None
 
-        # # Check if the running tasks have finished
         # # TODO check if expected run time is the same as the 'assigned'
         # #  runtime (i.e. we have a 'delay'); if not, we have a delay and
-        # # we need to return 'current workflow execution status'
 
         allocation_triggers = []
         while not test:
             # curr_allocs protects against duplicated scheduled variables
             curr_allocs = []
+            machine, task = (None, None)
+            status = WorkflowStatus.UNSCHEDULED
             for t in current_plan.tasks:
                 if t.task_status is TaskStatus.FINISHED:
                     current_plan.tasks.remove(t)
+
                 machine, task, status = self.algorithm(
                     cluster=self.cluster,
                     clock=self.env.now,
@@ -272,12 +278,10 @@ class Scheduler:
                 ):
                     self.observation_queue.remove(observation)
                     break
-            elif (machine is None
-                  or task is None):
+            elif machine is None or task is None:
                 yield self.env.timeout(TIMESTEP)
             else:
-                # Runs the task on the machie
-                # task.machine = machine
+                # Run the task on the machie
                 if machine not in curr_allocs:
                     ret = self.env.process(
                         self.cluster.allocate_task_to_cluster(task, machine)
@@ -290,7 +294,7 @@ class Scheduler:
                     curr_allocs.append(machine)
                 else:
                     LOGGER.debug(
-                        'Two different tasks have been allocated the '
+                        f'Two different tasks have been allocated the '
                         'same machine at the same time. This should '
                         'be avoided in your algorithm!'
                     )
@@ -298,6 +302,12 @@ class Scheduler:
                 yield self.env.timeout(TIMESTEP)
 
         yield self.env.timeout(TIMESTEP)
+
+    def to_df(self):
+        df = pd.DataFrame()
+        df['observation_queue'] = [obs.name for obs in self.observation_queue]
+
+        return df
 
 
 class SchedulerStatus(Enum):

@@ -74,6 +74,8 @@ class TestSchedulerIngest(unittest.TestCase):
         self.scheduler = Scheduler(
             self.env, self.buffer, self.cluster, FifoAlgorithm
         )
+        self.planner = Planner(self.env, PLANNING_ALGORITHM,
+                               self.cluster)
         planner = None
         self.telescope = Telescope(self.env, config, planner, self.scheduler)
 
@@ -126,7 +128,8 @@ class TestSchedulerIngest(unittest.TestCase):
         status = self.env.process(
             self.scheduler.allocate_ingest(
                 observation,
-                pipelines
+                pipelines,
+                self.planner
             )
         )
 
@@ -217,7 +220,8 @@ class TestSchedulerFIFO(unittest.TestCase):
             in l
         ]
         self.scheduler.observation_queue.append(curr_obs)
-        self.env.process(self.planner.run(curr_obs))
+        curr_obs.ast = self.env.now
+        self.env.process(self.planner.run(curr_obs,self.buffer))
         self.env.process(self.scheduler.allocate_tasks(curr_obs, test=True))
         self.env.run(1)
         self.assertListEqual(
@@ -286,12 +290,13 @@ class TestSchedulerIntegration(unittest.TestCase):
         observation.status = RunStatus.WAITING
         status = self.env.process(self.scheduler.allocate_ingest(
             observation,
-            pipelines
+            pipelines,
+            self.planner
         ))
-        self.env.process(self.planner.run(observation))
+        self.env.process(self.planner.run(observation,self.buffer))
 
         self.env.run(until=1)
-
+        
         self.assertEqual(5, len(self.cluster.resources['available']))
         # After 1 timestep, data in the HotBuffer should be 2
         self.assertEqual(496, self.buffer.hot[0].current_capacity)

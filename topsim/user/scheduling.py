@@ -66,11 +66,13 @@ class FifoAlgorithm(Algorithm):
         for t in tasks:
             # Allocate the first element in the Task list:
             if t.task_status is TaskStatus.UNSCHEDULED and \
-                    t.est + workflow_plan.start_time <= clock:
+                    t.est + workflow_plan.ast <= clock:
                 # Check if task has any predecessors:
                 # TODO check to make sure that the Machine is unoccupied; if
                 #  it is occupied, then we are DELAYED and need to
                 #  communicate this
+                if workflow_plan.ast > workflow_plan.est:
+                    workflow_plan.status = WorkflowStatus.DELAYED
                 if not t.pred:
                     machine = cluster.dmachine[t.machine_id.id]
                     workflow_plan.status = WorkflowStatus.SCHEDULED
