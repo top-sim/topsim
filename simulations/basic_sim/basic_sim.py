@@ -20,10 +20,11 @@ Basic simulation, with minimal Observation Plan and dummy observation workflows
 import simpy
 import logging
 
-from topsim.algorithms.scheduling import FifoAlgorithm
+from topsim.user.scheduling import FifoAlgorithm
+from topsim.user.telescope import Telescope
 from topsim.core.simulation import Simulation
 
-logging.basicConfig(level="WARNING")
+logging.basicConfig(level="DEBUG")
 LOGGER = logging.getLogger(__name__)
 
 BASIC_CONFIG = 'simulations/basic_sim/input/basic_simulation.json'
@@ -34,13 +35,16 @@ env = simpy.Environment()
 event_file = EVENT_FILE
 planning_algorithm = 'heft'
 scheduling_algorithm = FifoAlgorithm
-algorith_map = {'heft':planning_algorithm, 'fifo': scheduling_algorithm}
+instrument = Telescope
+
+algorith_map = {'heft': planning_algorithm, 'fifo': scheduling_algorithm}
 simulation = Simulation(
-	env,
-	BASIC_CONFIG,
-	algorith_map,
-	EVENT_FILE
+    env,
+    BASIC_CONFIG,
+    instrument,
+    algorith_map,
+    EVENT_FILE
 )
 
-simulation.start(16)
-simulation.resume(17)
+simulation.start(-1)
+

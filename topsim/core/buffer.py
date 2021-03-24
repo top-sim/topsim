@@ -96,7 +96,11 @@ class Buffer:
             )
             for b in self.hot:
                 if self.hot[b].has_waiting_observations():
-                    self.env.process(self.move_hot_to_cold(b))
+                    if self.cold[b].has_capacity(
+                            self.hot[b].observations['stored'][
+                                0].total_data_size
+                    ):
+                        self.env.process(self.move_hot_to_cold(b))
             yield self.env.timeout(TIMESTEP)
 
     def check_buffer_capacity(self, observation):
@@ -121,7 +125,7 @@ class Buffer:
             raise RuntimeError(
                 "Observation data size exceeds total Buffer capacity"
             )
-        elif self.hot[b].current_capacity - size < 0 \
+        elif self.hot[b].current_capacity - size <= 0 \
                 or not self.cold[b].has_capacity(size):
             return False
 
@@ -303,15 +307,25 @@ class Buffer:
         else:
             raise RuntimeError(f'Multi-buffer functionality not complete')
 
-    def print_state(self):
-        return {
-            # "hotbuffer_capacity": self.hot.current_capacity,
-            # "hotbuffer_stored_obsevations":
-            #     [x.name for x in self.hot.observations["stored"]],
-            # "cold_buffer_storage": self.cold.current_capacity,
-            # "cold_buffer_observations":
-            #     [x for x in self.cold.observations]
-        }
+    def is_empty(self):
+        """
+        Determine if both buffers are cleared of all observational data
+
+        Returns
+        -------
+        True if both buffers' current capacity is the same as their total
+        capacity.
+        """
+
+        for buf in self.hot:
+            if self.hot[buf].total_capacity != self.hot[buf].current_capacity:
+                return False
+        for buf in self.cold:
+            if self.cold[buf].total_capacity != self.cold[buf].current_capacity:
+                return False
+
+        return True
+
 
     def to_df(self):
         """
@@ -472,6 +486,8 @@ class ColdBuffer:
 
         Preferred approach over accessing self.current_capacity
 
+        We also need to check that the combined observation size of the capacity
+
         Parameters
         ----------
         observation_size : int
@@ -485,8 +501,13 @@ class ColdBuffer:
             Otherwise.
 
         """
+        size = observation_size
+        if self.observations['transfer']:
+            size = observation_size + self.observations[
+            'transfer'].total_data_size
+
         return (
-                self.current_capacity - observation_size >= 0
+                self.current_capacity - size >= 0
         )
 
     def receive_observation(self, observation, residual_data):

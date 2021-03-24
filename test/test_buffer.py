@@ -148,18 +148,23 @@ class TestBufferIngestDataStream(unittest.TestCase):
 
         self.assertEqual(RunStatus.WAITING, self.observation.status)
         self.env.process(self.buffer.ingest_data_stream(self.observation))
-        # self.assertRaises(
-        # 	RuntimeError, self.env.process, self.buffer.ingest_data_stream(
-        # 		self.observation
-        # 	)
-        # )
-
         self.assertRaises(
             RuntimeError, self.env.run, until=1
         )
 
-    # self.assertEqual(500, self.buffer.hot.current_capacity)
-
+    #TODO Ensure that we do not start observations if the size of the data +
+    # the total size of the TRANSFERRING observation data is > than the total
+    # data of the cold buffer.
+    # NOTE This is necessary only for if we want to move data from hot-to-cold.
+    # This avoids the possibility for an observation to
+    # go ahead when both hot buffer and cold buffer have capacity
+    # mid-transfer, but the cold buffer does not have capacity post-transfer.
+    # For example, if we both buffers have capacity of 150, we ingest a 125
+    # tb ingest, we start to transfer that to the buffer, then we get a 50tb
+    # ingest when the HotBuffer is at 80 and the ColdBuffer is at 70 (
+    # mid-transfer), this means will will accept an ingest of 50 data because
+    # both  separately are fine, but after ingest will not be.
+    #
     def testIngestEdgeCase(self):
         """
         Buffer must accept ingest at rate up to 'max ingest data rate' but
@@ -356,8 +361,10 @@ class TestBufferRequests(unittest.TestCase):
         """
 
         # Calling planner.run() will store the generate plan in the observation object
-        # calling next() runs the iterator immediately after generator is called
-        next(self.planner.run(self.observation))
+        # calling next() runs the iterator immediately after generator is
+        # called
+        self.observation.ast = 0
+        next(self.planner.run(self.observation, self.buffer))
         self.assertTrue(self.observation.plan is not None)
         # Buffer observation queue should be empty
 #

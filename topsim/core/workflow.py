@@ -39,3 +39,4 @@ class Task(object):
         self.alloc = None
         self.duration = None
         self.pred = pred
+        self.workflow_offset = 0

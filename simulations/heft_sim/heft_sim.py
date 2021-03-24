@@ -23,13 +23,15 @@ namely, the original HEFT workflow from Topcuoglu 2000.
 """
 
 import simpy
+import logging
 
 from topsim.user.scheduling import FifoAlgorithm
 from topsim.user.telescope import Telescope
 from topsim.core.simulation import Simulation
 from topsim.core.delay import DelayModel
 
-
+logging.basicConfig(level="INFO")
+LOGGER = logging.getLogger(__name__)
 EVENT_FILE = 'simulations/heft_sim/output/heft_sim_delay_low.trace'
 
 CONFIG = 'simulations/heft_sim/input/heft_single_observation_simulation.json'
@@ -49,5 +51,5 @@ simulation = Simulation(
     delay=dm
 )
 
-simulation.start(11)
-simulation.resume(200)
+simulation.start(-1)
+# simulation.resume(200)

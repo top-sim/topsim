@@ -37,7 +37,8 @@ class Cluster:
         self.resources = {
             'ingest': [],
             'occupied': [],
-            'available': [machine for machine in self.machines]
+            'available': [machine for machine in self.machines],
+            'total': len(self.machines)
         }
         self.tasks = {
             'running': [],
@@ -242,6 +243,31 @@ class Cluster:
             else:
                 yield self.env.timeout(TIMESTEP)
 
+    def is_idle(self):
+        """
+        Check to see if anything is running on the cluster
+
+        This is a way of determining if we are able to finish the simulation.
+
+        Returns
+        -------
+
+        """
+
+        no_tasks_running = (
+                (len(self.clusters['default']['tasks']['running'])== 0) or
+                (len(self.clusters['default']['tasks']['waiting']) ==0)
+        )
+
+        no_resources_occupied = (
+                (len(self.clusters['default']['resources']['occupied']) == 0) or
+                (len(self.clusters['default']['resources']['ingest']) == 0)
+        )
+        if no_tasks_running and no_resources_occupied:
+            return True
+        else:
+            return False
+
     def is_occupied(self, machine, c='default'):
         """
         Check if the machine is occupied
@@ -297,24 +323,32 @@ class Cluster:
         """
         tasks = []
         for i in range(demand):
-            t = Task("ingest-t{0}".format(i),None)
+            t = Task("ingest-t{0}".format(i), None)
             t.duration = duration
             t.task_status = TaskStatus.SCHEDULED
             tasks.append(t)
         return tasks
 
-
     def to_df(self):
+        """
+
+        Notes
+        -----
+        Currently only works for single resource
+
+        Returns
+        -------
+
+        """
         df = pd.DataFrame()
         df['available_resources'] = [
             self.clusters['default']['usage_data']['available']
         ]
         df['occupied_resources'] = [
             self.clusters['default']['usage_data']['occupied']]
-        df['ingest_resources'] =[
+        df['ingest_resources'] = [
             self.clusters['default']['usage_data']['ingest']
         ]
-
         df['running_tasks'] = [
             self.clusters['default']['usage_data']['running_tasks']]
         df['finished_tasks'] = [
@@ -322,6 +356,28 @@ class Cluster:
         # df['waiting_tasks'] = [len(self.tasks['waiting'])]
 
         return df
+
+    def finished_task_time_data(self):
+        """
+        Each task in the 'finished' component of 'self.clusters' has the
+        estimated start times, end times, and the actual start and finish
+        times. We can use this to track the expected finish time across the
+        two
+        Returns
+        -------
+        """
+
+        finished_tasks = self.clusters['default']['tasks']['finished']
+        task_data = {}
+        for task in finished_tasks:
+            task_data[task.id] = {}
+            task_data[task.id]['est'] = task.est
+            task_data[task.id]['eft'] = task.eft
+            task_data[task.id]['ast'] = task.ast
+            task_data[task.id]['aft'] = task.aft
+            # task_data['pred'] = [pred for pred in task.pred]
+
+        return task_data
 
     def print_state(self):
         # self.clusters[c]['resources']

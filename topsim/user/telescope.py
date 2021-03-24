@@ -150,7 +150,7 @@ class Telescope(Instrument):
                         ret = self.begin_observation(observation)
                         observation.ast = self.env.now
                         # self.env.process(
-                        #     self.planner.run(observation)
+                        #     self.planner.run(observation,self.buffer)
                         # )
                         # yield plan_trigger
                         LOGGER.info(
@@ -258,6 +258,24 @@ class Telescope(Instrument):
             'telescope_arrays_used': self.telescope_use,
             'observations_waiting': self.observations_waiting()
         }
+
+    def is_idle(self):
+        """
+        Check if telescope has current or pending observations
+
+        Returns
+        -------
+        True if there are no pending or current observations
+        """
+        for observation in self.observations:
+            if observation.status != RunStatus.FINISHED:
+                return False
+        if (
+                (not self.telescope_status)
+                and self.telescope_use == 0
+        ):
+            return True
+        return False
 
     def to_df(self):
         df = pd.DataFrame()

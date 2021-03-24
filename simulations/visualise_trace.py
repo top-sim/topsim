@@ -37,12 +37,12 @@ df_low_delay = pd.read_pickle(delay_low_heft_pickle)
 
 # fig, axs = plt.subplots(nrows=1, ncols=2)
 
-sns.lineplot(
-    data=df_heft, x=df_heft.index, y="running_tasks",label='No Delay'
-)
-sns.lineplot(
-    data=df_delay,x=df_delay.index, y="running_tasks", label='High Delay'
-)
+# sns.lineplot(
+#     data=df_heft, x=df_heft.index, y="running_tasks",label='No Delay'
+# )
+# sns.lineplot(
+#     data=df_delay,x=df_delay.index, y="running_tasks", label='High Delay'
+# )
 sns.lineplot(
     data=df_low_delay, x=df_low_delay.index, y="running_tasks", label='Low '
                                                                       'Delay'

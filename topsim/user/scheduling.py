@@ -89,7 +89,8 @@ class FifoAlgorithm(Algorithm):
                     # Check if there is an overlap between the two sets
                     if not pred.issubset(finished):
                         # One of the predecessors of 't' is still running
-                        return None, None, workflow_plan.status
+                        continue
+                        # return None, None, workflow_plan.status
                     else:
                         machine = cluster.dmachine[t.machine_id.id]
                         if self.cluster.is_occupied(machine):

@@ -141,8 +141,8 @@ class Simulation:
         if runtime > 0:
             self.env.run(until=runtime)
         else:
-            if not self.is_finished():
-                self.env.run()
+            while not self.is_finished():
+                self.env.run(self.env.now+1)
 
         LOGGER.info("Simulation Finished @ %s", self.env.now)
 
@@ -169,8 +169,12 @@ class Simulation:
             )
         self.env.run(until=until)
 
-
     def is_finished(self):
+        if (
+                self.buffer.is_empty() and self.cluster.is_idle() and
+                self.scheduler.is_idle() and self.instrument.is_idle()
+        ):
+            return True
         return False
 
     @staticmethod

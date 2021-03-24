@@ -46,7 +46,6 @@ class Scheduler:
     def __init__(self, env, buffer, cluster, algorithm):
         self.env = env
         self.algorithm = algorithm
-        self.waiting_observations = []
         self.cluster = cluster
         self.buffer = buffer
         self.status = SchedulerStatus.SLEEP
@@ -104,6 +103,16 @@ class Scheduler:
 
             LOGGER.debug("Scheduler Status: %s", self.status)
             yield self.env.timeout(TIMESTEP)
+
+    def is_idle(self):
+        """
+        Determine if the scheduler has completed its work
+
+        Returns True if idle
+        -------
+        """
+
+        return len(self.observation_queue) == 0
 
     def scheduler_status(self):
         """
@@ -214,10 +223,7 @@ class Scheduler:
 
     def print_state(self):
         # Change this to 'workflows scheduled/workflows unscheduled'
-        return {
-            'observations_for_processing': [observation.plan.id for observation
-                                            in self.waiting_observations]
-        }
+        pass
 
     def allocate_tasks(self, observation, test=False):
         """

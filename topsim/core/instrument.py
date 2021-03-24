@@ -131,7 +131,7 @@ class Observation(object):
     def is_finished(self, current_time, telescope_status):
         if self.ast is None:
             return False
-        if current_time >= self.ast + self.duration \
+        elif current_time >= self.ast + self.duration \
                 and telescope_status \
                 and (self.status is not RunStatus.FINISHED):
             return True

@@ -22,7 +22,6 @@ class Monitor(object):
                 'cluster_state': self.simulation.cluster.print_state(),
                 'instrument_state': self.simulation.instrument.print_state(),
                 'scheduler_state': self.simulation.scheduler.print_state(),
-                'buffer_state': self.simulation.buffer.print_state()
             }
 
             self.df = self.df.append(
@@ -44,6 +43,7 @@ class Monitor(object):
     def collate_actor_dataframes(self):
         df = pd.DataFrame()
         cluster = self.simulation.cluster.to_df()
+        tasks = self.simulation.cluster.finished_task_time_data()
         buffer = self.simulation.buffer.to_df()
         instrument = self.simulation.instrument.to_df()
         df = df.join([cluster, buffer, instrument], how='outer')
