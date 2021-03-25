@@ -256,7 +256,7 @@ class Buffer:
 
         """
         b = observation.buffer_id
-        time_left = observation.duration - 1
+        time_left = observation.duration -1
         if observation.status is RunStatus.WAITING:
             raise RuntimeError(
                 "Observation must be marked RUNNING before ingest begins!"

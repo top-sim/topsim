@@ -2,22 +2,22 @@
 	"instrument": {
 		"telescope": {
 			"total_arrays": 36,
-			"max_ingest_resources": 5,
+			"max_ingest_resources": 1,
 			"pipelines": {
 				"continuum": {
-					"demand": 5
+					"demand": 1
 				},
 				"spectral": {
-					"demand": 10
+					"demand": 1
 				},
 				"pulsar": {
-					"demand": 5
+					"demand": 1
 				}
 			},
 			"observations": [
 				{
 					"name": "emu",
-					"start": 0,
+					"start": 1,
 					"duration": 10,
 					"demand": 36,
 					"workflow": "test/data/config/workflow_config.json",

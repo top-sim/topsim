@@ -43,23 +43,6 @@ class Observation(object):
 
     Array with associated photographic information.
 
-       Parameters
-       ----------
-    name : str
-        Observation name/ID
-    start : int
-        Expected start-time of the observation
-    duration : int
-        Expected Duration of the observation
-    demand : int
-        Expected Telescope demand of (Number of arrays used) during observation
-    workflow : str
-        Path to the workflow specification (JSON file)
-    type : str
-        What type of observation (Continuum, Spectral, etc.)
-    data_rate: int
-        Expected incoming data rate produced by the observation (GB/s)
-
     Attributes
     ----------
     name : str
@@ -87,11 +70,30 @@ class Observation(object):
 
     def __init__(self, name, start, duration, demand, workflow, type,
                  data_rate):
+        """
+        Parameters
+           ----------
+        name : str
+            Observation name/ID
+        start : int
+            Expected start-time of the observation
+        duration : int
+            Expected Duration of the observation
+        demand : int
+            Expected Telescope demand of (Number of arrays used) during observation
+        workflow : str
+            Path to the workflow specification (JSON file)
+        type : str
+            What type of observation (Continuum, Spectral, etc.)
+        data_rate: int
+            Expected incoming data rate produced by the observation (GB/s)
+
+        """
 
         self.name = name
         self.buffer_id = 0
         self.cluster_id = 'default'
-        self.start = start
+        # self.start = start
         self.est = start
         self.ast = None
         self.duration = duration
@@ -121,7 +123,7 @@ class Observation(object):
         False if telescope does not have capacity
 
         """
-        if self.start <= current_time \
+        if self.est <= current_time \
                 and self.demand <= capacity \
                 and self.status is RunStatus.WAITING:
             return True

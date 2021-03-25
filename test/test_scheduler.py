@@ -171,13 +171,13 @@ class TestSchedulerFIFO(unittest.TestCase):
         self.scheduler = Scheduler(self.env, self.buffer,
                                    self.cluster, sched_algorithm)
         self.telescope = Telescope(
-            self.env, config, self.scheduler, self.planner
+            self.env, config, self.planner, self.scheduler
         )
 
     def tearDown(self):
         pass
 
-    def test_allocate_tasks(self):
+    def testAllocationTasksNoObservation(self):
         """
         allocate_tasks assumes we have:
 
@@ -207,11 +207,7 @@ class TestSchedulerFIFO(unittest.TestCase):
             9 - cat0_m0 - (84,98)
 
         """
-
-        # self.assertFalse(self.scheduler.allocate_tasks())
-
         curr_obs = self.telescope.observations[0]
-        # self.scheduler.current_observation = curr_obs
         gen = self.scheduler.allocate_tasks(curr_obs)
         self.assertRaises(RuntimeError, next, gen)
         l = [0, 3, 2, 4, 1,5, 6, 8, 7, 9]
@@ -229,25 +225,33 @@ class TestSchedulerFIFO(unittest.TestCase):
             [a.task.tid for a in curr_obs.plan.exec_order]
         )
         self.buffer.cold[0].observations['stored'].append(curr_obs)
-        # self.env.process(self.scheduler.allocate_tasks(curr_obs))
-        self.env.run(until=2)
-        # self.assertEqual(1, len(self.cluster.tasks['running']))
-        self.env.run(until=12)
-        # self.assertEqual(1, len(self.cluster.tasks['running']))
-        self.env.run(until=15)
-        # self.assertEqual(3, self.cluster.tasks['running'][0].id)
-        # self.assertEqual(1, len(self.cluster.resources['occupied']))
-        self.env.run(until=31)
-        # self.assertEqual(3, len(self.cluster.tasks['running']))
         self.env.run(until=98)
-        # self.assertEqual(exec_ord[-1], self.cluster.tasks['running'][0].id)
-        self.env.run(until=106)
         self.assertEqual(10, len(self.cluster.tasks['finished']))
         self.assertEqual(0, len(self.cluster.tasks['running']))
-        self.env.run(until=107)
-        # one more cycle before we reach the point where the scheduler is
-        # able to remove the observation from the queue
         self.assertEqual(0, len(self.scheduler.observation_queue))
+
+    def testAllocateTasksWithPreceedingObservation(self):
+        pipelines = self.telescope.pipelines
+        max_ingest = 5
+
+        observation = self.telescope.observations[0]
+        self.env.process(self.cluster.run())
+        self.env.process(self.buffer.run())
+        self.env.process(self.telescope.run())
+        self.scheduler.start()
+        self.env.process(self.scheduler.run())
+        # status = self.env.process(self.scheduler.allocate_ingest(
+        #     observation,
+        #     pipelines,
+        #     self.planner
+        # ))
+
+        self.env.run(until=1)
+        self.env.run(until=11)
+        self.env.run(until=118)
+        self.env.run(until=119)
+
+
 
 
 class TestSchedulerIntegration(unittest.TestCase):
@@ -268,11 +272,7 @@ class TestSchedulerIntegration(unittest.TestCase):
         )
 
     def test_FIFO_with_buffer(self):
-        # pipelines = {
-        #     "continuum": {
-        #         "demand": 5
-        #     }
-        # }
+
         pipelines = self.telescope.pipelines
         max_ingest = 5
         observation = self.telescope.observations[0]
@@ -293,7 +293,7 @@ class TestSchedulerIntegration(unittest.TestCase):
             pipelines,
             self.planner
         ))
-        self.env.process(self.planner.run(observation,self.buffer))
+        # self.env.process(self.planner.run(observation,self.buffer))
 
         self.env.run(until=1)
         

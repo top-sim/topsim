@@ -136,7 +136,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'finished': [], 'waiting': []}"
+            "tasks": "{'running': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'finished': [], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": true,
@@ -209,7 +209,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'finished': [], 'waiting': []}"
+            "tasks": "{'running': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'finished': [], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": true,
@@ -282,7 +282,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'finished': [], 'waiting': []}"
+            "tasks": "{'running': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'finished': [], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": true,
@@ -355,7 +355,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'finished': [], 'waiting': []}"
+            "tasks": "{'running': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'finished': [], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": true,
@@ -428,7 +428,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'finished': [], 'waiting': []}"
+            "tasks": "{'running': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'finished': [], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": true,
@@ -501,7 +501,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'finished': [], 'waiting': []}"
+            "tasks": "{'running': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'finished': [], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": true,
@@ -574,7 +574,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'finished': [], 'waiting': []}"
+            "tasks": "{'running': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'finished': [], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": true,
@@ -647,7 +647,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'finished': [], 'waiting': []}"
+            "tasks": "{'running': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'finished': [], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": true,
@@ -720,7 +720,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'finished': [], 'waiting': []}"
+            "tasks": "{'running': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'finished': [], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": true,
@@ -793,7 +793,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'finished': [], 'waiting': []}"
+            "tasks": "{'running': [], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": true,
@@ -866,7 +866,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'finished': [], 'waiting': []}"
+            "tasks": "{'running': [], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -939,7 +939,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -1012,7 +1012,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -1085,7 +1085,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -1158,7 +1158,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -1231,7 +1231,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -1304,7 +1304,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -1377,7 +1377,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -1450,7 +1450,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -1523,80 +1523,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
-        },
-        "instrument_state": {
-            "telescope_in_use": false,
-            "telescope_arrays_used": 0,
-            "observations_waiting": 1
-        },
-        "scheduler_state": null
-    },
-    {
-        "cluster_state": {
-            "machines": [
-                {
-                    "id": "cat0_m0",
-                    "cpu": -1106,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m1",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m2",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m3",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m4",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m5",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m6",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m7",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m8",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m9",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                }
-            ],
-            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -1669,7 +1596,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -1742,7 +1669,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -1815,7 +1742,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -1888,7 +1815,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -1961,7 +1888,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -2034,7 +1961,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -2107,7 +2034,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -2180,7 +2107,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -2253,7 +2180,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -2326,7 +2253,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -2399,7 +2326,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -2472,7 +2399,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -2545,7 +2472,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -2618,7 +2545,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -2691,80 +2618,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_0], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4], 'waiting': []}"
-        },
-        "instrument_state": {
-            "telescope_in_use": false,
-            "telescope_arrays_used": 0,
-            "observations_waiting": 1
-        },
-        "scheduler_state": null
-    },
-    {
-        "cluster_state": {
-            "machines": [
-                {
-                    "id": "cat0_m0",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m1",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m2",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m3",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m4",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m5",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m6",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m7",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m8",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m9",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                }
-            ],
-            "tasks": "{'running': [], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0], 'waiting': []}"
+            "tasks": "{'running': [], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -2837,7 +2691,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_3], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0], 'waiting': []}"
+            "tasks": "{'running': [emu_0_3], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -2910,7 +2764,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_3], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0], 'waiting': []}"
+            "tasks": "{'running': [emu_0_3], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -2983,7 +2837,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_3], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0], 'waiting': []}"
+            "tasks": "{'running': [emu_0_3], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -3056,7 +2910,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_3], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0], 'waiting': []}"
+            "tasks": "{'running': [emu_0_3], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -3129,7 +2983,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_3], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0], 'waiting': []}"
+            "tasks": "{'running': [emu_0_3], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -3202,7 +3056,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_3], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0], 'waiting': []}"
+            "tasks": "{'running': [emu_0_3], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -3275,7 +3129,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_3], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0], 'waiting': []}"
+            "tasks": "{'running': [emu_0_3], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -3348,7 +3202,153 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_3], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0], 'waiting': []}"
+            "tasks": "{'running': [emu_0_3], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0], 'waiting': []}"
+        },
+        "instrument_state": {
+            "telescope_in_use": false,
+            "telescope_arrays_used": 0,
+            "observations_waiting": 1
+        },
+        "scheduler_state": null
+    },
+    {
+        "cluster_state": {
+            "machines": [
+                {
+                    "id": "cat0_m0",
+                    "cpu": -1006,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m1",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m2",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m3",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m4",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m5",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m6",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m7",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m8",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m9",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                }
+            ],
+            "tasks": "{'running': [emu_0_3], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0], 'waiting': []}"
+        },
+        "instrument_state": {
+            "telescope_in_use": false,
+            "telescope_arrays_used": 0,
+            "observations_waiting": 1
+        },
+        "scheduler_state": null
+    },
+    {
+        "cluster_state": {
+            "machines": [
+                {
+                    "id": "cat0_m0",
+                    "cpu": -1006,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m1",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m2",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m3",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m4",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m5",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m6",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m7",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m8",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m9",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                }
+            ],
+            "tasks": "{'running': [emu_0_3], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -3421,80 +3421,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_3, emu_0_4], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0], 'waiting': []}"
-        },
-        "instrument_state": {
-            "telescope_in_use": false,
-            "telescope_arrays_used": 0,
-            "observations_waiting": 1
-        },
-        "scheduler_state": null
-    },
-    {
-        "cluster_state": {
-            "machines": [
-                {
-                    "id": "cat0_m0",
-                    "cpu": -1006,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m1",
-                    "cpu": -866,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m2",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m3",
-                    "cpu": -986,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m4",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m5",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m6",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m7",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m8",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m9",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                }
-            ],
-            "tasks": "{'running': [emu_0_3, emu_0_4, emu_0_2], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0], 'waiting': []}"
+            "tasks": "{'running': [emu_0_3, emu_0_4], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -3567,7 +3494,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_3, emu_0_4, emu_0_2], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0], 'waiting': []}"
+            "tasks": "{'running': [emu_0_3, emu_0_4, emu_0_2], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -3640,153 +3567,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_3, emu_0_4, emu_0_2], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0], 'waiting': []}"
-        },
-        "instrument_state": {
-            "telescope_in_use": false,
-            "telescope_arrays_used": 0,
-            "observations_waiting": 1
-        },
-        "scheduler_state": null
-    },
-    {
-        "cluster_state": {
-            "machines": [
-                {
-                    "id": "cat0_m0",
-                    "cpu": -1006,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m1",
-                    "cpu": -866,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m2",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m3",
-                    "cpu": -986,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m4",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m5",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m6",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m7",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m8",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m9",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                }
-            ],
-            "tasks": "{'running': [emu_0_3, emu_0_4, emu_0_2], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0], 'waiting': []}"
-        },
-        "instrument_state": {
-            "telescope_in_use": false,
-            "telescope_arrays_used": 0,
-            "observations_waiting": 1
-        },
-        "scheduler_state": null
-    },
-    {
-        "cluster_state": {
-            "machines": [
-                {
-                    "id": "cat0_m0",
-                    "cpu": -1006,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m1",
-                    "cpu": -866,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m2",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m3",
-                    "cpu": -986,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m4",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m5",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m6",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m7",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m8",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m9",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                }
-            ],
-            "tasks": "{'running': [emu_0_3, emu_0_4, emu_0_2], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0], 'waiting': []}"
+            "tasks": "{'running': [emu_0_3, emu_0_4, emu_0_2], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -3859,80 +3640,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_3, emu_0_4, emu_0_2], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0], 'waiting': []}"
-        },
-        "instrument_state": {
-            "telescope_in_use": false,
-            "telescope_arrays_used": 0,
-            "observations_waiting": 1
-        },
-        "scheduler_state": null
-    },
-    {
-        "cluster_state": {
-            "machines": [
-                {
-                    "id": "cat0_m0",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m1",
-                    "cpu": -866,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m2",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m3",
-                    "cpu": -986,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m4",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m5",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m6",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m7",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m8",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m9",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                }
-            ],
-            "tasks": "{'running': [emu_0_4, emu_0_2], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3], 'waiting': []}"
+            "tasks": "{'running': [emu_0_4, emu_0_2], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -4005,7 +3713,153 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_4, emu_0_2, emu_0_5], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3], 'waiting': []}"
+            "tasks": "{'running': [emu_0_4, emu_0_2, emu_0_5], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3], 'waiting': []}"
+        },
+        "instrument_state": {
+            "telescope_in_use": false,
+            "telescope_arrays_used": 0,
+            "observations_waiting": 1
+        },
+        "scheduler_state": null
+    },
+    {
+        "cluster_state": {
+            "machines": [
+                {
+                    "id": "cat0_m0",
+                    "cpu": -1606,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m1",
+                    "cpu": -866,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m2",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m3",
+                    "cpu": -986,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m4",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m5",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m6",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m7",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m8",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m9",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                }
+            ],
+            "tasks": "{'running': [emu_0_4, emu_0_2, emu_0_5], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3], 'waiting': []}"
+        },
+        "instrument_state": {
+            "telescope_in_use": false,
+            "telescope_arrays_used": 0,
+            "observations_waiting": 1
+        },
+        "scheduler_state": null
+    },
+    {
+        "cluster_state": {
+            "machines": [
+                {
+                    "id": "cat0_m0",
+                    "cpu": -1606,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m1",
+                    "cpu": -866,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m2",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m3",
+                    "cpu": -986,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m4",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m5",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m6",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m7",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m8",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m9",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                }
+            ],
+            "tasks": "{'running': [emu_0_4, emu_0_2, emu_0_5], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -4078,7 +3932,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_4, emu_0_2, emu_0_5, emu_0_1], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3], 'waiting': []}"
+            "tasks": "{'running': [emu_0_4, emu_0_2, emu_0_5, emu_0_1], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -4151,7 +4005,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_4, emu_0_2, emu_0_5, emu_0_1], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3], 'waiting': []}"
+            "tasks": "{'running': [emu_0_4, emu_0_2, emu_0_5, emu_0_1], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -4224,7 +4078,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_4, emu_0_2, emu_0_5, emu_0_1], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3], 'waiting': []}"
+            "tasks": "{'running': [emu_0_4, emu_0_2, emu_0_5, emu_0_1], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -4297,7 +4151,80 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_4, emu_0_2, emu_0_5, emu_0_1], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3], 'waiting': []}"
+            "tasks": "{'running': [emu_0_4, emu_0_2, emu_0_5, emu_0_1], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3], 'waiting': []}"
+        },
+        "instrument_state": {
+            "telescope_in_use": false,
+            "telescope_arrays_used": 0,
+            "observations_waiting": 1
+        },
+        "scheduler_state": null
+    },
+    {
+        "cluster_state": {
+            "machines": [
+                {
+                    "id": "cat0_m0",
+                    "cpu": -1606,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m1",
+                    "cpu": -866,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m2",
+                    "cpu": -836,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m3",
+                    "cpu": -986,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m4",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m5",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m6",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m7",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m8",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m9",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                }
+            ],
+            "tasks": "{'running': [emu_0_4, emu_0_2, emu_0_5, emu_0_1], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -4370,80 +4297,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_4, emu_0_2, emu_0_5, emu_0_1], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3], 'waiting': []}"
-        },
-        "instrument_state": {
-            "telescope_in_use": false,
-            "telescope_arrays_used": 0,
-            "observations_waiting": 1
-        },
-        "scheduler_state": null
-    },
-    {
-        "cluster_state": {
-            "machines": [
-                {
-                    "id": "cat0_m0",
-                    "cpu": -1606,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m1",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m2",
-                    "cpu": -836,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m3",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m4",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m5",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m6",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m7",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m8",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m9",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                }
-            ],
-            "tasks": "{'running': [emu_0_4, emu_0_5, emu_0_1], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2], 'waiting': []}"
+            "tasks": "{'running': [emu_0_4, emu_0_5, emu_0_1], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -4516,7 +4370,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_5, emu_0_1, emu_0_6], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_5, emu_0_1, emu_0_6], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -4589,7 +4443,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_5, emu_0_1, emu_0_6], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_5, emu_0_1, emu_0_6], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -4662,7 +4516,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_5, emu_0_1, emu_0_6], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_5, emu_0_1, emu_0_6], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -4735,7 +4589,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_5, emu_0_1, emu_0_6], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_5, emu_0_1, emu_0_6], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -4808,80 +4662,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_5, emu_0_1, emu_0_6], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4], 'waiting': []}"
-        },
-        "instrument_state": {
-            "telescope_in_use": false,
-            "telescope_arrays_used": 0,
-            "observations_waiting": 1
-        },
-        "scheduler_state": null
-    },
-    {
-        "cluster_state": {
-            "machines": [
-                {
-                    "id": "cat0_m0",
-                    "cpu": -1606,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m1",
-                    "cpu": -1016,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m2",
-                    "cpu": -836,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m3",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m4",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m5",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m6",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m7",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m8",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m9",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                }
-            ],
-            "tasks": "{'running': [emu_0_5, emu_0_1, emu_0_6], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_5, emu_0_1, emu_0_6], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -4954,7 +4735,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_5, emu_0_1, emu_0_6], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4], 'waiting': []}"
+            "tasks": "{'running': [emu_0_5, emu_0_6], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -5027,7 +4808,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_5, emu_0_6], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1], 'waiting': []}"
+            "tasks": "{'running': [emu_0_5, emu_0_6], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -5100,7 +4881,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_5, emu_0_6], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1], 'waiting': []}"
+            "tasks": "{'running': [emu_0_5, emu_0_6], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -5173,7 +4954,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_5, emu_0_6], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1], 'waiting': []}"
+            "tasks": "{'running': [emu_0_5, emu_0_6], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -5246,7 +5027,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_5, emu_0_6], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1], 'waiting': []}"
+            "tasks": "{'running': [emu_0_5, emu_0_6], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -5272,7 +5053,7 @@
                 },
                 {
                     "id": "cat0_m2",
-                    "cpu": -1376,
+                    "cpu": 84,
                     "memory": 1,
                     "disk": 1
                 },
@@ -5319,7 +5100,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_5, emu_0_6, emu_0_8], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1], 'waiting': []}"
+            "tasks": "{'running': [emu_0_5, emu_0_6], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -5345,7 +5126,7 @@
                 },
                 {
                     "id": "cat0_m2",
-                    "cpu": -1376,
+                    "cpu": 84,
                     "memory": 1,
                     "disk": 1
                 },
@@ -5392,7 +5173,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_5, emu_0_6, emu_0_8], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1], 'waiting': []}"
+            "tasks": "{'running': [emu_0_5, emu_0_6], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -5406,7 +5187,7 @@
             "machines": [
                 {
                     "id": "cat0_m0",
-                    "cpu": -1606,
+                    "cpu": 84,
                     "memory": 1,
                     "disk": 1
                 },
@@ -5418,7 +5199,7 @@
                 },
                 {
                     "id": "cat0_m2",
-                    "cpu": -1376,
+                    "cpu": 84,
                     "memory": 1,
                     "disk": 1
                 },
@@ -5465,80 +5246,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_5, emu_0_6, emu_0_8], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1], 'waiting': []}"
-        },
-        "instrument_state": {
-            "telescope_in_use": false,
-            "telescope_arrays_used": 0,
-            "observations_waiting": 1
-        },
-        "scheduler_state": null
-    },
-    {
-        "cluster_state": {
-            "machines": [
-                {
-                    "id": "cat0_m0",
-                    "cpu": -1606,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m1",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m2",
-                    "cpu": -1376,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m3",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m4",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m5",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m6",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m7",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m8",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m9",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                }
-            ],
-            "tasks": "{'running': [emu_0_5, emu_0_6, emu_0_8], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1], 'waiting': []}"
+            "tasks": "{'running': [emu_0_6], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -5611,7 +5319,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_5, emu_0_8], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6], 'waiting': []}"
+            "tasks": "{'running': [emu_0_8], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -5684,7 +5392,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_8], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5], 'waiting': []}"
+            "tasks": "{'running': [emu_0_8], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -5757,7 +5465,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_8], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5], 'waiting': []}"
+            "tasks": "{'running': [emu_0_8], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -5830,7 +5538,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_8], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5], 'waiting': []}"
+            "tasks": "{'running': [emu_0_8], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -5903,7 +5611,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_8], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5], 'waiting': []}"
+            "tasks": "{'running': [emu_0_8], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -5976,7 +5684,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_8], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5], 'waiting': []}"
+            "tasks": "{'running': [emu_0_8], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -6049,7 +5757,299 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_8], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5], 'waiting': []}"
+            "tasks": "{'running': [emu_0_8], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6], 'waiting': []}"
+        },
+        "instrument_state": {
+            "telescope_in_use": false,
+            "telescope_arrays_used": 0,
+            "observations_waiting": 1
+        },
+        "scheduler_state": null
+    },
+    {
+        "cluster_state": {
+            "machines": [
+                {
+                    "id": "cat0_m0",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m1",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m2",
+                    "cpu": -1376,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m3",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m4",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m5",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m6",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m7",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m8",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m9",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                }
+            ],
+            "tasks": "{'running': [emu_0_8], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6], 'waiting': []}"
+        },
+        "instrument_state": {
+            "telescope_in_use": false,
+            "telescope_arrays_used": 0,
+            "observations_waiting": 1
+        },
+        "scheduler_state": null
+    },
+    {
+        "cluster_state": {
+            "machines": [
+                {
+                    "id": "cat0_m0",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m1",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m2",
+                    "cpu": -1376,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m3",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m4",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m5",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m6",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m7",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m8",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m9",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                }
+            ],
+            "tasks": "{'running': [emu_0_8], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6], 'waiting': []}"
+        },
+        "instrument_state": {
+            "telescope_in_use": false,
+            "telescope_arrays_used": 0,
+            "observations_waiting": 1
+        },
+        "scheduler_state": null
+    },
+    {
+        "cluster_state": {
+            "machines": [
+                {
+                    "id": "cat0_m0",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m1",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m2",
+                    "cpu": -1376,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m3",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m4",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m5",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m6",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m7",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m8",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m9",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                }
+            ],
+            "tasks": "{'running': [emu_0_8], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6], 'waiting': []}"
+        },
+        "instrument_state": {
+            "telescope_in_use": false,
+            "telescope_arrays_used": 0,
+            "observations_waiting": 1
+        },
+        "scheduler_state": null
+    },
+    {
+        "cluster_state": {
+            "machines": [
+                {
+                    "id": "cat0_m0",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m1",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m2",
+                    "cpu": -1376,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m3",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m4",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m5",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m6",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m7",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m8",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                },
+                {
+                    "id": "cat0_m9",
+                    "cpu": 84,
+                    "memory": 1,
+                    "disk": 1
+                }
+            ],
+            "tasks": "{'running': [emu_0_8], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -6122,7 +6122,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_8, emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5], 'waiting': []}"
+            "tasks": "{'running': [emu_0_8, emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -6195,7 +6195,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_8, emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5], 'waiting': []}"
+            "tasks": "{'running': [emu_0_8, emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -6268,7 +6268,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_8, emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5], 'waiting': []}"
+            "tasks": "{'running': [emu_0_8, emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -6341,7 +6341,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_8, emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5], 'waiting': []}"
+            "tasks": "{'running': [emu_0_8, emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -6414,7 +6414,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_8, emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5], 'waiting': []}"
+            "tasks": "{'running': [emu_0_8, emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -6487,7 +6487,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_8, emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5], 'waiting': []}"
+            "tasks": "{'running': [emu_0_8, emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -6560,80 +6560,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_8, emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5], 'waiting': []}"
-        },
-        "instrument_state": {
-            "telescope_in_use": false,
-            "telescope_arrays_used": 0,
-            "observations_waiting": 1
-        },
-        "scheduler_state": null
-    },
-    {
-        "cluster_state": {
-            "machines": [
-                {
-                    "id": "cat0_m0",
-                    "cpu": -1386,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m1",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m2",
-                    "cpu": -1376,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m3",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m4",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m5",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m6",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m7",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m8",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m9",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                }
-            ],
-            "tasks": "{'running': [emu_0_8, emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5], 'waiting': []}"
+            "tasks": "{'running': [emu_0_8, emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -6706,7 +6633,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_8, emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5], 'waiting': []}"
+            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -6779,7 +6706,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8], 'waiting': []}"
+            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -6852,7 +6779,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8], 'waiting': []}"
+            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -6925,7 +6852,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8], 'waiting': []}"
+            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -6998,7 +6925,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8], 'waiting': []}"
+            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -7071,7 +6998,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8], 'waiting': []}"
+            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -7144,7 +7071,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8], 'waiting': []}"
+            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -7217,7 +7144,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8], 'waiting': []}"
+            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -7290,7 +7217,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8], 'waiting': []}"
+            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -7363,7 +7290,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8], 'waiting': []}"
+            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -7436,7 +7363,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8], 'waiting': []}"
+            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -7509,7 +7436,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8], 'waiting': []}"
+            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -7582,80 +7509,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_7], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8], 'waiting': []}"
-        },
-        "instrument_state": {
-            "telescope_in_use": false,
-            "telescope_arrays_used": 0,
-            "observations_waiting": 1
-        },
-        "scheduler_state": null
-    },
-    {
-        "cluster_state": {
-            "machines": [
-                {
-                    "id": "cat0_m0",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m1",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m2",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m3",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m4",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m5",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m6",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m7",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m8",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m9",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                }
-            ],
-            "tasks": "{'running': [], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8, emu_0_7], 'waiting': []}"
+            "tasks": "{'running': [], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8, emu_0_7], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -7728,7 +7582,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8, emu_0_7], 'waiting': []}"
+            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8, emu_0_7], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -7801,7 +7655,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8, emu_0_7], 'waiting': []}"
+            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8, emu_0_7], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -7874,7 +7728,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8, emu_0_7], 'waiting': []}"
+            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8, emu_0_7], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -7947,7 +7801,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8, emu_0_7], 'waiting': []}"
+            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8, emu_0_7], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -8020,7 +7874,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8, emu_0_7], 'waiting': []}"
+            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8, emu_0_7], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -8093,7 +7947,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8, emu_0_7], 'waiting': []}"
+            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8, emu_0_7], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -8166,7 +8020,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8, emu_0_7], 'waiting': []}"
+            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8, emu_0_7], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -8239,7 +8093,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8, emu_0_7], 'waiting': []}"
+            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8, emu_0_7], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -8312,7 +8166,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8, emu_0_7], 'waiting': []}"
+            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8, emu_0_7], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -8385,7 +8239,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8, emu_0_7], 'waiting': []}"
+            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8, emu_0_7], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -8458,7 +8312,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8, emu_0_7], 'waiting': []}"
+            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8, emu_0_7], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -8531,80 +8385,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8, emu_0_7], 'waiting': []}"
-        },
-        "instrument_state": {
-            "telescope_in_use": false,
-            "telescope_arrays_used": 0,
-            "observations_waiting": 1
-        },
-        "scheduler_state": null
-    },
-    {
-        "cluster_state": {
-            "machines": [
-                {
-                    "id": "cat0_m0",
-                    "cpu": -926,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m1",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m2",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m3",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m4",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m5",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m6",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m7",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m8",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m9",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                }
-            ],
-            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8, emu_0_7], 'waiting': []}"
+            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8, emu_0_7], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,
@@ -8677,80 +8458,7 @@
                     "disk": 1
                 }
             ],
-            "tasks": "{'running': [emu_0_9], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8, emu_0_7], 'waiting': []}"
-        },
-        "instrument_state": {
-            "telescope_in_use": false,
-            "telescope_arrays_used": 0,
-            "observations_waiting": 1
-        },
-        "scheduler_state": null
-    },
-    {
-        "cluster_state": {
-            "machines": [
-                {
-                    "id": "cat0_m0",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m1",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m2",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m3",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m4",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m5",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m6",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m7",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m8",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                },
-                {
-                    "id": "cat0_m9",
-                    "cpu": 84,
-                    "memory": 1,
-                    "disk": 1
-                }
-            ],
-            "tasks": "{'running': [], 'finished': [ingest-t0, ingest-t1, ingest-t2, ingest-t3, ingest-t4, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_6, emu_0_5, emu_0_8, emu_0_7, emu_0_9], 'waiting': []}"
+            "tasks": "{'running': [], 'finished': [ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, ingest-t0-emu, emu_0_0, emu_0_3, emu_0_2, emu_0_4, emu_0_1, emu_0_5, emu_0_6, emu_0_8, emu_0_7, emu_0_9], 'waiting': []}"
         },
         "instrument_state": {
             "telescope_in_use": false,

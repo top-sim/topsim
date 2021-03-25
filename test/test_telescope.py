@@ -75,18 +75,20 @@ class TestTelescopeIngest(unittest.TestCase):
         self.scheduler.start()
         self.env.process(self.scheduler.run())
         self.env.process(self.buffer.run())
-        self.env.run(until=1)
+        self.env.run(until=2)
         self.assertEqual(36, telescope.telescope_use)
         self.assertEqual(5, len(self.cluster.resources['available']))
         # After 1 timestep, data in the HotBuffer should be 2
         self.assertEqual(496, self.buffer.hot[0].current_capacity)
-        self.env.run(until=10)
-        self.assertEqual(460, self.buffer.hot[0].current_capacity)
+        self.env.run(until=11)
+        self.assertEqual(len([self.buffer.hot[0].observations["transfer"]]),1)
+        self.assertEqual(462, self.buffer.hot[0].current_capacity)
+        self.assertEqual(248,self.buffer.cold[0].current_capacity)
         self.env.run(until=12)
         self.assertEqual(0, telescope.telescope_use)
         self.assertEqual(10, len(self.cluster.resources['available']))
         self.assertEqual(5, len(self.cluster.tasks['finished']))
-    # self.assertEqual(1, len(self.scheduler.waiting_observations))
+
 
 
 class TestObservationConfig(unittest.TestCase):
