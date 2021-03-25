@@ -53,6 +53,7 @@ class Task(object):
         self.task_status = TaskStatus.UNSCHEDULED
         self.pred = None
         self.delay = delay
+        self.workflow_offset = 0
 
         # Machine information that is less important
         # currently (will update this in future versions)

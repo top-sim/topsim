@@ -13,9 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import os
 import unittest
 import simpy
 import logging
+
+import pandas as pd
 
 from topsim.core.simulation import Simulation
 from topsim.user.scheduling import FifoAlgorithm
@@ -24,19 +27,11 @@ from topsim.user.telescope import Telescope
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
-CONFIG = "test/data/simulation_pickles/standard_simulation.json"
-INTEGRATION = "test/data/simulation_pickles/integration_simulation.json"
-HEFT_CONFIG = "test/data/simulation_pickle/heft_single_observation_simulation" \
-              ".json"
+CONFIG = "test/simulation_pickles/heft_single_observation_simulation.json"
 
-# Globals
-OBS_START_TME = 0
-OBS_DURATION = 10
-OBS_DEMAND = 15
-OBS_WORKFLOW = "test/data/config/workflow_config.json"
-PLANNING_ALGORITHM = 'heft'
-EVENT_FILE = 'test/simulation_pickles/heft_sim_delay_low'
-
+EVENT_FILE = 'test/simulation_pickles/sim_nodelay'
+EVENT_PICKLE = f'{EVENT_FILE}-heft.pkl'
+TASKS_PICKLE = f'{EVENT_FILE}-heft-tasks.pkl'
 
 class TestMonitorPandasPickle(unittest.TestCase):
 
@@ -50,7 +45,7 @@ class TestMonitorPandasPickle(unittest.TestCase):
         env = simpy.Environment()
         sched_algorithm = FifoAlgorithm()
         instrument = Telescope
-        simulation = Simulation(
+        self.simulation = Simulation(
             env=env,
             config=CONFIG,
             instrument=instrument,
@@ -60,11 +55,15 @@ class TestMonitorPandasPickle(unittest.TestCase):
         )
 
     def testPickleGeneratedAfterSimulation(self):
-
-        pass
+        if not os.path.exists(EVENT_PICKLE):
+            res = self.simulation.start(-1)
+        sim_df = pd.read_pickle(EVENT_PICKLE)
+        tasks_df = pd.read_pickle(TASKS_PICKLE)
+        self.assertTrue(True)
 
     def testPickleResultsAgreeWithExpectations(self):
         pass
 
     def testPickleResultsWithLowDegreeDelays(self):
+        delay_pickle = f'test/simulation_pickles/sim_nodelay'
         pass

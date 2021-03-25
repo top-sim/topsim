@@ -327,7 +327,7 @@ class Cluster:
         """
         tasks = []
         for i in range(demand):
-            t = Task(f"ingest-t{0}-{observation.name}", None)
+            t = Task(f"ingest-t{i}-{observation.name}", None)
             t.duration = observation.duration
             t.task_status = TaskStatus.SCHEDULED
             tasks.append(t)
@@ -375,13 +375,14 @@ class Cluster:
         task_data = {}
         for task in finished_tasks:
             task_data[task.id] = {}
-            task_data[task.id]['est'] = task.est
-            task_data[task.id]['eft'] = task.eft
+            task_data[task.id]['est'] = task.est + task.workflow_offset
+            task_data[task.id]['eft'] = task.eft + task.workflow_offset
             task_data[task.id]['ast'] = task.ast
             task_data[task.id]['aft'] = task.aft
+            task_data[task.id]['workflow_offset'] = task.workflow_offset
             # task_data['pred'] = [pred for pred in task.pred]
 
-        return task_data
+        return pd.DataFrame(task_data)
 
     def print_state(self):
         # self.clusters[c]['resources']

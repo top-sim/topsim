@@ -29,10 +29,9 @@ class Monitor(object):
             )
             self.events.append(state)
             self.write_to_file()
-            # self.df = self.df.append(cluster)
-            # x = [buffer, self.df]
-            # self.df = self.df.merge(buffer, how='left',sort=False)
+            tasks = self.simulation.cluster.finished_task_time_data()
             alg = self.simulation.planner.algorithm
+            tasks.to_pickle(f"{self.event_file}-{alg}-tasks.pkl")
             self.df.to_pickle("{0}-{1}.pkl".format(self.event_file,alg))
             yield self.env.timeout(1)
 
@@ -43,7 +42,6 @@ class Monitor(object):
     def collate_actor_dataframes(self):
         df = pd.DataFrame()
         cluster = self.simulation.cluster.to_df()
-        tasks = self.simulation.cluster.finished_task_time_data()
         buffer = self.simulation.buffer.to_df()
         instrument = self.simulation.instrument.to_df()
         df = df.join([cluster, buffer, instrument], how='outer')
