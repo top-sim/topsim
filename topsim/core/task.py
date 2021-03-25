@@ -15,6 +15,7 @@
 
 from enum import Enum
 from topsim.core.delay import DelayModel
+import simpy
 import logging
 
 logger = logging.getLogger(__name__)
@@ -85,12 +86,13 @@ class Task(object):
         """
         self.task_status = TaskStatus.RUNNING
         self.ast = env.now
-        self.eft = self.duration+self.ast
+        # self.eft = self.duration+self.ast
         duration = self._calc_task_delay()
-        yield env.timeout(duration)
-        self.aft = env.now
+        yield env.timeout(duration-1)
+        self.aft = env.now+1
+        self.task_status = TaskStatus.FINISHED
         logger.debug('%s finished at %s', self.id, self.aft)
-        return TaskStatus.FINISHED
+        # return TaskStatus.FINISHED
 
     def _calc_task_delay(self):
         """

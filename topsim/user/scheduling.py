@@ -77,6 +77,11 @@ class FifoAlgorithm(Algorithm):
                     machine = cluster.dmachine[t.machine_id.id]
                     workflow_plan.status = WorkflowStatus.SCHEDULED
                     if self.is_machine_occupied(machine):
+                        # Is there another machine of same
+                        if self.cluster.resources['available']:
+                            machine = self.cluster.resources['available'][0]
+                            t.duration = t.flops/machine.cpu
+                            return machine, t, workflow_plan.status
                         return None, None, workflow_plan.status
                     return machine, t, workflow_plan.status
                 # The task has predecessors

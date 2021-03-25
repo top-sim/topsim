@@ -201,7 +201,7 @@ class Scheduler:
                 cluster_ingest = self.env.process(
                     self.cluster.provision_ingest_resources(
                         pipeline_demand,
-                        observation.duration
+                        observation
                     )
                 )
                 ret = self.env.process(
@@ -270,11 +270,11 @@ class Scheduler:
                 if t.task_status is TaskStatus.FINISHED:
                     current_plan.tasks.remove(t)
 
-                machine, task, status = self.algorithm(
-                    cluster=self.cluster,
-                    clock=self.env.now,
-                    workflow_plan=current_plan
-                )
+            machine, task, status = self.algorithm(
+                cluster=self.cluster,
+                clock=self.env.now,
+                workflow_plan=current_plan
+            )
             current_plan.status = status
 
             if (machine is None and task is None and status is

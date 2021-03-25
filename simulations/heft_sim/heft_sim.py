@@ -30,7 +30,7 @@ from topsim.user.telescope import Telescope
 from topsim.core.simulation import Simulation
 from topsim.core.delay import DelayModel
 
-logging.basicConfig(level="INFO")
+logging.basicConfig(level="WARNING")
 LOGGER = logging.getLogger(__name__)
 EVENT_FILE = 'simulations/heft_sim/output/heft_sim_delay_low.trace'
 

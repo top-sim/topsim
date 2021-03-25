@@ -84,13 +84,12 @@ class TestIngest(unittest.TestCase):
         self.assertTrue(retval)
 
     def testClusterProvisionIngest(self):
-        duration = self.observation.duration
         pipeline_demand = 5
         self.env.process(self.cluster.run())
         peek = self.env.peek()
         self.env.process(self.cluster.provision_ingest_resources(
             pipeline_demand,
-            duration)
+            self.observation)
         )
         self.env.run(until=1)
         self.assertEqual(1, self.env.now)
@@ -99,11 +98,21 @@ class TestIngest(unittest.TestCase):
         #  	self.assertEqual(TaskStatus.RUNNING, task.task_status)
         self.assertEqual(5, len(self.cluster.resources['available']))
         self.assertEqual(5, len(self.cluster.tasks['running']))
-        self.env.run(until=10)
         self.assertEqual(5, len(self.cluster.resources['available']))
-        self.env.run(until=20)
+        self.env.run(until=10)
+        # AS Far as the simulation is concerned, we this occurs 'before' 10
+        # seconds in simtime; however, the rest of the simulation is
+        # operating AT time = 10, which is when the tasks are "Due" to
+        # finish. Here we are running the tasks for "1 -timestep less" than
+        # is necessary, but within the simulation time this allows us to run
+        # "on time". I.e. at time = 10 (in the simulation), there _will_ be
+        # 10 resources available, because it's the time period in which all
+        # ingest tasks will finish. However, in real terms, these tasks
+        # technically finished one timestep earlier.
         self.assertEqual(10, len(self.cluster.resources['available']))
-        self.assertEqual(20, self.env.now)
+        # self.env.run(until=20)
+        # self.assertEqual(10, len(self.cluster.resources['available']))
+        # self.assertEqual(20, self.env.now)
 
     def test_cluster_ingest_complex_pipelin(self):
         pass

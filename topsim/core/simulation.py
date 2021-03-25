@@ -143,7 +143,7 @@ class Simulation:
         else:
             while not self.is_finished():
                 self.env.run(self.env.now+1)
-
+            self.env.run(self.env.now+1)
         LOGGER.info("Simulation Finished @ %s", self.env.now)
 
     def resume(self, until):
