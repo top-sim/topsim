@@ -122,6 +122,12 @@ class Cluster:
         # Length is how long the pipeline will take to
         # ingest/observation will take
 
+        num_available = len(self.clusters[c]['resources']['available'])
+        num_ingest = len(self.clusters[c]['resources']['ingest'])
+
+        if pipeline_demand > max_ingest_resources:
+            return False
+
         if len(self.clusters[c]['resources']['available']) >= pipeline_demand \
                 and len(
             self.clusters[c]['resources']['ingest']) < max_ingest_resources:

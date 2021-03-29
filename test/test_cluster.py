@@ -114,6 +114,15 @@ class TestIngest(unittest.TestCase):
         # self.assertEqual(10, len(self.cluster.resources['available']))
         # self.assertEqual(20, self.env.now)
 
+    def testIngestPipelineExceedsIngestCapacity(self):
+        """
+        If we have a pipeline that requests too many ingest pipelines then we
+        need to reject its observation.
+        Returns
+        -------
+
+        """
+
     def test_cluster_ingest_complex_pipelin(self):
         pass
 
