@@ -29,9 +29,10 @@ logger = logging.getLogger(__name__)
 
 CONFIG = "test/simulation_pickles/heft_single_observation_simulation.json"
 
-EVENT_FILE = 'test/simulation_pickles/sim_nodelay'
-EVENT_PICKLE = f'{EVENT_FILE}-heft.pkl'
-TASKS_PICKLE = f'{EVENT_FILE}-heft-tasks.pkl'
+SIM_TIMESTAMP = f'{0}'
+EVENT_PICKLE = f'{SIM_TIMESTAMP}-FIFOAlgorithm-heft-sim.pkl'
+TASKS_PICKLE = f'{SIM_TIMESTAMP}-FIFOAlgorithm-heft-tasks.pkl'
+
 
 class TestMonitorPandasPickle(unittest.TestCase):
 
@@ -51,12 +52,14 @@ class TestMonitorPandasPickle(unittest.TestCase):
             instrument=instrument,
             algorithm_map={'pheft': 'pheft', 'heft': 'heft',
                            'fifo': FifoAlgorithm},
-            event_file=EVENT_FILE,
+            delay=None,
+            timestamp=SIM_TIMESTAMP
         )
 
     def testPickleGeneratedAfterSimulation(self):
         if not os.path.exists(EVENT_PICKLE):
             res = self.simulation.start(-1)
+
         sim_df = pd.read_pickle(EVENT_PICKLE)
         tasks_df = pd.read_pickle(TASKS_PICKLE)
         self.assertTrue(True)

@@ -7,10 +7,10 @@ logger = logging.getLogger(__name__)
 
 
 class Monitor(object):
-    def __init__(self, simulation,event_file):
+    def __init__(self, simulation,start_time):
         self.simulation = simulation
         self.env = simulation.env
-        self.event_file = event_file
+        self.sim_timestamp = start_time
         self.events = []
         self.df = pd.DataFrame()
 
@@ -27,16 +27,15 @@ class Monitor(object):
             self.df = self.df.append(
                 self.collate_actor_dataframes(), ignore_index=True
             )
-            self.events.append(state)
-            self.write_to_file()
             tasks = self.simulation.cluster.finished_task_time_data()
-            alg = self.simulation.planner.algorithm
-            tasks.to_pickle(f"{self.event_file}-{alg}-tasks.pkl")
-            self.df.to_pickle("{0}-{1}.pkl".format(self.event_file,alg))
+            palg = self.simulation.planner.algorithm
+            salg = repr(self.simulation.scheduler.algorithm)
+            tasks.to_pickle(f"{self.sim_timestamp}-{palg}-{salg}-tasks.pkl")
+            self.df.to_pickle(f"{self.sim_timestamp}-{palg}-{salg}-sim.pkl")
             yield self.env.timeout(1)
 
     def write_to_file(self):
-        with open(self.event_file, 'w+') as f:
+        with open(self.sim_timestamp, 'w+') as f:
             json.dump(self.events, f, indent=4)
 
     def collate_actor_dataframes(self):

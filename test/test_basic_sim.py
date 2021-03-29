@@ -29,7 +29,6 @@ from topsim.user.telescope import Telescope
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
-EVENT_FILE = 'test/basic-workflow-data/output/sim.trace'
 BASIC_WORKFLOW = 'test/basic-workflow-data/basic_workflow_config.json'
 BASIC_CLUSTER = 'test/basic-workflow-data/basic_config.json'
 BASIC_BUFFER = 'test/basic-workflow-data/basic_buffer.json'
@@ -49,7 +48,6 @@ class TestBasicIngest(unittest.TestCase):
             BASIC_CONFIG,
             Telescope,
             algorithm_map,
-            event_file
         )
 
     def testClusterIngest(self):

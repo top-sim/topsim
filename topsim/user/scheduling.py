@@ -43,6 +43,9 @@ class FifoAlgorithm(Algorithm):
     def parse_workflow_plan(self):
         pass
 
+    def __repr__(self):
+        return "FIFOAlgorithm"
+
     def __call__(self, cluster, clock, workflow_plan):
         """
         :param cluster:

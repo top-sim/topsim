@@ -7,6 +7,7 @@ finished.
 
 
 import logging
+import time
 import json
 from topsim.core.config import Config
 from topsim.core.monitor import Monitor
@@ -25,7 +26,8 @@ class Simulation:
     monitoring, and provides the conditions for checking if the simulation has
     finished.
 
-    Parameters
+    Attributes
+
     ----------
     env : simpy.Environment bject
         This is how the TOpSim simulation maintains state across the
@@ -50,8 +52,10 @@ class Simulation:
     scheduling_algorithm: object
         instance of the core.algorithm interface
 
-    event_file: str
-        Path to the output file that stsores execution of simulation.
+    sim_timestamp: str
+        Optional Simulation start-time; this is useful for testing, to ensure we
+        name the file and the tests match up. Also useful if you do not want to
+        use the time of the simulation as the name.
 
     visualisation: bool
         If visualisation is required, True; else, False
@@ -70,15 +74,17 @@ class Simulation:
             config,
             instrument,
             algorithm_map,
-            event_file,
-            delay=None
+            delay=None,
+            timestamp=None
     ):
 
         self.env = env
 
-        # Event file setup
-        if event_file is not None:
-            self.monitor = Monitor(self,event_file)
+        if timestamp:
+            self.monitor = Monitor(self,timestamp)
+        else:
+            sim_start_time = f'{time.time()}'.split('.')[0]
+            self.monitor = Monitor(self,sim_start_time)
         # Process necessary config files
 
         # Initiaise Actor and Resource objects
