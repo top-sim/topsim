@@ -32,13 +32,15 @@ import simpy
 import logging
 
 from topsim.core.config import Config
-from topsim.user.telescope import Telescope
-from topsim.core.scheduler import Scheduler
+
+from topsim.core.scheduler import Scheduler, ScheduleStatus
 from topsim.core.cluster import Cluster
 from topsim.core.planner import Planner
 from topsim.core.buffer import Buffer
 from topsim.core.instrument import RunStatus
+from topsim.core.delay import DelayModel
 
+from topsim.user.telescope import Telescope
 from topsim.user.scheduling import FifoAlgorithm
 
 logging.basicConfig(level="WARNING")
@@ -144,20 +146,6 @@ class TestSchedulerIngest(unittest.TestCase):
         self.assertEqual(210, self.buffer.cold[0].current_capacity)
 
 
-"""
-TODO 
-Global DAG internalisation needs work (unimplemented as it currently stands)
-Maybe this is implicit? I.e. we visualise it but there is no explicit 
-concept of it in the function of the simulation? 
-
-Scheduler post-ingest calculations and start-times that we need to iron out
-
-* Movement from hot-buffer to cold buffer
-* Data 'provisioning' for initial workflow node
-* Machine 'provisioning' for the workflow based on Cluster and GLOBAL DAG
-"""
-
-
 class TestSchedulerFIFO(unittest.TestCase):
 
     def setUp(self):
@@ -210,14 +198,14 @@ class TestSchedulerFIFO(unittest.TestCase):
         curr_obs = self.telescope.observations[0]
         gen = self.scheduler.allocate_tasks(curr_obs)
         self.assertRaises(RuntimeError, next, gen)
-        l = [0, 3, 2, 4, 1,5, 6, 8, 7, 9]
+        l = [0, 3, 2, 4, 1, 5, 6, 8, 7, 9]
         exec_ord = [
             curr_obs.name + '_' + str(self.env.now) + '_' + str(tid) for tid
             in l
         ]
         self.scheduler.observation_queue.append(curr_obs)
         curr_obs.ast = self.env.now
-        self.env.process(self.planner.run(curr_obs,self.buffer))
+        self.env.process(self.planner.run(curr_obs, self.buffer))
         self.env.process(self.scheduler.allocate_tasks(curr_obs))
         self.env.run(1)
         self.assertListEqual(
@@ -229,29 +217,6 @@ class TestSchedulerFIFO(unittest.TestCase):
         self.assertEqual(10, len(self.cluster.tasks['finished']))
         self.assertEqual(0, len(self.cluster.tasks['running']))
         self.assertEqual(0, len(self.scheduler.observation_queue))
-
-    def testAllocateTasksWithPreceedingObservation(self):
-        pipelines = self.telescope.pipelines
-        max_ingest = 5
-
-        observation = self.telescope.observations[0]
-        self.env.process(self.cluster.run())
-        self.env.process(self.buffer.run())
-        self.env.process(self.telescope.run())
-        self.scheduler.start()
-        self.env.process(self.scheduler.run())
-        # status = self.env.process(self.scheduler.allocate_ingest(
-        #     observation,
-        #     pipelines,
-        #     self.planner
-        # ))
-
-        self.env.run(until=1)
-        self.env.run(until=11)
-        self.env.run(until=118)
-        self.env.run(until=119)
-
-
 
 
 class TestSchedulerIntegration(unittest.TestCase):
@@ -270,40 +235,105 @@ class TestSchedulerIntegration(unittest.TestCase):
         self.telescope = Telescope(
             self.env, config, self.planner, self.scheduler
         )
+        self.env.process(self.cluster.run())
+        self.env.process(self.buffer.run())
+        self.scheduler.start()
+        self.env.process(self.scheduler.run())
+        self.env.process(self.telescope.run())
 
     def test_FIFO_with_buffer(self):
+        """
+        Demonstrate that the scheduler accurately schedules when we have
+        other Actors working in tandem.
 
-        pipelines = self.telescope.pipelines
-        max_ingest = 5
-        observation = self.telescope.observations[0]
+        Expectations:
+            - After 1 timestep in the simualtion, we have 5 resources
+            available of the 10 that we start with.
+            -
+        Returns
+        -------
 
-        ready_status = self.scheduler.check_ingest_capacity(
-            observation,
-            pipelines,
-            max_ingest
+        """
+        self.env.run(until=1)
+
+        self.assertEqual(10, len(self.cluster.resources['available']))
+        # This takes timestep, data in the HotBuffer should be 4
+        self.env.run(until=2)
+        self.assertEqual(5, len(self.cluster.resources['available']))
+        self.assertEqual(496, self.buffer.hot[0].current_capacity)
+        self.env.run(until=31)
+        self.assertEqual(5, len(self.cluster.tasks['finished']))
+        # self.assertEqual(500, self.buffer.hot[0].current_capacity)
+        self.assertEqual(210, self.buffer.cold[0].current_capacity)
+        self.env.run(until=32)
+        # Ensure the time
+        self.assertEqual(ScheduleStatus.ONTIME, self.scheduler.schedule_status)
+        # 30 timesteps until we finish everything + 81 timesteps to complete
+        # workflow plan.
+        self.env.run(until=124)
+        # As we have been processing the current observation, we are also
+        # ingestting the next one.
+        self.assertEqual(250, self.buffer.cold[0].current_capacity)
+
+
+class TestSchedulerWithDelays(unittest.TestCase):
+
+    def setUp(self):
+        """
+        Repeating above test cases but with delays to determine that delay
+        flags reach us.
+        Returns
+        -------
+
+        """
+
+        self.env = simpy.Environment()
+        config = Config(INTEGRATION)
+        self.cluster = Cluster(self.env, config)
+        self.buffer = Buffer(self.env, self.cluster, config)
+        self.planner = Planner(
+            self.env, PLANNING_ALGORITHM,
+            self.cluster, delay_model=DelayModel(0.3, "normal")
+        )
+
+        self.scheduler = Scheduler(
+            self.env, self.buffer, self.cluster, FifoAlgorithm()
+        )
+        self.telescope = Telescope(
+            self.env, config, self.planner, self.scheduler
         )
         self.env.process(self.cluster.run())
         self.env.process(self.buffer.run())
         self.scheduler.start()
         self.env.process(self.scheduler.run())
+        self.env.process(self.telescope.run())
 
-        observation.status = RunStatus.WAITING
-        status = self.env.process(self.scheduler.allocate_ingest(
-            observation,
-            pipelines,
-            self.planner
-        ))
-        # self.env.process(self.planner.run(observation,self.buffer))
+    def testIntegrationWithTaskDelays(self):
+        """
+        Nothing should change until we reach the workflow plan, as we are
+        testing TaskDelays
+        Returns
+        -------
+        """
 
         self.env.run(until=1)
-        
-        self.assertEqual(5, len(self.cluster.resources['available']))
-        # After 1 timestep, data in the HotBuffer should be 2
+        # Remember - env starts at 0, we don't start until 1.
+        self.assertEqual(10, len(self.cluster.resources['available']))
+        self.env.run(until=2)
+
+        # After 1 timestep, data in the HotBuffer should be 4
         self.assertEqual(496, self.buffer.hot[0].current_capacity)
-        self.env.run(until=30)
+        self.env.run(until=31)
         self.assertEqual(5, len(self.cluster.tasks['finished']))
         self.assertEqual(500, self.buffer.hot[0].current_capacity)
-        self.assertEqual(210, self.buffer.cold[0].current_capacity)
-        self.env.run(until=131)
-
-        self.assertEqual(250, self.buffer.cold[0].current_capacity)
+        self.env.run(until=32)
+        # Ensure the time
+        self.assertEqual(ScheduleStatus.ONTIME, self.scheduler.schedule_status)
+        self.env.run(until=50)
+        self.assertTrue(ScheduleStatus.DELAYED,self.scheduler.schedule_status)
+        self.env.run(until=124)
+        # Assert that we still have tasks running
+        self.assertLess(
+            0, len(self.cluster.clusters['default']['tasks']['running'])
+        )
+        self.assertNotEqual(250, self.buffer.cold[0].current_capacity)

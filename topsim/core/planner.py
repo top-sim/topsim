@@ -223,7 +223,7 @@ class WorkflowPlan:
         """
 
         storage = buffer.buffer_storage_summary()
-        size = observation.duration * storage['hotbuffer']['data_rate']
+        size = observation.duration * observation.ingest_data_rate
         hot_to_cold_time = int(size/storage['coldbuffer']['data_rate'])
         est = observation.duration + hot_to_cold_time
         return est

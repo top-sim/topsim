@@ -50,6 +50,7 @@ class Task(object):
         self.aft = -1
         self.machine_id = None
         self.duration = None
+        self.delay_flag = False
         self.task_status = TaskStatus.UNSCHEDULED
         self.pred = None
         self.delay = delay
@@ -90,6 +91,8 @@ class Task(object):
         # self.eft = self.duration+self.ast
         duration = self._calc_task_delay()
         yield env.timeout(duration-1)
+        if self.duration < self._calc_task_delay():
+            self.delay_flag = True
         self.aft = env.now+1
         self.task_status = TaskStatus.FINISHED
         logger.debug('%s finished at %s', self.id, self.aft)

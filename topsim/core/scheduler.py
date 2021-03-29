@@ -259,7 +259,8 @@ class Scheduler:
 
         # # TODO check if expected run time is the same as the 'assigned'
         # #  runtime (i.e. we have a 'delay'); if not, we have a delay and
-
+        if current_plan.est > self.env.now:
+            self.schedule_status.DELAYED
         allocation_triggers = []
         while not test:
             # curr_allocs protects against duplicated scheduled variables
@@ -267,6 +268,8 @@ class Scheduler:
             machine, task = (None, None)
             status = WorkflowStatus.UNSCHEDULED
             for t in current_plan.tasks:
+                if t.delay_flag:
+                    self.schedule_status = ScheduleStatus.DELAYED
                 if t.task_status is TaskStatus.FINISHED:
                     current_plan.tasks.remove(t)
 
@@ -276,6 +279,9 @@ class Scheduler:
                 workflow_plan=current_plan
             )
             current_plan.status = status
+            if current_plan.status is WorkflowStatus.DELAYED:
+                if self.schedule_status != ScheduleStatus.DELAYED:
+                    self.schedule_status = ScheduleStatus.DELAYED
 
             if (machine is None and task is None and status is
                     WorkflowStatus.FINISHED):

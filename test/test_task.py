@@ -25,7 +25,9 @@ class TestTaskDelay(unittest.TestCase):
 
     def setUp(self):
         self.task_id = 'apricot_jam_0_10'
+        # Based on seed, this does not produce a delay
         self.dm_nodelay = DelayModel(0.1, "normal")
+        # Based on seed, this does produce a delay
         self.dm_delay = DelayModel(0.3, "normal")
         self.assertEqual(20, self.dm_nodelay.seed)
 
@@ -77,6 +79,7 @@ class TestTaskDelay(unittest.TestCase):
         self.env.process(t.do_work(self.env))
         self.env.run()
         self.assertEqual(12, t.aft)
+        self.assertTrue(t.delay_flag)
 
 
 class TaskInit(unittest.TestCase):
