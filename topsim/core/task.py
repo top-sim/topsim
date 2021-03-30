@@ -17,6 +17,7 @@ from enum import Enum
 from topsim.core.delay import DelayModel
 import simpy
 import logging
+import copy
 
 logger = logging.getLogger(__name__)
 
@@ -37,39 +38,41 @@ class Task(object):
 
     # NB I don't want tasks to have null defaults; should we improve on this
     # by initialising everything in a task at once?
-    def __init__(self, tid, delay):
+    def __init__(
+            self, tid, est, eft, machine, predecessors,
+            flops=0, memory=0, io=0, delay=None
+    ):
         """
         :param tid: ID of the Task object
         :param env: Simulation environment to which the task will be added, and where it will run as a process
         """
 
         self.id = tid
-        self.est = 0
-        self.eft = 0
+        self.est = est
+        self.eft = eft
         self.ast = -1
         self.aft = -1
-        self.machine_id = None
-        self.duration = None
+        self.machine = machine
+        self.duration = eft-est
+        self.est_duration = eft-est
         self.delay_flag = False
         self.task_status = TaskStatus.UNSCHEDULED
-        self.pred = None
+        self.pred = predecessors
         self.delay = delay
+        self.delay_offset = 0
         self.workflow_offset = 0
 
         # Machine information that is less important
         # currently (will update this in future versions)
-
-        self.flops = 0
-        self.memory = 0
-        self.io = 0
+        self.flops = flops
+        self.memory = memory
+        self.io = io
 
     def __repr__(self):
         return str(self.id)
 
     def __hash__(self):
         return hash(self.id)
-
-
 
     def do_work(self,env):
         """
@@ -89,14 +92,47 @@ class Task(object):
         self.task_status = TaskStatus.RUNNING
         self.ast = env.now
         # self.eft = self.duration+self.ast
+        # Process potential updates to duration:
+
         duration = self._calc_task_delay()
         yield env.timeout(duration-1)
-        if self.duration < self._calc_task_delay():
+        if self.duration < duration:
             self.delay_flag = True
+            self.delay_offset += (duration - self.duration)
         self.aft = env.now+1
         self.task_status = TaskStatus.FINISHED
         logger.debug('%s finished at %s', self.id, self.aft)
         # return TaskStatus.FINISHED
+
+    def update_allocation(self, machine):
+        """
+        At runtime, it may be that a machine allocation is suggested that we
+        have not planned for. Therefore, we need to recalculate the duration
+        based on that allocation.
+
+        Additionally, it is possible that the new allocation increases the
+        time cost associated with the task (that is, the duration is longer
+        than originally expected). This means we have a form of runtime delay
+        that is separate to the 'average' delay likelihood built into running
+        tasks. Therefore, we need to update the tasks actual duration,
+        whilst also keeping the old value of duration to help determine the
+        extent to which the task is delayed, both based on this machine
+        re-allocation *and* the task runtime variations.
+
+        Parameters
+        ----------
+        machine
+            The new machine we are updating to.
+
+        Returns
+        -------
+
+        """
+        duration = int(self.flops/machine.cpu)
+        if duration > self.duration:
+            self.delay_flag = True
+            self.delay_offset = (duration - self.duration)
+            self.duration = duration
 
     def _calc_task_delay(self):
         """

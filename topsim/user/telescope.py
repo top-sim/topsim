@@ -3,11 +3,10 @@
 # import config_data
 import pandas as pd
 import logging
-# CHANGE THIS TO GET DEBUG VALUES FROM LOGS
-import json
+
 
 from topsim.core.instrument import Instrument, RunStatus
-
+from topsim.core.scheduler import ScheduleStatus
 LOGGER = logging.getLogger(__name__)
 
 
@@ -102,6 +101,7 @@ class Telescope(Instrument):
         self.telescope_status = False
         self.telescope_use = 0
         self.planner = planner
+        self.delayed = False
 
     def run(self):
         """
@@ -132,6 +132,11 @@ class Telescope(Instrument):
         """
 
         while self.has_observations_to_process():
+            # Check if scheduler is delayed
+            if (self.scheduler.schedule_status is ScheduleStatus.DELAYED
+                    and not self.delayed):
+                self.delayed = True
+
             for observation in self.observations:
                 capacity = self.total_arrays - self.telescope_use
                 # IF there is an observation ready for start
@@ -283,6 +288,7 @@ class Telescope(Instrument):
         df['observations_finished'] = [self.observations_finished()]
         df['observations_delayed'] = [self._calc_observation_delay()]
         df['telescope_status'] = [self.telescope_status]
+        df['delay_status'] = [self.delayed]
         return df
 
     def _calc_observation_delay(self):

@@ -4,7 +4,7 @@ import logging
 
 from topsim.core.config import Config
 from topsim.core.simulation import Simulation
-from topsim.user.scheduling import FifoAlgorithm
+from topsim.user.scheduling import GreedyAlgorithmFromPlan
 from topsim.user.telescope import Telescope
 logging.basicConfig(level='WARNING')
 logger = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ class TestSimulationConfig(unittest.TestCase):
         # tel = Telescope(env, buffer_obj, config, planner)
         self.event_file = EVENT_FILE
         self.env = simpy.Environment()
-        self.algorithm_map = {'heft': 'heft', 'fifo': FifoAlgorithm}
+        self.algorithm_map = {'heft': 'heft', 'fifo': GreedyAlgorithmFromPlan}
         self.instrument = Telescope
 
     def tearDown(self):
@@ -48,7 +48,7 @@ class TestSimulationRuntime(unittest.TestCase):
     def setUp(self) -> None:
         event_file = EVENT_FILE
         env = simpy.Environment()
-        algorithm_map = {'heft': 'heft', 'fifo': FifoAlgorithm}
+        algorithm_map = {'heft': 'heft', 'fifo': GreedyAlgorithmFromPlan}
         self.simulation = Simulation(
             env,
             CONFIG,
@@ -74,7 +74,7 @@ class TestSimulationBasicSetup(unittest.TestCase):
 
     def setUp(self) -> None:
         env = simpy.Environment()
-        algorithm_map = {'heft': 'heft', 'fifo': FifoAlgorithm}
+        algorithm_map = {'heft': 'heft', 'fifo': GreedyAlgorithmFromPlan}
         self.simulation = Simulation(
             env,
             BASIC_CONFIG,

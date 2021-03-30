@@ -23,7 +23,7 @@ from topsim.core.buffer import Buffer
 from topsim.core.instrument import Observation
 from topsim.core.delay import DelayModel
 
-from topsim.user.scheduling import FifoAlgorithm
+from topsim.user.scheduling import GreedyAlgorithmFromPlan
 
 current_dir = os.path.abspath('')
 
@@ -115,7 +115,7 @@ class TestPlannerDelay(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
-        sched_algorithm = FifoAlgorithm()
+        sched_algorithm = GreedyAlgorithmFromPlan()
         config = Config(HEFT_CONFIG)
         dm = DelayModel(0.1, "normal")
         self.cluster = Cluster(self.env, config=config)

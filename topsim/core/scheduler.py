@@ -52,6 +52,7 @@ class Scheduler:
         self.ingest_observation = None
         self.observation_queue = []
         self.schedule_status = ScheduleStatus.ONTIME
+        self.delay_offset = 0
 
     def start(self):
         """
@@ -257,8 +258,8 @@ class Scheduler:
                 current_plan = None
                 observation = None
 
-        # # TODO check if expected run time is the same as the 'assigned'
-        # #  runtime (i.e. we have a 'delay'); if not, we have a delay and
+        # Do we have a run-time delay (is our workflow starting later than
+        # expected on the cluster? This is the sign of a delay).
         if current_plan.est > self.env.now:
             self.schedule_status.DELAYED
         allocation_triggers = []
@@ -268,9 +269,10 @@ class Scheduler:
             machine, task = (None, None)
             status = WorkflowStatus.UNSCHEDULED
             for t in current_plan.tasks:
-                if t.delay_flag:
-                    self.schedule_status = ScheduleStatus.DELAYED
                 if t.task_status is TaskStatus.FINISHED:
+                    if t.delay_flag:
+                        self.schedule_status = ScheduleStatus.DELAYED
+                        self.delay_offset += t.delay_offset
                     current_plan.tasks.remove(t)
 
             machine, task, status = self.algorithm(
@@ -279,8 +281,8 @@ class Scheduler:
                 workflow_plan=current_plan
             )
             current_plan.status = status
-            if current_plan.status is WorkflowStatus.DELAYED:
-                if self.schedule_status != ScheduleStatus.DELAYED:
+            if (current_plan.status is WorkflowStatus.DELAYED and
+                    self.schedule_status is not WorkflowStatus.DELAYED):
                     self.schedule_status = ScheduleStatus.DELAYED
 
             if (machine is None and task is None and status is
@@ -295,6 +297,8 @@ class Scheduler:
             else:
                 # Run the task on the machie
                 if machine not in curr_allocs:
+                    if machine.id != task.machine.id:
+                        task.update_allocation(machine)
                     ret = self.env.process(
                         self.cluster.allocate_task_to_cluster(task, machine)
                     )
@@ -318,7 +322,8 @@ class Scheduler:
     def to_df(self):
         df = pd.DataFrame()
         df['observation_queue'] = [obs.name for obs in self.observation_queue]
-
+        df['schedule_status'] = [str(self.schedule_status)]
+        df['delay_offset'] = [str(self.schedule_status)]
         return df
 
 

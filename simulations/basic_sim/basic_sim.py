@@ -20,7 +20,7 @@ Basic simulation, with minimal Observation Plan and dummy observation workflows
 import simpy
 import logging
 
-from topsim.user.scheduling import FifoAlgorithm
+from topsim.user.scheduling import GreedyAlgorithmFromPlan
 from topsim.user.telescope import Telescope
 from topsim.core.simulation import Simulation
 
@@ -34,7 +34,7 @@ EVENT_FILE = 'simulations/basic_sim/output/sim.trace'
 env = simpy.Environment()
 event_file = EVENT_FILE
 planning_algorithm = 'heft'
-scheduling_algorithm = FifoAlgorithm
+scheduling_algorithm = GreedyAlgorithmFromPlan
 instrument = Telescope
 
 algorith_map = {'heft': planning_algorithm, 'fifo': scheduling_algorithm}

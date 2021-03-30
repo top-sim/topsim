@@ -28,6 +28,7 @@ CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
 BUFFER_CONFIG = 'test/data/config/buffer.json'
 CONFIG = 'test/data/config/standard_simulation.json'
 
+
 class TestTelescopeConfig(unittest.TestCase):
 
     def setUp(self):
@@ -88,6 +89,12 @@ class TestTelescopeIngest(unittest.TestCase):
         self.assertEqual(0, telescope.telescope_use)
         self.assertEqual(10, len(self.cluster.resources['available']))
         self.assertEqual(5, len(self.cluster.tasks['finished']))
+
+
+class TestTaskDelayDetection(unittest.TestCase):
+    """
+    The telescope will flag delays and report this as a flag.
+    """
 
 
 

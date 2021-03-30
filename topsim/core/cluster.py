@@ -265,8 +265,8 @@ class Cluster:
         """
 
         no_tasks_running = (
-                (len(self.clusters['default']['tasks']['running'])== 0) or
-                (len(self.clusters['default']['tasks']['waiting']) ==0)
+                (len(self.clusters['default']['tasks']['running']) == 0) or
+                (len(self.clusters['default']['tasks']['waiting']) == 0)
         )
 
         no_resources_occupied = (
@@ -333,7 +333,11 @@ class Cluster:
         """
         tasks = []
         for i in range(demand):
-            t = Task(f"ingest-t{i}-{observation.name}", None)
+            t = Task(
+                f"ingest-t{i}-{observation.name}",
+                0, 0, None, None, 0, 0, 0, None
+            )
+
             t.duration = observation.duration
             t.task_status = TaskStatus.SCHEDULED
             tasks.append(t)

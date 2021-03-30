@@ -19,8 +19,20 @@ Unittests for the topsim.core.delay.DelayModel class
 
 import unittest
 from numpy.random import seed
+import simpy
 
+from topsim.core.config import Config
+from topsim.core.scheduler import Scheduler, ScheduleStatus
+from topsim.core.cluster import Cluster
+from topsim.core.planner import Planner
+from topsim.core.buffer import Buffer
 from topsim.core.delay import DelayModel
+
+from topsim.user.telescope import Telescope
+from topsim.user.scheduling import GreedyAlgorithmFromPlan
+
+INTEGRATION = "test/data/config/integration_simulation.json"
+PLANNING_ALGORITHM = 'heft'
 
 
 class TestDelayCreation(unittest.TestCase):
@@ -57,3 +69,100 @@ class TestDelayCreation(unittest.TestCase):
         delay = dm.generate_delay(rt)
         self.assertEqual(1, delay-rt)
 
+
+class TestDelaysInActors(unittest.TestCase):
+
+    def setUp(self):
+        """
+        Repeating above test cases but with delays to determine that delay
+        flags reach us.
+        Returns
+        -------
+
+        """
+
+        self.env = simpy.Environment()
+        config = Config(INTEGRATION)
+        self.cluster = Cluster(self.env, config)
+        self.buffer = Buffer(self.env, self.cluster, config)
+        self.planner = Planner(
+            self.env, PLANNING_ALGORITHM,
+            self.cluster, delay_model=DelayModel(0.3, "normal")
+        )
+
+        self.scheduler = Scheduler(
+            self.env, self.buffer, self.cluster, GreedyAlgorithmFromPlan()
+        )
+        self.telescope = Telescope(
+            self.env, config, self.planner, self.scheduler
+        )
+        self.env.process(self.cluster.run())
+        self.env.process(self.buffer.run())
+        self.scheduler.start()
+        self.env.process(self.scheduler.run())
+        self.env.process(self.telescope.run())
+
+    def test_scheduler_delay_detection(self):
+        """
+        Nothing should change until we reach the workflow plan, as we are
+        testing TaskDelays
+        Returns
+        -------
+        """
+
+        self.env.run(until=1)
+        # Remember - env starts at 0, we don't start until 1.
+        self.assertEqual(10, len(self.cluster.resources['available']))
+        self.env.run(until=2)
+
+        # After 1 timestep, data in the HotBuffer should be 4
+        self.assertEqual(496, self.buffer.hot[0].current_capacity)
+        self.env.run(until=31)
+        self.assertEqual(5, len(self.cluster.tasks['finished']))
+        self.assertEqual(500, self.buffer.hot[0].current_capacity)
+        self.env.run(until=44)
+        # We know that the schedule has been delayed - however, we don't
+        # report this to the telescope until we know how long we are delayed
+        # (that is, until the task has completely finished its duration).
+        # In this instance. we know that the first task is going to be
+        # delayed, and so wait until it's completed execution to trigger a
+        # delay.
+        self.assertEqual(ScheduleStatus.ONTIME, self.scheduler.schedule_status)
+        self.env.run(until=45)
+        self.assertTrue(ScheduleStatus.DELAYED,self.scheduler.schedule_status)
+        self.env.run(until=124)
+        # Assert that we still have tasks running
+        self.assertLess(
+            0, len(self.cluster.clusters['default']['tasks']['running'])
+        )
+        self.assertNotEqual(250, self.buffer.cold[0].current_capacity)
+
+    def test_telescope_delay_detection(self):
+        """
+
+        Returns
+        -------
+
+        """
+        self.env.run(until=1)
+        # Remember - env starts at 0, we don't start until 1.
+        self.assertEqual(10, len(self.cluster.resources['available']))
+        self.env.run(until=2)
+
+        # After 1 timestep, data in the HotBuffer should be 4
+        self.assertEqual(496, self.buffer.hot[0].current_capacity)
+        self.env.run(until=31)
+        self.assertEqual(5, len(self.cluster.tasks['finished']))
+        self.assertEqual(500, self.buffer.hot[0].current_capacity)
+        self.env.run(until=32)
+        # Ensure the time
+        self.assertEqual(ScheduleStatus.ONTIME, self.scheduler.schedule_status)
+        self.env.run(until=50)
+        self.assertTrue(ScheduleStatus.DELAYED,self.scheduler.schedule_status)
+        self.assertTrue(self.telescope.delayed)
+
+    def test_telescope_delay_greedy_decision(self):
+        """
+        Returns
+        -------
+        """

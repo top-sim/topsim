@@ -21,7 +21,7 @@ import logging
 import pandas as pd
 
 from topsim.core.simulation import Simulation
-from topsim.user.scheduling import FifoAlgorithm
+from topsim.user.scheduling import GreedyAlgorithmFromPlan
 from topsim.user.telescope import Telescope
 
 logging.basicConfig(level="WARNING")
@@ -44,14 +44,14 @@ class TestMonitorPandasPickle(unittest.TestCase):
         -------
         """
         env = simpy.Environment()
-        sched_algorithm = FifoAlgorithm()
+        sched_algorithm = GreedyAlgorithmFromPlan()
         instrument = Telescope
         self.simulation = Simulation(
             env=env,
             config=CONFIG,
             instrument=instrument,
             algorithm_map={'pheft': 'pheft', 'heft': 'heft',
-                           'fifo': FifoAlgorithm},
+                           'fifo': GreedyAlgorithmFromPlan},
             delay=None,
             timestamp=SIM_TIMESTAMP
         )

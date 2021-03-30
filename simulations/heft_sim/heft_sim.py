@@ -25,7 +25,7 @@ namely, the original HEFT workflow from Topcuoglu 2000.
 import simpy
 import logging
 
-from topsim.user.scheduling import FifoAlgorithm
+from topsim.user.scheduling import GreedyAlgorithmFromPlan
 from topsim.user.telescope import Telescope
 from topsim.core.simulation import Simulation
 from topsim.core.delay import DelayModel
@@ -38,7 +38,7 @@ CONFIG = 'simulations/heft_sim/input/heft_single_observation_simulation.json'
 env = simpy.Environment()
 
 planning_algorithm = 'heft'
-scheduling_algorithm = FifoAlgorithm
+scheduling_algorithm = GreedyAlgorithmFromPlan
 instrument = Telescope
 dm = DelayModel(0.5, 'normal', DelayModel.DelayDegree.LOW)
 
@@ -46,7 +46,7 @@ simulation = Simulation(
     env=env,
     config=CONFIG,
     instrument=instrument,
-    algorithm_map={'pheft': 'pheft', 'heft': 'heft', 'fifo': FifoAlgorithm},
+    algorithm_map={'pheft': 'pheft', 'heft': 'heft', 'fifo': GreedyAlgorithmFromPlan},
     event_file=EVENT_FILE,
     delay=dm
 )

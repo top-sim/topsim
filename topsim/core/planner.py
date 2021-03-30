@@ -168,17 +168,20 @@ class WorkflowPlan:
             allocation = self.solution.task_allocations.get(task)
             tid = self._create_observation_task_id(task.tid, env)
             dm = copy.copy(delay_model)
-            taskobj = Task(tid, dm)
-            taskobj.est = allocation.ast
-            taskobj.eft = allocation.aft
-            taskobj.duration = taskobj.eft - taskobj.est
-            taskobj.machine_id = allocation.machine
-            taskobj.flops = task.flops_demand
-            taskobj.pred = [
+            predecessors = [
                 self._create_observation_task_id(x.tid, env) for x in list(
                     workflow.graph.predecessors(task)
                 )
             ]
+            taskobj = Task(
+                tid,
+                allocation.ast,
+                allocation.aft,
+                allocation.machine,
+                predecessors,
+                task.flops_demand, 0, 0,
+                dm
+            )
             self.tasks.append(taskobj)
         self.tasks.sort(key=lambda x: x.est)
         self.exec_order = self.solution.execution_order

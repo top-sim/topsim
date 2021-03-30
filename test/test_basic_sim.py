@@ -23,7 +23,7 @@ import simpy
 from topsim.core.simulation import Simulation
 from topsim.core.instrument import RunStatus
 
-from topsim.user.scheduling import FifoAlgorithm
+from topsim.user.scheduling import GreedyAlgorithmFromPlan
 from topsim.user.telescope import Telescope
 
 logging.basicConfig(level="WARNING")
@@ -42,7 +42,7 @@ class TestBasicIngest(unittest.TestCase):
         event_file = EVENT_FILE
         self.env = simpy.Environment()
         planning_algorithm = 'heft'
-        algorithm_map = {'heft':'heft', 'fifo': FifoAlgorithm}
+        algorithm_map = {'heft':'heft', 'fifo': GreedyAlgorithmFromPlan}
         self.simulation = Simulation(
             self.env,
             BASIC_CONFIG,

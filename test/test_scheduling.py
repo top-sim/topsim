@@ -19,13 +19,13 @@ Test the scheduling algorithm as 'designed' by the user.
 
 import unittest
 
-from topsim.user.scheduling import FifoAlgorithm
+from topsim.user.scheduling import GreedyAlgorithmFromPlan
 
 
 class TestFifoAlgorithm(unittest.TestCase):
 
     def setUp(self):
-        self.algorithm = FifoAlgorithm()
+        self.algorithm = GreedyAlgorithmFromPlan()
         # TODO setup a workflow
         self.workflow = None
 

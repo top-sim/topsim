@@ -41,7 +41,7 @@ from topsim.core.instrument import RunStatus
 from topsim.core.delay import DelayModel
 
 from topsim.user.telescope import Telescope
-from topsim.user.scheduling import FifoAlgorithm
+from topsim.user.scheduling import GreedyAlgorithmFromPlan
 
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
@@ -74,7 +74,7 @@ class TestSchedulerIngest(unittest.TestCase):
         self.cluster = Cluster(self.env, config)
         self.buffer = Buffer(self.env, self.cluster, config)
         self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, FifoAlgorithm
+            self.env, self.buffer, self.cluster, GreedyAlgorithmFromPlan
         )
         self.planner = Planner(self.env, PLANNING_ALGORITHM,
                                self.cluster)
@@ -146,11 +146,11 @@ class TestSchedulerIngest(unittest.TestCase):
         self.assertEqual(210, self.buffer.cold[0].current_capacity)
 
 
-class TestSchedulerFIFO(unittest.TestCase):
+class TestSchedulerGreedyAllocation(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
-        sched_algorithm = FifoAlgorithm()
+        sched_algorithm = GreedyAlgorithmFromPlan()
         config = Config(HEFT_CONFIG)
         self.cluster = Cluster(self.env, config)
         self.planner = Planner(self.env, PLANNING_ALGORITHM,
@@ -230,7 +230,7 @@ class TestSchedulerIntegration(unittest.TestCase):
                                self.cluster)
 
         self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, FifoAlgorithm()
+            self.env, self.buffer, self.cluster, GreedyAlgorithmFromPlan()
         )
         self.telescope = Telescope(
             self.env, config, self.planner, self.scheduler
@@ -276,17 +276,9 @@ class TestSchedulerIntegration(unittest.TestCase):
         self.assertEqual(250, self.buffer.cold[0].current_capacity)
 
 
-class TestSchedulerWithDelays(unittest.TestCase):
+class TestSchedulerDelayHelpers(unittest.TestCase):
 
     def setUp(self):
-        """
-        Repeating above test cases but with delays to determine that delay
-        flags reach us.
-        Returns
-        -------
-
-        """
-
         self.env = simpy.Environment()
         config = Config(INTEGRATION)
         self.cluster = Cluster(self.env, config)
@@ -297,7 +289,7 @@ class TestSchedulerWithDelays(unittest.TestCase):
         )
 
         self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, FifoAlgorithm()
+            self.env, self.buffer, self.cluster, GreedyAlgorithmFromPlan()
         )
         self.telescope = Telescope(
             self.env, config, self.planner, self.scheduler
@@ -308,32 +300,12 @@ class TestSchedulerWithDelays(unittest.TestCase):
         self.env.process(self.scheduler.run())
         self.env.process(self.telescope.run())
 
-    def testIntegrationWithTaskDelays(self):
+    def test_propogate_delay_returns_updated_workflow(self):
         """
-        Nothing should change until we reach the workflow plan, as we are
-        testing TaskDelays
+        When a delay is triggered, we want to ensure that we cascade this
+        down throughout the task graph to determine the global affect of the
+        delay on the workflow's makespan.
         Returns
         -------
+
         """
-
-        self.env.run(until=1)
-        # Remember - env starts at 0, we don't start until 1.
-        self.assertEqual(10, len(self.cluster.resources['available']))
-        self.env.run(until=2)
-
-        # After 1 timestep, data in the HotBuffer should be 4
-        self.assertEqual(496, self.buffer.hot[0].current_capacity)
-        self.env.run(until=31)
-        self.assertEqual(5, len(self.cluster.tasks['finished']))
-        self.assertEqual(500, self.buffer.hot[0].current_capacity)
-        self.env.run(until=32)
-        # Ensure the time
-        self.assertEqual(ScheduleStatus.ONTIME, self.scheduler.schedule_status)
-        self.env.run(until=50)
-        self.assertTrue(ScheduleStatus.DELAYED,self.scheduler.schedule_status)
-        self.env.run(until=124)
-        # Assert that we still have tasks running
-        self.assertLess(
-            0, len(self.cluster.clusters['default']['tasks']['running'])
-        )
-        self.assertNotEqual(250, self.buffer.cold[0].current_capacity)
