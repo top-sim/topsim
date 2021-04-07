@@ -31,7 +31,7 @@ class GreedyAlgorithmFromPlan(Algorithm):
         pass
 
     def __repr__(self):
-        return "FIFOAlgorithm"
+        return "GreedyAlgorithmFromPlan"
 
     def __call__(self, cluster, clock, workflow_plan):
         """
