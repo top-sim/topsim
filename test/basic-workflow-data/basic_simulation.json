@@ -43,11 +43,6 @@
 		"header": {
 			"time": "false",
 			"gen_specs": {
-				"file": 0,
-				"seed": 0,
-				"range": 0,
-				"heterogeneity": 0,
-				"multiplier": 0
 			}
 		},
 		"system": {
@@ -75,5 +70,6 @@
 		}
 	},
 	"planning": "heft",
-	"scheduling": "fifo"
+	"scheduling": "fifo",
+	"timestep": "seconds"
 }

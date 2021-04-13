@@ -67,6 +67,11 @@ class Config:
         else:
             raise KeyError("'scheduling' is not present in JSON")
 
+        if 'timestep' in cfg and cfg['timestep'] is not None:
+            self.timestep_unit = cfg['timestep']
+        else:
+            self.timestep_unit = 'seconds'
+
     def parse_cluster_config(self):
         try:
             (self.cluster['system'] and self.cluster['system']['resources']
@@ -80,18 +85,24 @@ class Config:
 
         machines = self.cluster['system']['resources']
         machine_list = []
+        timestep_multiplier = 1
+        if self.timestep_unit == 'minutes':
+            timestep_multiplier = 60
+        if self.timestep_unit == 'hours':
+            timestep_multiplier = 3600
         for machine in machines:
+            cpu = machines[machine]['flops']*timestep_multiplier
             machine_list.append(
                 Machine(
                     id=machine,
-                    cpu=machines[machine]['flops'],
-                    memory=1,
-                    disk=1,
-                    bandwidth=machines[machine]['rates']
+                    cpu=cpu,
+                    memory=1,# * timestep_multiplier,
+                    disk=1,# * timestep_multiplier,
+                    bandwidth=machines[machine]['rates'] * timestep_multiplier
                 )
             )
 
-        bandwidth = self.cluster['system']['bandwidth']
+        bandwidth = self.cluster['system']['bandwidth'] * timestep_multiplier
         return machine_list, bandwidth
 
     def parse_instrument_config(self, instrument_name):
@@ -127,7 +138,7 @@ class Config:
             max_data_rate=config['cold']['max_data_rate']
         )
 
-        return {0: hot}, {0:cold}
+        return {0: hot}, {0: cold}
 
 
 class TaskInstanceConfig(object):

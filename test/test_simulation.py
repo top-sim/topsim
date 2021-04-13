@@ -46,7 +46,6 @@ class TestSimulationConfig(unittest.TestCase):
 class TestSimulationRuntime(unittest.TestCase):
 
     def setUp(self) -> None:
-        event_file = EVENT_FILE
         env = simpy.Environment()
         algorithm_map = {'heft': 'heft', 'fifo': GreedyAlgorithmFromPlan}
         self.simulation = Simulation(
@@ -54,7 +53,8 @@ class TestSimulationRuntime(unittest.TestCase):
             CONFIG,
             Telescope,
             algorithm_map,
-            event_file
+            delay=None,
+            timestamp=f'{0}'
         )
 
     def testLimitedRuntime(self):
@@ -80,5 +80,6 @@ class TestSimulationBasicSetup(unittest.TestCase):
             BASIC_CONFIG,
             Telescope,
             algorithm_map,
-            EVENT_FILE,
+            delay=None,
+            timestamp=f'{0}'
         )

@@ -47,8 +47,8 @@ class TestClusterConfig(unittest.TestCase):
         # This is a homogeneous file, so each flops value should be 95
         for machine in cluster.machines:
             # machine is an object instance of Machine
-            self.assertEqual(84, machine.cpu)
-            self.assertEqual(10, machine.bandwidth)
+            self.assertEqual(5040, machine.cpu)
+            self.assertEqual(600, machine.bandwidth)
 
 
 class TestIngest(unittest.TestCase):

@@ -31,16 +31,16 @@ current_dir = os.path.abspath('')
 OBS_START_TME = 0
 OBS_DURATION = 10
 OBS_DEMAND = 15
-
+OBS_DATA_RATE = 5
+OBS_PIPELINE = 'continuum'
 PLAN_ALGORITHM = 'heft'
-
 
 HEFT_CLUSTER_CONFIG = "test/data/config/system_config.json"
 CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
 CONFIG = "test/data/config/standard_simulation.json"
 HEFT_CONFIG = "test/data/config/heft_single_observation_simulation.json"
 MACHINE_CONFIG = None
-OBS_WORKFLOW = "test/data/config/workflow_config.json"
+OBS_WORKFLOW = "test/data/config/workflow_config_minutes.json"
 
 
 class TestPlannerConfig(unittest.TestCase):
@@ -54,10 +54,11 @@ class TestPlannerConfig(unittest.TestCase):
     def testPlannerBasicConfig(self):
         planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
         available_resources = planner.cluster_to_shadow_format()
-        self.assertEqual(1.0, available_resources['system']['bandwidth'])
+        # Bandwidth set at 1gb/s = 60gb/min.
+        self.assertEqual(60.0, available_resources['system']['bandwidth'])
         machine = available_resources['system']['resources']['cat0_m0']
         self.assertEqual(
-            84, available_resources['system']['resources']['cat0_m0']['flops']
+            5040, available_resources['system']['resources']['cat0_m0']['flops']
         )
 
 
@@ -76,14 +77,33 @@ class TestWorkflowPlan(unittest.TestCase):
             OBS_DURATION,
             OBS_DEMAND,
             OBS_WORKFLOW,
-            type=None,
-            data_rate=None
+            type=OBS_PIPELINE,
+            data_rate=OBS_DATA_RATE
         )
 
     def tearDown(self):
         pass
 
     def testWorkflowPlanCreation(self):
+        """
+        Notes
+        -------
+        id rank
+        0 6421.0
+        5 4990.0
+        3 4288.0
+        4 4240.0
+        2 3683.0
+        1 4077.0
+        6 2529.0
+        8 2953.0
+        7 2963.0
+        9 1202.0
+        Returns
+        -------
+        True if passes all tests, false otherwise
+        """
+
         time = self.env.now
         self.assertRaises(
             RuntimeError,
@@ -97,6 +117,7 @@ class TestWorkflowPlan(unittest.TestCase):
             'heft',
             self.buffer
         )
+
         expected_exec_order = [0, 5, 3, 4, 2, 1, 6, 8, 7, 9]
         self.assertEqual(len(plan.tasks), len(expected_exec_order))
         for x in range(len(plan.tasks)):
@@ -108,7 +129,7 @@ class TestWorkflowPlan(unittest.TestCase):
             )
         # Get taskid 5
         task5_comp = plan.tasks[5].flops
-        self.assertEqual(task5_comp, 92000)
+        self.assertEqual(task5_comp, 5520000)
 
 
 class TestPlannerDelay(unittest.TestCase):
@@ -127,8 +148,8 @@ class TestPlannerDelay(unittest.TestCase):
             OBS_DURATION,
             OBS_DEMAND,
             OBS_WORKFLOW,
-            type=None,
-            data_rate=None
+            type=OBS_PIPELINE,
+            data_rate=OBS_DATA_RATE
         )
 
     def testShadowIntegration(self):

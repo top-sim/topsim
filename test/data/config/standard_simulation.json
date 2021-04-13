@@ -20,7 +20,7 @@
 				"start": 1,
 				"duration": 10,
 				"demand": 36,
-				"workflow": "test/data/config/workflow_config.json",
+				"workflow": "test/data/config/workflow_config_minutes.json",
 				"type": "continuum",
 				"data_product_rate": 4
 			},
@@ -29,7 +29,7 @@
 				"start": 15,
 				"duration": 20,
 				"demand": 18,
-				"workflow": "test/data/config/workflow_config.json",
+				"workflow": "test/data/config/workflow_config_minutes.json",
 				"type": "spectral",
 				"data_product_rate": 5
 			}
@@ -40,11 +40,6 @@
 		"header": {
 			"time": "false",
 			"gen_specs": {
-				"file": "recipes/routput/basic_spec-10.json",
-				"seed": 20,
-				"range": "[(50, 100)]",
-				"heterogeneity": 1.0,
-				"multiplier": 1
 			}
 		},
 		"system": {
@@ -104,5 +99,7 @@
 		}
 	},
 	"planning": "heft",
-	"scheduling": "fifo"
+	"scheduling": "fifo",
+	"timestep": "minutes"
+
 }

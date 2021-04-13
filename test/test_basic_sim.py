@@ -29,17 +29,18 @@ from topsim.user.telescope import Telescope
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
+SIM_TIMESTAMP = f'{0}'
 BASIC_WORKFLOW = 'test/basic-workflow-data/basic_workflow_config.json'
 BASIC_CLUSTER = 'test/basic-workflow-data/basic_config.json'
 BASIC_BUFFER = 'test/basic-workflow-data/basic_buffer.json'
 BASIC_PLAN = 'test/basic-workflow-data/basic_observation_plan.json'
 BASIC_CONFIG = 'test/basic-workflow-data/basic_simulation.json'
+EVENT_PICKLE = f'{SIM_TIMESTAMP}-GreedyAlgorithmFromPlan-heft-sim.pkl'
 
 
 class TestBasicIngest(unittest.TestCase):
 
     def setUp(self) -> None:
-        event_file = EVENT_FILE
         self.env = simpy.Environment()
         planning_algorithm = 'heft'
         algorithm_map = {'heft':'heft', 'fifo': GreedyAlgorithmFromPlan}
@@ -48,6 +49,8 @@ class TestBasicIngest(unittest.TestCase):
             BASIC_CONFIG,
             Telescope,
             algorithm_map,
+            delay=None,
+            timestamp=EVENT_PICKLE
         )
 
     def testClusterIngest(self):

@@ -29,9 +29,9 @@ logger = logging.getLogger(__name__)
 
 CONFIG = "test/simulation_pickles/heft_single_observation_simulation.json"
 
-SIM_TIMESTAMP = f'{0}'
-EVENT_PICKLE = f'{SIM_TIMESTAMP}-FIFOAlgorithm-heft-sim.pkl'
-TASKS_PICKLE = f'{SIM_TIMESTAMP}-FIFOAlgorithm-heft-tasks.pkl'
+SIM_TIMESTAMP = f'test/simulation_pickles/{0}'
+EVENT_PICKLE = f'{SIM_TIMESTAMP}-heft-GreedyAlgorithmFromPlan-sim.pkl'
+TASKS_PICKLE = f'{SIM_TIMESTAMP}-heft-GreedyAlgorithmFromPlan-tasks.pkl'
 
 
 class TestMonitorPandasPickle(unittest.TestCase):
