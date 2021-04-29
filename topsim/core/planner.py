@@ -190,6 +190,17 @@ class WorkflowPlan:
         self.priority = 0
         self.status = WorkflowStatus.UNSCHEDULED
 
+    def _generate_topological_plan(self):
+        """
+        This is used if we do not use a planning schedule, and instead are
+        operating on a batch-processing model. The batch processing model
+        means that we take up all resources assigned to the workflow.
+        Returns
+        -------
+
+        """
+        pass
+
     def _create_observation_task_id(self, tid, env):
         return self.id + '_' + str(env.now) + '_' + str(tid)
 

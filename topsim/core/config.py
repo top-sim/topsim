@@ -25,12 +25,6 @@ import logging
 LOGGER = logging.getLogger(__name__)
 
 
-# class Workflow(object):
-# 	def __init__(self,workflow):
-# 		self.id = workflow
-# 		self.submit_time = 0
-#
-
 class Config:
     """
     Process the configuration of the current simulation
@@ -91,13 +85,13 @@ class Config:
         if self.timestep_unit == 'hours':
             timestep_multiplier = 3600
         for machine in machines:
-            cpu = machines[machine]['flops']*timestep_multiplier
+            cpu = machines[machine]['flops'] * timestep_multiplier
             machine_list.append(
                 Machine(
                     id=machine,
                     cpu=cpu,
-                    memory=1,# * timestep_multiplier,
-                    disk=1,# * timestep_multiplier,
+                    memory=1,  # * timestep_multiplier,
+                    disk=1,  # * timestep_multiplier,
                     bandwidth=machines[machine]['rates'] * timestep_multiplier
                 )
             )
@@ -106,6 +100,11 @@ class Config:
         return machine_list, bandwidth
 
     def parse_instrument_config(self, instrument_name):
+        timestep_multiplier = 1
+        if self.timestep_unit == 'minutes':
+            timestep_multiplier = 60
+        if self.timestep_unit == 'hours':
+            timestep_multiplier = 3600
         cfg = self.instrument
         total_arrays = cfg[instrument_name]['total_arrays']
         pipelines = cfg[instrument_name]['pipelines']
@@ -119,7 +118,8 @@ class Config:
                     demand=observation['demand'],
                     workflow=observation['workflow'],
                     type=observation['type'],
-                    data_rate=observation['data_product_rate']
+                    data_rate=observation[
+                                  'data_product_rate'] * timestep_multiplier
                 )
                 observations.append(o)
             except KeyError:
@@ -129,13 +129,19 @@ class Config:
 
     def parse_buffer_config(self):
         config = self.buffer
+        timestep_multiplier = 1
+        if self.timestep_unit == 'minutes':
+            timestep_multiplier = 60
+        if self.timestep_unit == 'hours':
+            timestep_multiplier = 3600
         hot = HotBuffer(
             capacity=config['hot']['capacity'],
-            max_ingest_data_rate=config['hot']['max_ingest_rate']
+            max_ingest_data_rate=config['hot'][
+                                     'max_ingest_rate'] * timestep_multiplier
         )
         cold = ColdBuffer(
             capacity=config['cold']['capacity'],
-            max_data_rate=config['cold']['max_data_rate']
+            max_data_rate=config['cold']['max_data_rate'] * timestep_multiplier
         )
 
         return {0: hot}, {0: cold}

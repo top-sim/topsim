@@ -12,6 +12,7 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import time
 import logging
 import pandas as pd
 
@@ -50,8 +51,10 @@ class Scheduler:
         self.buffer = buffer
         self.status = SchedulerStatus.SLEEP
         self.ingest_observation = None
+        self.provision_ingest = 0
         self.observation_queue = []
         self.schedule_status = ScheduleStatus.ONTIME
+        self.algtime = {}
         self.delay_offset = 0
 
     def start(self):
@@ -157,11 +160,16 @@ class Scheduler:
         cluster_capacity = False
         pipeline_demand = pipelines[observation.type]['demand']
         if self.cluster.check_ingest_capacity(pipeline_demand, max_ingest):
-            LOGGER.debug(
-                "Cluster is able to process ingest for observation %s",
-                observation.name
-            )
-            cluster_capacity = True
+            if self.provision_ingest + pipeline_demand <= max_ingest:
+                cluster_capacity = True
+                self.provision_ingest += pipeline_demand
+                LOGGER.debug(
+                    "Cluster is able to process ingest for observation %s",
+                    observation.name
+                )
+            else:
+                LOGGER.debug('Cluster is unable to process ingest as two'
+                             'observations are scheduled at the same time')
 
         return buffer_capacity and cluster_capacity
 
@@ -220,6 +228,7 @@ class Scheduler:
             yield self.env.timeout(1)
 
         if RunStatus.FINISHED:
+            self.provision_ingest -= pipeline_demand
             self.cluster.clean_up_ingest()
 
     def print_state(self):
@@ -274,16 +283,18 @@ class Scheduler:
                         self.schedule_status = ScheduleStatus.DELAYED
                         self.delay_offset += t.delay_offset
                     current_plan.tasks.remove(t)
-
+            nm = f'{observation.name}-algtime'
+            self.algtime[nm] = time.time()
             machine, task, status = self.algorithm(
                 cluster=self.cluster,
                 clock=self.env.now,
                 workflow_plan=current_plan
             )
+            self.algtime[nm] = (time.time() - self.algtime[nm])
             current_plan.status = status
             if (current_plan.status is WorkflowStatus.DELAYED and
                     self.schedule_status is not WorkflowStatus.DELAYED):
-                    self.schedule_status = ScheduleStatus.DELAYED
+                self.schedule_status = ScheduleStatus.DELAYED
 
             if (machine is None and task is None and status is
                     WorkflowStatus.FINISHED):
@@ -321,9 +332,18 @@ class Scheduler:
 
     def to_df(self):
         df = pd.DataFrame()
-        df['observation_queue'] = [obs.name for obs in self.observation_queue]
+        queuestr = f''
+        for obs in self.observation_queue:
+            queuestr += f'{obs.name}'
+        df['observation_queue'] =queuestr
         df['schedule_status'] = [str(self.schedule_status)]
         df['delay_offset'] = [str(self.schedule_status)]
+        tmp = f'alg'
+        if self.algtime:
+            for key, value in self.algtime.items():
+                df[key] = value
+        else:
+            df['algtime'] = tmp
         return df
 
 

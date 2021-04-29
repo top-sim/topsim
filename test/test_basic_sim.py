@@ -29,13 +29,13 @@ from topsim.user.telescope import Telescope
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
-SIM_TIMESTAMP = f'{0}'
+SIM_TIMESTAMP = f'test/basic-workflow-data/{0}'
 BASIC_WORKFLOW = 'test/basic-workflow-data/basic_workflow_config.json'
 BASIC_CLUSTER = 'test/basic-workflow-data/basic_config.json'
 BASIC_BUFFER = 'test/basic-workflow-data/basic_buffer.json'
 BASIC_PLAN = 'test/basic-workflow-data/basic_observation_plan.json'
 BASIC_CONFIG = 'test/basic-workflow-data/basic_simulation.json'
-EVENT_PICKLE = f'{SIM_TIMESTAMP}-GreedyAlgorithmFromPlan-heft-sim.pkl'
+EVENT_PICKLE = f'{SIM_TIMESTAMP}'
 
 
 class TestBasicIngest(unittest.TestCase):
@@ -50,7 +50,7 @@ class TestBasicIngest(unittest.TestCase):
             Telescope,
             algorithm_map,
             delay=None,
-            timestamp=EVENT_PICKLE
+            timestamp=SIM_TIMESTAMP
         )
 
     def testClusterIngest(self):
@@ -122,6 +122,6 @@ class TestBasicIngest(unittest.TestCase):
         # We've finished processing one of the workflows so one observation
         # is finished.
         self.assertEqual(
-            1, len(self.simulation.buffer.cold[0].observations['stored'])
+        2, len(self.simulation.buffer.cold[0].observations['stored'])
         )
 

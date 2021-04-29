@@ -22,7 +22,7 @@
 					"demand": 36,
 					"workflow": "test/data/config/workflow_config_minutes.json",
 					"type": "continuum",
-					"data_product_rate": 2
+					"data_product_rate": 0.03333333333333333
 				}
 			]
 		}
@@ -51,11 +51,11 @@
 	"buffer": {
 		"hot": {
 			"capacity": 500,
-			"max_ingest_rate": 5
+			"max_ingest_rate": 0.08333333333333333
 		},
 		"cold": {
 			"capacity": 250,
-			"max_data_rate": 2
+			"max_data_rate": 0.03333333333333333
 		}
 	},
 	"planning": "heft",

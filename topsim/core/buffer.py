@@ -256,7 +256,7 @@ class Buffer:
 
         """
         b = observation.buffer_id
-        time_left = observation.duration -1
+        time_left = observation.duration - 1
         if observation.status is RunStatus.WAITING:
             raise RuntimeError(
                 "Observation must be marked RUNNING before ingest begins!"
@@ -325,7 +325,6 @@ class Buffer:
                 return False
 
         return True
-
 
     def to_df(self):
         """
@@ -475,6 +474,7 @@ class ColdBuffer:
         self.total_capacity = capacity
         self.current_capacity = self.total_capacity
         self.max_data_rate = max_data_rate
+        self.next_obs = 0
         self.observations = {
             'stored': [],
             'transfer': None
@@ -504,7 +504,7 @@ class ColdBuffer:
         size = observation_size
         if self.observations['transfer']:
             size = observation_size + self.observations[
-            'transfer'].total_data_size
+                'transfer'].total_data_size
 
         return (
                 self.current_capacity - size >= 0
@@ -559,7 +559,12 @@ class ColdBuffer:
         -------
         topsim.core.telescope.Observation object
         """
-        return self.observations['stored'][0]
+        if len(self.observations['stored']) >= self.next_obs:
+            return self.observations['stored'][-1]
+        else:
+            obs = self.observations['stored'][self.next_obs]
+            self.next_obs += 1
+            return obs
 
     def remove(self, observation):
         """

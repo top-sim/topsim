@@ -43,6 +43,7 @@ class Monitor(object):
         cluster = self.simulation.cluster.to_df()
         buffer = self.simulation.buffer.to_df()
         instrument = self.simulation.instrument.to_df()
-        df = df.join([cluster, buffer, instrument], how='outer')
+        scheduler = self.simulation.scheduler.to_df()
+        df = df.join([cluster, buffer, instrument,scheduler], how='outer')
         return df
 

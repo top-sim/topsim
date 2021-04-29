@@ -130,7 +130,8 @@ class Cluster:
 
         if len(self.clusters[c]['resources']['available']) >= pipeline_demand \
                 and len(
-            self.clusters[c]['resources']['ingest']) < max_ingest_resources:
+            self.clusters[c]['resources']['ingest'])+pipeline_demand <= \
+                max_ingest_resources:
             return True
         else:
             return False
@@ -154,23 +155,31 @@ class Cluster:
         tasks = self._generate_ingest_tasks(demand, observation)
 
         pairs = []
-        self.clusters[c]['resources']['ingest'].extend(
-            self.clusters[c]['resources']['available'][:demand])
+        temp_intest_resources = self.clusters[c]['resources']['available'][:demand]
+        # self.clusters[c]['resources']['ingest'].extend(
+        #     self.clusters[c]['resources']['available'][:demand])
         self.clusters[c]['resources']['available'] = \
             self.clusters[c]['resources']['available'][demand:]
 
         self.usage_data['available'] = len(
             self.clusters[c]['resources']['available']
         )
-        self.usage_data['ingest'] = len(self.clusters[c]['resources']['ingest'])
 
-        for i, machine in enumerate(self.clusters[c]['resources']['ingest']):
+
+        for i, machine in enumerate(temp_intest_resources):
             pairs.append((machine, tasks[i]))
+            self.clusters[c]['usage_data']['available'] -= 1
+            self.clusters[c]['usage_data']['running_tasks'] += 1
+        self.clusters[c]['resources']['ingest'].extend(temp_intest_resources)
+        # self.clusters[c]['ingest'] = len(self.clusters[c]['resources'][
+        #                                      'ingest'])
 
         self.clusters[c]['ingest']['status'] = True
         self.clusters[c]['ingest']['demand'] = demand
+        # self.clusters[c]['usage_data']['running_tasks'] + len(
+        #     self.clusters[c][
+        #     'ingest']['demand'])
 
-        self.usage_data['running_tasks'] = self.clusters[c]['ingest']['demand']
         curr_tasks = {}
         while True:
             for pair in pairs:
