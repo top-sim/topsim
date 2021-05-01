@@ -161,9 +161,9 @@ class Cluster:
         self.clusters[c]['resources']['available'] = \
             self.clusters[c]['resources']['available'][demand:]
 
-        self.usage_data['available'] = len(
-            self.clusters[c]['resources']['available']
-        )
+        # self.usage_data['available'] = len(
+        #     self.clusters[c]['resources']['available']
+        # )
 
 
         for i, machine in enumerate(temp_intest_resources):
@@ -253,6 +253,7 @@ class Cluster:
                 self.clusters[c]['usage_data']['finished_tasks'] += 1
                 if ingest:
                     self.clusters[c]['resources']['ingest'].remove(machine)
+                    # self.clusters[c]['usage_data']['available'] += 1
                 else:
                     self.clusters[c]['resources']['occupied'].remove(machine)
                 self.clusters[c]['resources']['available'].append(machine)
