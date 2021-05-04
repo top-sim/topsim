@@ -344,7 +344,7 @@ class Cluster:
         tasks = []
         for i in range(demand):
             t = Task(
-                f"ingest-t{i}-{observation.name}",
+                f"{observation.name}_ingest_t{i}",
                 0, 0, None, None, 0, 0, 0, None
             )
 
@@ -400,6 +400,7 @@ class Cluster:
             task_data[task.id]['ast'] = task.ast
             task_data[task.id]['aft'] = task.aft
             task_data[task.id]['workflow_offset'] = task.workflow_offset
+            task_data[task.id]['observation_id'] = task.id.split('_')[0]
             # task_data['pred'] = [pred for pred in task.pred]
 
         return pd.DataFrame(task_data)

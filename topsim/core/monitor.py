@@ -3,11 +3,12 @@ import logging
 import time
 import os
 import pandas as pd
+
 logger = logging.getLogger(__name__)
 
 
 class Monitor(object):
-    def __init__(self, simulation,start_time):
+    def __init__(self, simulation, start_time):
         self.simulation = simulation
         self.env = simulation.env
         self.sim_timestamp = start_time
@@ -44,6 +45,11 @@ class Monitor(object):
         buffer = self.simulation.buffer.to_df()
         instrument = self.simulation.instrument.to_df()
         scheduler = self.simulation.scheduler.to_df()
-        df = df.join([cluster, buffer, instrument,scheduler], how='outer')
+        algs = pd.DataFrame(
+            {
+                'planning': self.simulation.planner.algorithm,
+                'scheduling': repr(self.simulation.scheduler.algorithm)
+            },
+        )
+        df = df.join([cluster, buffer, instrument, scheduler,algs], how='outer')
         return df
-
