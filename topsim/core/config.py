@@ -52,15 +52,6 @@ class Config:
             self.buffer = cfg['buffer']
         else:
             raise KeyError("'buffer' is not present in JSON")
-        if 'planning' in cfg and cfg['planning'] is not None:
-            self.planning = cfg['planning']
-        else:
-            raise KeyError("'planning' is not present in JSON")
-        if 'scheduling' in cfg and cfg['scheduling'] is not None:
-            self.scheduling = cfg['scheduling']
-        else:
-            raise KeyError("'scheduling' is not present in JSON")
-
         if 'timestep' in cfg and cfg['timestep'] is not None:
             self.timestep_unit = cfg['timestep']
         else:
@@ -108,6 +99,7 @@ class Config:
         cfg = self.instrument
         total_arrays = cfg[instrument_name]['total_arrays']
         pipelines = cfg[instrument_name]['pipelines']
+        observation_pipelines = []
         observations = []
         for observation in cfg[instrument_name]['observations']:
             try:

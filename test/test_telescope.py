@@ -47,6 +47,8 @@ class TestTelescopeConfig(unittest.TestCase):
             planner=None, scheduler=self.scheduler
         )
         self.assertEqual(36, telescope.total_arrays)
+        # Pipelines are associated with individual observation
+        self.assertEqual()
         self.assertEqual(5, telescope.pipelines['pulsar']['demand'])
 
 

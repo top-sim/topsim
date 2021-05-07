@@ -25,6 +25,10 @@ class Monitor(object):
                 'scheduler_state': self.simulation.scheduler.print_state(),
             }
 
+            # TODO only write data until end of simulation
+            #  (df to pickle is #  expensive)
+            # TODO Return final dataframe as an object if specified in
+            #  simualtion constructor.
             self.df = self.df.append(
                 self.collate_actor_dataframes(), ignore_index=True
             )
@@ -47,9 +51,11 @@ class Monitor(object):
         scheduler = self.simulation.scheduler.to_df()
         algs = pd.DataFrame(
             {
-                'planning': self.simulation.planner.algorithm,
-                'scheduling': repr(self.simulation.scheduler.algorithm)
+                'planning': [self.simulation.planner.algorithm],
+                'scheduling': [repr(self.simulation.scheduler.algorithm)]
             },
         )
-        df = df.join([cluster, buffer, instrument, scheduler,algs], how='outer')
+        cf = pd.DataFrame({'config': self.simulation.cfgpath})
+        df = df.join([cluster, buffer, instrument, scheduler, algs, cf],
+                     how='outer')
         return df

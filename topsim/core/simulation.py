@@ -5,7 +5,6 @@ monitoring, and provides the conditions for checking if the simulation has
 finished.
 """
 
-
 import logging
 import time
 import json
@@ -73,7 +72,8 @@ class Simulation:
             env,
             config,
             instrument,
-            algorithm_map,
+            planning,
+            scheduling,
             delay=None,
             timestamp=None
     ):
@@ -81,19 +81,19 @@ class Simulation:
         self.env = env
 
         if timestamp:
-            self.monitor = Monitor(self,timestamp)
+            self.monitor = Monitor(self, timestamp)
         else:
             sim_start_time = f'{time.time()}'.split('.')[0]
-            self.monitor = Monitor(self,sim_start_time)
+            self.monitor = Monitor(self, sim_start_time)
         # Process necessary config files
-
+        self.cfgpath = config
         # Initiaise Actor and Resource objects
         cfg = Config(config)
         self.cluster = Cluster(env, cfg)
         self.buffer = Buffer(env, self.cluster, cfg)
-        planning_algorithm = algorithm_map[cfg.planning]
-        self.planner = Planner(env, planning_algorithm, self.cluster,delay)
-        scheduling_algorithm = algorithm_map[cfg.scheduling]()
+        planning_algorithm = planning
+        self.planner = Planner(env, planning_algorithm, self.cluster, delay)
+        scheduling_algorithm = scheduling
         self.scheduler = Scheduler(
             env, self.buffer, self.cluster, scheduling_algorithm
         )
@@ -148,8 +148,8 @@ class Simulation:
             self.env.run(until=runtime)
         else:
             while not self.is_finished():
-                self.env.run(self.env.now+1)
-            self.env.run(self.env.now+1)
+                self.env.run(self.env.now + 1)
+            self.env.run(self.env.now + 1)
         LOGGER.info("Simulation Finished @ %s", self.env.now)
 
     def resume(self, until):
