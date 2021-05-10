@@ -158,7 +158,7 @@ class Scheduler:
             buffer_capacity = True
 
         cluster_capacity = False
-        pipeline_demand = pipelines[observation.type]['demand']
+        pipeline_demand = pipelines[observation.name]['ingest_demand']
         if self.cluster.check_ingest_capacity(pipeline_demand, max_ingest):
             if self.provision_ingest + pipeline_demand <= max_ingest:
                 cluster_capacity = True
@@ -200,7 +200,7 @@ class Scheduler:
         self.env.process(
             planner.run(observation, self.buffer)
         )
-        pipeline_demand = pipelines[observation.type]['demand']
+        pipeline_demand = pipelines[observation.name]['ingest_demand']
         self.ingest_observation = observation
         # We do an off-by-one check here, because the first time we run the
         # loop we will be one timestep ahead.

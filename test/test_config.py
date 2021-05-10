@@ -23,17 +23,17 @@ import json
 from topsim.core.config import Config
 from topsim.user.telescope import Telescope
 
-CONFIG = "test/data/config/standard_simulation.json"
+CONFIG = "test/data/config_update/standard_simulation.json"
 NOFILE = "test/data/config/cluster_config.json"  # Does not exist
 INCORRECT_JSON = "test/data/config/sneaky.json"
 NOT_JSON = "test/data/config/oops.txt"
 MISSING_KEYS = "test/data/config/config_missing_keys.json"
 
+
 class TestGeneralConfig(unittest.TestCase):
 
     def test_config_file_exists(self):
         config = Config(CONFIG)
-
 
     def test_config_nofile(self):
         self.assertRaises(FileNotFoundError, Config, NOFILE)
@@ -69,3 +69,20 @@ class TestActorConfigIncorrectJSON(unittest.TestCase):
         self.assertRaises(
             KeyError, self.config.parse_buffer_config
         )
+
+
+class TestActorConfigurationReturnsCorrectDictionary(unittest.TestCase):
+
+    def setUp(self):
+        self.config = Config(CONFIG)
+
+    def test_instrument_parameters(self):
+        (total_arrays,
+         pipelines,
+         observations,
+         max_ingest_resources) = self.config.parse_instrument_config(
+            Telescope.name
+        )
+
+        self.assertTrue('emu' in pipelines)
+        # self.assertTrue('')

@@ -99,17 +99,18 @@ class Config:
         cfg = self.instrument
         total_arrays = cfg[instrument_name]['total_arrays']
         pipelines = cfg[instrument_name]['pipelines']
-        observation_pipelines = []
         observations = []
         for observation in cfg[instrument_name]['observations']:
             try:
+                name = observation['name']
+                workflow_path = pipelines[name]['workflow']
+                ingest_demand = pipelines[name]['ingest_demand']
                 o = Observation(
-                    name=observation['name'],
+                    name=name,
                     start=observation['start'],
                     duration=observation['duration'],
-                    demand=observation['demand'],
-                    workflow=observation['workflow'],
-                    type=observation['type'],
+                    demand=ingest_demand,
+                    workflow=workflow_path,
                     data_rate=observation[
                                   'data_product_rate'] * timestep_multiplier
                 )

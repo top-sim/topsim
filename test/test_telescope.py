@@ -23,9 +23,6 @@ from topsim.core.buffer import Buffer
 from topsim.core.cluster import Cluster
 from topsim.core.planner import Planner
 
-OBSERVATION_CONFIG = 'test/data/config/observations.json'
-CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
-BUFFER_CONFIG = 'test/data/config/buffer.json'
 CONFIG = 'test/data/config/standard_simulation.json'
 
 
@@ -48,7 +45,7 @@ class TestTelescopeConfig(unittest.TestCase):
         )
         self.assertEqual(36, telescope.total_arrays)
         # Pipelines are associated with individual observation
-        self.assertEqual()
+        self.assertEqual('emu')
         self.assertEqual(5, telescope.pipelines['pulsar']['demand'])
 
 
