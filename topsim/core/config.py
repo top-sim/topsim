@@ -109,7 +109,7 @@ class Config:
                     name=name,
                     start=observation['start'],
                     duration=observation['duration'],
-                    demand=ingest_demand,
+                    demand=observation['instrument_demand'],
                     workflow=workflow_path,
                     data_rate=observation[
                                   'data_product_rate'] * timestep_multiplier

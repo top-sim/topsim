@@ -16,7 +16,7 @@
 """
 Test an entire run-through simulation to make sure all the 'bits' fit in place
 """
-
+import os
 import unittest
 import logging
 import simpy
@@ -30,28 +30,27 @@ logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
 SIM_TIMESTAMP = f'test/basic-workflow-data/{0}'
-BASIC_WORKFLOW = 'test/basic-workflow-data/basic_workflow_config.json'
-BASIC_CLUSTER = 'test/basic-workflow-data/basic_config.json'
-BASIC_BUFFER = 'test/basic-workflow-data/basic_buffer.json'
-BASIC_PLAN = 'test/basic-workflow-data/basic_observation_plan.json'
 BASIC_CONFIG = 'test/basic-workflow-data/basic_simulation.json'
-EVENT_PICKLE = f'{SIM_TIMESTAMP}'
 
 
 class TestBasicIngest(unittest.TestCase):
 
     def setUp(self) -> None:
         self.env = simpy.Environment()
-        planning_algorithm = 'heft'
-        algorithm_map = {'heft':'heft', 'fifo': GreedyAlgorithmFromPlan}
         self.simulation = Simulation(
             self.env,
             BASIC_CONFIG,
             Telescope,
-            algorithm_map,
+            planning='heft',
+            scheduling=GreedyAlgorithmFromPlan,
             delay=None,
             timestamp=SIM_TIMESTAMP
         )
+
+    def tearDown(self):
+        output = 'test/basic-workflow-data/0-heft-GreedyAlgorithmFromPlan'
+        os.remove(f'{output}-sim.pkl')
+        os.remove(f'{output}-tasks.pkl')
 
     def testClusterIngest(self):
         """

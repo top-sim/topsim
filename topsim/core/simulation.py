@@ -93,7 +93,7 @@ class Simulation:
         self.buffer = Buffer(env, self.cluster, cfg)
         planning_algorithm = planning
         self.planner = Planner(env, planning_algorithm, self.cluster, delay)
-        scheduling_algorithm = scheduling
+        scheduling_algorithm = scheduling()
         self.scheduler = Scheduler(
             env, self.buffer, self.cluster, scheduling_algorithm
         )

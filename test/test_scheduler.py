@@ -46,9 +46,9 @@ from topsim.user.scheduling import GreedyAlgorithmFromPlan
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
-CONFIG = "test/data/config/standard_simulation.json"
-INTEGRATION = "test/data/config/integration_simulation.json"
-HEFT_CONFIG = "test/data/config/heft_single_observation_simulation.json"
+CONFIG = "test/data/config_update/standard_simulation.json"
+INTEGRATION = "test/data/config_update/integration_simulation.json"
+HEFT_CONFIG = "test/data/config_update/heft_single_observation_simulation.json"
 # Globals
 OBS_START_TME = 0
 OBS_DURATION = 10
