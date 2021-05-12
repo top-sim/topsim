@@ -31,7 +31,7 @@ from topsim.core.delay import DelayModel
 from topsim.user.telescope import Telescope
 from topsim.user.scheduling import GreedyAlgorithmFromPlan
 
-INTEGRATION = "test/data/config/integration_simulation.json"
+INTEGRATION = "test/data/config_update/integration_simulation.json"
 PLANNING_ALGORITHM = 'heft'
 
 

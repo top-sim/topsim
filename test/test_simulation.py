@@ -1,19 +1,17 @@
 import unittest
 import simpy
 import logging
+import os
 
 from topsim.core.config import Config
 from topsim.core.simulation import Simulation
 from topsim.user.scheduling import GreedyAlgorithmFromPlan
 from topsim.user.telescope import Telescope
-logging.basicConfig(level='WARNING')
+logging.basicConfig(level='DEBUG')
 logger = logging.getLogger(__name__)
 
-TELESCOPE_CONFIG = 'test/data/config/observations.json'
-CLUSTER_CONFIG = 'test/data/config/basic_spec-10.json'
-BUFFER_CONFIG = 'test/data/config/buffer.json'
-EVENT_FILE = 'test/data/output/sim.trace'
-CONFIG = 'test/data/config/standard_simulation.json'
+cwd = os.getcwd()
+CONFIG = f'{cwd}/test/data/config_update/standard_simulation.json'
 
 
 class TestSimulationConfig(unittest.TestCase):
@@ -23,21 +21,18 @@ class TestSimulationConfig(unittest.TestCase):
 
     def setUp(self):
         # tel = Telescope(env, buffer_obj, config, planner)
-        self.event_file = EVENT_FILE
         self.env = simpy.Environment()
-        self.algorithm_map = {'heft': 'heft', 'fifo': GreedyAlgorithmFromPlan}
         self.instrument = Telescope
-
-    def tearDown(self):
-        pass
+        self.timestamp = f'{cwd}/test/data/output/{0}'
 
     def testBasicConfig(self):
         simulation = Simulation(
             self.env,
             CONFIG,
             self.instrument,
-            self.algorithm_map,
-            self.event_file
+            planning='heft',
+            scheduling=GreedyAlgorithmFromPlan,
+            timestamp=self.timestamp
         )
         self.assertTrue(36, simulation.instrument.total_arrays)
 
@@ -47,39 +42,48 @@ class TestSimulationRuntime(unittest.TestCase):
 
     def setUp(self) -> None:
         env = simpy.Environment()
-        algorithm_map = {'heft': 'heft', 'fifo': GreedyAlgorithmFromPlan}
         self.simulation = Simulation(
             env,
             CONFIG,
             Telescope,
-            algorithm_map,
+            planning='heft',
+            scheduling=GreedyAlgorithmFromPlan,
             delay=None,
-            timestamp=f'{0}'
+            timestamp=f'{cwd}/test/data/output/{0}'
         )
+
+    def tearDown(self):
+        output = f'{cwd}/test/data/output/0-heft-GreedyAlgorithmFromPlan'
+        logger.debug(cwd)
+        logger.debug(os.listdir('.'))
+        os.remove(f'{output}-sim.pkl')
+        os.remove(f'{output}-tasks.pkl')
 
     def testLimitedRuntime(self):
         self.simulation.start(runtime=60)
 
 
 # BASIC WORKFLOW DATA
-BASIC_WORKFLOW = 'test/basic-workflow-data/basic_workflow_config.json'
-BASIC_CLUSTER = 'test/basic-workflow-data/basic_config.json'
-BASIC_BUFFER = 'test/basic-workflow-data/basic_buffer.json'
-BASIC_PLAN = 'test/basic-workflow-data/basic_observation_plan.json'
 
-BASIC_CONFIG = 'test/basic-workflow-data/basic_simulation.json'
+BASIC_CONFIG = f'{cwd}test/basic-workflow-data/basic_simulation.json'
 
 
 class TestSimulationBasicSetup(unittest.TestCase):
 
     def setUp(self) -> None:
         env = simpy.Environment()
-        algorithm_map = {'heft': 'heft', 'fifo': GreedyAlgorithmFromPlan}
         self.simulation = Simulation(
             env,
             BASIC_CONFIG,
             Telescope,
-            algorithm_map,
+            planning='heft',
+            scheduling=GreedyAlgorithmFromPlan,
             delay=None,
-            timestamp=f'{0}'
+            timestamp=f'test/basic-workflow-data/{0}'
         )
+
+    def tearDown(self):
+        output = 'test/data/output/0-heft-GreedyAlgorithmFromPlan'
+        os.remove(f'{output}-sim.pkl')
+        os.remove(f'{output}-tasks.pkl')
+

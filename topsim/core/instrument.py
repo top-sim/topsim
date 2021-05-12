@@ -68,7 +68,7 @@ class Observation(object):
         been started on Telescope.
     """
 
-    def __init__(self, name, start, duration, demand, workflow, type,
+    def __init__(self, name, start, duration, demand, workflow,
                  data_rate):
         """
         Parameters
@@ -98,11 +98,11 @@ class Observation(object):
         self.ast = None
         self.duration = duration
         self.demand = demand
-        self.status = RunStatus.WAITING
-        self.type = type
         self.workflow = workflow
         self.total_data_size = 0
         self.ingest_data_rate = data_rate
+        self.status = RunStatus.WAITING
+
         self.plan = None
 
     def is_ready(self, current_time, capacity):

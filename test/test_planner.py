@@ -35,10 +35,8 @@ OBS_DATA_RATE = 5
 OBS_PIPELINE = 'continuum'
 PLAN_ALGORITHM = 'heft'
 
-HEFT_CLUSTER_CONFIG = "test/data/config/system_config.json"
-CLUSTER_CONFIG = "test/data/config/basic_spec-10.json"
-CONFIG = "test/data/config/standard_simulation.json"
-HEFT_CONFIG = "test/data/config/heft_single_observation_simulation.json"
+CONFIG = "test/data/config_update/standard_simulation.json"
+HEFT_CONFIG = "test/data/config_update/heft_single_observation_simulation.json"
 MACHINE_CONFIG = None
 OBS_WORKFLOW = "test/data/config/workflow_config_minutes.json"
 
@@ -77,7 +75,6 @@ class TestWorkflowPlan(unittest.TestCase):
             OBS_DURATION,
             OBS_DEMAND,
             OBS_WORKFLOW,
-            type=OBS_PIPELINE,
             data_rate=OBS_DATA_RATE
         )
 
@@ -148,7 +145,6 @@ class TestPlannerDelay(unittest.TestCase):
             OBS_DURATION,
             OBS_DEMAND,
             OBS_WORKFLOW,
-            type=OBS_PIPELINE,
             data_rate=OBS_DATA_RATE
         )
 

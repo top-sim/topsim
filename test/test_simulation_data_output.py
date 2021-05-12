@@ -44,14 +44,13 @@ class TestMonitorPandasPickle(unittest.TestCase):
         -------
         """
         env = simpy.Environment()
-        sched_algorithm = GreedyAlgorithmFromPlan()
         instrument = Telescope
         self.simulation = Simulation(
             env=env,
             config=CONFIG,
             instrument=instrument,
-            algorithm_map={'pheft': 'pheft', 'heft': 'heft',
-                           'fifo': GreedyAlgorithmFromPlan},
+            planning='heft',
+            scheduling=GreedyAlgorithmFromPlan,
             delay=None,
             timestamp=SIM_TIMESTAMP
         )

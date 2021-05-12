@@ -91,7 +91,6 @@ class TestBufferIngestDataStream(unittest.TestCase):
             duration=OBS_DURATION,
             demand=OBS_DEMAND,
             workflow=OBS_WORKFLOW,
-            type='continuum',
             data_rate=5,
         )
 
@@ -227,7 +226,6 @@ class TestBufferRequests(unittest.TestCase):
             OBS_DURATION,
             OBS_DEMAND,
             OBS_WORKFLOW,
-            type='continuum',
             data_rate=2
         )
 

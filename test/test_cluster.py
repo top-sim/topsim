@@ -64,7 +64,6 @@ class TestIngest(unittest.TestCase):
             OBS_DURATION,
             OBS_DEMAND,
             OBS_WORKFLOW,
-            type=None,
             data_rate=None
         )
 
