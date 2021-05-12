@@ -7,7 +7,7 @@ from topsim.core.config import Config
 from topsim.core.simulation import Simulation
 from topsim.user.scheduling import GreedyAlgorithmFromPlan
 from topsim.user.telescope import Telescope
-logging.basicConfig(level='WARNING')
+logging.basicConfig(level='DEBUG')
 logger = logging.getLogger(__name__)
 
 cwd = os.getcwd()
@@ -23,7 +23,7 @@ class TestSimulationConfig(unittest.TestCase):
         # tel = Telescope(env, buffer_obj, config, planner)
         self.env = simpy.Environment()
         self.instrument = Telescope
-        self.timestamp = f'test/data/output/{0}'
+        self.timestamp = f'{cwd}/test/data/output/{0}'
 
     def testBasicConfig(self):
         simulation = Simulation(
@@ -49,14 +49,15 @@ class TestSimulationRuntime(unittest.TestCase):
             planning='heft',
             scheduling=GreedyAlgorithmFromPlan,
             delay=None,
-            timestamp=f'test/data/output/{0}'
+            timestamp=f'{cwd}/test/data/output/{0}'
         )
 
     def tearDown(self):
         output = 'test/data/output/0-heft-GreedyAlgorithmFromPlan'
+        logger.debug(cwd)
+        logger.debug(os.listdir('.'))
         os.remove(f'{output}-sim.pkl')
         os.remove(f'{output}-tasks.pkl')
-
 
     def testLimitedRuntime(self):
         self.simulation.start(runtime=60)
