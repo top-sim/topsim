@@ -10,7 +10,9 @@ from topsim.user.telescope import Telescope
 logging.basicConfig(level='WARNING')
 logger = logging.getLogger(__name__)
 
-CONFIG = 'test/data/config_update/standard_simulation.json'
+cwd = os.getcwd()
+CONFIG = f'{cwd}/test/data/config_update/standard_simulation.json'
+
 
 class TestSimulationConfig(unittest.TestCase):
     """
@@ -62,7 +64,7 @@ class TestSimulationRuntime(unittest.TestCase):
 
 # BASIC WORKFLOW DATA
 
-BASIC_CONFIG = 'test/basic-workflow-data/basic_simulation.json'
+BASIC_CONFIG = f'{cwd}test/basic-workflow-data/basic_simulation.json'
 
 
 class TestSimulationBasicSetup(unittest.TestCase):
