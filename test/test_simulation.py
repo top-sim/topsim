@@ -56,8 +56,8 @@ class TestSimulationRuntime(unittest.TestCase):
         output = f'{cwd}/test/data/output/0-heft-GreedyAlgorithmFromPlan'
         logger.debug(cwd)
         logger.debug(os.listdir('.'))
-        os.remove(f'{output}-sim.pkl')
-        os.remove(f'{output}-tasks.pkl')
+        # os.remove(f'{output}-sim.pkl')
+        # os.remove(f'{output}-tasks.pkl')
 
     def testLimitedRuntime(self):
         self.simulation.start(runtime=60)
