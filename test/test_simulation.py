@@ -53,7 +53,7 @@ class TestSimulationRuntime(unittest.TestCase):
         )
 
     def tearDown(self):
-        output = 'test/data/output/0-heft-GreedyAlgorithmFromPlan'
+        output = f'{cwd}/test/data/output/0-heft-GreedyAlgorithmFromPlan'
         logger.debug(cwd)
         logger.debug(os.listdir('.'))
         os.remove(f'{output}-sim.pkl')
