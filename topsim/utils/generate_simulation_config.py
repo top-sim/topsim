@@ -12,3 +12,15 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import json
+
+
+def process_observation_schedule(path):
+    pass
+
+def process_workflow_pipelines(path):
+    pass
+
+def process_cluster_configuration(path):
+    pass

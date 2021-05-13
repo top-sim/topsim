@@ -32,6 +32,7 @@ logger = logging.getLogger(__name__)
 SIM_TIMESTAMP = f'test/basic-workflow-data/{0}'
 BASIC_CONFIG = 'test/basic-workflow-data/basic_simulation.json'
 
+cwd = os.getcwd()
 
 class TestBasicIngest(unittest.TestCase):
 
@@ -47,10 +48,10 @@ class TestBasicIngest(unittest.TestCase):
             timestamp=SIM_TIMESTAMP
         )
 
-    def tearDown(self):
-        output = 'test/basic-workflow-data/0-heft-GreedyAlgorithmFromPlan'
-        os.remove(f'{output}-sim.pkl')
-        os.remove(f'{output}-tasks.pkl')
+    # def tearDown(self):
+    #     output = 'test/basic-workflow-data/output/{0}'
+    #     os.remove(f'{output}-sim.pkl')
+    #     os.remove(f'{output}-tasks.pkl')
 
     def testClusterIngest(self):
         """

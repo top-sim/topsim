@@ -75,7 +75,8 @@ class Simulation:
             planning,
             scheduling,
             delay=None,
-            timestamp=None
+            timestamp=None,
+            to_file=False,
     ):
 
         self.env = env
@@ -104,9 +105,11 @@ class Simulation:
             scheduler=self.scheduler
         )
 
+        self.to_file = to_file
+
         self.running = False
 
-    def start(self, runtime=150):
+    def start(self, runtime=-1):
         """
         Run the simulation, either for the specified runtime, OR until the
         exit condition is reached:
@@ -152,6 +155,14 @@ class Simulation:
             self.env.run(self.env.now + 1)
         LOGGER.info("Simulation Finished @ %s", self.env.now)
 
+        if self.to_file:
+            self.monitor.df.to_pickle(f'{self.monitor.sim_timestamp}-sim.pkl')
+            self._generate_final_task_data().to_pickle(
+                f'{self.monitor.sim_timestamp}-tasks.pkl'
+            )
+        else:
+            return self.monitor.df, self._generate_final_task_data()
+
     def resume(self, until):
         """
         Resume a simulation for a period of time
@@ -186,3 +197,22 @@ class Simulation:
     @staticmethod
     def _split_monolithic_config(self, json):
         return json
+
+    def _generate_final_task_data(self):
+        """
+        Generate a final data frame from the cluster's task dataframe output.
+        Returns
+        -------
+
+        """
+
+        df = self.cluster.finished_task_time_data()
+        df = df.T
+        size = len(df)
+        df['scheduling'] = [self.planner.algorithm for x in range(size)]
+        df['planning'] = [
+            repr(self.scheduler.algorithm) for x in range(size)
+        ]
+        df['config'] = [self.cfgpath for x in range(size)]
+        return df
+

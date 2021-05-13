@@ -53,6 +53,8 @@ class DelayModel:
         LOW = 0.25
         MID = 0.5
         HIGH = 0.75
+        NONE = 0
+
 
     def __init__(self, prob, dist, degree=DelayDegree.LOW, seed=20):
         """
@@ -86,6 +88,9 @@ class DelayModel:
         self.degree = degree
         self.seed = seed
 
+    def __str__(self):
+        return str(self.degree)
+
     def generate_delay(self, task_runtime, n=100):
         """
         Produce a delay based on current DelayModel attributes.
@@ -98,10 +103,13 @@ class DelayModel:
             This is the runtime+delay value = essentially the new runtime value
         """
         delay = task_runtime
-        if default_rng(self.seed).random() < self.prob:
-            rand_var = self._create_random_value_from_runtime(task_runtime, n)
-            delay = int(rand_var)
-        return delay
+        if self.degree.value == 0:
+            return delay
+        else:
+            if default_rng(self.seed).random() < self.prob:
+                rand_var = self._create_random_value_from_runtime(task_runtime, n)
+                delay = int(rand_var)
+            return delay
 
     def _create_random_value_from_runtime(self, runtime, n=100):
         """

@@ -7,7 +7,7 @@ from topsim.core.config import Config
 from topsim.core.simulation import Simulation
 from topsim.user.scheduling import GreedyAlgorithmFromPlan
 from topsim.user.telescope import Telescope
-logging.basicConfig(level='DEBUG')
+logging.basicConfig(level='WARNING')
 logger = logging.getLogger(__name__)
 
 cwd = os.getcwd()
@@ -38,35 +38,35 @@ class TestSimulationConfig(unittest.TestCase):
 
 
 # @unittest.skip
-class TestSimulationRuntime(unittest.TestCase):
+class TestSimulationFileOptions(unittest.TestCase):
 
     def setUp(self) -> None:
-        env = simpy.Environment()
-        self.simulation = Simulation(
-            env,
+        self.env = simpy.Environment()
+
+    def tearDown(self):
+        output = f'{cwd}/test/data/output/0'
+        os.remove(f'{output}-sim.pkl')
+        os.remove(f'{output}-tasks.pkl')
+
+    def test_simulation_produces_file(self):
+        simulation = Simulation(
+            self.env,
             CONFIG,
             Telescope,
             planning='heft',
             scheduling=GreedyAlgorithmFromPlan,
             delay=None,
-            timestamp=f'{cwd}/test/data/output/{0}'
+            timestamp=f'{cwd}/test/data/output/{0}',
+            to_file=True
         )
 
-    def tearDown(self):
-        output = f'{cwd}/test/data/output/0-heft-GreedyAlgorithmFromPlan'
-        logger.debug(cwd)
-        logger.debug(os.listdir('.'))
-        os.remove(f'{output}-sim.pkl')
-        os.remove(f'{output}-tasks.pkl')
+        simulation.start(runtime=60)
 
-    def testLimitedRuntime(self):
-        self.simulation.start(runtime=60)
 
 
 # BASIC WORKFLOW DATA
 
 BASIC_CONFIG = f'{cwd}test/basic-workflow-data/basic_simulation.json'
-
 
 class TestSimulationBasicSetup(unittest.TestCase):
 
@@ -79,11 +79,11 @@ class TestSimulationBasicSetup(unittest.TestCase):
             planning='heft',
             scheduling=GreedyAlgorithmFromPlan,
             delay=None,
-            timestamp=f'test/basic-workflow-data/{0}'
+            timestamp=f'test/basic-workflow-data/output/{0}'
         )
 
     def tearDown(self):
-        output = 'test/data/output/0-heft-GreedyAlgorithmFromPlan'
+        output = f'test/basic-workflow-data/output/{0}'
         os.remove(f'{output}-sim.pkl')
         os.remove(f'{output}-tasks.pkl')
 
