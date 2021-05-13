@@ -33,6 +33,7 @@ SIM_TIMESTAMP = f'test/simulation_pickles/{0}'
 EVENT_PICKLE = f'{SIM_TIMESTAMP}-heft-GreedyAlgorithmFromPlan-sim.pkl'
 TASKS_PICKLE = f'{SIM_TIMESTAMP}-heft-GreedyAlgorithmFromPlan-tasks.pkl'
 
+cwd = os.getcwd()
 
 class TestMonitorPandasPickle(unittest.TestCase):
 
@@ -52,20 +53,72 @@ class TestMonitorPandasPickle(unittest.TestCase):
             planning='heft',
             scheduling=GreedyAlgorithmFromPlan,
             delay=None,
-            timestamp=SIM_TIMESTAMP
+            timestamp=SIM_TIMESTAMP,
+            to_file=True
         )
 
+    def tearDown(self):
+        output = f'{cwd}/test/simulation_pickles/{0}'
+        os.remove(f'{output}-sim.pkl')
+        os.remove(f'{output}-tasks.pkl')
+
     def testPickleGeneratedAfterSimulation(self):
-        if not os.path.exists(EVENT_PICKLE):
-            res = self.simulation.start(-1)
+        res = self.simulation.start(-1)
 
-        sim_df = pd.read_pickle(EVENT_PICKLE)
-        tasks_df = pd.read_pickle(TASKS_PICKLE)
-        self.assertTrue(True)
+        sim_df = pd.read_pickle('test/simulation_pickles/0-sim.pkl')
+        tasks_df = pd.read_pickle('test/simulation_pickles/0-tasks.pkl')
+        self.assertTrue('running_tasks' in sim_df)
 
-    def testPickleResultsAgreeWithExpectations(self):
+
+class TestMonitorNoFileOption(unittest.TestCase):
+
+    def setUp(self) -> None:
+        """
+        Basic simulation using a single observation + heft workflow +
+        homogenous system configuration.
+        Returns
+        -------
+        """
+        self.env = simpy.Environment()
+        self.instrument = Telescope
+        self.ts = f'{cwd}/test/simulation_pickles/{0}'
+
+    def test_simulation_nofile_option(self):
+        simulation = Simulation(
+            self.env,
+            CONFIG,
+            self.instrument,
+            planning='heft',
+            scheduling=GreedyAlgorithmFromPlan,
+            delay=None,
+            timestamp=self.ts,
+        )
+        simdf, taskdf = simulation.start(runtime=60)
+        self.assertFalse(os.path.exists("test/simulation_pickles/0-sim.pkl"))
+
+    def test_multi_siulation_data_merge(self):
+        global_sim_df = pd.DataFrame()
+        global_task_df = pd.DataFrame()
+        for algorithm in ['heft', 'fcfs']:
+            env = simpy.Environment()
+            simulation = Simulation(
+                env,
+                CONFIG,
+                self.instrument,
+                planning=algorithm,
+                scheduling=GreedyAlgorithmFromPlan,
+                delay=None,
+                timestamp=self.ts,
+            )
+            simdf, taskdf = simulation.start()
+            global_sim_df = global_sim_df.append(simdf)
+            global_task_df = global_task_df.append(taskdf)
+
+        self.assertEqual(250, len(global_sim_df))
+
+    def testResultsAgreeWithExpectations(self):
         pass
 
-    def testPickleResultsWithLowDegreeDelays(self):
+    def testResultsWithLowDegreeDelays(self):
         delay_pickle = f'test/simulation_pickles/sim_nodelay'
         pass
