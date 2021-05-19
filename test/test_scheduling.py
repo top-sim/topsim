@@ -19,7 +19,7 @@ Test the scheduling algorithm as 'designed' by the user.
 
 import unittest
 
-from topsim.user.scheduling import GreedyAlgorithmFromPlan
+from topsim.user.scheduling import GreedyAlgorithmFromPlan, BatchProcessing
 
 
 class TestFifoAlgorithm(unittest.TestCase):
@@ -29,4 +29,16 @@ class TestFifoAlgorithm(unittest.TestCase):
         # TODO setup a workflow
         self.workflow = None
 
+    def testAccurateReturn(self):
+        pass
 
+    def testTemporaryResourcesAllocation(self):
+        pass
+
+    def testRemovalofESTCheck(self):
+        pass
+
+
+class TestBatchSchedulerAllocation(unittest.TestCase):
+    def setUp(self) -> None:
+        self.algorithm = BatchProcessing
