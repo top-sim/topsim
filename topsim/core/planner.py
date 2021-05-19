@@ -2,6 +2,8 @@ import sys
 import logging
 import copy
 
+import networkx as nx
+
 from enum import Enum
 
 from topsim.core.task import Task
@@ -115,7 +117,11 @@ class Planner:
         and create a dictionary in the format required for shadow.
         :return: dictionary of machine requirements
         """
-        available_resources = self.cluster.resources['available']
+
+        # TODO we have reverted to the entire list of machines; can we
+        #  improve this moving forward?
+        # TODO entire machines
+        available_resources = list(self.cluster.dmachine.values())
         dictionary = {
             "system": {
                 "resources": None,
@@ -153,6 +159,8 @@ class WorkflowPlan:
             self.solution = shadow_pheft(workflow)
         elif algorithm is 'fcfs':
             self.solution = shadow_fcfs(workflow)
+        elif algorithm is 'batch':
+            self.solution = None
         else:
             raise RuntimeError("Other algorithms are not supported")
         logger.debug(
@@ -161,34 +169,42 @@ class WorkflowPlan:
             )
         )
 
-        self.est = self._calc_workflow_est(observation, buffer)
-        self.eft = self.solution
-        self.tasks = []
-        for task in self.solution.task_allocations:
-            allocation = self.solution.task_allocations.get(task)
-            tid = self._create_observation_task_id(task.tid, env)
-            dm = copy.copy(delay_model)
-            predecessors = [
-                self._create_observation_task_id(x.tid, env) for x in list(
-                    workflow.graph.predecessors(task)
+        if algorithm is not 'batch':
+            self.est = self._calc_workflow_est(observation, buffer)
+            self.eft = self.solution.makespan
+            self.tasks = []
+            for task in self.solution.task_allocations:
+                allocation = self.solution.task_allocations.get(task)
+                tid = self._create_observation_task_id(task.tid, env)
+                dm = copy.copy(delay_model)
+                predecessors = [
+                    self._create_observation_task_id(x.tid, env) for x in list(
+                        workflow.graph.predecessors(task)
+                    )
+                ]
+                taskobj = Task(
+                    tid,
+                    allocation.ast,
+                    allocation.aft,
+                    allocation.machine,
+                    predecessors,
+                    task.flops_demand, 0, 0,
+                    dm
                 )
-            ]
-            taskobj = Task(
-                tid,
-                allocation.ast,
-                allocation.aft,
-                allocation.machine,
-                predecessors,
-                task.flops_demand, 0, 0,
-                dm
-            )
-            self.tasks.append(taskobj)
-        self.tasks.sort(key=lambda x: x.est)
-        self.exec_order = self.solution.execution_order
+                self.tasks.append(taskobj)
+            self.tasks.sort(key=lambda x: x.est)
+            self.exec_order = self.solution.execution_order
 
-        self.start_time = None
-        self.priority = 0
-        self.status = WorkflowStatus.UNSCHEDULED
+            self.start_time = None
+            self.priority = 0
+            self.status = WorkflowStatus.UNSCHEDULED
+        # else:
+        #     self.est = self._calc_workflow_est(observation, buffer)
+        #     self.eft = None
+        #     self.tasks = []
+        #     execution_order = workflow.graph.
+        #     for task in workflow:
+
 
     def _generate_topological_plan(self):
         """

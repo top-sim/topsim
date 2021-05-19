@@ -62,9 +62,46 @@ class TestSimulationFileOptions(unittest.TestCase):
 
         simulation.start(runtime=60)
 
+LARGE_CONFIG = 'test/data/config/mos_sw10.json'
 
+class TestSimulationLargeExperiment(unittest.TestCase):
+    def setUp(self) -> None:
+        env = simpy.Environment()
+        self.simulation = Simulation(
+            env,
+            LARGE_CONFIG,
+            Telescope,
+            planning='heft',
+            scheduling=GreedyAlgorithmFromPlan,
+            delay=None,
+            timestamp=f'test/basic-workflow-data/output/{0}'
+        )
 
-# BASIC WORKFLOW DATA
+    def testSimulationRuns(self):
+        """
+        This is a quick test to make sure that we can simulate a large
+        complex simulation where all the moving pieces exist.
+
+        There are a couple of conditions that require us to simply ignore an
+        allocation; there are circumstances that exist when an observation
+        provisions resources for ingest at the same timestep as allocations
+        are made by the scheduler. The observation/ingest is provision first,
+        but the resources are not 'consumed' (moved from 'available to
+        unavailable') until after the scheduler has seen that the resources are
+        available and assigned tasks to them.
+
+        This may be fixed in future approaches by using a 'shadow' allocation
+        scheme, which acts as a way of maintaining more global state with the
+        actors still 'theoretically' blind. The current approach is useful in
+        that it prototypes the use of simpy returns in a useful way.
+
+        Returns
+        -------
+
+        """
+        self.simulation.start()
+
+    # BASIC WORKFLOW DATA
 
 BASIC_CONFIG = f'{cwd}test/basic-workflow-data/basic_simulation.json'
 

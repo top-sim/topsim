@@ -134,29 +134,10 @@ class TestIngest(unittest.TestCase):
             self.assertEqual(TaskStatus.SCHEDULED, task.task_status)
 
 
-class TestCluster(unittest.TestCase):
+class TestClusterBatchScheduling(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         pass
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         pass
-
-    def testClusterQueue(self):
-        env = simpy.Environment()
-        env.process(self.run_env(env))
-        env.run(until=20)
-
-    def run_env(self, env):
-        i = 0
-        while i < 15:
-            logger.debug(env.now)
-            if env.now == 5:
-                env.process(self.secret(env))
-            i += 1
-            yield env.timeout(1)
-
-    def secret(self, env):
-        logger.debug('Started secret business @ {0}'.format(env.now))
-        yield env.timeout(4)
-        logger.debug('Finished secret business @ {0}'.format(env.now))

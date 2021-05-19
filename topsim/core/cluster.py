@@ -14,7 +14,17 @@ class Cluster:
     machines : dict
         a formatted string to print out what the animal says
     resources : dict
-        the name of the animal
+        Dictionary that maintains record of what resources are doing what:
+            * 'ingest' resources are being used to process ingest data from
+            currently running observation
+            * 'occupied' resources are those running workflow tasks
+            * 'idle' resources is a dictionary of observations that are
+            currently running in batch-processing mode, in which resources
+            are provisioned in bulk and then used over the course of the
+            workflow. These resources are returned to 'available' at the
+            conclusion of the workflow
+            * 'available' resources are those that are available for allocation
+
     tasks : dict
         the sound that the animal makes
     ingest : int
@@ -27,16 +37,15 @@ class Cluster:
     """
 
     def __init__(self, env, config):
-        """
-        :param env:
-        :param spec:
-        """
+
         self.machines, self.system_bandwidth = config.parse_cluster_config()
         self.dmachine = {machine.id: machine for machine in self.machines}
         self.cl = ['default']
+
         self.resources = {
             'ingest': [],
             'occupied': [],
+            'idle': {},
             'available': [machine for machine in self.machines],
             'total': len(self.machines)
         }
@@ -130,7 +139,7 @@ class Cluster:
 
         if len(self.clusters[c]['resources']['available']) >= pipeline_demand \
                 and len(
-            self.clusters[c]['resources']['ingest'])+pipeline_demand <= \
+            self.clusters[c]['resources']['ingest']) + pipeline_demand <= \
                 max_ingest_resources:
             return True
         else:
@@ -155,31 +164,19 @@ class Cluster:
         tasks = self._generate_ingest_tasks(demand, observation)
 
         pairs = []
-        temp_intest_resources = self.clusters[c]['resources']['available'][:demand]
-        # self.clusters[c]['resources']['ingest'].extend(
-        #     self.clusters[c]['resources']['available'][:demand])
+        temp_intest_resources = self.clusters[c]['resources']['available'][
+                                :demand]
         self.clusters[c]['resources']['available'] = \
             self.clusters[c]['resources']['available'][demand:]
-
-        # self.usage_data['available'] = len(
-        #     self.clusters[c]['resources']['available']
-        # )
-
 
         for i, machine in enumerate(temp_intest_resources):
             pairs.append((machine, tasks[i]))
             self.clusters[c]['usage_data']['available'] -= 1
             self.clusters[c]['usage_data']['running_tasks'] += 1
         self.clusters[c]['resources']['ingest'].extend(temp_intest_resources)
-        # self.clusters[c]['ingest'] = len(self.clusters[c]['resources'][
-        #                                      'ingest'])
 
         self.clusters[c]['ingest']['status'] = True
         self.clusters[c]['ingest']['demand'] = demand
-        # self.clusters[c]['usage_data']['running_tasks'] + len(
-        #     self.clusters[c][
-        #     'ingest']['demand'])
-
         curr_tasks = {}
         while True:
             for pair in pairs:
@@ -210,6 +207,26 @@ class Cluster:
         self.clusters[c]['ingest']['completed'] += 1
         self.clusters[c]['ingest']['status'] = False
 
+    # TODO Work on cluster machine access to avoid the 'remove(x) not in
+    #  list' errors we get everytime that we attempt to double allocate to a
+    #  resource because it's been allocated to a task but the provision of
+    #  that task hasn't happened within the simulation (see Simpy's
+    #  "Simulataneous Time" discussion).
+
+    def provision_resource_allocation(self, machine):
+        """
+        Mark a machine on the cluster as being allocated to a task, without
+        the allocation place just yet.
+
+
+        Returns
+        -------
+
+        """
+
+    def current_available_resources(self):
+        return [x for x in self.clusters['default']['resources']['available']]
+
     def allocate_task_to_cluster(self, task, machine, ingest=False,
                                  c='default'):
         """
@@ -220,11 +237,15 @@ class Cluster:
         True if task successfully completed
         """
         ret = None
-
+        # TODO need to have runtime check to ensure that we are able to check
+        #  if our allocation doesn't work (i.e. machine is unavailable)
         while True:
             if task not in self.clusters[c]['tasks']['running']:
                 self.clusters[c]['tasks']['running'].append(task)
                 if not ingest:
+                    if machine not in self.clusters[c]['resources'][
+                        'available']:
+                        yield self.env.timeout(TIMESTEP, False)
                     # Ingest resources are allocated in bulk, so we do that
                     # elsewhere
                     self.clusters[c]['resources']['occupied'].append(machine)
@@ -304,6 +325,8 @@ class Cluster:
         -------
 
         """
+        # TODO add 'is provisioned' check here
+
         return (machine in self.clusters[c]['resources']['occupied']
                 or machine in self.clusters[c]['resources']['ingest'])
 
@@ -326,6 +349,25 @@ class Cluster:
         -------
 
         """
+
+    def _mark_machine_occupied(self):
+        """
+        Update allocation dictionaries and output data dictionaries
+        Returns
+        -------
+
+        """
+        pass
+
+    def _mark_machine_available(self):
+        """
+        Update allocation dictionaries and output data dictionaries
+
+        Returns
+        -------
+
+        """
+        pass
 
     def _generate_ingest_tasks(self, demand, observation):
         """
