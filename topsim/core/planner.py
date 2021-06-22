@@ -2,6 +2,8 @@ import sys
 import logging
 import copy
 
+import networkx as nx
+
 from enum import Enum
 
 from topsim.core.task import Task
@@ -137,8 +139,8 @@ class Planner:
 
 class WorkflowPlan:
     """
-    WorkflowPlans are used within the Planner, SchedulerA Actors and Cluster
-    Resource. They are higher-level than the shadow library representation,
+    WorkflowPlans are used within the Planner, Scheduler, and Cluster. 
+    They are higher-level than the shadow library representation,
     as they are a storage component of scheduled tasks, rather than directly
     representing the DAG nature of the workflow. This is why the tasks are
     stored in queues.
@@ -153,6 +155,8 @@ class WorkflowPlan:
             self.solution = shadow_pheft(workflow)
         elif algorithm is 'fcfs':
             self.solution = shadow_fcfs(workflow)
+        elif algorithm is 'batch':
+            self.solution = None
         else:
             raise RuntimeError("Other algorithms are not supported")
         logger.debug(
@@ -161,30 +165,31 @@ class WorkflowPlan:
             )
         )
 
-        self.est = self._calc_workflow_est(observation, buffer)
-        self.eft = self.solution
-        self.tasks = []
-        for task in self.solution.task_allocations:
-            allocation = self.solution.task_allocations.get(task)
-            tid = self._create_observation_task_id(task.tid, env)
-            dm = copy.copy(delay_model)
-            predecessors = [
-                self._create_observation_task_id(x.tid, env) for x in list(
-                    workflow.graph.predecessors(task)
+        if algorithm is not 'batch':
+            self.est = self._calc_workflow_est(observation, buffer)
+            self.eft = self.solution.makespan
+            self.tasks = []
+            for task in self.solution.task_allocations:
+                allocation = self.solution.task_allocations.get(task)
+                tid = self._create_observation_task_id(task.tid, env)
+                dm = copy.copy(delay_model)
+                predecessors = [
+                    self._create_observation_task_id(x.tid, env) for x in list(
+                        workflow.graph.predecessors(task)
+                    )
+                ]
+                taskobj = Task(
+                    tid,
+                    allocation.ast,
+                    allocation.aft,
+                    allocation.machine,
+                    predecessors,
+                    task.flops_demand, 0, 0,
+                    dm
                 )
-            ]
-            taskobj = Task(
-                tid,
-                allocation.ast,
-                allocation.aft,
-                allocation.machine,
-                predecessors,
-                task.flops_demand, 0, 0,
-                dm
-            )
-            self.tasks.append(taskobj)
-        self.tasks.sort(key=lambda x: x.est)
-        self.exec_order = self.solution.execution_order
+                self.tasks.append(taskobj)
+            self.tasks.sort(key=lambda x: x.est)
+            self.exec_order = self.solution.execution_order
 
         self.start_time = None
         self.priority = 0
