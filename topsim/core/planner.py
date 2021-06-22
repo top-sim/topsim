@@ -117,7 +117,11 @@ class Planner:
         and create a dictionary in the format required for shadow.
         :return: dictionary of machine requirements
         """
-        available_resources = self.cluster.resources['available']
+
+        # TODO we have reverted to the entire list of machines; can we
+        #  improve this moving forward?
+        # TODO entire machines
+        available_resources = list(self.cluster.dmachine.values())
         dictionary = {
             "system": {
                 "resources": None,
@@ -191,9 +195,7 @@ class WorkflowPlan:
             self.tasks.sort(key=lambda x: x.est)
             self.exec_order = self.solution.execution_order
 
-        self.start_time = None
-        self.priority = 0
-        self.status = WorkflowStatus.UNSCHEDULED
+
 
     def _generate_topological_plan(self):
         """

@@ -89,7 +89,7 @@ class Buffer:
         A simpy.env.timeout() of duration topsim.common.globals.TIMESTEP
         """
         while True:
-            LOGGER.info(
+            LOGGER.debug(
                 "HotBuffer: %s \nColdBuffer: %s",
                 [self.hot[b].current_capacity for b in self.hot],
                 [self.cold[b].current_capacity for b in self.cold]

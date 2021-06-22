@@ -52,8 +52,101 @@ class GreedyAlgorithmFromPlan(Algorithm):
         # Check if there is an overlap between the two sets
 
         curr_allocs = []
-
+        allocations = []
+        temporary_resources = self.cluster.current_available_resources()
         for t in tasks:
+            # Allocate the first element in the Task list:
+            # TODO determine if it is possible to remove the t.est check
+            # UPDATE: This is because we do not process data transfer runtime
+            # NEed to calculate this dynamically taking into account the
+            # largest data product from the parent tasks.
+            if t.task_status is TaskStatus.UNSCHEDULED and \
+                         t.est + workflow_plan.ast <= clock:
+                # Are we workkflow - delayed?
+                if workflow_plan.ast > workflow_plan.est:
+                    workflow_plan.status = WorkflowStatus.DELAYED
+                if not t.pred:
+                    machine = cluster.dmachine[t.machine.id]
+                    # workflow_plan.status = WorkflowStatus.SCHEDULED
+                    if self.is_machine_occupied(
+                            machine) or machine not in temporary_resources:
+                        # Is there another machine
+                        if temporary_resources:
+                            machine = temporary_resources[0]
+                            alloc = (machine, t)
+                            allocations.append(alloc)
+                            temporary_resources.remove(machine)
+                    else:
+                        alloc = (machine, t)
+                        allocations.append(alloc)
+                        temporary_resources.remove(machine)
+                # The task has predecessors
+                else:
+                    # If the set of finished tasks does not contain all of the
+                    # previous tasks, we cannot start yet.
+                    pred = set(t.pred)
+                    finished = set(t.id for t in cluster.tasks['finished'])
+                    machine = cluster.dmachine[t.machine.id]
+
+                    # Check if there is an overlap between the two sets
+                    if not pred.issubset(finished):
+                        # One of the predecessors of 't' is still running
+                        continue
+                    else:
+                        # A machine may not be occupied, but we may have
+                        # provisionally allocated it within this scheduling run
+                        if self.cluster.is_occupied(
+                                machine) or machine not in temporary_resources:
+                            if temporary_resources:
+                                machine = temporary_resources[0]
+                                allocations.append((machine, t))
+                                temporary_resources.remove(machine)
+                                # return machine, t, workflow_plan.status
+                            # return None, None, workflow_plan.status
+                        # return machine, t, workflow_plan.status
+                        else:
+                            allocations.append((machine, t))
+                            temporary_resources.remove(machine)
+
+        if len(workflow_plan.tasks) == 0:
+            workflow_plan.status = WorkflowStatus.FINISHED
+            logger.debug("is finished %s", workflow_id)
+        if len(allocations) > 0:
+            workflow_plan.status = WorkflowStatus.SCHEDULED
+        return allocations, workflow_plan.status
+        # return None, None, workflow_plan.status
+
+    def to_df(self):
+        df = pd.DataFrame()
+        return df
+
+    def is_machine_occupied(self, machine):
+        """
+        Check the custer to determine if the machinen we have just selected is
+        available.
+        Returns
+        -------
+        True if machine is occupied
+        """
+        return self.cluster.is_occupied(machine)
+
+
+class BatchProcessing(Algorithm):
+    """
+    Mimic a batch-processing heuristic, in which tasks are allocated to an
+    available resource if it matches the requirements. There is no checking
+    of task times or ESTs/EFTs; we just ensure that the tasks' precedence
+    constraints are met.
+    """
+
+    def __call__(self, cluster, clock, workflow_plan):
+        if workflow_plan.algorithm is not 'batch':
+            raise RuntimeError("Workflow Plan is not compatible with this "
+                               "dynamic scheduler")
+        else:
+            allocated_machines = cluster.resources_for_batch_processing()
+
+        for t in workflow_plan.tasks:
             # Allocate the first element in the Task list:
             if t.task_status is TaskStatus.UNSCHEDULED and \
                     t.est + workflow_plan.ast <= clock:
@@ -92,32 +185,6 @@ class GreedyAlgorithmFromPlan(Algorithm):
             workflow_plan.status = WorkflowStatus.FINISHED
             logger.debug("is finished %s", workflow_id)
 
-        return None, None, workflow_plan.status
-
-    def to_df(self):
-        df = pd.DataFrame()
-        return df
-
-    def is_machine_occupied(self, machine):
-        """
-        Check the custer to determine if the machinen we have just selected is
-        available.
-        Returns
-        -------
-        True if machine is occupied
-        """
-        return self.cluster.is_occupied(machine)
-
-
-class BatchProcessing(Algorithm):
-    """
-    Mimic a batch-processing heuristic, in which tasks are allocated to an
-    available resource if it matches the requirements. There is no checking
-    of task times or ESTs/EFTs; we just ensure that the tasks' precedence
-    constraints are met.
-    """
-
-    def __call__(self, cluster, clock, workflow_plan):
         return None, None, WorkflowStatus.SCHEDULED
 
     def to_df(self):

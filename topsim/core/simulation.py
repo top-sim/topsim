@@ -14,6 +14,7 @@ from topsim.core.scheduler import Scheduler
 from topsim.core.cluster import Cluster
 from topsim.core.buffer import Buffer
 from topsim.core.planner import Planner
+from topsim.core.delay import DelayModel
 
 LOGGER = logging.getLogger(__name__)
 
@@ -93,6 +94,9 @@ class Simulation:
         self.cluster = Cluster(env, cfg)
         self.buffer = Buffer(env, self.cluster, cfg)
         planning_algorithm = planning
+
+        if not delay:
+            delay = DelayModel(0.0, "normal", DelayModel.DelayDegree.NONE)
         self.planner = Planner(env, planning_algorithm, self.cluster, delay)
         scheduling_algorithm = scheduling()
         self.scheduler = Scheduler(

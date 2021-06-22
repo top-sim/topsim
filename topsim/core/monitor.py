@@ -51,7 +51,7 @@ class Monitor(object):
         instrument = self.simulation.instrument.to_df()
         scheduler = self.simulation.scheduler.to_df()
         delay = pd.DataFrame(
-            {'delay': [str(self.simulation.planner.delay_model)]}
+            {'delay': [self.simulation.planner.delay_model.degree.value]}
         )
         algs = pd.DataFrame(
             {

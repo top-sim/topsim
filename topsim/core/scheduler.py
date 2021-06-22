@@ -93,7 +93,7 @@ class Scheduler:
         LOGGER.debug("Scheduler starting up...")
 
         while self.status is SchedulerStatus.RUNNING:
-            LOGGER.info('Time on Scheduler: {0}'.format(self.env.now))
+            LOGGER.debug('Time on Scheduler: {0}'.format(self.env.now))
             if self.buffer.has_observations_ready_for_processing():
                 obs = self.buffer.next_observation_for_processing()
                 if obs not in self.observation_queue:
@@ -262,11 +262,11 @@ class Scheduler:
         current_plan.ast = self.env.now
         for task in current_plan.tasks:
             task.workflow_offset = self.env.now
-        if current_plan.is_finished():
-            if self.buffer.mark_observation_finished(observation):
-                current_plan = None
-                observation = None
-
+        # if current_plan.is_finished():
+        #     if self.buffer.mark_observation_finished(observation):
+        #         current_plan = None
+        #         observation = None
+        #
         # Do we have a run-time delay (is our workflow starting later than
         # expected on the cluster? This is the sign of a delay).
         if current_plan.est > self.env.now:
@@ -275,7 +275,7 @@ class Scheduler:
         while not test:
             # curr_allocs protects against duplicated scheduled variables
             curr_allocs = []
-            machine, task = (None, None)
+            # machine, task = (None, None)
             status = WorkflowStatus.UNSCHEDULED
             for t in current_plan.tasks:
                 if t.task_status is TaskStatus.FINISHED:
@@ -285,47 +285,61 @@ class Scheduler:
                     current_plan.tasks.remove(t)
             nm = f'{observation.name}-algtime'
             self.algtime[nm] = time.time()
-            machine, task, status = self.algorithm(
+            alloc, status = self.algorithm(
                 cluster=self.cluster,
                 clock=self.env.now,
                 workflow_plan=current_plan
             )
+            LOGGER.info(f'{observation.name} has '
+                        f'{len(current_plan.tasks)} tasks @ {self.env.now}')
             self.algtime[nm] = (time.time() - self.algtime[nm])
             current_plan.status = status
             if (current_plan.status is WorkflowStatus.DELAYED and
                     self.schedule_status is not WorkflowStatus.DELAYED):
                 self.schedule_status = ScheduleStatus.DELAYED
 
-            if (machine is None and task is None and status is
+            if (not alloc and status is
                     WorkflowStatus.FINISHED):
                 if self.buffer.mark_observation_finished(
                         observation
                 ):
                     self.observation_queue.remove(observation)
+                    LOGGER.info(f'{observation.name} Removed from Queue @'
+                                f'{self.env.now}')
                     break
-            elif machine is None or task is None:
+            elif not alloc:
                 yield self.env.timeout(TIMESTEP)
             else:
+                if self.env.now == 1335:
+                    LOGGER.info(
+                        len(self.cluster.clusters['default']['resources'][
+                                    'available']
+                            )
+                    )
+                    x = 1
                 # Run the task on the machie
-                if machine not in curr_allocs:
+                for machine, task in alloc:
                     if machine.id != task.machine.id:
                         task.update_allocation(machine)
+                    allocation_success = None
                     ret = self.env.process(
                         self.cluster.allocate_task_to_cluster(task, machine)
                     )
-                    LOGGER.info("Allocation {0}-{1} made to cluster".format(
-                        task, machine
-                    ))
-                    allocation_triggers.append(ret)
-                    task.task_status = TaskStatus.SCHEDULED
-                    curr_allocs.append(machine)
-                else:
-                    LOGGER.debug(
-                        f'Two different tasks have been allocated the '
-                        'same machine at the same time. This should '
-                        'be avoided in your algorithm!'
-                    )
-                    continue
+                    try:
+                        allocation_success = ret.value
+                    except AttributeError:
+                         allocation_success = True
+                    if allocation_success:
+                        LOGGER.debug("Allocation {0}-{1} made to "
+                                 "cluster".format(
+                            task, machine
+                        ))
+                        allocation_triggers.append(ret)
+                        task.task_status = TaskStatus.SCHEDULED
+                        curr_allocs.append(machine)
+                    else:
+                        LOGGER.debug("Allocation was not made to cluster "
+                                    "do to double-allocation")
                 yield self.env.timeout(TIMESTEP)
 
         yield self.env.timeout(TIMESTEP)
