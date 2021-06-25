@@ -23,7 +23,7 @@ import simpy
 from topsim.core.simulation import Simulation
 from topsim.core.instrument import RunStatus
 
-from topsim.user.scheduling import GreedyAlgorithmFromPlan
+from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.telescope import Telescope
 
 logging.basicConfig(level="WARNING")
@@ -43,7 +43,7 @@ class TestBasicIngest(unittest.TestCase):
             BASIC_CONFIG,
             Telescope,
             planning='heft',
-            scheduling=GreedyAlgorithmFromPlan,
+            scheduling=DynamicAlgorithmFromPlan,
             delay=None,
             timestamp=SIM_TIMESTAMP
         )

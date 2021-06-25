@@ -14,7 +14,7 @@ from shadow.algorithms.heuristic import heft as shadow_heft
 from shadow.algorithms.heuristic import pheft as shadow_pheft
 from shadow.algorithms.heuristic import fcfs as shadow_fcfs
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class WorkflowStatus(int, Enum):
@@ -143,8 +143,8 @@ class Planner:
 
 class WorkflowPlan:
     """
-    WorkflowPlans are used within the Planner, SchedulerA Actors and Cluster
-    Resource. They are higher-level than the shadow library representation,
+    WorkflowPlans are used within the Planner, Scheduler, and Cluster. 
+    They are higher-level than the shadow library representation,
     as they are a storage component of scheduled tasks, rather than directly
     representing the DAG nature of the workflow. This is why the tasks are
     stored in queues.
@@ -163,7 +163,7 @@ class WorkflowPlan:
             self.solution = None
         else:
             raise RuntimeError("Other algorithms are not supported")
-        logger.debug(
+        LOGGER.debug(
             "Solution makespan for {0} is {1}".format(
                 algorithm, self.solution.makespan
             )
@@ -182,28 +182,25 @@ class WorkflowPlan:
                         workflow.graph.predecessors(task)
                     )
                 ]
+                edge_costs = {}
+                data = dict(workflow.graph.pred[task])
+                for element in data:
+                    nm = self._create_observation_task_id(element.tid, env)
+                    val = data[element]['data_size']
+                    edge_costs[nm]=val
                 taskobj = Task(
                     tid,
                     allocation.ast,
                     allocation.aft,
-                    allocation.machine,
+                    allocation.machine.id,
                     predecessors,
-                    task.flops_demand, 0, 0,
+                    task.flops_demand, 0, edge_costs,
                     dm
                 )
                 self.tasks.append(taskobj)
             self.tasks.sort(key=lambda x: x.est)
             self.exec_order = self.solution.execution_order
 
-            self.start_time = None
-            self.priority = 0
-            self.status = WorkflowStatus.UNSCHEDULED
-        # else:
-        #     self.est = self._calc_workflow_est(observation, buffer)
-        #     self.eft = None
-        #     self.tasks = []
-        #     execution_order = workflow.graph.
-        #     for task in workflow:
 
 
     def _generate_topological_plan(self):

@@ -227,10 +227,16 @@ class Cluster:
     def current_available_resources(self):
         return [x for x in self.clusters['default']['resources']['available']]
 
-    def allocate_task_to_cluster(self, task, machine, ingest=False,
+    def allocate_task_to_cluster(self, task, machine, alt=None,
+                                 altmachine=None, ingest=False,
                                  c='default'):
         """
         Receive task from scheduler for allocation to specified machine
+
+        Parameters
+        ----------
+        pred : list of predecessors machine allocations, for use if the task
+        is allocated to a different machine.
 
         Returns
         -------
@@ -239,6 +245,7 @@ class Cluster:
         ret = None
         # TODO need to have runtime check to ensure that we are able to check
         #  if our allocation doesn't work (i.e. machine is unavailable)
+
         while True:
             if task not in self.clusters[c]['tasks']['running']:
                 self.clusters[c]['tasks']['running'].append(task)
@@ -253,33 +260,28 @@ class Cluster:
                     self.clusters[c]['usage_data']['available'] -= 1
                     self.clusters[c]['usage_data']['running_tasks'] += 1
                     duration = round(task.flops / machine.cpu)
+
                     if duration != task.duration:
                         task.duration = duration
 
                 task.task_status = TaskStatus.SCHEDULED
-
-                # The currently-stored duration may be a result of a
-                # preliminary allocation to another machine. Here we make
-                # sure we update that.
-
-                # ret = self.env.process(machine.run(task, self.env))
-                machine.run_task(task)
-                ret = self.env.process(task.do_work(self.env))
+                ret = self.env.process(task.do_work(self.env,machine, alt,
+                                                    altmachine))
                 yield self.env.timeout(0)
             if ret.triggered:
-                machine.stop_task(task)
+                # machine.stop_task(task)
                 self.clusters[c]['tasks']['running'].remove(task)
                 self.clusters[c]['usage_data']['running_tasks'] -= 1
                 self.clusters[c]['tasks']['finished'].append(task)
                 self.clusters[c]['usage_data']['finished_tasks'] += 1
                 if ingest:
                     self.clusters[c]['resources']['ingest'].remove(machine)
-                    # self.clusters[c]['usage_data']['available'] += 1
                 else:
                     self.clusters[c]['resources']['occupied'].remove(machine)
                 self.clusters[c]['resources']['available'].append(machine)
                 self.clusters[c]['usage_data']['available'] += 1
                 task.task_status = TaskStatus.FINISHED
+                task.delay_flag = task.delay_flag
                 return task.task_status
             else:
                 yield self.env.timeout(TIMESTEP)

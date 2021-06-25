@@ -151,6 +151,7 @@ class Simulation:
         self.env.process(self.scheduler.run())
         self.env.process(self.buffer.run())
 
+
         if runtime > 0:
             self.env.run(until=runtime)
         else:

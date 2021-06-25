@@ -21,7 +21,7 @@ import logging
 import pandas as pd
 
 from topsim.core.simulation import Simulation
-from topsim.user.scheduling import GreedyAlgorithmFromPlan
+from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.telescope import Telescope
 
 logging.basicConfig(level="WARNING")
@@ -52,7 +52,7 @@ class TestMonitorPandasPickle(unittest.TestCase):
             config=CONFIG,
             instrument=instrument,
             planning='heft',
-            scheduling=GreedyAlgorithmFromPlan,
+            scheduling=DynamicAlgorithmFromPlan,
             delay=None,
             timestamp=SIM_TIMESTAMP,
             to_file=True
@@ -90,7 +90,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
             CONFIG,
             self.instrument,
             planning='heft',
-            scheduling=GreedyAlgorithmFromPlan,
+            scheduling=DynamicAlgorithmFromPlan,
             delay=None,
             timestamp=self.ts,
         )
@@ -107,7 +107,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
                 CONFIG,
                 self.instrument,
                 planning=algorithm,
-                scheduling=GreedyAlgorithmFromPlan,
+                scheduling=DynamicAlgorithmFromPlan,
                 delay=None,
                 timestamp=self.ts,
             )
@@ -115,7 +115,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
             global_sim_df = global_sim_df.append(simdf)
             global_task_df = global_task_df.append(taskdf)
 
-        self.assertEqual(250, len(global_sim_df))
+        self.assertEqual(252, len(global_sim_df))
 
     def testResultsAgreeWithExpectations(self):
         pass

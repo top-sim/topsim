@@ -26,7 +26,7 @@ import simpy
 
 from topsim.core.simulation import Simulation
 
-from topsim.algorithms.scheduling import FifoAlgorithm
+from topsim.algorithms.dynamic_plan import FifoAlgorithm
 
 # We need a number of configuration files for the basic set-up
 
