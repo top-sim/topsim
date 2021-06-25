@@ -3,6 +3,14 @@
 )](https://travis-ci.com/top-sim/topsim)
 [![Coverage Status](https://coveralls.io/repos/github/top-sim/topsim/badge.svg?branch=master)](https://coveralls.io/github/top-sim/topsim?branch=master)
 
+## 2021 ISC-HPC PhD Forum Branch
+This branch contains the code used to generate results for the 2021 ISC HPC PhD 
+Forum. Development has continued (see other branches and the 'development' branch); 
+for the purpose of backwards compatibility and reproducibility, this branch
+has been created. Feel free to compare the differences in functionality of the branches. 
+
+
+## What is TopSim
 TopSim is a telescope observation and data post-processing simulator, based on
 a fork of Robert Lexis' CloudSimPy. The intention of TopSim is to provide an
 end-to-end view of telescope observations, data-archival, and the subsequent
