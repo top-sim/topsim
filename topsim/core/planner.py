@@ -14,7 +14,7 @@ from shadow.algorithms.heuristic import heft as shadow_heft
 from shadow.algorithms.heuristic import pheft as shadow_pheft
 from shadow.algorithms.heuristic import fcfs as shadow_fcfs
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class WorkflowStatus(int, Enum):
@@ -163,7 +163,7 @@ class WorkflowPlan:
             self.solution = None
         else:
             raise RuntimeError("Other algorithms are not supported")
-        logger.debug(
+        LOGGER.debug(
             "Solution makespan for {0} is {1}".format(
                 algorithm, self.solution.makespan
             )
@@ -182,13 +182,19 @@ class WorkflowPlan:
                         workflow.graph.predecessors(task)
                     )
                 ]
+                edge_costs = {}
+                data = dict(workflow.graph.pred[task])
+                for element in data:
+                    nm = self._create_observation_task_id(element.tid, env)
+                    val = data[element]['data_size']
+                    edge_costs[nm]=val
                 taskobj = Task(
                     tid,
                     allocation.ast,
                     allocation.aft,
-                    allocation.machine,
+                    allocation.machine.id,
                     predecessors,
-                    task.flops_demand, 0, 0,
+                    task.flops_demand, 0, edge_costs,
                     dm
                 )
                 self.tasks.append(taskobj)

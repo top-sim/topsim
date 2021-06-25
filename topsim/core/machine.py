@@ -29,6 +29,7 @@ class Machine(object):
         while True:
             if task.task_status is TaskStatus.SCHEDULED:
                 self.run_task(task)
+                ret = None
                 ret = yield env.process(task.do_work(env))
                 self.stop_task(task)
                 return ret
@@ -86,6 +87,9 @@ class Machine(object):
         }
         df = pd.DataFrame.from_dict(d)
         return df
+
+    def __hash__(self):
+        return hash(self.id)
 
     def __eq__(self, other):
         return isinstance(other, Machine) and other.id == self.id

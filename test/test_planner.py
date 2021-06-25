@@ -23,7 +23,7 @@ from topsim.core.buffer import Buffer
 from topsim.core.instrument import Observation
 from topsim.core.delay import DelayModel
 
-from topsim.user.scheduling import GreedyAlgorithmFromPlan
+from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
 
 current_dir = os.path.abspath('')
 
@@ -133,7 +133,7 @@ class TestPlannerDelay(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
-        sched_algorithm = GreedyAlgorithmFromPlan()
+        sched_algorithm = DynamicAlgorithmFromPlan()
         config = Config(HEFT_CONFIG)
         dm = DelayModel(0.1, "normal")
         self.cluster = Cluster(self.env, config=config)

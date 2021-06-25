@@ -24,7 +24,7 @@ namely, the original HEFT workflow from Topcuoglu 2000.
 
 import simpy
 
-from topsim.user.scheduling import GreedyAlgorithmFromPlan
+from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.telescope import Telescope
 from topsim.core.simulation import Simulation
 
@@ -34,14 +34,14 @@ CONFIG = 'simulations/real_time/real_time.json'
 env = simpy.Environment()
 
 planning_algorithm = 'heft'
-scheduling_algorithm = GreedyAlgorithmFromPlan
+scheduling_algorithm = DynamicAlgorithmFromPlan
 instrument = Telescope
 
 simulation = Simulation(
     env=env,
     config=CONFIG,
     instrument=instrument,
-    algorithm_map={'pheft': 'pheft', 'heft': 'heft', 'fifo': GreedyAlgorithmFromPlan},
+    algorithm_map={'pheft': 'pheft', 'heft': 'heft', 'fifo': DynamicAlgorithmFromPlan},
     event_file=EVENT_FILE,
 )
 

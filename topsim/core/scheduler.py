@@ -262,30 +262,29 @@ class Scheduler:
         current_plan.ast = self.env.now
         for task in current_plan.tasks:
             task.workflow_offset = self.env.now
-        # if current_plan.is_finished():
-        #     if self.buffer.mark_observation_finished(observation):
-        #         current_plan = None
-        #         observation = None
-        #
-        # Do we have a run-time delay (is our workflow starting later than
-        # expected on the cluster? This is the sign of a delay).
+
+        # Do we have a runtime delay?
         if current_plan.est > self.env.now:
             self.schedule_status.DELAYED
-        allocation_triggers = []
+
+        existing_schedule = set()
+        allocation_pairs = {}
         while not test:
             # curr_allocs protects against duplicated scheduled variables
-            curr_allocs = []
             # machine, task = (None, None)
             status = WorkflowStatus.UNSCHEDULED
+            np = []
             for t in current_plan.tasks:
-                if t.task_status is TaskStatus.FINISHED:
+                if t.task_status is not TaskStatus.FINISHED:
+                    np.append(t)
+                else:
                     if t.delay_flag:
                         self.schedule_status = ScheduleStatus.DELAYED
                         self.delay_offset += t.delay_offset
-                    current_plan.tasks.remove(t)
+            current_plan.tasks = np
             nm = f'{observation.name}-algtime'
             self.algtime[nm] = time.time()
-            alloc, status = self.algorithm(
+            timestep_allocations, status = self.algorithm(
                 cluster=self.cluster,
                 clock=self.env.now,
                 workflow_plan=current_plan
@@ -298,7 +297,9 @@ class Scheduler:
                     self.schedule_status is not WorkflowStatus.DELAYED):
                 self.schedule_status = ScheduleStatus.DELAYED
 
-            if (not alloc and status is
+            existing_schedule.update(timestep_allocations)
+            # If the workflow is finished
+            if (not existing_schedule and status is
                     WorkflowStatus.FINISHED):
                 if self.buffer.mark_observation_finished(
                         observation
@@ -307,42 +308,68 @@ class Scheduler:
                     LOGGER.info(f'{observation.name} Removed from Queue @'
                                 f'{self.env.now}')
                     break
-            elif not alloc:
+
+            # If there are no allocations made this timestep
+            elif not existing_schedule:
                 yield self.env.timeout(TIMESTEP)
             else:
-                if self.env.now == 1335:
-                    LOGGER.info(
-                        len(self.cluster.clusters['default']['resources'][
-                                    'available']
-                            )
-                    )
-                    x = 1
-                # Run the task on the machie
-                for machine, task in alloc:
-                    if machine.id != task.machine.id:
+                sorted_schedule = sorted(
+                    existing_schedule, key=lambda a:  a[1].est
+                )
+                curr_allocs = []
+                for allocation in sorted_schedule:
+                    machine, task = allocation
+                    if machine.id != task.machine:
                         task.update_allocation(machine)
+                        task.machine = machine
                     allocation_success = None
+                    allocation_pairs[task.id] = (task, machine)
+                    alt = False
+                    altmachine = []
+                    for pred in task.pred:
+                        if allocation_pairs[pred][1] != machine:
+                            alt = True
+                            altmachine.append(allocation_pairs[pred][0])
+                    # Schedule
+                    if machine in curr_allocs or self.cluster.is_occupied(machine):
+                        continue
                     ret = self.env.process(
-                        self.cluster.allocate_task_to_cluster(task, machine)
+                        self.cluster.allocate_task_to_cluster(task, machine,
+                                                              alt,altmachine)
                     )
+                    """
+                    `ret` will only have a value if an error occurs;
+                    otherwise, we are trying to get value that doesn't
+                    exist. Hence, the best case scenario is AttributeError. 
+                    """
                     try:
                         allocation_success = ret.value
                     except AttributeError:
-                         allocation_success = True
+                        allocation_success = True
                     if allocation_success:
                         LOGGER.debug("Allocation {0}-{1} made to "
                                  "cluster".format(
                             task, machine
                         ))
-                        allocation_triggers.append(ret)
                         task.task_status = TaskStatus.SCHEDULED
                         curr_allocs.append(machine)
+                        existing_schedule.remove(allocation)
                     else:
                         LOGGER.debug("Allocation was not made to cluster "
-                                    "do to double-allocation")
+                                    "due to double-allocation")
                 yield self.env.timeout(TIMESTEP)
 
         yield self.env.timeout(TIMESTEP)
+
+    def tmp(self, task, machine):
+        allocation_pairs = {}
+        allocation_pairs[task.id] = machine
+        alt_machine = False
+        for pred in task.pred:
+            if allocation_pairs[pred] != machine:
+                alt_machine = True
+        if alt_machine:
+            self.env.process(task._wait_for_transfer(self.env))
 
     def to_df(self):
         df = pd.DataFrame()

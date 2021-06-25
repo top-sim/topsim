@@ -41,7 +41,7 @@ from topsim.core.instrument import RunStatus
 from topsim.core.delay import DelayModel
 
 from topsim.user.telescope import Telescope
-from topsim.user.scheduling import GreedyAlgorithmFromPlan
+from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
 
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
@@ -49,6 +49,7 @@ logger = logging.getLogger(__name__)
 CONFIG = "test/data/config_update/standard_simulation.json"
 INTEGRATION = "test/data/config_update/integration_simulation.json"
 HEFT_CONFIG = "test/data/config_update/heft_single_observation_simulation.json"
+LONG_CONFIG = "test/data/config/mos_sw10_long.json"
 # Globals
 OBS_START_TME = 0
 OBS_DURATION = 10
@@ -74,7 +75,7 @@ class TestSchedulerIngest(unittest.TestCase):
         self.cluster = Cluster(self.env, config)
         self.buffer = Buffer(self.env, self.cluster, config)
         self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, GreedyAlgorithmFromPlan
+            self.env, self.buffer, self.cluster, DynamicAlgorithmFromPlan
         )
         self.planner = Planner(self.env, PLANNING_ALGORITHM,
                                self.cluster)
@@ -146,11 +147,11 @@ class TestSchedulerIngest(unittest.TestCase):
         self.assertEqual(210, self.buffer.cold[0].current_capacity)
 
 
-class TestSchedulerGreedyAllocation(unittest.TestCase):
+class TestSchedulerDynamicPlanAllocation(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
-        sched_algorithm = GreedyAlgorithmFromPlan()
+        sched_algorithm = DynamicAlgorithmFromPlan()
         config = Config(HEFT_CONFIG)
         self.cluster = Cluster(self.env, config)
         self.planner = Planner(self.env, PLANNING_ALGORITHM,
@@ -213,9 +214,37 @@ class TestSchedulerGreedyAllocation(unittest.TestCase):
             [a.task.tid for a in curr_obs.plan.exec_order]
         )
         self.buffer.cold[0].observations['stored'].append(curr_obs)
-        self.env.run(until=98)
+        self.env.run(until=99)
         self.assertEqual(10, len(self.cluster.tasks['finished']))
         self.assertEqual(0, len(self.cluster.tasks['running']))
+        self.assertEqual(0, len(self.scheduler.observation_queue))
+
+
+class TestSchedulerLongWorkflow(unittest.TestCase):
+
+    def setUp(self):
+        self.env = simpy.Environment()
+        sched_algorithm = DynamicAlgorithmFromPlan()
+        config = Config(LONG_CONFIG)
+        self.cluster = Cluster(self.env, config)
+        self.planner = Planner(self.env, PLANNING_ALGORITHM,
+                               self.cluster)
+        self.buffer = Buffer(self.env, self.cluster, config)
+        self.scheduler = Scheduler(self.env, self.buffer,
+                                   self.cluster, sched_algorithm)
+        self.telescope = Telescope(
+            self.env, config, self.planner, self.scheduler
+        )
+
+    def testAllocationTasksLongWorkflow(self):
+        curr_obs = self.telescope.observations[0]
+        self.scheduler.observation_queue.append(curr_obs)
+        curr_obs.ast = self.env.now
+        self.env.process(self.planner.run(curr_obs, self.buffer))
+        self.env.process(self.scheduler.allocate_tasks(curr_obs))
+        self.env.run(1)
+        self.buffer.cold[0].observations['stored'].append(curr_obs)
+        self.env.run(until=299)
         self.assertEqual(0, len(self.scheduler.observation_queue))
 
 
@@ -230,7 +259,7 @@ class TestSchedulerIntegration(unittest.TestCase):
                                self.cluster)
 
         self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, GreedyAlgorithmFromPlan()
+            self.env, self.buffer, self.cluster, DynamicAlgorithmFromPlan()
         )
         self.telescope = Telescope(
             self.env, config, self.planner, self.scheduler
@@ -289,7 +318,7 @@ class TestSchedulerDelayHelpers(unittest.TestCase):
         )
 
         self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, GreedyAlgorithmFromPlan()
+            self.env, self.buffer, self.cluster, DynamicAlgorithmFromPlan()
         )
         self.telescope = Telescope(
             self.env, config, self.planner, self.scheduler

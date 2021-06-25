@@ -19,13 +19,13 @@ Test the scheduling algorithm as 'designed' by the user.
 
 import unittest
 
-from topsim.user.scheduling import GreedyAlgorithmFromPlan, BatchProcessing
+from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan, BatchProcessing
 
 
 class TestFifoAlgorithm(unittest.TestCase):
 
     def setUp(self):
-        self.algorithm = GreedyAlgorithmFromPlan()
+        self.algorithm = DynamicAlgorithmFromPlan()
         # TODO setup a workflow
         self.workflow = None
 

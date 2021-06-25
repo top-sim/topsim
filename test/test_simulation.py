@@ -5,7 +5,7 @@ import os
 
 from topsim.core.config import Config
 from topsim.core.simulation import Simulation
-from topsim.user.scheduling import GreedyAlgorithmFromPlan
+from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.telescope import Telescope
 logging.basicConfig(level='WARNING')
 logger = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ class TestSimulationConfig(unittest.TestCase):
             CONFIG,
             self.instrument,
             planning='heft',
-            scheduling=GreedyAlgorithmFromPlan,
+            scheduling=DynamicAlgorithmFromPlan,
             timestamp=self.timestamp
         )
         self.assertTrue(36, simulation.instrument.total_arrays)
@@ -54,7 +54,7 @@ class TestSimulationFileOptions(unittest.TestCase):
             CONFIG,
             Telescope,
             planning='heft',
-            scheduling=GreedyAlgorithmFromPlan,
+            scheduling=DynamicAlgorithmFromPlan,
             delay=None,
             timestamp=f'{cwd}/test/data/output/{0}',
             to_file=True
@@ -64,6 +64,7 @@ class TestSimulationFileOptions(unittest.TestCase):
 
 LARGE_CONFIG = 'test/data/config/mos_sw10.json'
 
+@unittest.skip
 class TestSimulationLargeExperiment(unittest.TestCase):
     def setUp(self) -> None:
         env = simpy.Environment()
@@ -72,7 +73,7 @@ class TestSimulationLargeExperiment(unittest.TestCase):
             LARGE_CONFIG,
             Telescope,
             planning='heft',
-            scheduling=GreedyAlgorithmFromPlan,
+            scheduling=DynamicAlgorithmFromPlan,
             delay=None,
             timestamp=f'test/basic-workflow-data/output/{0}'
         )
@@ -114,7 +115,7 @@ class TestSimulationBasicSetup(unittest.TestCase):
             BASIC_CONFIG,
             Telescope,
             planning='heft',
-            scheduling=GreedyAlgorithmFromPlan,
+            scheduling=DynamicAlgorithmFromPlan,
             delay=None,
             timestamp=f'test/basic-workflow-data/output/{0}'
         )
