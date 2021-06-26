@@ -361,15 +361,15 @@ class Scheduler:
 
         yield self.env.timeout(TIMESTEP)
 
-    def tmp(self, task, machine):
-        allocation_pairs = {}
-        allocation_pairs[task.id] = machine
-        alt_machine = False
-        for pred in task.pred:
-            if allocation_pairs[pred] != machine:
-                alt_machine = True
-        if alt_machine:
-            self.env.process(task._wait_for_transfer(self.env))
+    def replace_previous_schedule(self, existing_schedule, new_schedule):
+        updated = set()
+        diff = []
+        for machine, task in existing_schedule:
+            diff.extend([(a,b ) for (a, b) in new_schedule if b == task])
+
+
+
+        return updated
 
     def to_df(self):
         df = pd.DataFrame()
@@ -386,6 +386,33 @@ class Scheduler:
         else:
             df['algtime'] = tmp
         return df
+
+
+class Schedule:
+
+    def __init__(self):
+        self.allocation = []
+        self.replace = False
+        self.status = WorkflowStatus.SCHEDULED
+
+    def add_allocation(self,task, machine):
+        self.allocation.append((task, machine))
+
+    def replace_previous_schedule(self):
+        self.replace = True
+
+
+class Allocation:
+
+    def __init__(self, task, machine):
+        self.task = task
+        self.machine = machine
+
+    def __eq__(self, other):
+        return self.task == other.task.id and self.machine == other.machine.id
+
+    def __hash__(self):
+        return hash(self.task.id + self.machine.id)
 
 
 class SchedulerStatus(Enum):

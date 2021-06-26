@@ -95,8 +95,7 @@ class Task(object):
             yield env.timeout(self._wait_for_transfer(env,machine, altmachine))
         self.task_status = TaskStatus.RUNNING
         self.ast = env.now
-        if self.ast != self.est:
-            x=5
+
         # self.eft = self.duration+self.ast
         # Process potential updates to duration:
 

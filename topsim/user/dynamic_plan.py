@@ -38,26 +38,30 @@ class DynamicAlgorithmFromPlan(Algorithm):
 
     def __call__(self, cluster, clock, workflow_plan):
         """
-        :param cluster:
-        :param clock:
-        :param workflow_plan: a (Workflow-id, workflow-plan) tuple.
-        :return:
+        Iterate through immediate predecessors and check that they are finished
+        Schedule as we go check if there is an overlap between the two sets
+
+        Parameters
+        ----------
+        cluster : topsim.core.Cluster object
+            The current cluster
+        clock : int
+            The current time in the simulation
+        workflow_plan : topsim.planner.WorkflowPlan object
+            The workflow plan devised
+
+        Returns
+        -------
+        allocations, WorkflowStatus, false
         """
         self.cluster = cluster
         machines = cluster.machines
         workflow_id = workflow_plan.id
-        # tasks = cluster.tasks_which_has_waiting_instance
         tasks = workflow_plan.tasks
-
-        # Iterate through immediate predecessors and check that they are
-        # finished
-        # Schedule as we go
-        # Check if there is an overlap between the two sets
-
+        replace = False
         allocations = []
         self.accurate = 0
         self.alternate = 0
-        # temporary_resources = self.cluster.current_available_resources()
         for t in tasks:
             # Allocate the first element in the Task list:
             if t.task_status is TaskStatus.UNSCHEDULED:
@@ -67,13 +71,8 @@ class DynamicAlgorithmFromPlan(Algorithm):
                 if not t.pred:
                     machine = cluster.dmachine[t.machine]
                     workflow_plan.status = WorkflowStatus.SCHEDULED
-                    # if self.is_machine_occupied(
-                    #         machine) or machine not in temporary_resources:
-                    #     continue
-                    # else:
                     alloc = (machine, t)
                     allocations.append(alloc)
-                    # temporary_resources.remove(machine)
                     self.accurate += 1
 
                 # The task has predecessors
@@ -89,21 +88,13 @@ class DynamicAlgorithmFromPlan(Algorithm):
                         # One of the predecessors of 't' is still running
                         continue
                     else:
-
-                        # if self.cluster.is_occupied(
-                        #         machine) or machine not in temporary_resources:
-                        #     continue
-                        # else:
                         allocations.append((machine, t))
-                            # temporary_resources.remove(machine)
-                            # self.accurate += 1
 
         if len(workflow_plan.tasks) == 0:
             workflow_plan.status = WorkflowStatus.FINISHED
             logger.debug("is finished %s", workflow_id)
 
         return allocations, workflow_plan.status
-        # return None, None, workflow_plan.status
 
     def to_df(self):
         df = pd.DataFrame()
@@ -139,21 +130,13 @@ class BatchProcessing(Algorithm):
 
         for t in workflow_plan.tasks:
             # Allocate the first element in the Task list:
-            if t.task_status is TaskStatus.UNSCHEDULED and \
-                    t.est + workflow_plan.ast <= clock:
+            if t.task_status is TaskStatus.UNSCHEDULED:
                 # Are we workkflow - delayed?
                 if workflow_plan.ast > workflow_plan.est:
                     workflow_plan.status = WorkflowStatus.DELAYED
                 if not t.pred:
                     machine = cluster.dmachine[t.machine.id]
-                    workflow_plan.status = WorkflowStatus.SCHEDULED
-                    if self.is_machine_occupied(machine):
-                        # Is there another machine
-                        if self.cluster.resources['available']:
-                            machine = self.cluster.resources['available'][0]
-                            return machine, t, workflow_plan.status
-                        return None, None, workflow_plan.status
-                    return machine, t, workflow_plan.status
+
                 # The task has predecessors
                 else:
                     # If the set of finished tasks does not contain all of the
@@ -168,13 +151,13 @@ class BatchProcessing(Algorithm):
                         continue
                     else:
                         machine = cluster.dmachine[t.machine.id]
-                        if self.cluster.is_occupied(machine):
+                        if cluster.is_occupied(machine):
                             return None, None, workflow_plan.status
                         return machine, t, workflow_plan.status
 
         if len(workflow_plan.tasks) == 0:
             workflow_plan.status = WorkflowStatus.FINISHED
-            logger.debug("is finished %s", workflow_id)
+            logger.debug("is finished %s", workflow_plan)
 
         return None, None, WorkflowStatus.SCHEDULED
 
