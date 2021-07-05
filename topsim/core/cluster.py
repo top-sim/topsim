@@ -227,16 +227,19 @@ class Cluster:
     def current_available_resources(self):
         return [x for x in self.clusters['default']['resources']['available']]
 
-    def allocate_task_to_cluster(self, task, machine, alt=None,
-                                 altmachine=None, ingest=False,
-                                 c='default'):
+    def allocate_task_to_cluster(
+            self, task, machine, pred_allocations=None, ingest=False, c='default'
+    ):
         """
         Receive task from scheduler for allocation to specified machine
 
         Parameters
         ----------
-        pred : list of predecessors machine allocations, for use if the task
-        is allocated to a different machine.
+        machine
+        task
+        pred_allocations
+        ingest
+        c
 
         Returns
         -------
@@ -265,8 +268,9 @@ class Cluster:
                         task.duration = duration
 
                 task.task_status = TaskStatus.SCHEDULED
-                ret = self.env.process(task.do_work(self.env,machine, alt,
-                                                    altmachine))
+                ret = self.env.process(
+                    task.do_work(self.env, machine, pred_allocations)
+                )
                 yield self.env.timeout(0)
             if ret.triggered:
                 # machine.stop_task(task)
@@ -352,7 +356,25 @@ class Cluster:
 
         """
 
-    def _mark_machine_occupied(self):
+    def _set_task_as_running(self):
+        """
+
+        Returns
+        -------
+
+        """
+        pass
+
+    def _set_task_as_finished(self):
+        """
+
+        Returns
+        -------
+
+        """
+        pass
+
+    def _set_machine_occupied(self):
         """
         Update allocation dictionaries and output data dictionaries
         Returns
@@ -361,7 +383,7 @@ class Cluster:
         """
         pass
 
-    def _mark_machine_available(self):
+    def _set_machine_available(self):
         """
         Update allocation dictionaries and output data dictionaries
 
@@ -370,6 +392,30 @@ class Cluster:
 
         """
         pass
+
+    def _set_machine_reserved(self):
+        """
+        Reserved is a keyword used for batch processing, in which a pool of
+        resources are selected and removed for a specific observation
+
+        Returns
+        -------
+
+        """
+        pass
+
+    def get_reserved_machines(self, observation):
+        """
+
+        Parameters
+        ----------
+        observation
+
+
+        Returns
+        -------
+        List of resources on which the observation may return
+        """
 
     def _generate_ingest_tasks(self, demand, observation):
         """

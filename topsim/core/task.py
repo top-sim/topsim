@@ -74,7 +74,7 @@ class Task(object):
     def __hash__(self):
         return hash(self.id)
 
-    def do_work(self,env, machine, alt=False, altmachine=None):
+    def do_work(self,env, machine, altmachine=None):
         """
         This runs the task on the 'cluster'. We make the task in control of
         it's execution in order to "give it control" of delays.
@@ -91,7 +91,7 @@ class Task(object):
         -------
 
         """
-        if alt:
+        if altmachine:
             yield env.timeout(self._wait_for_transfer(env,machine, altmachine))
         self.task_status = TaskStatus.RUNNING
         self.ast = env.now

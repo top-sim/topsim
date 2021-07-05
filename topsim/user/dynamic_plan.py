@@ -12,7 +12,7 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+import copy
 import logging
 import pandas as pd
 
@@ -36,7 +36,7 @@ class DynamicAlgorithmFromPlan(Algorithm):
     def __repr__(self):
         return "DynamicAlgorithmFromPlan"
 
-    def __call__(self, cluster, clock, workflow_plan):
+    def __call__(self, cluster, clock, workflow_plan, existing_schedule):
         """
         Iterate through immediate predecessors and check that they are finished
         Schedule as we go check if there is an overlap between the two sets
@@ -59,36 +59,39 @@ class DynamicAlgorithmFromPlan(Algorithm):
         workflow_id = workflow_plan.id
         tasks = workflow_plan.tasks
         replace = False
-        allocations = []
+        allocations = copy.copy(existing_schedule)
+        # allocations = copy.copy(existing_schedule)
         self.accurate = 0
         self.alternate = 0
-        for t in tasks:
-            # Allocate the first element in the Task list:
-            if t.task_status is TaskStatus.UNSCHEDULED:
-                # Are we workkflow - delayed?
-                if workflow_plan.ast > workflow_plan.est:
-                    workflow_plan.status = WorkflowStatus.DELAYED
-                if not t.pred:
-                    machine = cluster.dmachine[t.machine]
-                    workflow_plan.status = WorkflowStatus.SCHEDULED
-                    alloc = (machine, t)
-                    allocations.append(alloc)
-                    self.accurate += 1
+        for task in tasks:
+            if task not in allocations:
+                if (task.task_status is TaskStatus.UNSCHEDULED and
+                        task not in allocations):
+                    # Are we workkflow - delayed?
+                    if workflow_plan.ast > workflow_plan.est:
+                        workflow_plan.status = WorkflowStatus.DELAYED
+                    if not task.pred:
+                        machine = cluster.dmachine[task.machine]
+                        workflow_plan.status = WorkflowStatus.SCHEDULED
+                        # We do not update the allocations
+                        allocations[task] = machine
+                        self.accurate += 1
 
-                # The task has predecessors
-                else:
-                    # If the set of finished tasks does not contain all of the
-                    # previous tasks, we cannot start yet.
-                    pred = set(t.pred)
-                    finished = set(t.id for t in cluster.tasks['finished'])
-                    machine = cluster.dmachine[t.machine]
-
-                    # Check if there is an overlap between the two sets
-                    if not pred.issubset(finished):
-                        # One of the predecessors of 't' is still running
-                        continue
+                    # The task has predecessors
                     else:
-                        allocations.append((machine, t))
+                        # If the set of finished tasks does not contain all
+                        # of the previous tasks, we cannot start yet.
+                        pred = set(task.pred)
+                        machine = cluster.dmachine[task.machine]
+                        finished = set(t.id for t in cluster.tasks['finished'])
+
+                        # Check if there is an overlap between the two sets
+                        if not pred.issubset(finished):
+                            # One of the predecessors of 't' is still running
+                            continue
+                        else:
+                            allocations[task] = machine
+                            self.accurate += 1
 
         if len(workflow_plan.tasks) == 0:
             workflow_plan.status = WorkflowStatus.FINISHED
@@ -121,8 +124,8 @@ class BatchProcessing(Algorithm):
     constraints are met.
     """
 
-    def __call__(self, cluster, clock, workflow_plan):
-        if workflow_plan.algorithm is not 'batch':
+    def __call__(self, cluster, clock, workflow_plan, existing_schedule):
+        if workflow_plan.algorithm != 'batch':
             raise RuntimeError("Workflow Plan is not compatible with this "
                                "dynamic scheduler")
         else:
