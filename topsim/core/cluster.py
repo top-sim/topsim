@@ -85,6 +85,14 @@ class Cluster:
         self.env = env
 
     def run(self):
+        """
+        Start the runtime loop for the cluster, and manage checks on the
+        machine
+
+        Returns
+        -------
+
+        """
         while True:
             for c in self.cl:
                 if not self.clusters[c]['ingest']['status']:
@@ -153,44 +161,40 @@ class Cluster:
         Parameters
         ----------
 
+        c
+        observation
         demand : int
             The type of ingest pipeline - see Observation
-        duration : int
 
         Returns
         -------
         """
 
+        if demand > len(self.current_available_resources()):
+            raise RuntimeError(
+                f"Failed to check system capacity"
+                f" before allocating resources to ingest!"
+            )
+
         tasks = self._generate_ingest_tasks(demand, observation)
 
         pairs = []
-        temp_intest_resources = self.clusters[c]['resources']['available'][
-                                :demand]
-        self.clusters[c]['resources']['available'] = \
-            self.clusters[c]['resources']['available'][demand:]
 
-        for i, machine in enumerate(temp_intest_resources):
+        temp_ingest_resources = (
+            self.clusters[c]['resources']['available'][:demand]
+        )
+
+        for i, machine in enumerate(temp_ingest_resources):
             pairs.append((machine, tasks[i]))
-            self.clusters[c]['usage_data']['available'] -= 1
-            self.clusters[c]['usage_data']['running_tasks'] += 1
-        self.clusters[c]['resources']['ingest'].extend(temp_intest_resources)
 
         self.clusters[c]['ingest']['status'] = True
         self.clusters[c]['ingest']['demand'] = demand
-        curr_tasks = {}
         while True:
             for pair in pairs:
                 (machine, task) = pair
-                # if task not in self.tasks['running']:
-                #     self.tasks['running'].append(task)
                 ret = self.env.process(
                     self.allocate_task_to_cluster(task, machine, ingest=True)
                 )
-            if len(self.clusters[c]['resources']['ingest']) == 0:
-                self.clusters[c]['ingest']['completed'] += 1
-                self.clusters[c]['ingest']['status'] = False
-                # We've finished ingest
-                break
             else:
                 break
         yield self.env.timeout(TIMESTEP)
@@ -225,6 +229,12 @@ class Cluster:
         """
 
     def current_available_resources(self):
+        """
+
+        Returns
+        -------
+
+        """
         return [x for x in self.clusters['default']['resources']['available']]
 
     def allocate_task_to_cluster(self, task, machine, alt=None,
@@ -248,26 +258,34 @@ class Cluster:
 
         while True:
             if task not in self.clusters[c]['tasks']['running']:
-                self.clusters[c]['tasks']['running'].append(task)
-                if not ingest:
-                    if machine not in self.clusters[c]['resources'][
-                        'available']:
-                        yield self.env.timeout(TIMESTEP, False)
+                if (machine not in
+                    self.clusters[c]['resources']['available'] and
+                    machine not in self.clusters[c]['resources']['ingest']
+                ):
+                    raise RuntimeError('Double-machine allocation made - '
+                                       'double check your scheduling algorithm')
+                    # yield self.env.timeout(TIMESTEP, False)
+                    # break
+                if ingest:
                     # Ingest resources are allocated in bulk, so we do that
                     # elsewhere
+                    self.clusters[c]['tasks']['running'].append(task)
+                    self.clusters[c]['resources']['ingest'].append(machine)
+                    self.clusters[c]['resources']['available'].remove(machine)
+                    self.clusters[c]['usage_data']['available'] -= 1
+                    self.clusters[c]['usage_data']['running_tasks'] += 1
+                else:
+                    self.clusters[c]['tasks']['running'].append(task)
                     self.clusters[c]['resources']['occupied'].append(machine)
                     self.clusters[c]['resources']['available'].remove(machine)
                     self.clusters[c]['usage_data']['available'] -= 1
                     self.clusters[c]['usage_data']['running_tasks'] += 1
-                    duration = round(task.flops / machine.cpu)
-
-                    if duration != task.duration:
-                        task.duration = duration
 
                 task.task_status = TaskStatus.SCHEDULED
-                ret = self.env.process(task.do_work(self.env,machine, alt,
+                ret = self.env.process(task.do_work(self.env, machine, alt,
                                                     altmachine))
                 yield self.env.timeout(0)
+
             if ret.triggered:
                 # machine.stop_task(task)
                 self.clusters[c]['tasks']['running'].remove(task)
