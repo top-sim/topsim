@@ -12,7 +12,7 @@ class Algorithm(ABC):
     allocation by the 'scheduler').
     """
     @abstractmethod
-    def __call__(self, cluster, clock, plan):
+    def __call__(self, cluster, clock, plan, schedule):
         pass
 
     @abstractmethod

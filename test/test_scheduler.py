@@ -42,6 +42,7 @@ from topsim.core.delay import DelayModel
 
 from topsim.user.telescope import Telescope
 from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.greedy import GreedyAlgorithmFromPlan
 
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
@@ -220,6 +221,7 @@ class TestSchedulerDynamicPlanAllocation(unittest.TestCase):
         self.assertEqual(0, len(self.scheduler.observation_queue))
 
 
+
 class TestSchedulerLongWorkflow(unittest.TestCase):
 
     def setUp(self):
@@ -237,6 +239,34 @@ class TestSchedulerLongWorkflow(unittest.TestCase):
         )
 
     def testAllocationTasksLongWorkflow(self):
+        curr_obs = self.telescope.observations[0]
+        self.scheduler.observation_queue.append(curr_obs)
+        curr_obs.ast = self.env.now
+        self.env.process(self.planner.run(curr_obs, self.buffer))
+        self.env.process(self.scheduler.allocate_tasks(curr_obs))
+        self.env.run(1)
+        self.buffer.cold[0].observations['stored'].append(curr_obs)
+        self.env.run(until=299)
+        self.assertEqual(0, len(self.scheduler.observation_queue))
+
+
+class TestSchedulerDynamicReAllocation(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.env = simpy.Environment()
+        sched_algorithm = GreedyAlgorithmFromPlan()
+        config = Config(LONG_CONFIG)
+        self.cluster = Cluster(self.env, config)
+        self.planner = Planner(self.env, PLANNING_ALGORITHM,
+                               self.cluster)
+        self.buffer = Buffer(self.env, self.cluster, config)
+        self.scheduler = Scheduler(self.env, self.buffer,
+                                   self.cluster, sched_algorithm)
+        self.telescope = Telescope(
+            self.env, config, self.planner, self.scheduler
+        )
+
+    def test_reallocation_with_plan(self):
         curr_obs = self.telescope.observations[0]
         self.scheduler.observation_queue.append(curr_obs)
         curr_obs.ast = self.env.now
