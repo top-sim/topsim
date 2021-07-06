@@ -221,6 +221,32 @@ class TestSchedulerDynamicPlanAllocation(unittest.TestCase):
         self.assertEqual(0, len(self.scheduler.observation_queue))
 
 
+class TestSchedulerEdgeCases(unittest.TestCase):
+
+    def setUp(self) -> None:
+        """
+        This test scenario is going to test the edge cases like
+        double-allocation that may happen.
+
+        For example - the use of curr_allocs should result in the
+        _process_current_schedule not double_allocation, so we will test this.
+        Returns
+        -------
+
+        """
+
+    def test_double_allocation(self):
+        """
+        Given an existing schedule, add multiple allocations to ensure
+        duplicates do not exist
+
+        Returns
+        -------
+
+        """
+
+
+
 
 class TestSchedulerLongWorkflow(unittest.TestCase):
 

@@ -237,7 +237,7 @@ class Cluster:
         """
         return [x for x in self.clusters['default']['resources']['available']]
 
-    def allocate_task_to_cluster(self, task, machine, alt=None,
+    def allocate_task_to_cluster(self, task, machine,
                                  altmachine=None, ingest=False,
                                  c='default'):
         """
@@ -282,7 +282,7 @@ class Cluster:
                     self.clusters[c]['usage_data']['running_tasks'] += 1
 
                 task.task_status = TaskStatus.SCHEDULED
-                ret = self.env.process(task.do_work(self.env, machine, alt,
+                ret = self.env.process(task.do_work(self.env, machine,
                                                     altmachine))
                 yield self.env.timeout(0)
 
