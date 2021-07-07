@@ -39,6 +39,7 @@ from topsim.core.planner import Planner
 from topsim.core.buffer import Buffer
 from topsim.core.instrument import RunStatus
 from topsim.core.delay import DelayModel
+from topsim.core.task import Task
 
 from topsim.user.telescope import Telescope
 from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
@@ -51,11 +52,6 @@ CONFIG = "test/data/config_update/standard_simulation.json"
 INTEGRATION = "test/data/config_update/integration_simulation.json"
 HEFT_CONFIG = "test/data/config_update/heft_single_observation_simulation.json"
 LONG_CONFIG = "test/data/config/mos_sw10_long.json"
-# Globals
-OBS_START_TME = 0
-OBS_DURATION = 10
-OBS_DEMAND = 15
-OBS_WORKFLOW = "test/data/config/workflow_config.json"
 PLANNING_ALGORITHM = 'heft'
 
 
@@ -147,6 +143,10 @@ class TestSchedulerIngest(unittest.TestCase):
         self.assertEqual(500, self.buffer.hot[0].current_capacity)
         self.assertEqual(210, self.buffer.cold[0].current_capacity)
 
+class TestSchedulerAllocations(unittest.TestCase):
+    def setUp(self) -> None:
+        pass
+
 
 class TestSchedulerDynamicPlanAllocation(unittest.TestCase):
 
@@ -234,6 +234,21 @@ class TestSchedulerEdgeCases(unittest.TestCase):
         -------
 
         """
+        self.env = simpy.Environment()
+        config = Config(CONFIG)
+        sched_algorithm = DynamicAlgorithmFromPlan()
+
+        self.cluster = Cluster(env=self.env, config=config)
+        self.telescope = Telescope(
+            self.env, config, planner=None, scheduler=None
+        )
+        self.buffer = Buffer(self.env, self.cluster, config)
+
+        self.scheduler = Scheduler(self.env, self.buffer,
+                                   self.cluster, sched_algorithm)
+
+        self.observation = self.telescope.observations[0]
+        self.machine = self.cluster.machines[0]
 
     def test_double_allocation(self):
         """
@@ -244,8 +259,18 @@ class TestSchedulerEdgeCases(unittest.TestCase):
         -------
 
         """
-
-
+        task = Task('test_0', 0, 2, self.machine, [])
+        dup_task = Task('test_2', 8, 12, self.machine, [])
+        existing_schedule = {task: self.machine, dup_task: self.machine}
+        new_schedule, new_pairs = self.scheduler._process_current_schedule(
+            existing_schedule, allocation_pairs={}
+        )
+        self.assertFalse(task in self.cluster.tasks['running'])
+        self.env.run(until=1)
+        self.assertTrue(task in self.cluster.tasks['running'])
+        self.assertTrue(dup_task in new_schedule)
+        self.assertFalse(task in new_schedule)
+        self.assertTrue(task.id in new_pairs)
 
 
 class TestSchedulerLongWorkflow(unittest.TestCase):

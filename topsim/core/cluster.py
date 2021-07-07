@@ -262,10 +262,9 @@ class Cluster:
                     self.clusters[c]['resources']['available'] and
                     machine not in self.clusters[c]['resources']['ingest']
                 ):
-                    raise RuntimeError('Double-machine allocation made - '
-                                       'double check your scheduling algorithm')
+                    yield self.env.timeout(TIMESTEP)
                     # yield self.env.timeout(TIMESTEP, False)
-                    # break
+                    break
                 if ingest:
                     # Ingest resources are allocated in bulk, so we do that
                     # elsewhere

@@ -334,6 +334,7 @@ class Scheduler:
         """
         Given a schedule and existing allocations, run through the schedule
         and run the allocation for that tasks if possible
+
         Parameters
         ----------
         schedule
@@ -352,52 +353,31 @@ class Scheduler:
             machine = schedule[task]
             if machine.id != task.machine:
                 task.update_allocation(machine)
-            allocation_pairs[task.id] = (task, machine)
-            pred_allocations = self._find_pred_allocations(
-                task, machine, allocation_pairs
-            )
             # Schedule
             if machine in curr_allocs or self.cluster.is_occupied(machine):
-                continue
+                LOGGER.debug(
+                    "Allocation not made to cluster due to double-allocation"
+                )
+            else:
+                allocation_pairs[task.id] = (task, machine)
+                pred_allocations = self._find_pred_allocations(
+                    task, machine, allocation_pairs
+                )
+                self.env.process(
+                    self.cluster.allocate_task_to_cluster(
+                        task, machine, pred_allocations
+                    )
+                )
 
-            allocation_success = self._make_individual_allocation(
-                task, machine, pred_allocations
-            )
-
-            if allocation_success:
                 LOGGER.debug(f"Allocation {task}-{machine} made to cluster")
                 task.task_status = TaskStatus.SCHEDULED
                 curr_allocs.append(machine)
                 schedule.pop(task, None)
-            else:
-                LOGGER.debug(
-                    "Allocation not made to cluster due to double-allocation"
-                )
+
         return schedule, allocation_pairs
 
 
-    def _make_individual_allocation(self, task, machine,
-        pred_allocations):
-        """
-        `ret` will only have a value if an error occurs;
-        otherwise, we are trying to get value that doesn't
-        exist. Hence, the 'best case scenario' is AttributeError.
 
-        Returns
-        -------
-        ret
-        """
-
-        ret = self.env.process(
-            self.cluster.allocate_task_to_cluster(
-                task, machine, pred_allocations
-            )
-        )
-        try:
-            allocation_success = ret.value
-        except AttributeError:
-            allocation_success = True
-        return allocation_success
 
 
     def _update_current_plan(self, current_plan):
