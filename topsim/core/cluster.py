@@ -262,7 +262,8 @@ class Cluster:
                     self.clusters[c]['resources']['available'] and
                     machine not in self.clusters[c]['resources']['ingest']
                 ):
-                    yield self.env.timeout(TIMESTEP)
+                    raise RuntimeError
+                    # yield self.env.timeout(TIMESTEP)
                     # yield self.env.timeout(TIMESTEP, False)
                     break
                 if ingest:
