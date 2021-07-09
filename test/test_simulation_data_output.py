@@ -114,7 +114,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
             )
             simdf, taskdf = simulation.start()
             global_sim_df = global_sim_df.append(simdf)
-            print(len(simdf))
+            print(simdf.to_string)
             global_task_df = global_task_df.append(taskdf)
         self.assertEqual(252, len(global_sim_df))
 
