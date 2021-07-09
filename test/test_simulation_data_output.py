@@ -97,7 +97,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
         simdf, taskdf = simulation.start(runtime=60)
         self.assertFalse(os.path.exists("test/simulation_pickles/0-sim.pkl"))
 
-    @unittest.skip()
+    @unittest.skip("testing")
     def test_multi_siulation_data_merge(self):
         global_sim_df = pd.DataFrame()
         global_task_df = pd.DataFrame()
