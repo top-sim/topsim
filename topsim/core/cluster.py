@@ -261,7 +261,9 @@ class Cluster:
                     self.clusters[c]['usage_data']['available'] -= 1
                     self.clusters[c]['usage_data']['running_tasks'] += 1
                 else:
-                    self._set_machine_occupied(machine, observation)
+                    self.clusters[c]['resources']['available'].remove(machine)
+                    self.clusters[c]['resources']['occupied'].append(machine)
+                    # self._set_machine_occupied(machine, observation)
                     self.clusters[c]['tasks']['running'].append(task)
                     self.clusters[c]['usage_data']['available'] -= 1
                     self.clusters[c]['usage_data']['running_tasks'] += 1
@@ -433,7 +435,7 @@ class Cluster:
         else:
             return False
 
-    def _set_machine_available(self, machine, observation):
+    def _set_machine_available(self, machine, observation,c='default'):
         """
         Take a machine marked as 'occupied' on the cluster and mark it either
         as available or return it to an observation's pool of resources.
