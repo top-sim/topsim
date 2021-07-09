@@ -2,7 +2,7 @@ language: python
 python:
   - "3.7"
 before_script:
-  - git clone https://github.com/myxie/shadow ~/shadow 
+  - git clone -b development https://github.com/myxie/shadow ~/shadow
   - export PYTHONPATH=$PYTHONPATH:~/shadow/
 #  - chmod 0555 /home/travis/build/top-sim/topsim/test/data/output
 
