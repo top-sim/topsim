@@ -24,9 +24,6 @@ from topsim.core.simulation import Simulation
 from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.telescope import Telescope
 
-logging.basicConfig(level="WARNING")
-logger = logging.getLogger(__name__)
-
 CONFIG = "test/simulation_pickles/heft_single_observation_simulation.json"
 
 SIM_TIMESTAMP = f'test/simulation_pickles/{0}'
@@ -99,6 +96,9 @@ class TestMonitorNoFileOption(unittest.TestCase):
 
     # @unittest.skip("testing")
     def test_multi_siulation_data_merge(self):
+        pd.set_option('display.max_rows', None)
+        logging.basicConfig(level="DEBUG")
+        logger = logging.getLogger(__name__)
         global_sim_df = pd.DataFrame()
         global_task_df = pd.DataFrame()
         for algorithm in ['heft', 'fcfs']:
@@ -114,7 +114,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
             )
             simdf, taskdf = simulation.start()
             global_sim_df = global_sim_df.append(simdf)
-            print(simdf.to_string)
+            print(simdf)
             global_task_df = global_task_df.append(taskdf)
         self.assertEqual(252, len(global_sim_df))
 
