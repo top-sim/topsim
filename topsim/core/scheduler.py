@@ -278,7 +278,7 @@ class Scheduler:
                 # We have finished this observation
                 LOGGER.info(f'{observation.name} Removed from Queue @'
                             f'{self.env.now}')
-                self.cluster.release_batch_resources(observation)
+                # self.cluster.release_batch_resources(observation)
                 break
             # If there are no allocations made this timestep
             elif not schedule:
