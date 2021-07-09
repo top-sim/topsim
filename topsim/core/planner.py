@@ -115,7 +115,10 @@ class Planner:
         """
         Given the cluster, select from the available resources to allocate
         and create a dictionary in the format required for shadow.
-        :return: dictionary of machine requirements
+        Returns
+        ----
+        dictionary : dict
+            dictionary of machine requirements
         """
 
         # TODO we have reverted to the entire list of machines; can we
@@ -169,7 +172,10 @@ class WorkflowPlan:
             )
         )
 
-        if algorithm is not 'batch':
+        if algorithm is 'batch':
+            pass
+
+        else:
             self.est = self._calc_workflow_est(observation, buffer)
             self.eft = self.solution.makespan
             self.tasks = []
@@ -200,6 +206,10 @@ class WorkflowPlan:
                 self.tasks.append(taskobj)
             self.tasks.sort(key=lambda x: x.est)
             self.exec_order = self.solution.execution_order
+
+
+    def _generate_static_workflow_plan(self):
+        pass
 
 
 

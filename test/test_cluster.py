@@ -189,11 +189,49 @@ class TestClusterBatchScheduling(unittest.TestCase):
 
     def setUp(self) -> None:
         """
-        TODO
         Batch scheduling setup
+        """
+        self.env = simpy.Environment()
+        config = Config(CONFIG)
+
+        self.cluster = Cluster(env=self.env, config=config)
+        self.telescope = Telescope(
+            self.env, config, planner=None, scheduler=None
+        )
+        self.observation = self.telescope.observations[0]
+
+    def test_provision_resources(self):
+        """
+        Test that resource provisioning occurs and the right number of
+        resources exist in the right place
+
+        Returns
+        -------
 
         """
-        pass
+        provision_size = 5
+        self.cluster.provision_batch_resources(
+            provision_size, self.observation
+        )
+        self.assertEqual(5, len(self.cluster._get_available_resources()))
+        self.assertEqual(
+            5, len(self.cluster._get_idle_resources(self.observation))
+        )
+        self.assertListEqual(
+            self.cluster._get_batch_observations(), [self.observation]
+        )
+
+    def test_batch_removal(self):
+        provision_size = 5
+        self.cluster.provision_batch_resources(
+            provision_size, self.observation
+        )
+        self.cluster.release_batch_resources(self.observation)
+        self.assertListEqual(
+            [], self.cluster._get_idle_resources(self.observation)
+        )
+        self.assertEqual(10, len(self.cluster._get_available_resources()))
+
 
     def tearDown(self) -> None:
         """
