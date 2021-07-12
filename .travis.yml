@@ -2,8 +2,8 @@ language: python
 python:
   - "3.7"
 before_script:
-  - git clone -b development https://github.com/myxie/shadow ~/shadow
-  - export PYTHONPATH=$PYTHONPATH:~/shadow/
+#  - git clone -b development https://github.com/myxie/shadow ~/shadow
+# - export PYTHONPATH=$PYTHONPATH:~/shadow/
 #  - chmod 0555 /home/travis/build/top-sim/topsim/test/data/output
 
 script: coverage run -m unittest discover test
