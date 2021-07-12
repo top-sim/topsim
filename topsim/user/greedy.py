@@ -23,7 +23,12 @@ from topsim.core.task import TaskStatus
 
 LOGGER = logging.getLogger(__name__)
 
+
 class GreedyAlgorithmFromPlan(Algorithm):
+    """
+    Algorithm that Greedily re-allocates a schedule based on run-time
+    resource availability.
+    """
     def __init__(self, threshold=0.8):
         self.threshold = threshold
 
@@ -33,7 +38,7 @@ class GreedyAlgorithmFromPlan(Algorithm):
     def __repr__(self):
         return "GreedyAlgorithmFromPlan"
 
-    def __call__(self, cluster, clock, workflow_plan,existing_schedule):
+    def __call__(self, cluster, clock, workflow_plan, existing_schedule):
         """
 
         """
