@@ -1,5 +1,12 @@
-Additional Software
+Getting Started
 ===================
+
+.. toctree::
+	:maxdepth: 2
+
+	installation
+	configuration
+	additional_materials
 
 TopSim, in addition to the **SimPy** library, makes use of the following Python libraries:
 

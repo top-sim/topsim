@@ -24,7 +24,7 @@ from topsim.core.instrument import Observation
 from topsim.core.delay import DelayModel
 
 from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
-
+from topsim.user.plan.static_planning import SHADOWPlanning
 current_dir = os.path.abspath('')
 
 # Globals
@@ -41,11 +41,13 @@ MACHINE_CONFIG = None
 OBS_WORKFLOW = "test/data/config/workflow_config_minutes.json"
 
 
+
 class TestPlannerConfig(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
         config = Config(CONFIG)
+        planning_model =
         self.cluster = Cluster(env=self.env, config=config)
         self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
 
@@ -172,4 +174,21 @@ class TestPlannerDelay(unittest.TestCase):
         pass
 
     def testIncorrectParameters(self):
+        pass
+
+
+class TestBatchProcessingPlan(unittest.TestCase):
+
+    def setUp(self) -> None:
+        """
+        Create a planner and a `simpy` environment in which to run dummy
+        simulations for the purpose of ensuring the planner works nicely
+        when selecting 'batch' as a static scheduling method.
+        Returns
+        -------
+
+        """
+        pass
+
+    def tearDown(self) -> None:
         pass

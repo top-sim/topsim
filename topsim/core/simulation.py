@@ -26,14 +26,14 @@ class Simulation:
     monitoring, and provides the conditions for checking if the simulation has
     finished.
 
-    Attributes
-
+    Parameters
     ----------
+
     env : simpy.Environment bject
         This is how the TOpSim simulation maintains state across the
         different actors, and interfaces with the simpy processes.
 
-    telescope_config: str
+    telescope_config: `str`
         This is a path to the telescope config that follows the TOpSim config
         specification (JSON). This file will be parsed in the Telescope class
         constructure
@@ -50,7 +50,7 @@ class Simulation:
         algorithms.examples/
 
     scheduling_algorithm: object
-        instance of the core.algorithm interface
+        instance of the ``core.algorithm`` interface
 
     sim_timestamp: str
         Optional Simulation start-time; this is useful for testing, to ensure we
@@ -60,8 +60,29 @@ class Simulation:
     visualisation: bool
         If visualisation is required, True; else, False
 
-    Methods
-    -------
+
+    Notes
+    -----
+    An Index instance can **only** contain hashable objects
+
+    Examples
+    --------
+
+    Standard simulation with data frame output
+
+    >>> env = simpy.environment()
+    >>> config = Config('path/to/config')
+    >>> instrument = CustomInstrument()
+    >>> plan = PlanningModel()
+    >>> sched = SchedulingModel()
+    >>> simulation = Simulation(env, config, instrument,plan,sched)
+
+    If we want delays in the model:
+
+    >>> dm = DelayModel(prob=0.1, dist='normal', DelayDegree.LOW)
+    >>> simulation =  Simulation(
+    >>>    env, config, instrument,plan,sched, delay=dm
+    >>> )
 
 
     Raises
@@ -88,6 +109,8 @@ class Simulation:
             sim_start_time = f'{time.time()}'.split('.')[0]
             self.monitor = Monitor(self, sim_start_time)
         # Process necessary config files
+
+        #: Configuration path
         self.cfgpath = config
         # Initiaise Actor and Resource objects
         cfg = Config(config)
@@ -115,6 +138,7 @@ class Simulation:
 
     def start(self, runtime=-1):
         """
+
         Run the simulation, either for the specified runtime, OR until the
         exit condition is reached:
 
@@ -172,7 +196,8 @@ class Simulation:
         """
         Resume a simulation for a period of time
         Useful for testing purposes, as we do not re-initialise the process
-        calls as we used to in Simulation.start()
+        calls as we used to in :meth:`core.topsim.simulation.Simulation.start`
+
         Parameters
         ----------
         until : int

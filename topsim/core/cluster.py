@@ -9,7 +9,7 @@ class Cluster:
     A class used to represent the Cluster, the abstract representation
     of computing resources in the Science Data Processor
 
-    Attributes
+    Parameters
     ----------
     machines : dict
         a formatted string to print out what the animal says

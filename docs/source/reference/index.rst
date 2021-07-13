@@ -2,7 +2,9 @@
 Reference
 -----------------
 .. toctree::
-	:caption: Reference Items
-	:maxdepth: 1
+	:caption: Class and API Reference
+	:maxdepth: 3
 
+	simulation
+	cluster
 

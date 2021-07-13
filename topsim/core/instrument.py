@@ -89,7 +89,7 @@ class Observation(object):
             Expected incoming data rate produced by the observation (GB/s)
 
         """
-
+        # TODO change to self.id
         self.name = name
         self.buffer_id = 0
         self.cluster_id = 'default'
