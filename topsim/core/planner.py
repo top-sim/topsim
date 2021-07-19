@@ -51,8 +51,8 @@ class Planner:
         self.env = env
         self.cluster = cluster
         # self.envconfig = envconfig
-        self.model = model
         self.algorithm = algorithm
+        self.model = model(algorithm, cluster, delay_model)
         self.delay_model = delay_model
 
     def run(self, observation, buffer):
@@ -68,12 +68,9 @@ class Planner:
         -------
 
         """
+        return self.model.generate_plan(self.env.now, buffer, observation)
 
-        observation.plan = self.model(
-            self.algorithm, observation , buffer
-        ).generate_plan()
-
-        yield self.env.timeout(0)
+        # yield self.env.timeout(0,plan)
 
 
 class WorkflowPlan:

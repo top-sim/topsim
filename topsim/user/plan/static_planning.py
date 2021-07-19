@@ -36,15 +36,15 @@ class SHADOWPlanning(Planning):
     delay_model
     """
 
-    def __init__(self, observation, algorithm, buffer, delay_model=None):
+    def __init__(self, algorithm, cluster, delay_model=None):
 
-        super().__init__(observation, algorithm, buffer)
+        super().__init__(algorithm, cluster, delay_model)
         # self.observation = observation
-        self.algorithm = algorithm
+        # self.algorithm = algorithm
         # self.buffer = buffer
-        self.delay_model = delay_model
+        # self.delay_model = delay_model
 
-    def generate_plan(self, clock):
+    def generate_plan(self, clock, buffer, observation):
         """
         For this StaticPlanning example, we are using the SHADOW static
         scheduling library to produce static plans. There are a couple of
@@ -58,31 +58,36 @@ class SHADOWPlanning(Planning):
         -------
 
         """
-        if self.observation.ast is None:
+        if observation.ast is None:
             raise RuntimeError(
                 f'Observation AST must be updated before plan'
             )
-        solution = self._run_scheduling()
+        workflow = self._initialise_shadow_workflows(observation)
+        solution = self._run_scheduling(workflow)
 
-        est = self._calc_workflow_est()
+        est = self._calc_workflow_est(observation, buffer)
         eft = solution.makespan
         tasks = []
 
         for task in solution.task_allocations:
             allocation = solution.task_allocations.get(task)
-            tid = self._create_observation_task_id(task.tid)
+            tid = self._create_observation_task_id(task.tid, observation, clock)
             dm = copy.copy(self.delay_model)
+            pred = list(workflow.graph.predecessors(task))
             predecessors = [
-                self._create_observation_task_id(x.tid) for x in list(
-                    solution.workflow.graph.predecessors(task)
-                )
+                self._create_observation_task_id(
+                    x.tid, observation, clock
+                ) for x in pred
             ]
             edge_costs = {}
-            data = dict(solution.workflow.graph.pred[task])
+            data = dict(workflow.graph.pred[task])
             for element in data:
-                nm = self._create_observation_task_id(element.tid, clock)
+                nm = self._create_observation_task_id(
+                    element.tid, observation, clock
+                )
                 val = data[element]['data_size']
-                edge_costs[nm]=val
+                edge_costs[nm] = val
+
             taskobj = Task(
                 tid,
                 allocation.ast,
@@ -101,9 +106,33 @@ class SHADOWPlanning(Planning):
         )
 
     def to_df(self):
+        """
+        Produce output to be amalgamated into the global simulation data
+        frame produced by the Monitor
+        """
         pass
 
-    def _run_scheduling(self):
+    def _initialise_shadow_workflows(self, observation):
+        """
+        Use the SHADOW library workflow model to build the graph
+
+        Parameters
+        ----------
+        observation
+
+        Returns
+        -------
+        workflow : shadow.models.workflow.Worflow
+            A wrapper for NetworkX DiGraph object with additional information
+
+        """
+        workflow = Workflow(observation.workflow)
+        available_resources = self._cluster_to_shadow_format()
+        workflow_env = Environment(available_resources, dictionary=True)
+        workflow.add_environment(workflow_env)
+        return workflow
+
+    def _run_scheduling(self, workflow):
         """
         Produce static schedules based on the algorithm specified at
         object creation.
@@ -114,10 +143,6 @@ class SHADOWPlanning(Planning):
             A solution object which describes a static schedule with
             additional information.
         """
-        workflow = Workflow(self.observation.workflow)
-        available_resources = self._cluster_to_shadow_format()
-        workflow_env = Environment(available_resources, dictionary=True)
-        workflow.add_environment(workflow_env)
 
         if self.algorithm is 'heft':
             solution = heft(workflow)
@@ -131,7 +156,7 @@ class SHADOWPlanning(Planning):
             )
         LOGGER.debug(
             "Solution makespan for {0} is {1}".format(
-                self.algorithm, self.solution.makespan
+                self.algorithm, solution.makespan
             )
         )
         return solution

@@ -33,7 +33,7 @@ extensions = [
     'sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'sphinx.ext.autosummary'
 ]
 
-# Add any paths that contain templates here, relative to this directory.
+# Add any paths that contain templates here, relative to this sdirectory.
 templates_path = ['_templates']
 
 # List of patterns, relative to source directory, that match files and
@@ -44,7 +44,7 @@ exclude_patterns = []
 autodoc_member_order = 'bysource'
 autosummary_generate = True
 
-# -- Options for HTML output -------------------------------------------------
+# -- Options for HTML output ---------------------q----------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.

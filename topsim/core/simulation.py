@@ -79,7 +79,7 @@ class Simulation:
 
     If we want delays in the model:
 
-    >>> dm = DelayModel(prob=0.1, dist='normal', DelayDegree.LOW)
+    >>> dm = DelayModel(prob=0.1, dist='normal', dm=DelayModel.DelayDegree.LOW)
     >>> simulation =  Simulation(
     >>>    env, config, instrument,plan,sched, delay=dm
     >>> )
@@ -174,7 +174,6 @@ class Simulation:
         self.scheduler.start()
         self.env.process(self.scheduler.run())
         self.env.process(self.buffer.run())
-
 
         if runtime > 0:
             self.env.run(until=runtime)

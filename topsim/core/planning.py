@@ -33,43 +33,45 @@ class Planning(ABC):
     algorithm : str
          Name of the algorithm used in the model; some models allow for
          multiple algorithms in addition to the model
-    buffer : topsim.core.buffer.Buffer
-        The simulation buffer object; used for start-time estimation of
-        observation
+    buffer : topsim.core.buffer.Cluster
+        The simulation Cluster object - used to retrieve current cluster
+        information to inform the static schedule.
 
     Attributes
     ----------
 
     """
 
-    def __init__(self, observation, algorithm, buffer, delay_model=None):
-        self.observation = observation
+    def __init__(self, algorithm, cluster, delay_model=None):
+        # self.observation = observation
         self.algorithm = algorithm
-        self.buffer = buffer
+        self.cluster = cluster
         self.delay_model = delay_model
 
     @abstractmethod
-    def generate_plan(self, clock):
+    def generate_plan(self, clock, buffer, observation):
         """
         Build a WorkflowPlan object storing
         Returns
         -------
-
+        plan : core.topsim.planner.WorkflowPlan
+            WorkflowPlan object
         """
-        plan = None
-        return plan
-
+        pass
 
     @abstractmethod
     def to_df(self):
         """
+        Generate output to be amalgamated into the global simulation data
+        frame produced by the Monitor
 
         Returns
         -------
         df : pandas.DataFrame
         """
+        pass
 
-    def _calc_workflow_est(self):
+    def _calc_workflow_est(self,observation, buffer):
         """
         Calculate the estimated start time of the workflow based on data
         transfer delays post-observation
@@ -80,11 +82,11 @@ class Planning(ABC):
         -------
 
         """
-        storage = self.buffer.buffer_storage_summary()
-        size = self.observation.duration * self.observation.ingest_data_rate
+        storage = buffer.buffer_storage_summary()
+        size = observation.duration * observation.ingest_data_rate
         hot_to_cold_time = int(size/storage['coldbuffer']['data_rate'])
-        est = self.observation.duration + hot_to_cold_time
+        est = observation.duration + hot_to_cold_time
         return est
 
-    def _create_observation_task_id(self, tid, clock):
-        return self.observation.name + '_' + str(clock) + '_' + str(tid)
+    def _create_observation_task_id(self, tid, observation, clock):
+        return observation.name + '_' + str(clock) + '_' + str(tid)

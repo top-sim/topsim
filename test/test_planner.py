@@ -25,6 +25,7 @@ from topsim.core.delay import DelayModel
 
 from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.plan.static_planning import SHADOWPlanning
+
 current_dir = os.path.abspath('')
 
 # Globals
@@ -41,19 +42,23 @@ MACHINE_CONFIG = None
 OBS_WORKFLOW = "test/data/config/workflow_config_minutes.json"
 
 
-
 class TestPlannerConfig(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
         config = Config(CONFIG)
-        planning_model =
+        self.model = SHADOWPlanning
         self.cluster = Cluster(env=self.env, config=config)
         self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
 
     def testPlannerBasicConfig(self):
-        planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
-        available_resources = planner.cluster_to_shadow_format()
+        planner = Planner(
+            env=self.env,
+            algorithm=PLAN_ALGORITHM,
+            cluster=self.cluster,
+            model=self.model
+        )
+        available_resources = planner.model._cluster_to_shadow_format()
         # Bandwidth set at 1gb/s = 60gb/min.
         self.assertEqual(60.0, available_resources['system']['bandwidth'])
         machine = available_resources['system']['resources']['cat0_m0']
@@ -67,10 +72,13 @@ class TestWorkflowPlan(unittest.TestCase):
     def setUp(self):
         self.env = simpy.Environment()
         config = Config(CONFIG)
+        self.model = SHADOWPlanning
         self.cluster = Cluster(self.env, config=config)
         self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
 
-        self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
+        self.planner = Planner(
+            self.env, PLAN_ALGORITHM, self.cluster, self.model,
+        )
         self.observation = Observation(
             'planner_observation',
             OBS_START_TME,
@@ -104,18 +112,18 @@ class TestWorkflowPlan(unittest.TestCase):
         """
 
         time = self.env.now
-        self.assertRaises(
-            RuntimeError,
-            next, self.planner.run(self.observation, self.buffer)
-        )
+        # self.assertRaises(
+        #     RuntimeError,
+        #     next, self.planner.run(self.observation, self.buffer)
+        # )
         self.observation.ast = self.env.now
-
-        plan = self.planner.plan(
-            self.observation,
-            self.observation.workflow,
-            'heft',
-            self.buffer
-        )
+        plan = self.planner.run(self.observation, self.buffer)
+        # plan = self.planner.plan(
+        #     self.observation,
+        #     self.observation.workflow,
+        #     'heft',
+        #     self.buffer
+        # )
 
         expected_exec_order = [0, 5, 3, 4, 2, 1, 6, 8, 7, 9]
         self.assertEqual(len(plan.tasks), len(expected_exec_order))
@@ -138,9 +146,11 @@ class TestPlannerDelay(unittest.TestCase):
         sched_algorithm = DynamicAlgorithmFromPlan()
         config = Config(HEFT_CONFIG)
         dm = DelayModel(0.1, "normal")
+        self.model = SHADOWPlanning
         self.cluster = Cluster(self.env, config=config)
         self.buffer = Buffer(self.env, self.cluster, config)
-        self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster, dm)
+        self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster,
+                               self.model, dm)
         self.observation = Observation(
             'planner_observation',
             OBS_START_TME,
@@ -160,13 +170,13 @@ class TestPlannerDelay(unittest.TestCase):
         and thus run the rest of the code in run()  next(val)
         """
 
-        self.assertRaises(
-            RuntimeError,
-            next,
-            self.planner.run(self.observation, self.buffer)
-        )
+        # self.assertRaises(
+        #     RuntimeError,
+        #     next,
+        #     self.planner.run(self.observation, self.buffer)
+        # )
         self.observation.ast = self.env.now
-        next(self.planner.run(self.observation, self.buffer))
+        self.observation.plan = self.planner.run(self.observation, self.buffer)
         self.assertTrue(self.observation.plan is not None)
         self.assertTrue(0.1, self.observation.plan.tasks[0].delay.prob)
 

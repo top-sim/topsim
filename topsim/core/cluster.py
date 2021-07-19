@@ -39,6 +39,7 @@ class Cluster:
     def __init__(self, env, config):
 
         self.machines, self.system_bandwidth = config.parse_cluster_config()
+        # TODO dmachine is a hack, we should improve this
         self.dmachine = {machine.id: machine for machine in self.machines}
         self.cl = ['default']
 
@@ -98,11 +99,11 @@ class Cluster:
                 if not self.clusters[c]['ingest']['status']:
                     self.clusters[c]['usage_data']['ingest'] = 0
                     self.clusters[c]['ingest']['demand'] = 0
-                if self.clusters[c]['tasks']['waiting']:
-                    for task in self.clusters[c]['tasks']['waiting']:
-                        if task.task_status is TaskStatus.FINISHED:
-                            self.clusters[c]['tasks']['waiting'].remove(task)
-                            self.clusters[c]['tasks']['finished'].append(task)
+                # if self.clusters[c]['tasks']['waiting']:
+                #     for task in self.clusters[c]['tasks']['waiting']:
+                #         if task.task_status is TaskStatus.FINISHED:
+                #             self.clusters[c]['tasks']['waiting'].remove(task)
+                #             self.clusters[c]['tasks']['finished'].append(task)
             yield self.env.timeout(1)
 
     def check_ingest_capacity(self, pipeline_demand, max_ingest_resources,
