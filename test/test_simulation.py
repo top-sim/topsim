@@ -6,6 +6,7 @@ import os
 from topsim.core.config import Config
 from topsim.core.simulation import Simulation
 from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.plan.static_planning import SHADOWPlanning
 from topsim.user.telescope import Telescope
 logging.basicConfig(level='WARNING')
 logger = logging.getLogger(__name__)
@@ -30,7 +31,8 @@ class TestSimulationConfig(unittest.TestCase):
             self.env,
             CONFIG,
             self.instrument,
-            planning='heft',
+            planning_model=SHADOWPlanning,
+            planning_algorithm='heft',
             scheduling=DynamicAlgorithmFromPlan,
             timestamp=self.timestamp
         )

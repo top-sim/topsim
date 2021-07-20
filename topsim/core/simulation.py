@@ -91,10 +91,11 @@ class Simulation:
 
     def __init__(
             self,
-            env,
+            env, 
             config,
             instrument,
-            planning,
+            planning_model,
+            planning_algorithm,
             scheduling,
             delay=None,
             timestamp=None,

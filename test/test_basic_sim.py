@@ -25,12 +25,14 @@ from topsim.core.instrument import RunStatus
 
 from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.telescope import Telescope
+from topsim.user.plan.static_planning import SHADOWPlanning
 
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
 SIM_TIMESTAMP = f'test/basic-workflow-data/{0}'
 BASIC_CONFIG = 'test/basic-workflow-data/basic_simulation.json'
+planning_model = SHADOWPlanning
 
 cwd = os.getcwd()
 
@@ -42,7 +44,8 @@ class TestBasicIngest(unittest.TestCase):
             self.env,
             BASIC_CONFIG,
             Telescope,
-            planning='heft',
+            planning_algorithm='heft',
+            planning_model=SHADOWPlanning,
             scheduling=DynamicAlgorithmFromPlan,
             delay=None,
             timestamp=SIM_TIMESTAMP
