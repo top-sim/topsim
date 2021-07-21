@@ -197,9 +197,10 @@ class Scheduler:
         ------
         """
         observation.ast = self.env.now
-        self.env.process(
-            planner.run(observation, self.buffer)
-        )
+        # self.env.process(
+        observation.plan = planner.run(observation, self.buffer)
+        # )
+
         pipeline_demand = pipelines[observation.name]['ingest_demand']
         self.ingest_observation = observation
         # We do an off-by-one check here, because the first time we run the

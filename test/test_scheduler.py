@@ -44,6 +44,7 @@ from topsim.core.task import Task
 from topsim.user.telescope import Telescope
 from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.greedy import GreedyAlgorithmFromPlan
+from topsim.user.plan.static_planning import SHADOWPlanning
 
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
@@ -75,9 +76,10 @@ class TestSchedulerIngest(unittest.TestCase):
             self.env, self.buffer, self.cluster, DynamicAlgorithmFromPlan
         )
         self.planner = Planner(self.env, PLANNING_ALGORITHM,
-                               self.cluster)
-        planner = None
-        self.telescope = Telescope(self.env, config, planner, self.scheduler)
+                               self.cluster, SHADOWPlanning)
+        # planner = None
+        self.telescope = Telescope(self.env, config, self.planner,
+                                   self.scheduler)
 
     def testSchdulerCheckIngestReady(self):
         """
@@ -143,6 +145,7 @@ class TestSchedulerIngest(unittest.TestCase):
         self.assertEqual(500, self.buffer.hot[0].current_capacity)
         self.assertEqual(210, self.buffer.cold[0].current_capacity)
 
+
 class TestSchedulerAllocations(unittest.TestCase):
     def setUp(self) -> None:
         pass
@@ -156,7 +159,7 @@ class TestSchedulerDynamicPlanAllocation(unittest.TestCase):
         config = Config(HEFT_CONFIG)
         self.cluster = Cluster(self.env, config)
         self.planner = Planner(self.env, PLANNING_ALGORITHM,
-                               self.cluster)
+                               self.cluster, SHADOWPlanning)
         self.buffer = Buffer(self.env, self.cluster, config)
         self.scheduler = Scheduler(self.env, self.buffer,
                                    self.cluster, sched_algorithm)
@@ -207,7 +210,7 @@ class TestSchedulerDynamicPlanAllocation(unittest.TestCase):
         ]
         self.scheduler.observation_queue.append(curr_obs)
         curr_obs.ast = self.env.now
-        self.env.process(self.planner.run(curr_obs, self.buffer))
+        curr_obs.plan = self.planner.run(curr_obs, self.buffer)
         self.env.process(self.scheduler.allocate_tasks(curr_obs))
         self.env.run(1)
         self.assertListEqual(
@@ -281,7 +284,7 @@ class TestSchedulerLongWorkflow(unittest.TestCase):
         config = Config(LONG_CONFIG)
         self.cluster = Cluster(self.env, config)
         self.planner = Planner(self.env, PLANNING_ALGORITHM,
-                               self.cluster)
+                               self.cluster, SHADOWPlanning)
         self.buffer = Buffer(self.env, self.cluster, config)
         self.scheduler = Scheduler(self.env, self.buffer,
                                    self.cluster, sched_algorithm)
@@ -293,7 +296,7 @@ class TestSchedulerLongWorkflow(unittest.TestCase):
         curr_obs = self.telescope.observations[0]
         self.scheduler.observation_queue.append(curr_obs)
         curr_obs.ast = self.env.now
-        self.env.process(self.planner.run(curr_obs, self.buffer))
+        curr_obs.plan = self.planner.run(curr_obs, self.buffer)
         self.env.process(self.scheduler.allocate_tasks(curr_obs))
         self.env.run(1)
         self.buffer.cold[0].observations['stored'].append(curr_obs)
@@ -309,7 +312,7 @@ class TestSchedulerDynamicReAllocation(unittest.TestCase):
         config = Config(LONG_CONFIG)
         self.cluster = Cluster(self.env, config)
         self.planner = Planner(self.env, PLANNING_ALGORITHM,
-                               self.cluster)
+                               self.cluster, SHADOWPlanning)
         self.buffer = Buffer(self.env, self.cluster, config)
         self.scheduler = Scheduler(self.env, self.buffer,
                                    self.cluster, sched_algorithm)
@@ -321,7 +324,7 @@ class TestSchedulerDynamicReAllocation(unittest.TestCase):
         curr_obs = self.telescope.observations[0]
         self.scheduler.observation_queue.append(curr_obs)
         curr_obs.ast = self.env.now
-        self.env.process(self.planner.run(curr_obs, self.buffer))
+        curr_obs.plan = self.planner.run(curr_obs, self.buffer)
         self.env.process(self.scheduler.allocate_tasks(curr_obs))
         self.env.run(1)
         self.buffer.cold[0].observations['stored'].append(curr_obs)
@@ -337,7 +340,7 @@ class TestSchedulerIntegration(unittest.TestCase):
         self.cluster = Cluster(self.env, config)
         self.buffer = Buffer(self.env, self.cluster, config)
         self.planner = Planner(self.env, PLANNING_ALGORITHM,
-                               self.cluster)
+                               self.cluster, SHADOWPlanning)
 
         self.scheduler = Scheduler(
             self.env, self.buffer, self.cluster, DynamicAlgorithmFromPlan()
@@ -395,7 +398,7 @@ class TestSchedulerDelayHelpers(unittest.TestCase):
         self.buffer = Buffer(self.env, self.cluster, config)
         self.planner = Planner(
             self.env, PLANNING_ALGORITHM,
-            self.cluster, delay_model=DelayModel(0.3, "normal")
+            self.cluster, SHADOWPlanning, delay_model=DelayModel(0.3, "normal")
         )
 
         self.scheduler = Scheduler(

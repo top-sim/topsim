@@ -83,9 +83,8 @@ class WorkflowPlan:
     """
 
     def __init__(self,
-                 est, eft, tasks, exec_order,status):
-
-
+                 id, est, eft, tasks, exec_order,status):
+        self.id = id
         self.est = est
         self.eft = eft
         self.tasks = tasks

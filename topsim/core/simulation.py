@@ -91,7 +91,7 @@ class Simulation:
 
     def __init__(
             self,
-            env, 
+            env,
             config,
             instrument,
             planning_model,
@@ -117,11 +117,14 @@ class Simulation:
         cfg = Config(config)
         self.cluster = Cluster(env, cfg)
         self.buffer = Buffer(env, self.cluster, cfg)
-        planning_algorithm = planning
+        planning_algorithm = planning_algorithm
+        planning_model = planning_model
 
         if not delay:
             delay = DelayModel(0.0, "normal", DelayModel.DelayDegree.NONE)
-        self.planner = Planner(env, planning_algorithm, self.cluster, delay)
+        self.planner = Planner(
+            env, planning_algorithm, self.cluster, planning_model, delay
+        )
         scheduling_algorithm = scheduling()
         self.scheduler = Scheduler(
             env, self.buffer, self.cluster, scheduling_algorithm
@@ -245,4 +248,3 @@ class Simulation:
         ]
         df['config'] = [self.cfgpath for x in range(size)]
         return df
-

@@ -102,7 +102,8 @@ class SHADOWPlanning(Planning):
         exec_order = solution.execution_order
 
         return WorkflowPlan(
-            est, eft, tasks, exec_order, WorkflowStatus.SCHEDULED
+            observation.name, est, eft, tasks, exec_order,
+            WorkflowStatus.SCHEDULED
         )
 
     def to_df(self):

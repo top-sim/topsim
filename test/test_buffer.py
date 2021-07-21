@@ -25,6 +25,7 @@ from topsim.core.instrument import Observation, RunStatus
 from topsim.core.buffer import Buffer
 from topsim.core.cluster import Cluster
 
+from topsim.user.plan.static_planning import SHADOWPlanning
 # Globals
 OBS_START_TME = 0
 OBS_DURATION = 10
@@ -219,7 +220,7 @@ class TestBufferRequests(unittest.TestCase):
         self.buffer = Buffer(
             env=self.env, cluster=self.cluster, config=self.config
         )
-        self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
+        self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster, SHADOWPlanning)
         self.observation = Observation(
             'scheduler_observation',
             OBS_START_TME,
@@ -362,7 +363,7 @@ class TestBufferRequests(unittest.TestCase):
         # calling next() runs the iterator immediately after generator is
         # called
         self.observation.ast = 0
-        next(self.planner.run(self.observation, self.buffer))
+        self.observation.plan = self.planner.run(self.observation, self.buffer)
         self.assertTrue(self.observation.plan is not None)
         # Buffer observation queue should be empty
 #
