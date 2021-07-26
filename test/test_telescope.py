@@ -64,7 +64,7 @@ class TestTelescopeIngest(unittest.TestCase):
             env=self.env, buffer=self.buffer, cluster=self.cluster,
             algorithm=None
         )
-        self.planner = Planner(self.env, 'heft', self.cluster, SHADOWPlanning)
+        self.planner = Planner(self.env, 'heft', self.cluster, SHADOWPlanning('heft'))
 
     def testIngest(self):
         telescope = Telescope(

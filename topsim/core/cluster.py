@@ -362,7 +362,7 @@ class Cluster:
         Returns
         -------
         """
-        available_resources = self._get_available_resources()
+        available_resources = self.get_available_resources()
 
         tmp = len(available_resources)
         if size > tmp > 0:
@@ -407,7 +407,7 @@ class Cluster:
     def _remove_available_resource(self, machine, c='default'):
         pass
 
-    def _get_available_resources(self, c='default'):
+    def get_available_resources(self, c='default'):
         return self.clusters[c]['resources']['available']
 
     def _get_idle_resources(self, observation, c='default'):
@@ -425,7 +425,7 @@ class Cluster:
         -------
 
         """
-        if machine in self._get_available_resources():
+        if machine in self.get_available_resources():
             self.clusters[c]['resources']['available'].remove(machine)
             self.clusters[c]['resources']['occupied'].append(machine)
             return True
@@ -481,7 +481,7 @@ class Cluster:
         """
         if observation not in self.clusters[c]['resources']['idle']:
             self.clusters[c]['resources']['idle'][observation] = []
-        if machine in self._get_available_resources():
+        if machine in self.get_available_resources():
             self.clusters[c]['resources']['idle'][observation].append(machine)
             self._remove_available_resource(machine)
         else:

@@ -213,7 +213,7 @@ class TestClusterBatchScheduling(unittest.TestCase):
         self.cluster.provision_batch_resources(
             provision_size, self.observation
         )
-        self.assertEqual(5, len(self.cluster._get_available_resources()))
+        self.assertEqual(5, len(self.cluster.get_available_resources()))
         self.assertEqual(
             5, len(self.cluster._get_idle_resources(self.observation))
         )
@@ -230,7 +230,7 @@ class TestClusterBatchScheduling(unittest.TestCase):
         self.assertListEqual(
             [], self.cluster._get_idle_resources(self.observation)
         )
-        self.assertEqual(10, len(self.cluster._get_available_resources()))
+        self.assertEqual(10, len(self.cluster.get_available_resources()))
 
 
     def tearDown(self) -> None:

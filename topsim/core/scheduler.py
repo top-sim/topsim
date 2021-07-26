@@ -198,16 +198,16 @@ class Scheduler:
         """
         observation.ast = self.env.now
         # self.env.process(
-        observation.plan = planner.run(observation, self.buffer)
+        # observation.plan = planner.run(observation, self.buffer)
         # )
 
         pipeline_demand = pipelines[observation.name]['ingest_demand']
-        self.ingest_observation = observation
+        ingest_observation = observation
         # We do an off-by-one check here, because the first time we run the
         # loop we will be one timestep ahead.
         time_left = observation.duration - 1
-        while self.ingest_observation.status is not RunStatus.FINISHED:
-            if self.ingest_observation.status is RunStatus.WAITING:
+        while ingest_observation.status is not RunStatus.FINISHED:
+            if ingest_observation.status is RunStatus.WAITING:
                 cluster_ingest = self.env.process(
                     self.cluster.provision_ingest_resources(
                         pipeline_demand,
@@ -219,9 +219,9 @@ class Scheduler:
                         observation,
                     )
                 )
-                self.ingest_observation.status = RunStatus.RUNNING
+                ingest_observation.status = RunStatus.RUNNING
 
-            elif self.ingest_observation.status is RunStatus.RUNNING:
+            elif ingest_observation.status is RunStatus.RUNNING:
                 if time_left > 0:
                     time_left -= 1
                 else:
@@ -231,6 +231,12 @@ class Scheduler:
         if RunStatus.FINISHED:
             self.provision_ingest -= pipeline_demand
             self.cluster.clean_up_ingest()
+            # TODO Fix this implicit object change, as whilst this is the
+            #  same as the object in the buffer, it is from the buffer we
+            #  get the observation. It is probably worth storing plans
+            #  separately and then 'giving' them to the observation once it
+            #  arrives at the scheduler.
+            observation.plan = planner.run(observation, self.buffer)
 
     def print_state(self):
         # Change this to 'workflows scheduled/workflows unscheduled'

@@ -52,7 +52,7 @@ class Planner:
         self.cluster = cluster
         # self.envconfig = envconfig
         self.algorithm = algorithm
-        self.model = model(algorithm, cluster, delay_model)
+        self.model = model  # algorithm, cluster, delay_model)
         self.delay_model = delay_model
 
     def run(self, observation, buffer):
@@ -68,7 +68,8 @@ class Planner:
         -------
 
         """
-        return self.model.generate_plan(self.env.now, buffer, observation)
+        return self.model.generate_plan(self.env.now, self.cluster, buffer,
+                                        observation)
 
         # yield self.env.timeout(0,plan)
 

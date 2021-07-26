@@ -42,14 +42,13 @@ class Planning(ABC):
 
     """
 
-    def __init__(self, algorithm, cluster, delay_model=None):
+    def __init__(self, algorithm, delay_model=None):
         # self.observation = observation
         self.algorithm = algorithm
-        self.cluster = cluster
         self.delay_model = delay_model
 
     @abstractmethod
-    def generate_plan(self, clock, buffer, observation):
+    def generate_plan(self, clock, cluser, buffer, observation):
         """
         Build a WorkflowPlan object storing
         Returns

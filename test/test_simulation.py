@@ -31,7 +31,7 @@ class TestSimulationConfig(unittest.TestCase):
             self.env,
             CONFIG,
             self.instrument,
-            planning_model=SHADOWPlanning,
+            planning_model=SHADOWPlanning('heft'),
             planning_algorithm='heft',
             scheduling=DynamicAlgorithmFromPlan,
             timestamp=self.timestamp
@@ -55,7 +55,7 @@ class TestSimulationFileOptions(unittest.TestCase):
             self.env,
             CONFIG,
             Telescope,
-            planning_model= SHADOWPlanning,
+            planning_model= SHADOWPlanning('heft'),
             planning_algorithm='heft',
             scheduling=DynamicAlgorithmFromPlan,
             delay=None,

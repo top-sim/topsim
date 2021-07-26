@@ -50,7 +50,7 @@ class TestMonitorPandasPickle(unittest.TestCase):
             config=CONFIG,
             instrument=instrument,
             planning_algorithm='heft',
-            planning_model=SHADOWPlanning,
+            planning_model=SHADOWPlanning('heft'),
             scheduling=DynamicAlgorithmFromPlan,
             delay=None,
             timestamp=SIM_TIMESTAMP,
@@ -89,7 +89,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
             CONFIG,
             self.instrument,
             planning_algorithm='heft',
-            planning_model=SHADOWPlanning,
+            planning_model=SHADOWPlanning('heft'),
             scheduling=DynamicAlgorithmFromPlan,
             delay=None,
             timestamp=self.ts,
@@ -99,9 +99,6 @@ class TestMonitorNoFileOption(unittest.TestCase):
 
     # @unittest.skip("testing")
     def test_multi_siulation_data_merge(self):
-        pd.set_option('display.max_rows', None)
-        logging.basicConfig(level="DEBUG")
-        logger = logging.getLogger(__name__)
         global_sim_df = pd.DataFrame()
         global_task_df = pd.DataFrame()
         for algorithm in ['heft', 'fcfs']:
@@ -111,7 +108,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
                 CONFIG,
                 self.instrument,
                 planning_algorithm=algorithm,
-                planning_model=SHADOWPlanning,
+                planning_model=SHADOWPlanning(algorithm),
                 scheduling=DynamicAlgorithmFromPlan,
                 delay=None,
                 timestamp=self.ts,

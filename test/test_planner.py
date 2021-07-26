@@ -22,9 +22,10 @@ from topsim.core.cluster import Cluster
 from topsim.core.buffer import Buffer
 from topsim.core.instrument import Observation
 from topsim.core.delay import DelayModel
-
+from topsim.user.telescope import Telescope
 from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.plan.static_planning import SHADOWPlanning
+from topsim.user.plan.batch_planning import BatchPlanning
 
 current_dir = os.path.abspath('')
 
@@ -47,7 +48,7 @@ class TestPlannerConfig(unittest.TestCase):
     def setUp(self):
         self.env = simpy.Environment()
         config = Config(CONFIG)
-        self.model = SHADOWPlanning
+        self.model = SHADOWPlanning('heft')
         self.cluster = Cluster(env=self.env, config=config)
         self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
 
@@ -58,7 +59,8 @@ class TestPlannerConfig(unittest.TestCase):
             cluster=self.cluster,
             model=self.model
         )
-        available_resources = planner.model._cluster_to_shadow_format()
+        available_resources = planner.model._cluster_to_shadow_format(
+            self.cluster)
         # Bandwidth set at 1gb/s = 60gb/min.
         self.assertEqual(60.0, available_resources['system']['bandwidth'])
         machine = available_resources['system']['resources']['cat0_m0']
@@ -72,7 +74,7 @@ class TestWorkflowPlan(unittest.TestCase):
     def setUp(self):
         self.env = simpy.Environment()
         config = Config(CONFIG)
-        self.model = SHADOWPlanning
+        self.model = SHADOWPlanning('heft')
         self.cluster = Cluster(self.env, config=config)
         self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
 
@@ -146,11 +148,11 @@ class TestPlannerDelay(unittest.TestCase):
         sched_algorithm = DynamicAlgorithmFromPlan()
         config = Config(HEFT_CONFIG)
         dm = DelayModel(0.1, "normal")
-        self.model = SHADOWPlanning
+        self.model = SHADOWPlanning('heft', dm)
         self.cluster = Cluster(self.env, config=config)
         self.buffer = Buffer(self.env, self.cluster, config)
         self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster,
-                               self.model, dm)
+                               self.model, delay_model=dm)
         self.observation = Observation(
             'planner_observation',
             OBS_START_TME,
@@ -198,7 +200,45 @@ class TestBatchProcessingPlan(unittest.TestCase):
         -------
 
         """
+        self.env = simpy.Environment()
+        config = Config(CONFIG)
+        self.model = BatchPlanning('batch', max_resource_split=2)
+        self.cluster = Cluster(self.env, config=config)
+        self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
+        self.planner = Planner(
+            self.env, PLAN_ALGORITHM, self.cluster, self.model,
+        )
+        self.telescope = Telescope(
+            self.env, config, planner=None, scheduler=None
+        )
+
+    def test_generate_topological_sort(self):
         pass
+
+    def test_resource_provision(self):
+        """
+        Given a max_resource_split of 2, and total machines of 10, we should
+        provision a maximum of 5 machines within the cluster (
+        max_resource_split being the number of parallel provisionings we can
+        make).
+
+        Returns
+        -------
+
+        """
+        self.planner.run(self.telescope.observations[0], self.buffer)
+        self.assertEqual(5, len(self.cluster.get_available_resources()))
+
+    def test_max_resource_provision(self):
+        obs = self.telescope.observations[0]
+        self.env.process(
+            self.cluster.provision_ingest_resources(7, obs))
+        self.env.run(until=1)
+        self.assertEqual(3, len(self.cluster.get_available_resources()))
+        self.assertEqual(3,self.planner.model._max_resource_provision(
+            self.cluster))
+        self.planner.run(obs,self.buffer)
+        self.assertEqual(3, len(self.cluster._get_idle_resources(obs)))
 
     def tearDown(self) -> None:
         pass
