@@ -38,7 +38,7 @@ class GreedyAlgorithmFromPlan(Algorithm):
     def __repr__(self):
         return "GreedyAlgorithmFromPlan"
 
-    def __call__(self, cluster, clock, workflow_plan, existing_schedule):
+    def run(self, cluster, clock, workflow_plan, existing_schedule):
         """
 
         """

@@ -11,8 +11,12 @@ class Algorithm(ABC):
     Abstract base class for all Scheduling Algorithms (used in the dynamic
     allocation by the 'scheduler').
     """
+
+    def __init__(self):
+        self.name = "AbstractAlgorithm"
+
     @abstractmethod
-    def __call__(self, cluster, clock, plan, schedule):
+    def run(self, cluster, clock, plan, schedule):
         pass
 
     @abstractmethod

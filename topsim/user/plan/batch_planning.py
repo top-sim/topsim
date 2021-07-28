@@ -14,10 +14,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import json
+import copy
 import networkx as nx
 
+from topsim.core.task import Task
 from topsim.core.planning import Planning
-
+from topsim.core.planner import WorkflowStatus, WorkflowPlan
 
 class BatchPlanning(Planning):
     """
@@ -27,9 +29,8 @@ class BatchPlanning(Planning):
 
     """
 
-    def __init__(self, algorithm, delay_model=None, max_resource_split=2):
+    def __init__(self, algorithm, delay_model=None):
         super().__init__(algorithm, delay_model)
-        self.max_resources_split = max_resource_split
 
     def __str__(self):
         return
@@ -39,17 +40,49 @@ class BatchPlanning(Planning):
 
         Parameters
         ----------
+        cluster
         clock
         buffer
         observation
         """
         plan = None
         if self.algorithm is 'batch':
-            workflow = self._workflow_to_nx(observation.workflow)
-            provision = self._max_resource_provision(cluster)
-            cluster.provision_batch_resources(
-                provision, observation
+            graph = self._workflow_to_nx(observation.workflow)
+            est = self._calc_workflow_est(observation, buffer)
+
+            tasks = []
+
+            for task in nx.algorithms.topological_sort(graph):
+                tid = self._create_observation_task_id(
+                    task, observation, clock
+                )
+                dm = copy.copy(self.delay_model)
+                pred = list(graph.predecessors(task))
+                predecessors = [
+                    self._create_observation_task_id(
+                        x, observation, clock
+                    ) for x in pred
+                ]
+                edge_costs = {}
+                # Get the data transfer costs
+                data = dict(graph.pred[task])
+                for element in data:
+                    nm = self._create_observation_task_id(
+                        element, observation, clock
+                    )
+                    val = data[element]['data_size']
+                    edge_costs[nm] = val
+                taskobj = Task(
+                    task, 0, 0, None, predecessors, graph.node[task]['comp'], 0,
+                    edge_costs, dm
+                )
+                tasks.append(taskobj)
+            # exec_order = list(nx.algorithms.topological_sort(graph))
+            return WorkflowPlan(
+                observation.name, est, -1, tasks, tasks,
+                WorkflowStatus.SCHEDULED
             )
+
 
         else:
             raise RuntimeError(
@@ -73,35 +106,6 @@ class BatchPlanning(Planning):
             config = json.load(infile)
         graph = nx.readwrite.node_link_graph(config['graph'])
         return graph
-
-    def _max_resource_provision(self, cluster):
-        """
-
-        Calculate the appropriate number of resources to provision accordingly
-
-        Parameters
-        ----------
-        n_resources : int
-            The total number of resources available to the graph
-
-        Notes
-        -----
-
-        Returns
-        -------
-        prov_resources : int
-            Number of resources to provision based on our provisioning heuristic
-        """
-        available = len(cluster.get_available_resources())
-        # Ensure we don't provision more than is acceptable for a single
-        # workflow
-        max_allowed = int(len(cluster.dmachine) / self.max_resources_split)
-        if available == 0:
-            return None
-        if available < max_allowed:
-            return available
-        else:
-            return max_allowed
 
     def to_df(self):
         pass

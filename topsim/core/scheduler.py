@@ -317,7 +317,7 @@ class Scheduler:
         finished = False
         nm = f'{observation.name}-algtime'
         self.algtime[nm] = time.time()
-        schedule, status = self.algorithm(
+        schedule, status = self.algorithm.run(
             cluster=self.cluster,
             clock=self.env.now,
             workflow_plan=current_plan,

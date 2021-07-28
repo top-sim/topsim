@@ -45,7 +45,7 @@ class TestBasicIngest(unittest.TestCase):
             BASIC_CONFIG,
             Telescope,
             planning_algorithm='heft',
-            planning_model=SHADOWPlanning,
+            planning_model=SHADOWPlanning('heft'),
             scheduling=DynamicAlgorithmFromPlan,
             delay=None,
             timestamp=SIM_TIMESTAMP

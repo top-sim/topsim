@@ -83,6 +83,7 @@ class SHADOWPlanning(Planning):
                 ) for x in pred
             ]
             edge_costs = {}
+            # Get the data transfer costs
             data = dict(workflow.graph.pred[task])
             for element in data:
                 nm = self._create_observation_task_id(

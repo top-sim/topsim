@@ -36,7 +36,7 @@ class DynamicAlgorithmFromPlan(Algorithm):
     def __repr__(self):
         return "DynamicAlgorithmFromPlan"
 
-    def __call__(self, cluster, clock, workflow_plan, existing_schedule):
+    def run(self, cluster, clock, workflow_plan, existing_schedule):
         """
         Iterate through immediate predecessors and check that they are finished
         Schedule as we go check if there is an overlap between the two sets
@@ -124,7 +124,7 @@ class BatchProcessing(Algorithm):
     constraints are met.
     """
 
-    def __call__(self, cluster, clock, workflow_plan, existing_schedule):
+    def run(self, cluster, clock, workflow_plan, existing_schedule):
         if workflow_plan.algorithm != 'batch':
             raise RuntimeError("Workflow Plan is not compatible with this "
                                "dynamic scheduler")
@@ -174,7 +174,7 @@ class GlobalDagDelayHeuristic(Algorithm):
     Implementation of the bespoke Delay heuristic I have been working on
     """
 
-    def __call__(self, cluster, clock, workflow_plan):
+    def run(self, cluster, clock, workflow_plan):
         return None, None, workflow_plan.status
 
     def to_df(self):

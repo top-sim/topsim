@@ -344,7 +344,7 @@ class Cluster:
         return (machine in self.clusters[c]['resources']['occupied']
                 or machine in self.clusters[c]['resources']['ingest'])
 
-    def provision_batch_resources(self, size, observation, c='default'):
+    def provision_batch_resources(self, size, name, c='default'):
         """
         Mark a machine on the cluster as being allocated to a workflow, without
         the allocation place just yet.
@@ -354,7 +354,7 @@ class Cluster:
         size: int
             The number of resources to be provisioned based on the
             observation workflow
-        observation : the observation that is associated with the provisioning
+        name : the observation that is associated with the provisioning
         c :  str
             The name of the cluster (defaults to 'default' if we are only
             using one).
@@ -368,7 +368,7 @@ class Cluster:
         if size > tmp > 0:
             size = tmp
         for m in range(0, size):
-            self._add_idle_resource(observation, available_resources[0])
+            self._add_idle_resource(name, available_resources[0])
 
     def release_batch_resources(self, observation, c='default'):
         """

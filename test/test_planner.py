@@ -202,7 +202,8 @@ class TestBatchProcessingPlan(unittest.TestCase):
         """
         self.env = simpy.Environment()
         config = Config(CONFIG)
-        self.model = BatchPlanning('batch', max_resource_split=2)
+        self.model = BatchPlanning('batch')
+
         self.cluster = Cluster(self.env, config=config)
         self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
         self.planner = Planner(
@@ -213,32 +214,22 @@ class TestBatchProcessingPlan(unittest.TestCase):
         )
 
     def test_generate_topological_sort(self):
-        pass
-
-    def test_resource_provision(self):
         """
-        Given a max_resource_split of 2, and total machines of 10, we should
-        provision a maximum of 5 machines within the cluster (
-        max_resource_split being the number of parallel provisionings we can
-        make).
+        This is the main component of the batch_planning system - we just
+        return a topological sort of the tasks and a list of precedence
+        resources and wrap it into the 'WorkflowPlan' object.
 
         Returns
         -------
-
+        plan : core.planner.WorkflowPlan
+            WorkflowPlan object for the observation
         """
-        self.planner.run(self.telescope.observations[0], self.buffer)
-        self.assertEqual(5, len(self.cluster.get_available_resources()))
-
-    def test_max_resource_provision(self):
         obs = self.telescope.observations[0]
-        self.env.process(
-            self.cluster.provision_ingest_resources(7, obs))
-        self.env.run(until=1)
-        self.assertEqual(3, len(self.cluster.get_available_resources()))
-        self.assertEqual(3,self.planner.model._max_resource_provision(
-            self.cluster))
-        self.planner.run(obs,self.buffer)
-        self.assertEqual(3, len(self.cluster._get_idle_resources(obs)))
+        plan = self.planner.run(obs, self.buffer)
+        # order [0, 5, 4, 3, 2, 6, 1, 7, 8, 9]
+        self.assertIsNotNone(plan)
+
+
 
     def tearDown(self) -> None:
         pass

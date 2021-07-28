@@ -423,3 +423,14 @@ class TestSchedulerDelayHelpers(unittest.TestCase):
         -------
 
         """
+
+class TestSchedulerBatchPlanning(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.env=simpy.Environment()
+        config = Config(CONFIG)
+        self.cluster = Cluster(self.env, config)
+        self.buffer = Buffer(self.env, self.cluster, config)
+        # self.planer = Planner()
+
+

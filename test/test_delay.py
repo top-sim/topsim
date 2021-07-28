@@ -90,7 +90,7 @@ class TestDelaysInActors(unittest.TestCase):
                    DelayModel.DelayDegree.HIGH)
         self.planner = Planner(
             self.env, PLANNING_ALGORITHM,
-            self.cluster, SHADOWPlanning('heft'), delay_model=dm
+            self.cluster, SHADOWPlanning('heft',delay_model=dm), delay_model=dm
         )
 
         self.scheduler = Scheduler(
