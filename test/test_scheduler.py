@@ -42,14 +42,14 @@ from topsim.core.delay import DelayModel
 from topsim.core.task import Task
 
 from topsim.user.telescope import Telescope
-from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
-from topsim.user.greedy import GreedyAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.greedy import GreedyAlgorithmFromPlan
 from topsim.user.plan.static_planning import SHADOWPlanning
 
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
-CONFIG = "test/data/config_update/standard_simulation.json"
+CONFIG = "test/data/config_update/standard_simulation_longtask.json"
 INTEGRATION = "test/data/config_update/integration_simulation.json"
 HEFT_CONFIG = "test/data/config_update/heft_single_observation_simulation.json"
 LONG_CONFIG = "test/data/config/mos_sw10_long.json"
@@ -210,7 +210,8 @@ class TestSchedulerDynamicPlanAllocation(unittest.TestCase):
         ]
         self.scheduler.observation_queue.append(curr_obs)
         curr_obs.ast = self.env.now
-        curr_obs.plan = self.planner.run(curr_obs, self.buffer)
+        curr_obs.plan = self.planner.run(
+            curr_obs, self.buffer, self.telescope.max_ingest)
         self.env.process(self.scheduler.allocate_tasks(curr_obs))
         self.env.run(1)
         self.assertListEqual(
@@ -257,16 +258,13 @@ class TestSchedulerEdgeCases(unittest.TestCase):
         """
         Given an existing schedule, add multiple allocations to ensure
         duplicates do not exist
-
-        Returns
-        -------
-
         """
         task = Task('test_0', 0, 2, self.machine, [])
         dup_task = Task('test_2', 8, 12, self.machine, [])
         existing_schedule = {task: self.machine, dup_task: self.machine}
         new_schedule, new_pairs = self.scheduler._process_current_schedule(
-            existing_schedule, allocation_pairs={}
+            existing_schedule, allocation_pairs={},
+            workflow_id='test_id'
         )
         self.assertFalse(task in self.cluster.tasks['running'])
         self.env.run(until=1)
@@ -297,7 +295,9 @@ class TestSchedulerLongWorkflow(unittest.TestCase):
         curr_obs = self.telescope.observations[0]
         self.scheduler.observation_queue.append(curr_obs)
         curr_obs.ast = self.env.now
-        curr_obs.plan = self.planner.run(curr_obs, self.buffer)
+        curr_obs.plan = self.planner.run(
+            curr_obs, self.buffer, self.telescope.max_ingest
+        )
         self.env.process(self.scheduler.allocate_tasks(curr_obs))
         self.env.run(1)
         self.buffer.cold[0].observations['stored'].append(curr_obs)
@@ -325,7 +325,8 @@ class TestSchedulerDynamicReAllocation(unittest.TestCase):
         curr_obs = self.telescope.observations[0]
         self.scheduler.observation_queue.append(curr_obs)
         curr_obs.ast = self.env.now
-        curr_obs.plan = self.planner.run(curr_obs, self.buffer)
+        curr_obs.plan = self.planner.run(curr_obs, self.buffer,
+                                         self.telescope.max_ingest)
         self.env.process(self.scheduler.allocate_tasks(curr_obs))
         self.env.run(1)
         self.buffer.cold[0].observations['stored'].append(curr_obs)
@@ -399,7 +400,8 @@ class TestSchedulerDelayHelpers(unittest.TestCase):
         self.buffer = Buffer(self.env, self.cluster, config)
         self.planner = Planner(
             self.env, PLANNING_ALGORITHM,
-            self.cluster, SHADOWPlanning('heft'), delay_model=DelayModel(0.3, "normal")
+            self.cluster, SHADOWPlanning('heft'),
+            delay_model=DelayModel(0.3, "normal")
         )
 
         self.scheduler = Scheduler(
@@ -424,13 +426,12 @@ class TestSchedulerDelayHelpers(unittest.TestCase):
 
         """
 
+
 class TestSchedulerBatchPlanning(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.env=simpy.Environment()
+        self.env = simpy.Environment()
         config = Config(CONFIG)
         self.cluster = Cluster(self.env, config)
         self.buffer = Buffer(self.env, self.cluster, config)
         # self.planer = Planner()
-
-

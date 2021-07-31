@@ -29,10 +29,18 @@ class GreedyAlgorithmFromPlan(Algorithm):
     Algorithm that Greedily re-allocates a schedule based on run-time
     resource availability.
     """
-    def __init__(self, threshold=0.8):
-        self.threshold = threshold
+    def __init__(self):
+        super().__init__()
+        self.name = "GreedyAlgorithmFromPlan"
+
 
     def parse_workflow_plan(self):
+        """
+
+        Returns
+        -------
+
+        """
         pass
 
     def __repr__(self):
@@ -40,7 +48,10 @@ class GreedyAlgorithmFromPlan(Algorithm):
 
     def run(self, cluster, clock, workflow_plan, existing_schedule):
         """
-
+        cluster,
+        clock
+        workflow_plan
+        existing_schedule
         """
         self.cluster = cluster
         machines = cluster.machines

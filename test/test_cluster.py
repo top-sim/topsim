@@ -27,7 +27,7 @@ from topsim.core.task import Task
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
-CONFIG = "test/data/config_update/standard_simulation.json"
+CONFIG = "test/data/config_update/standard_simulation_longtask.json"
 OBS_START_TME = 0
 OBS_DURATION = 10
 OBS_DEMAND = 15
@@ -215,7 +215,7 @@ class TestClusterBatchScheduling(unittest.TestCase):
         )
         self.assertEqual(5, len(self.cluster.get_available_resources()))
         self.assertEqual(
-            5, len(self.cluster._get_idle_resources(self.observation))
+            5, len(self.cluster.get_idle_resources(self.observation))
         )
         self.assertListEqual(
             self.cluster._get_batch_observations(), [self.observation]
@@ -228,7 +228,7 @@ class TestClusterBatchScheduling(unittest.TestCase):
         )
         self.cluster.release_batch_resources(self.observation)
         self.assertListEqual(
-            [], self.cluster._get_idle_resources(self.observation)
+            [], self.cluster.get_idle_resources(self.observation)
         )
         self.assertEqual(10, len(self.cluster.get_available_resources()))
 

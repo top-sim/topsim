@@ -16,12 +16,11 @@
 import os
 import unittest
 import simpy
-import logging
 
 import pandas as pd
 
 from topsim.core.simulation import Simulation
-from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.telescope import Telescope
 from topsim.user.plan.static_planning import SHADOWPlanning
 
@@ -116,7 +115,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
             simdf, taskdf = simulation.start()
             global_sim_df = global_sim_df.append(simdf)
             global_task_df = global_task_df.append(taskdf)
-        self.assertEqual(252, len(global_sim_df))
+        self.assertEqual(246, len(global_sim_df))
 
     def testResultsAgreeWithExpectations(self):
         pass

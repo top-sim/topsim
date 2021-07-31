@@ -13,30 +13,77 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import copy
+import logging
+
+from topsim.core.task import TaskStatus
+from topsim.core.planner import WorkflowStatus
 from topsim.core.algorithm import Algorithm
+
+logger = logging.getLogger(__name__)
 
 
 class BatchProcessing(Algorithm):
     """
     Dynamic schedule for a workflowplan that is using a batch-processing
     resource reservation approach without generating a static schedule.
+
+    Attributes
+    ----------
+    max_resources_split : int
+        The number of provisions that can be made on the cluster.
+        By default, this is 2 - that is, only two workflows may run on the
+        cluster at any given point in time, provided they also do not overlap
+        with the number of ingest pipelines, too.
+
+    min_resources_per_workflow: int
+
     """
-    def __init__(self, max_resource_split=2):
+    def __init__(self, max_resources_split=2, min_resources_per_workflow=3):
         super().__init__()
-        self.max_resources_split = max_resource_split
+        self.max_resources_split = max_resources_split
+        self.min_resource_per_workflow = min_resources_per_workflow
         
     def __repr__(self):
         return "BatchProcessing"
 
     def run(self, cluster, clock, workflow_plan, existing_schedule):
         """
-        """
-        provision = self._max_resource_provision(cluster)
-        cluster.provision_batch_resources(
-            provision, workflow_plan.id
-        )
+        Generate a list of allocations for the current timestep using the
+        existing schedule as a basis.
 
-        pass
+        """
+        allocations = copy.copy(existing_schedule)
+        provision = self._provision_resources(cluster, workflow_plan)
+        tasks = workflow_plan.tasks
+        if provision:
+            temporary_resources = cluster.get_idle_resources(workflow_plan.id)
+            for task in tasks:
+                if len(temporary_resources) > 0 and task not in allocations:
+                    if task.task_status is TaskStatus.UNSCHEDULED:
+                        # Pick the next available machine
+                        m = temporary_resources[0]
+                        if not task.pred:
+                            allocations[task] = m
+                            temporary_resources.remove(m)
+                        else:
+                            pred = set(task.pred)
+                            finished = set(
+                                t.id for t in cluster.get_finished_tasks()
+                            )
+                            # Check if there isn't an overlap between sets
+                            if not pred.issubset(finished):
+                                # one of the predecessors is still running
+                                continue
+                            else:
+                                allocations[task] = m
+                                temporary_resources.remove(m)
+
+        if len(workflow_plan.tasks) == 0:
+            workflow_plan.status = WorkflowStatus.FINISHED
+            logger.debug(f'{workflow_plan.id} is finished.')
+        return allocations, workflow_plan.status
+
 
     def to_df(self):
         pass
@@ -62,6 +109,9 @@ class BatchProcessing(Algorithm):
         available = len(cluster.get_available_resources())
         # Ensure we don't provision more than is acceptable for a single
         # workflow
+
+        #  TODO do We need to make sure there's enough left for ingest to
+        #   occur?
         max_allowed = int(len(cluster.dmachine) / self.max_resources_split)
         if available == 0:
             return None
@@ -69,3 +119,29 @@ class BatchProcessing(Algorithm):
             return available
         else:
             return max_allowed
+
+    def _provision_resources(self,cluster, workflow_plan):
+        """
+        Given the defined max_resources_split, provision resources
+
+        Note:
+        This should only be called once, but it's easier to call it at the
+        beginning each time in the case that we have started an allocation
+        loop in the scheduler but there are no resources available.
+
+
+        Returns
+        -------
+
+        """
+        if cluster.get_idle_resources(workflow_plan.id):
+            return True
+        else:
+            provision = self._max_resource_provision(cluster)
+            if provision < self.min_resource_per_workflow:
+                return False
+            else:
+                return cluster.provision_batch_resources(
+                    provision, workflow_plan.id
+                )
+

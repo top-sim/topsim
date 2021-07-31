@@ -24,15 +24,12 @@ from topsim.core.planner import Planner
 from topsim.core.cluster import Cluster
 from topsim.core.scheduler import Scheduler
 from topsim.core.buffer import Buffer
-from topsim.core.instrument import Observation
-from topsim.core.delay import DelayModel
 from topsim.user.telescope import Telescope
 
 from topsim.user.plan.batch_planning import BatchPlanning
 from topsim.user.schedule.batch_allocation import BatchProcessing
 
-from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
-
+from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
 
 CONFIG = "test/data/config_update/standard_simulation.json"
 
@@ -66,7 +63,7 @@ class TestBatchSchedulerAllocation(unittest.TestCase):
             self.env, self.buffer, self.cluster, DynamicAlgorithmFromPlan()
         )
         self.algorithm = BatchProcessing()
-        self.model = BatchPlanning('heft')
+        self.model = BatchPlanning('batch')
         self.planner = Planner(
             self.env, 'heft', self.cluster, self.model,
         )
@@ -75,12 +72,11 @@ class TestBatchSchedulerAllocation(unittest.TestCase):
             self.env, config, self.planner, self.scheduler
         )
 
-
     def test_resource_provision(self):
         """
         Given a max_resource_split of 2, and total machines of 10, we should
         provision a maximum of 5 machines within the cluster (
-        max_resource_split being the number of parallel provisionings we can
+        max_resource_split being the number of parallel provision ings we can
         make).
 
         Returns
@@ -92,28 +88,31 @@ class TestBatchSchedulerAllocation(unittest.TestCase):
     def test_max_resource_provision(self):
         obs = self.telescope.observations[0]
         self.env.process(
-            self.cluster.provision_ingest_resources(7, obs)
+            self.cluster.provision_ingest_resources(5, obs)
         )
         self.env.run(until=1)
-        self.assertEqual(3, len(self.cluster.get_available_resources()))
-        self.assertEqual(3, self.algorithm._max_resource_provision(
+        self.assertEqual(5, len(self.cluster.get_available_resources()))
+        self.assertEqual(5, self.algorithm._max_resource_provision(
             self.cluster))
         # TODO The algorithm must provision resources if they are not already
         #  provisioned.
-        self.algorithm._provision_resources()
-        self.assertEqual(3, len(self.cluster._get_idle_resources(obs.name)))
+        plan = self.planner.run(obs, self.buffer, self.telescope.max_ingest)
+        self.algorithm._provision_resources(self.cluster, plan)
+        self.assertEqual(5, len(self.cluster.get_idle_resources(obs.name)))
         self.assertIsNone(
-            self.planner.model._max_resource_provision(self.cluster)
+            self.algorithm._max_resource_provision(self.cluster)
         )
         # self.planner.run(obs, )
 
     def test_algorithm_allocation(self):
         obs = self.telescope.observations[0]
-        obs.plan = self.planner.run(obs, self.buffer)
-        existing_schedule = []
-        schedule, status = self.algorithm.run(
-            self.cluster,self.env.now, obs.plan, existing_schedule
+        obs.plan = self.planner.run(obs, self.buffer, self.telescope.max_ingest)
+        # Replicate the Scheduler allocate_task() methods
+        existing_schedule = {}
+        existing_schedule, status = self.algorithm.run(
+            self.cluster, self.env.now, obs.plan, existing_schedule
         )
+        self.assertTrue(obs.plan.tasks[0] in existing_schedule)
 
     def test_observation_queue(self):
         """

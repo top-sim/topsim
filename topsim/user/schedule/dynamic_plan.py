@@ -27,11 +27,10 @@ class DynamicAlgorithmFromPlan(Algorithm):
     """
     This plan
     """
-    def __init__(self, threshold=0.8):
-        self.threshold = threshold
-
-    def parse_workflow_plan(self):
-        pass
+    def __init__(self):
+        super().__init__()
+        self.accurate = 0
+        self.alternate = 0
 
     def __repr__(self):
         return "DynamicAlgorithmFromPlan"
@@ -43,7 +42,8 @@ class DynamicAlgorithmFromPlan(Algorithm):
 
         Parameters
         ----------
-        cluster : topsim.core.Cluster object
+        existing_schedule
+        cluster : :py:obj:`topsim.core.Cluster object`
             The current cluster
         clock : int
             The current time in the simulation
@@ -54,7 +54,7 @@ class DynamicAlgorithmFromPlan(Algorithm):
         -------
         allocations, WorkflowStatus, false
         """
-        self.cluster = cluster
+        cluster = cluster
         machines = cluster.machines
         workflow_id = workflow_plan.id
         tasks = workflow_plan.tasks

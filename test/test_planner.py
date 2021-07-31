@@ -23,7 +23,7 @@ from topsim.core.buffer import Buffer
 from topsim.core.instrument import Observation
 from topsim.core.delay import DelayModel
 from topsim.user.telescope import Telescope
-from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.plan.static_planning import SHADOWPlanning
 from topsim.user.plan.batch_planning import BatchPlanning
 
@@ -35,12 +35,13 @@ OBS_DURATION = 10
 OBS_DEMAND = 15
 OBS_DATA_RATE = 5
 OBS_PIPELINE = 'continuum'
+TEL_MAX_INGEST = 5
 PLAN_ALGORITHM = 'heft'
 
-CONFIG = "test/data/config_update/standard_simulation.json"
+CONFIG = "test/data/config_update/standard_simulation_longtask.json"
 HEFT_CONFIG = "test/data/config_update/heft_single_observation_simulation.json"
 MACHINE_CONFIG = None
-OBS_WORKFLOW = "test/data/config/workflow_config_minutes.json"
+OBS_WORKFLOW = "test/data/config/workflow_config_minutes_longtask.json"
 
 
 class TestPlannerConfig(unittest.TestCase):
@@ -77,7 +78,6 @@ class TestWorkflowPlan(unittest.TestCase):
         self.model = SHADOWPlanning('heft')
         self.cluster = Cluster(self.env, config=config)
         self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
-
         self.planner = Planner(
             self.env, PLAN_ALGORITHM, self.cluster, self.model,
         )
@@ -119,7 +119,9 @@ class TestWorkflowPlan(unittest.TestCase):
         #     next, self.planner.run(self.observation, self.buffer)
         # )
         self.observation.ast = self.env.now
-        plan = self.planner.run(self.observation, self.buffer)
+        plan = self.planner.run(self.observation, self.buffer,
+                                TEL_MAX_INGEST
+                                )
         # plan = self.planner.plan(
         #     self.observation,
         #     self.observation.workflow,
@@ -178,7 +180,8 @@ class TestPlannerDelay(unittest.TestCase):
         #     self.planner.run(self.observation, self.buffer)
         # )
         self.observation.ast = self.env.now
-        self.observation.plan = self.planner.run(self.observation, self.buffer)
+        self.observation.plan = self.planner.run(self.observation,
+                                                 self.buffer, TEL_MAX_INGEST)
         self.assertTrue(self.observation.plan is not None)
         self.assertTrue(0.1, self.observation.plan.tasks[0].delay.prob)
 
@@ -225,11 +228,10 @@ class TestBatchProcessingPlan(unittest.TestCase):
             WorkflowPlan object for the observation
         """
         obs = self.telescope.observations[0]
-        plan = self.planner.run(obs, self.buffer)
-        # order [0, 5, 4, 3, 2, 6, 1, 7, 8, 9]
+        plan = self.planner.run(obs, self.buffer, TEL_MAX_INGEST)
+        order = [0, 1, 2, 3, 4, 5, 6, 8, 7, 9]
         self.assertIsNotNone(plan)
-
-
+        self.assertListEqual(order, plan.exec_order)
 
     def tearDown(self) -> None:
         pass

@@ -17,6 +17,20 @@ class Algorithm(ABC):
 
     @abstractmethod
     def run(self, cluster, clock, plan, schedule):
+        """
+
+        Parameters
+        ----------
+        cluster
+        clock
+        plan
+        schedule
+
+        Returns
+        -------
+
+        """
+
         pass
 
     @abstractmethod

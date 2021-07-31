@@ -25,7 +25,7 @@ from topsim.core.planner import Planner
 from topsim.user.plan.static_planning import SHADOWPlanning
 
 
-CONFIG = 'test/data/config_update/standard_simulation.json'
+CONFIG = 'test/data/config_update/standard_simulation_longtask.json'
 
 
 class TestTelescopeConfig(unittest.TestCase):

@@ -21,6 +21,7 @@ from topsim.core.task import Task
 from topsim.core.planning import Planning
 from topsim.core.planner import WorkflowStatus, WorkflowPlan
 
+
 class BatchPlanning(Planning):
     """
     Create a placeholder, topologically sorted plan for the batch-scheduler
@@ -33,9 +34,9 @@ class BatchPlanning(Planning):
         super().__init__(algorithm, delay_model)
 
     def __str__(self):
-        return
+        return 'BatchPlanning'
 
-    def generate_plan(self, clock, cluster, buffer, observation):
+    def generate_plan(self, clock, cluster, buffer, observation, max_ingest):
         """
 
         Parameters
@@ -51,8 +52,8 @@ class BatchPlanning(Planning):
             est = self._calc_workflow_est(observation, buffer)
 
             tasks = []
-
-            for task in nx.algorithms.topological_sort(graph):
+            exec_order = list(nx.algorithms.topological_sort(graph))
+            for task in exec_order:
                 tid = self._create_observation_task_id(
                     task, observation, clock
                 )
@@ -73,14 +74,15 @@ class BatchPlanning(Planning):
                     val = data[element]['data_size']
                     edge_costs[nm] = val
                 taskobj = Task(
-                    task, 0, 0, None, predecessors, graph.node[task]['comp'], 0,
+                    tid, 0, 0, None, predecessors, graph.nodes[task][
+                        'comp'], 0,
                     edge_costs, dm
                 )
                 tasks.append(taskobj)
             # exec_order = list(nx.algorithms.topological_sort(graph))
             return WorkflowPlan(
-                observation.name, est, -1, tasks, tasks,
-                WorkflowStatus.SCHEDULED
+                observation.name, est, -1, tasks, exec_order,
+                WorkflowStatus.SCHEDULED, max_ingest
             )
 
 
@@ -89,7 +91,6 @@ class BatchPlanning(Planning):
                 f'{self.algorithm} is not supported by {str(self)}'
             )
 
-        return plan
 
     def _workflow_to_nx(self, workflow):
         """

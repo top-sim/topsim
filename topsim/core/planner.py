@@ -55,7 +55,7 @@ class Planner:
         self.model = model  # algorithm, cluster, delay_model)
         self.delay_model = delay_model
 
-    def run(self, observation, buffer):
+    def run(self, observation, buffer, max_ingest):
         """
         Parameters
         ----------
@@ -66,10 +66,10 @@ class Planner:
 
         Returns
         -------
-
+        core.topsim.planner.WorkflowPlan
         """
         return self.model.generate_plan(self.env.now, self.cluster, buffer,
-                                        observation)
+                                        observation, max_ingest)
 
         # yield self.env.timeout(0,plan)
 
@@ -81,16 +81,21 @@ class WorkflowPlan:
     as they are a storage component of scheduled tasks, rather than directly
     representing the DAG nature of the workflow. This is why the tasks are
     stored in queues.
+
+    Parameters
+    ----------
+
     """
 
     def __init__(self,
-                 id, est, eft, tasks, exec_order,status):
+                 id, est, eft, tasks, exec_order,status, max_ingest):
         self.id = id
         self.est = est
         self.eft = eft
         self.tasks = tasks
         self.exec_order = exec_order
         self.status = status
+        self.max_ingest = max_ingest
         self.priority = None
 
     def __lt__(self, other):

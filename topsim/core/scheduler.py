@@ -29,22 +29,26 @@ LOGGER = logging.getLogger(__name__)
 class Scheduler:
     """
 
-    Parameters
-    ----------
-    env : Simpy.Environment object
-        The simulation Environment
-
-    buffer : core.buffer.Buffer object
-        The SDP buffer used in the simulation
-
-    cluster : core.cluster.Cluster object
-        The Cluster instance used for the simluation
-
     Attributes
     ----------
     """
 
     def __init__(self, env, buffer, cluster, algorithm):
+        """
+        Parameters
+        ----------
+        env : Simpy.Environment object
+            The simulation Environment
+
+        buffer : core.buffer.Buffer object
+            The SDP buffer used in the simulation
+
+        cluster : core.cluster.Cluster object
+            The Cluster instance used for the simluation
+
+        algorithm : core.cluster.Algorithm object
+            The algorithm model using
+        """
         self.env = env
         self.algorithm = algorithm
         self.cluster = cluster
@@ -173,7 +177,8 @@ class Scheduler:
 
         return buffer_capacity and cluster_capacity
 
-    def allocate_ingest(self, observation, pipelines, planner, c='default'):
+    def allocate_ingest(self, observation, pipelines, planner,
+                        max_ingest=None, c='default'):
         """
         Ingest is 'streaming' data to the buffer during the observation
         How we calculate how long it takes remains to be seen
@@ -236,7 +241,7 @@ class Scheduler:
             #  get the observation. It is probably worth storing plans
             #  separately and then 'giving' them to the observation once it
             #  arrives at the scheduler.
-            observation.plan = planner.run(observation, self.buffer)
+            observation.plan = planner.run(observation, self.buffer, max_ingest)
 
     def print_state(self):
         # Change this to 'workflows scheduled/workflows unscheduled'
@@ -293,7 +298,7 @@ class Scheduler:
             else:
                 # This is where allocations are made to the cluster
                 schedule, allocation_pairs = self._process_current_schedule(
-                    schedule, allocation_pairs
+                    schedule, allocation_pairs, current_plan.id
                 )
 
                 yield self.env.timeout(TIMESTEP)
@@ -338,7 +343,8 @@ class Scheduler:
 
         return current_plan, schedule, finished
 
-    def _process_current_schedule(self, schedule, allocation_pairs):
+    def _process_current_schedule(self, schedule, allocation_pairs,
+                                  workflow_id):
         """
         Given a schedule and existing allocations, run through the schedule
         and run the allocation for that tasks if possible
@@ -347,6 +353,8 @@ class Scheduler:
         ----------
         schedule
         allocation_pairs
+        workflow_id : The ID of the workflow. This is so in the cluster we
+        can find the appropriate set of provisioned resources.
 
         Returns
         -------
@@ -371,9 +379,12 @@ class Scheduler:
                 pred_allocations = self._find_pred_allocations(
                     task, machine, allocation_pairs
                 )
+                if task.task_status != TaskStatus.UNSCHEDULED:
+                    raise RuntimeError("Producing schedule with Scheduled "
+                                       "Tasks")
                 self.env.process(
                     self.cluster.allocate_task_to_cluster(
-                        task, machine, pred_allocations
+                        task, machine,  pred_allocations, workflow_id
                     )
                 )
 
@@ -383,10 +394,6 @@ class Scheduler:
                 schedule.pop(task, None)
 
         return schedule, allocation_pairs
-
-
-
-
 
     def _update_current_plan(self, current_plan):
         """

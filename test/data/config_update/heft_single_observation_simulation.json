@@ -5,7 +5,7 @@
 			"max_ingest_resources": 1,
 			"pipelines": {
 				"emu": {
-					"workflow": "test/data/config/workflow_config_minutes.json",
+					"workflow": "test/data/config/workflow_config_minutes_longtask.json",
 					"ingest_demand": 1
 				}
 			},

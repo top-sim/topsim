@@ -74,7 +74,7 @@ class Task(object):
     def __hash__(self):
         return hash(self.id)
 
-    def do_work(self,env, machine, altmachine=None):
+    def do_work(self, env, machine, predecessor_allocations=None):
         """
         This runs the task on the 'cluster'. We make the task in control of
         it's execution in order to "give it control" of delays.
@@ -91,8 +91,10 @@ class Task(object):
         -------
 
         """
-        if altmachine:
-            yield env.timeout(self._wait_for_transfer(env,machine, altmachine))
+        if predecessor_allocations:
+            yield env.timeout(
+                self._wait_for_transfer(env, machine, predecessor_allocations)
+            )
         self.task_status = TaskStatus.RUNNING
         self.ast = env.now
 
@@ -143,7 +145,7 @@ class Task(object):
             self.delay_offset = (duration - self.duration)
             self.duration = duration
 
-    def _wait_for_transfer(self,env,machine,altmachine):
+    def _wait_for_transfer(self, env, machine, predecessor_allocations):
         """
         Get the maximum data value from self.predecessors and use this to
         calculate the data transfer for a task.
@@ -155,7 +157,7 @@ class Task(object):
         mx = 0
         # Calculate the difference between the latest start time of the
         # predecessor and the current time.
-        for task in altmachine:
+        for task in predecessor_allocations:
             transfer_time = self.io[task.id] / machine.bandwidth
             if task.aft+transfer_time - env.now > mx :
                 mx = task.aft + transfer_time - env.now

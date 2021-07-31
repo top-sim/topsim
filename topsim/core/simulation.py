@@ -45,12 +45,12 @@ class Simulation:
     buffer_config: str
         Path to the buffer configuration
 
-    planning_algorithm: Object
+    planning_algorithm: object
         instance of the planning algorithm class interface as defined in
         algorithms.examples/
 
     scheduling_algorithm: object
-        instance of the ``core.algorithm`` interface
+        instance of the  :py:obj:`~topsim.core.algorithm.Algorithm` interface
 
     sim_timestamp: str
         Optional Simulation start-time; this is useful for testing, to ensure we
@@ -63,7 +63,7 @@ class Simulation:
 
     Notes
     -----
-    An Index instance can **only** contain hashable objects
+
 
     Examples
     --------
@@ -102,6 +102,7 @@ class Simulation:
             to_file=False,
     ):
 
+        #: simpy environment object
         self.env = env
 
         if timestamp:
@@ -111,10 +112,11 @@ class Simulation:
             self.monitor = Monitor(self, sim_start_time)
         # Process necessary config files
 
-        #: Configuration path
-        self.cfgpath = config
+        self.cfgpath = config #: Configuration path
+
         # Initiaise Actor and Resource objects
         cfg = Config(config)
+        #: :py:obj:`~topsim.core.cluster.Cluster` instance
         self.cluster = Cluster(env, cfg)
         self.buffer = Buffer(env, self.cluster, cfg)
         planning_algorithm = planning_algorithm
@@ -197,14 +199,16 @@ class Simulation:
 
     def resume(self, until):
         """
-        Resume a simulation for a period of time
+        Resume a simulation for a period of time.
+
         Useful for testing purposes, as we do not re-initialise the process
-        calls as we used to in :meth:`core.topsim.simulation.Simulation.start`
+        calls as we used to in
+        :py:obj:`~core.topsim.simulation.Simulation.start`
 
         Parameters
         ----------
         until : int
-            The (non-inclusive) Simpy.env.now timestep that we want to
+            The (non-inclusive) :py:obj:`Simpy.env.now` timestep that we want to
             continue to in the simulation
 
         Returns

@@ -48,7 +48,7 @@ class Planning(ABC):
         self.delay_model = delay_model
 
     @abstractmethod
-    def generate_plan(self, clock, cluser, buffer, observation):
+    def generate_plan(self, clock, cluser, buffer, observation,max_ingest):
         """
         Build a WorkflowPlan object storing
         Returns

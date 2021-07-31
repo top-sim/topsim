@@ -44,7 +44,7 @@ class SHADOWPlanning(Planning):
         # self.buffer = buffer
         # self.delay_model = delay_model
 
-    def generate_plan(self, clock, cluster, buffer, observation):
+    def generate_plan(self, clock, cluster, buffer, observation, max_ingest):
         """
         For this StaticPlanning example, we are using the SHADOW static
         scheduling library to produce static plans. There are a couple of
@@ -56,7 +56,7 @@ class SHADOWPlanning(Planning):
         cluster
         clock : int
             Current simulation time (usually provided through `env.now`)
-
+        max_ingest
         Returns
         -------
 
@@ -107,7 +107,7 @@ class SHADOWPlanning(Planning):
 
         return WorkflowPlan(
             observation.name, est, eft, tasks, exec_order,
-            WorkflowStatus.SCHEDULED
+            WorkflowStatus.SCHEDULED, max_ingest
         )
 
     def to_df(self):
@@ -198,6 +198,3 @@ class SHADOWPlanning(Planning):
 
         return dictionary
 
-
-"""
-"""

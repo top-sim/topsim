@@ -18,7 +18,6 @@ Unittests for the topsim.core.delay.DelayModel class
 """
 
 import unittest
-from numpy.random import seed
 import simpy
 
 from topsim.core.config import Config
@@ -29,7 +28,7 @@ from topsim.core.buffer import Buffer
 from topsim.core.delay import DelayModel
 
 from topsim.user.telescope import Telescope
-from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.plan.static_planning import SHADOWPlanning
 
 INTEGRATION = "test/data/config_update/integration_simulation.json"

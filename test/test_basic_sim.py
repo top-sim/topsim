@@ -23,7 +23,7 @@ import simpy
 from topsim.core.simulation import Simulation
 from topsim.core.instrument import RunStatus
 
-from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.telescope import Telescope
 from topsim.user.plan.static_planning import SHADOWPlanning
 
