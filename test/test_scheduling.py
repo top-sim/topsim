@@ -99,8 +99,8 @@ class TestBatchSchedulerAllocation(unittest.TestCase):
         plan = self.planner.run(obs, self.buffer, self.telescope.max_ingest)
         self.algorithm._provision_resources(self.cluster, plan)
         self.assertEqual(5, len(self.cluster.get_idle_resources(obs.name)))
-        self.assertIsNone(
-            self.algorithm._max_resource_provision(self.cluster)
+        self.assertEqual(
+                0, self.algorithm._max_resource_provision(self.cluster)
         )
         # self.planner.run(obs, )
 

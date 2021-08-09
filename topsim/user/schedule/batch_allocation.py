@@ -18,7 +18,7 @@ import logging
 
 from topsim.core.task import TaskStatus
 from topsim.core.planner import WorkflowStatus
-from topsim.core.algorithm import Algorithm
+from topsim.algorithms.scheduling import Algorithm
 
 logger = logging.getLogger(__name__)
 
@@ -39,11 +39,12 @@ class BatchProcessing(Algorithm):
     min_resources_per_workflow: int
 
     """
+
     def __init__(self, max_resources_split=2, min_resources_per_workflow=3):
         super().__init__()
         self.max_resources_split = max_resources_split
         self.min_resource_per_workflow = min_resources_per_workflow
-        
+
     def __repr__(self):
         return "BatchProcessing"
 
@@ -52,9 +53,14 @@ class BatchProcessing(Algorithm):
         Generate a list of allocations for the current timestep using the
         existing schedule as a basis.
 
+
         """
+        provision = False
         allocations = copy.copy(existing_schedule)
         provision = self._provision_resources(cluster, workflow_plan)
+        if clock % 100 == 0 and not provision:
+            logger.info(f"{workflow_plan.id} attempted to provision @ {clock}.")
+            logger.info(f"{cluster.num_provisioned_obs} existing provs.")
         tasks = workflow_plan.tasks
         if provision:
             temporary_resources = cluster.get_idle_resources(workflow_plan.id)
@@ -82,8 +88,8 @@ class BatchProcessing(Algorithm):
         if len(workflow_plan.tasks) == 0:
             workflow_plan.status = WorkflowStatus.FINISHED
             logger.debug(f'{workflow_plan.id} is finished.')
+            cluster.release_batch_resources(workflow_plan.id)
         return allocations, workflow_plan.status
-
 
     def to_df(self):
         pass
@@ -100,6 +106,10 @@ class BatchProcessing(Algorithm):
 
         Notes
         -----
+        The maximum resource provisioning is based on the effective
+        percentage of the total number of resources that exist in the
+        cluster. As the resources that are used to process the workflows are
+        shared with ingest resources, it's important
 
         Returns
         -------
@@ -114,13 +124,13 @@ class BatchProcessing(Algorithm):
         #   occur?
         max_allowed = int(len(cluster.dmachine) / self.max_resources_split)
         if available == 0:
-            return None
+            return 0
         if available < max_allowed:
             return available
         else:
             return max_allowed
 
-    def _provision_resources(self,cluster, workflow_plan):
+    def _provision_resources(self, cluster, workflow_plan):
         """
         Given the defined max_resources_split, provision resources
 
@@ -134,14 +144,18 @@ class BatchProcessing(Algorithm):
         -------
 
         """
-        if cluster.get_idle_resources(workflow_plan.id):
+        if cluster.is_observation_provisioned(workflow_plan.id):
+#             logger.info(f"{workflow_plan.id} already provisioned.")
             return True
         else:
-            provision = self._max_resource_provision(cluster)
-            if provision < self.min_resource_per_workflow:
+            if cluster.num_provisioned_obs >= self.max_resources_split:
                 return False
             else:
-                return cluster.provision_batch_resources(
-                    provision, workflow_plan.id
-                )
-
+                provision = self._max_resource_provision(cluster)
+                if provision < self.min_resource_per_workflow:
+                    return False
+                else:
+                    logger.info(f"{provision} machines for {workflow_plan.id}")
+                    return cluster.provision_batch_resources(
+                        provision, workflow_plan.id
+                    )

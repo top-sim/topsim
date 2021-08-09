@@ -111,7 +111,7 @@ class Task(object):
         self.aft = env.now+1
         if self.aft > self.eft:
             self.delay_flag = True
-        self.task_status = TaskStatus.FINISHED
+        # self.task_status = TaskStatus.FINISHED
         logger.debug('%s finished at %s', self.id, self.aft)
         # return TaskStatus.FINISHED
 

@@ -108,7 +108,9 @@ class Scheduler:
                     and self.status == SchedulerStatus.SHUTDOWN:
                 LOGGER.debug("No more waiting workflows")
                 break
-
+            # for obs in self.observation_queue:
+            #     if obs.workflow_plan.status == WorkflowStatus.FINISHED:
+            #         self.cluster.release_batch_resources(obs)
             LOGGER.debug("Scheduler Status: %s", self.status)
             yield self.env.timeout(TIMESTEP)
 
@@ -338,6 +340,7 @@ class Scheduler:
         # If the workflow is finished
         if not schedule and status is WorkflowStatus.FINISHED:
             if self.buffer.mark_observation_finished(observation):
+                self.cluster.release_batch_resources(observation.name)
                 self.observation_queue.remove(observation)
                 finished = True
 

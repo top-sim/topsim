@@ -16,7 +16,7 @@
 import logging
 import copy
 
-from topsim.core.planning import Planning
+from topsim.algorithms.planning import Planning
 from topsim.core.planner import WorkflowPlan, WorkflowStatus
 from topsim.core.task import Task
 

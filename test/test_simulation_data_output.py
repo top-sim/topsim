@@ -115,7 +115,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
             simdf, taskdf = simulation.start()
             global_sim_df = global_sim_df.append(simdf)
             global_task_df = global_task_df.append(taskdf)
-        self.assertEqual(246, len(global_sim_df))
+        self.assertEqual(248, len(global_sim_df))
 
     def testResultsAgreeWithExpectations(self):
         pass

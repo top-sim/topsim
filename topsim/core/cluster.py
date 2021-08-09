@@ -293,10 +293,10 @@ class Cluster:
                 self.clusters[c]['usage_data']['finished_tasks'] += 1
                 if ingest:
                     self.clusters[c]['resources']['ingest'].remove(machine)
+                    self.clusters[c]['resources']['available'].append(machine)
                 else:
                     # self.clusters[c]['resources']['occupied'].remove(machine)
                     self._set_machine_available(machine, observation)
-                self.clusters[c]['resources']['available'].append(machine)
                 # self.clusters[c]['usage_data']['available'] += 1
                 task.task_status = TaskStatus.FINISHED
                 task.delay_flag = task.delay_flag
@@ -422,6 +422,9 @@ class Cluster:
     def get_available_resources(self, c='default'):
         return self.clusters[c]['resources']['available']
 
+    def is_observation_provisioned(self, observation, c='default'):
+        return observation in self.clusters[c]['resources']['idle']
+
     def get_idle_resources(self, observation, c='default'):
         """
         List the resources that are currently provisioned for the
@@ -443,8 +446,35 @@ class Cluster:
         else:
             return []
 
+    @property
+    def num_provisioned_obs(self, c='default'):
+        """
+        Return how many observations have been provisioned
+
+        Useful for
+
+        Returns
+        -------
+        Number of observtions that have been provisioned (int)
+        """
+        x = sum(
+            [1 if self.clusters[c]['resources']['idle'][x] else 0
+             for x in self.clusters[c]['resources']['idle']]
+        )
+        return x
+
     def get_finished_tasks(self, c='default'):
-        return self.clusters[c]['tasks']['finished']
+        """
+        Return a list of the tasks that are finished
+        Parameters
+        ----------
+        c
+
+        Returns
+        -------
+
+        """
+        return [x for x in self.clusters[c]['tasks']['finished']]
 
     def _set_machine_occupied(self, machine, observation, c='default'):
         """

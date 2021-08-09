@@ -1,4 +1,4 @@
-# Copyright (C) 17/1/20 RW Bunney
+# Copyright (C) 12/7/21 RW Bunney
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,16 +13,79 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+"""
+Abstract class for building a workflow plan
 
 """
-This is a placeholder file for algorithm implementations; in the future,
-we will pull in the shadow framework and wrap it in a planning algorithm class
-"""
 
-# Todo - wrap Shadow functionality in here
+from abc import ABC, abstractmethod
+from topsim.core.planner import WorkflowPlan
 
 
-#  TODO introduce a 'default' batch-scheduling planning algorithm,
-#  which allocates all resources that a job will use over its duration. This
-#  'schedule' will then have a topological sort and fifo algorithm for the
-#  workflow.
+class Planning(ABC):
+    """
+    Base class for all planning models, used by the planner actor
+
+    Parameters
+    ----------
+    observation : topsim.core.instrument.Observation
+        Contains workflow associated with the observation processing.
+    algorithm : str
+         Name of the algorithm used in the model; some models allow for
+         multiple algorithms in addition to the model
+    buffer : topsim.core.buffer.Cluster
+        The simulation Cluster object - used to retrieve current cluster
+        information to inform the static schedule.
+
+    Attributes
+    ----------
+
+    """
+
+    def __init__(self, algorithm, delay_model=None):
+        # self.observation = observation
+        self.algorithm = algorithm
+        self.delay_model = delay_model
+
+    @abstractmethod
+    def generate_plan(self, clock, cluser, buffer, observation,max_ingest):
+        """
+        Build a WorkflowPlan object storing
+        Returns
+        -------
+        plan : core.topsim.planner.WorkflowPlan
+            WorkflowPlan object
+        """
+        pass
+
+    @abstractmethod
+    def to_df(self):
+        """
+        Generate output to be amalgamated into the global simulation data
+        frame produced by the Monitor
+
+        Returns
+        -------
+        df : pandas.DataFrame
+        """
+        pass
+
+    def _calc_workflow_est(self,observation, buffer):
+        """
+        Calculate the estimated start time of the workflow based on data
+        transfer delays post-observation
+
+        Parameters
+        ----------
+        Returns
+        -------
+
+        """
+        storage = buffer.buffer_storage_summary()
+        size = observation.duration * observation.ingest_data_rate
+        hot_to_cold_time = int(size/storage['coldbuffer']['data_rate'])
+        est = observation.duration + hot_to_cold_time
+        return est
+
+    def _create_observation_task_id(self, tid, observation, clock):
+        return observation.name + '_' + str(clock) + '_' + str(tid)

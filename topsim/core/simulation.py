@@ -50,7 +50,7 @@ class Simulation:
         algorithms.examples/
 
     scheduling_algorithm: object
-        instance of the  :py:obj:`~topsim.core.algorithm.Algorithm` interface
+        instance of the  :py:obj:`~topsim.algorithms.scheduling.Algorithm` interface
 
     sim_timestamp: str
         Optional Simulation start-time; this is useful for testing, to ensure we
