@@ -26,14 +26,14 @@ class Simulation:
     monitoring, and provides the conditions for checking if the simulation has
     finished.
 
-    Attributes
-
+    Parameters
     ----------
+
     env : simpy.Environment bject
         This is how the TOpSim simulation maintains state across the
         different actors, and interfaces with the simpy processes.
 
-    telescope_config: str
+    telescope_config: `str`
         This is a path to the telescope config that follows the TOpSim config
         specification (JSON). This file will be parsed in the Telescope class
         constructure
@@ -45,12 +45,12 @@ class Simulation:
     buffer_config: str
         Path to the buffer configuration
 
-    planning_algorithm: Object
+    planning_algorithm: object
         instance of the planning algorithm class interface as defined in
         algorithms.examples/
 
     scheduling_algorithm: object
-        instance of the core.algorithm interface
+        instance of the  :py:obj:`~topsim.algorithms.scheduling.Algorithm` interface
 
     sim_timestamp: str
         Optional Simulation start-time; this is useful for testing, to ensure we
@@ -60,8 +60,29 @@ class Simulation:
     visualisation: bool
         If visualisation is required, True; else, False
 
-    Methods
-    -------
+
+    Notes
+    -----
+
+
+    Examples
+    --------
+
+    Standard simulation with data frame output
+
+    >>> env = simpy.environment()
+    >>> config = Config('path/to/config')
+    >>> instrument = CustomInstrument()
+    >>> plan = PlanningModel()
+    >>> sched = SchedulingModel()
+    >>> simulation = Simulation(env, config, instrument,plan,sched)
+
+    If we want delays in the model:
+
+    >>> dm = DelayModel(prob=0.1, dist='normal', dm=DelayModel.DelayDegree.LOW)
+    >>> simulation =  Simulation(
+    >>>    env, config, instrument,plan,sched, delay=dm
+    >>> )
 
 
     Raises
@@ -73,13 +94,15 @@ class Simulation:
             env,
             config,
             instrument,
-            planning,
+            planning_model,
+            planning_algorithm,
             scheduling,
             delay=None,
             timestamp=None,
             to_file=False,
     ):
 
+        #: simpy environment object
         self.env = env
 
         if timestamp:
@@ -88,16 +111,22 @@ class Simulation:
             sim_start_time = f'{time.time()}'.split('.')[0]
             self.monitor = Monitor(self, sim_start_time)
         # Process necessary config files
-        self.cfgpath = config
+
+        self.cfgpath = config #: Configuration path
+
         # Initiaise Actor and Resource objects
         cfg = Config(config)
+        #: :py:obj:`~topsim.core.cluster.Cluster` instance
         self.cluster = Cluster(env, cfg)
         self.buffer = Buffer(env, self.cluster, cfg)
-        planning_algorithm = planning
+        planning_algorithm = planning_algorithm
+        planning_model = planning_model
 
         if not delay:
             delay = DelayModel(0.0, "normal", DelayModel.DelayDegree.NONE)
-        self.planner = Planner(env, planning_algorithm, self.cluster, delay)
+        self.planner = Planner(
+            env, planning_algorithm, self.cluster, planning_model, delay
+        )
         scheduling_algorithm = scheduling()
         self.scheduler = Scheduler(
             env, self.buffer, self.cluster, scheduling_algorithm
@@ -115,6 +144,7 @@ class Simulation:
 
     def start(self, runtime=-1):
         """
+
         Run the simulation, either for the specified runtime, OR until the
         exit condition is reached:
 
@@ -151,7 +181,6 @@ class Simulation:
         self.env.process(self.scheduler.run())
         self.env.process(self.buffer.run())
 
-
         if runtime > 0:
             self.env.run(until=runtime)
         else:
@@ -170,13 +199,16 @@ class Simulation:
 
     def resume(self, until):
         """
-        Resume a simulation for a period of time
+        Resume a simulation for a period of time.
+
         Useful for testing purposes, as we do not re-initialise the process
-        calls as we used to in Simulation.start()
+        calls as we used to in
+        :py:obj:`~core.topsim.simulation.Simulation.start`
+
         Parameters
         ----------
         until : int
-            The (non-inclusive) Simpy.env.now timestep that we want to
+            The (non-inclusive) :py:obj:`Simpy.env.now` timestep that we want to
             continue to in the simulation
 
         Returns
@@ -220,4 +252,3 @@ class Simulation:
         ]
         df['config'] = [self.cfgpath for x in range(size)]
         return df
-

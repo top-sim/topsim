@@ -29,22 +29,26 @@ LOGGER = logging.getLogger(__name__)
 class Scheduler:
     """
 
-    Parameters
-    ----------
-    env : Simpy.Environment object
-        The simulation Environment
-
-    buffer : core.buffer.Buffer object
-        The SDP buffer used in the simulation
-
-    cluster : core.cluster.Cluster object
-        The Cluster instance used for the simluation
-
     Attributes
     ----------
     """
 
     def __init__(self, env, buffer, cluster, algorithm):
+        """
+        Parameters
+        ----------
+        env : Simpy.Environment object
+            The simulation Environment
+
+        buffer : core.buffer.Buffer object
+            The SDP buffer used in the simulation
+
+        cluster : core.cluster.Cluster object
+            The Cluster instance used for the simluation
+
+        algorithm : core.cluster.Algorithm object
+            The algorithm model using
+        """
         self.env = env
         self.algorithm = algorithm
         self.cluster = cluster
@@ -104,7 +108,9 @@ class Scheduler:
                     and self.status == SchedulerStatus.SHUTDOWN:
                 LOGGER.debug("No more waiting workflows")
                 break
-
+            # for obs in self.observation_queue:
+            #     if obs.workflow_plan.status == WorkflowStatus.FINISHED:
+            #         self.cluster.release_batch_resources(obs)
             LOGGER.debug("Scheduler Status: %s", self.status)
             yield self.env.timeout(TIMESTEP)
 
@@ -173,7 +179,8 @@ class Scheduler:
 
         return buffer_capacity and cluster_capacity
 
-    def allocate_ingest(self, observation, pipelines, planner, c='default'):
+    def allocate_ingest(self, observation, pipelines, planner,
+                        max_ingest=None, c='default'):
         """
         Ingest is 'streaming' data to the buffer during the observation
         How we calculate how long it takes remains to be seen
@@ -197,16 +204,17 @@ class Scheduler:
         ------
         """
         observation.ast = self.env.now
-        self.env.process(
-            planner.run(observation, self.buffer)
-        )
+        # self.env.process(
+        # observation.plan = planner.run(observation, self.buffer)
+        # )
+
         pipeline_demand = pipelines[observation.name]['ingest_demand']
-        self.ingest_observation = observation
+        ingest_observation = observation
         # We do an off-by-one check here, because the first time we run the
         # loop we will be one timestep ahead.
         time_left = observation.duration - 1
-        while self.ingest_observation.status is not RunStatus.FINISHED:
-            if self.ingest_observation.status is RunStatus.WAITING:
+        while ingest_observation.status is not RunStatus.FINISHED:
+            if ingest_observation.status is RunStatus.WAITING:
                 cluster_ingest = self.env.process(
                     self.cluster.provision_ingest_resources(
                         pipeline_demand,
@@ -218,9 +226,9 @@ class Scheduler:
                         observation,
                     )
                 )
-                self.ingest_observation.status = RunStatus.RUNNING
+                ingest_observation.status = RunStatus.RUNNING
 
-            elif self.ingest_observation.status is RunStatus.RUNNING:
+            elif ingest_observation.status is RunStatus.RUNNING:
                 if time_left > 0:
                     time_left -= 1
                 else:
@@ -230,12 +238,18 @@ class Scheduler:
         if RunStatus.FINISHED:
             self.provision_ingest -= pipeline_demand
             self.cluster.clean_up_ingest()
+            # TODO Fix this implicit object change, as whilst this is the
+            #  same as the object in the buffer, it is from the buffer we
+            #  get the observation. It is probably worth storing plans
+            #  separately and then 'giving' them to the observation once it
+            #  arrives at the scheduler.
+            observation.plan = planner.run(observation, self.buffer, max_ingest)
 
     def print_state(self):
         # Change this to 'workflows scheduled/workflows unscheduled'
         pass
 
-    def allocate_tasks(self, observation, test=False):
+    def allocate_tasks(self, observation):
         """
         For the current observation, we need to allocate tasks to machines
         based on:
@@ -267,116 +281,187 @@ class Scheduler:
         if current_plan.est > self.env.now:
             self.schedule_status.DELAYED
 
-        existing_schedule = set()
+        schedule = {}
         allocation_pairs = {}
-        while not test:
-            # curr_allocs protects against duplicated scheduled variables
-            # machine, task = (None, None)
-            status = WorkflowStatus.UNSCHEDULED
-            np = []
-            for t in current_plan.tasks:
-                if t.task_status is not TaskStatus.FINISHED:
-                    np.append(t)
-                else:
-                    if t.delay_flag:
-                        self.schedule_status = ScheduleStatus.DELAYED
-                        self.delay_offset += t.delay_offset
-            current_plan.tasks = np
-            nm = f'{observation.name}-algtime'
-            self.algtime[nm] = time.time()
-            timestep_allocations, status = self.algorithm(
-                cluster=self.cluster,
-                clock=self.env.now,
-                workflow_plan=current_plan
+        while True:
+            current_plan.tasks = self._update_current_plan(current_plan)
+            current_plan, schedule, finished = self._generate_current_schedule(
+                observation, current_plan, schedule
             )
-            LOGGER.info(f'{observation.name} has '
-                        f'{len(current_plan.tasks)} tasks @ {self.env.now}')
-            self.algtime[nm] = (time.time() - self.algtime[nm])
-            current_plan.status = status
-            if (current_plan.status is WorkflowStatus.DELAYED and
-                    self.schedule_status is not WorkflowStatus.DELAYED):
-                self.schedule_status = ScheduleStatus.DELAYED
-
-            existing_schedule.update(timestep_allocations)
-            # If the workflow is finished
-            if (not existing_schedule and status is
-                    WorkflowStatus.FINISHED):
-                if self.buffer.mark_observation_finished(
-                        observation
-                ):
-                    self.observation_queue.remove(observation)
-                    LOGGER.info(f'{observation.name} Removed from Queue @'
-                                f'{self.env.now}')
-                    break
-
+            if finished:
+                # We have finished this observation
+                LOGGER.info(f'{observation.name} Removed from Queue @'
+                            f'{self.env.now}')
+                # self.cluster.release_batch_resources(observation)
+                break
             # If there are no allocations made this timestep
-            elif not existing_schedule:
+            elif not schedule:
                 yield self.env.timeout(TIMESTEP)
             else:
-                sorted_schedule = sorted(
-                    existing_schedule, key=lambda a:  a[1].est
+                # This is where allocations are made to the cluster
+                schedule, allocation_pairs = self._process_current_schedule(
+                    schedule, allocation_pairs, current_plan.id
                 )
-                curr_allocs = []
-                for allocation in sorted_schedule:
-                    machine, task = allocation
-                    if machine.id != task.machine:
-                        task.update_allocation(machine)
-                        task.machine = machine
-                    allocation_success = None
-                    allocation_pairs[task.id] = (task, machine)
-                    alt = False
-                    altmachine = []
-                    for pred in task.pred:
-                        if allocation_pairs[pred][1] != machine:
-                            alt = True
-                            altmachine.append(allocation_pairs[pred][0])
-                    # Schedule
-                    if machine in curr_allocs or self.cluster.is_occupied(machine):
-                        continue
-                    ret = self.env.process(
-                        self.cluster.allocate_task_to_cluster(task, machine,
-                                                              alt,altmachine)
-                    )
-                    """
-                    `ret` will only have a value if an error occurs;
-                    otherwise, we are trying to get value that doesn't
-                    exist. Hence, the best case scenario is AttributeError. 
-                    """
-                    try:
-                        allocation_success = ret.value
-                    except AttributeError:
-                        allocation_success = True
-                    if allocation_success:
-                        LOGGER.debug("Allocation {0}-{1} made to "
-                                 "cluster".format(
-                            task, machine
-                        ))
-                        task.task_status = TaskStatus.SCHEDULED
-                        curr_allocs.append(machine)
-                        existing_schedule.remove(allocation)
-                    else:
-                        LOGGER.debug("Allocation was not made to cluster "
-                                    "due to double-allocation")
+
                 yield self.env.timeout(TIMESTEP)
 
         yield self.env.timeout(TIMESTEP)
 
-    def tmp(self, task, machine):
-        allocation_pairs = {}
-        allocation_pairs[task.id] = machine
-        alt_machine = False
+    def _generate_current_schedule(self, observation, current_plan, schedule):
+        """
+        Each timestep, we want to generate a schedule based on the observation
+        plan and an existing schedule.
+        Parameters
+        ----------
+        current_plan
+        schedule
+
+        Returns
+        -------
+        current_plan, schedule, finished
+        """
+
+        finished = False
+        nm = f'{observation.name}-algtime'
+        self.algtime[nm] = time.time()
+        schedule, status = self.algorithm.run(
+            cluster=self.cluster,
+            clock=self.env.now,
+            workflow_plan=current_plan,
+            existing_schedule=schedule
+        )
+        self.algtime[nm] = (time.time() - self.algtime[nm])
+
+        current_plan.status = status
+        if (current_plan.status is WorkflowStatus.DELAYED and
+                self.schedule_status is not WorkflowStatus.DELAYED):
+            self.schedule_status = ScheduleStatus.DELAYED
+
+        # If the workflow is finished
+        if not schedule and status is WorkflowStatus.FINISHED:
+            if self.buffer.mark_observation_finished(observation):
+                self.cluster.release_batch_resources(observation.name)
+                self.observation_queue.remove(observation)
+                finished = True
+
+        return current_plan, schedule, finished
+
+    def _process_current_schedule(self, schedule, allocation_pairs,
+                                  workflow_id):
+        """
+        Given a schedule and existing allocations, run through the schedule
+        and run the allocation for that tasks if possible
+
+        Parameters
+        ----------
+        schedule
+        allocation_pairs
+        workflow_id : The ID of the workflow. This is so in the cluster we
+        can find the appropriate set of provisioned resources.
+
+        Returns
+        -------
+
+        """
+        sorted_tasks = sorted(
+            schedule.keys(), key=lambda t: t.est
+        )
+        curr_allocs = []
+        # Allocate tasks
+        for task in sorted_tasks:
+            machine = schedule[task]
+            if machine.id != task.machine:
+                task.update_allocation(machine)
+            # Schedule
+            if machine in curr_allocs or self.cluster.is_occupied(machine):
+                LOGGER.debug(
+                    "Allocation not made to cluster due to double-allocation"
+                )
+            else:
+                allocation_pairs[task.id] = (task, machine)
+                pred_allocations = self._find_pred_allocations(
+                    task, machine, allocation_pairs
+                )
+                if task.task_status != TaskStatus.UNSCHEDULED:
+                    raise RuntimeError("Producing schedule with Scheduled "
+                                       "Tasks")
+                self.env.process(
+                    self.cluster.allocate_task_to_cluster(
+                        task, machine,  pred_allocations, workflow_id
+                    )
+                )
+
+                LOGGER.debug(f"Allocation {task}-{machine} made to cluster")
+                task.task_status = TaskStatus.SCHEDULED
+                curr_allocs.append(machine)
+                schedule.pop(task, None)
+
+        return schedule, allocation_pairs
+
+    def _update_current_plan(self, current_plan):
+        """
+        Check the status of tasks in the workflow plan and remove them if
+        they are complete
+
+        Each task has a delay_flag that is triggered if the duration or
+        finish time is not the same as what was estimated in the planning.
+        The method will update the self.schedule_status and self.delay_offset
+        class attributes.
+
+        Parameters
+        ----------
+        current_plan : core.planning.WorkflowPlan
+            The workflow plan for an observation in self.observation_queue
+
+
+        Returns
+        -------
+        remaining_tasks : list
+            List of remaining tasks in the workflow plan
+        """
+
+        remaining_tasks = []
+        for t in current_plan.tasks:
+            if t.task_status is not TaskStatus.FINISHED:
+                remaining_tasks.append(t)
+            else:
+                if t.delay_flag:
+                    self.schedule_status = ScheduleStatus.DELAYED
+                    self.delay_offset += t.delay_offset
+        return remaining_tasks
+
+    def _find_pred_allocations(self, task, machine, allocations):
+        """
+        Return a list of machines that the current tasks' predecessors were
+        allocated to.
+
+        The purpose of this is to provide this to the task when calculating
+        its duration; communication time of data from tasks on other
+        machines will be non-negligible and this must be completed in full
+        before the task can begin executing.
+
+        Parameters
+        ----------
+        task
+
+        Returns
+        -------
+
+        """
+        pred_allocations = []
         for pred in task.pred:
-            if allocation_pairs[pred] != machine:
-                alt_machine = True
-        if alt_machine:
-            self.env.process(task._wait_for_transfer(self.env))
+            pred_task, pred_machine = allocations[pred]
+            if pred_machine != machine:
+                alt = True
+                pred_allocations.append(pred_task)
+        return pred_allocations
 
     def to_df(self):
         df = pd.DataFrame()
         queuestr = f''
         for obs in self.observation_queue:
             queuestr += f'{obs.name}'
-        df['observation_queue'] =queuestr
+        df['observation_queue'] = queuestr
         df['schedule_status'] = [str(self.schedule_status)]
         df['delay_offset'] = [str(self.schedule_status)]
         tmp = f'alg'
@@ -386,6 +471,33 @@ class Scheduler:
         else:
             df['algtime'] = tmp
         return df
+
+
+class Schedule:
+
+    def __init__(self):
+        self.allocation = []
+        self.replace = False
+        self.status = WorkflowStatus.SCHEDULED
+
+    def add_allocation(self, task, machine):
+        self.allocation.append((task, machine))
+
+    def replace_previous_schedule(self):
+        self.replace = True
+
+
+class Allocation:
+
+    def __init__(self, task, machine):
+        self.task = task
+        self.machine = machine
+
+    def __eq__(self, other):
+        return self.task == other.task.id and self.machine == other.machine.id
+
+    def __hash__(self):
+        return hash(self.task.id + self.machine.id)
 
 
 class SchedulerStatus(Enum):

@@ -20,7 +20,7 @@ Basic simulation, with minimal Observation Plan and dummy observation workflows
 import simpy
 import logging
 
-from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.telescope import Telescope
 from topsim.core.simulation import Simulation
 

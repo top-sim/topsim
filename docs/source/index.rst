@@ -35,39 +35,12 @@ resources is covered in both the :ref:`model_overview` and
 sections.
 
 
-Requirements
+Installation
 -------------
 .. toctree::
 	:maxdepth: 1
-	:caption: Documentation
 
 	requirements
-
-
-TopSim Model
---------------------------
-.. toctree::
-	:maxdepth: 1
-
 	model_overview
-	actors
-	resources
-
-Configuration and Set-up
-------------------------
-.. toctree::
-	:maxdepth: 1
-
 	configuration
-	runningsim
-	simulation
-
-Algorithms and *shadow* integration
------------------------------------
-
-
-.. toctree::
-	:maxdepth: 1
-	:caption: Reference Items
-
 	reference/index

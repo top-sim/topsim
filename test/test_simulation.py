@@ -3,10 +3,13 @@ import simpy
 import logging
 import os
 
-from topsim.core.config import Config
 from topsim.core.simulation import Simulation
-from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.batch_allocation import BatchProcessing
+from topsim.user.plan.static_planning import SHADOWPlanning
+from topsim.user.plan.batch_planning import BatchPlanning
 from topsim.user.telescope import Telescope
+
 logging.basicConfig(level='WARNING')
 logger = logging.getLogger(__name__)
 
@@ -30,7 +33,8 @@ class TestSimulationConfig(unittest.TestCase):
             self.env,
             CONFIG,
             self.instrument,
-            planning='heft',
+            planning_model=SHADOWPlanning('heft'),
+            planning_algorithm='heft',
             scheduling=DynamicAlgorithmFromPlan,
             timestamp=self.timestamp
         )
@@ -53,7 +57,8 @@ class TestSimulationFileOptions(unittest.TestCase):
             self.env,
             CONFIG,
             Telescope,
-            planning='heft',
+            planning_model=SHADOWPlanning('heft'),
+            planning_algorithm='heft',
             scheduling=DynamicAlgorithmFromPlan,
             delay=None,
             timestamp=f'{cwd}/test/data/output/{0}',
@@ -62,7 +67,28 @@ class TestSimulationFileOptions(unittest.TestCase):
 
         simulation.start(runtime=60)
 
+
+class TestSimulationBatchProcessing(unittest.TestCase):
+    def setUp(self) -> None:
+        self.env = simpy.Environment()
+
+    def test_run_batchmodel(self):
+        simulation = Simulation(
+            self.env,
+            CONFIG,
+            Telescope,
+            planning_model=BatchPlanning('batch'),
+            planning_algorithm='batch',
+            scheduling=BatchProcessing,
+            delay=None,
+            timestamp=f'{cwd}/test/data/output/{0}'
+        )
+        sim, task = simulation.start()
+        self.assertGreater(len(sim),0)
+
+
 LARGE_CONFIG = 'test/data/config/mos_sw10.json'
+
 
 @unittest.skip
 class TestSimulationLargeExperiment(unittest.TestCase):
@@ -72,7 +98,8 @@ class TestSimulationLargeExperiment(unittest.TestCase):
             env,
             LARGE_CONFIG,
             Telescope,
-            planning='heft',
+            planning_algorithm='heft',
+            planning_model=SHADOWPlanning('heft'),
             scheduling=DynamicAlgorithmFromPlan,
             delay=None,
             timestamp=f'test/basic-workflow-data/output/{0}'
@@ -104,7 +131,9 @@ class TestSimulationLargeExperiment(unittest.TestCase):
 
     # BASIC WORKFLOW DATA
 
+
 BASIC_CONFIG = f'{cwd}test/basic-workflow-data/basic_simulation.json'
+
 
 class TestSimulationBasicSetup(unittest.TestCase):
 
@@ -124,4 +153,3 @@ class TestSimulationBasicSetup(unittest.TestCase):
         output = f'test/basic-workflow-data/output/{0}'
         os.remove(f'{output}-sim.pkl')
         os.remove(f'{output}-tasks.pkl')
-

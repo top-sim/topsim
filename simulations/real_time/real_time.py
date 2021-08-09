@@ -24,7 +24,7 @@ namely, the original HEFT workflow from Topcuoglu 2000.
 
 import simpy
 
-from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.telescope import Telescope
 from topsim.core.simulation import Simulation
 

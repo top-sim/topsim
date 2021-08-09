@@ -16,16 +16,13 @@
 import os
 import unittest
 import simpy
-import logging
 
 import pandas as pd
 
 from topsim.core.simulation import Simulation
-from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.telescope import Telescope
-
-logging.basicConfig(level="WARNING")
-logger = logging.getLogger(__name__)
+from topsim.user.plan.static_planning import SHADOWPlanning
 
 CONFIG = "test/simulation_pickles/heft_single_observation_simulation.json"
 
@@ -51,7 +48,8 @@ class TestMonitorPandasPickle(unittest.TestCase):
             env=env,
             config=CONFIG,
             instrument=instrument,
-            planning='heft',
+            planning_algorithm='heft',
+            planning_model=SHADOWPlanning('heft'),
             scheduling=DynamicAlgorithmFromPlan,
             delay=None,
             timestamp=SIM_TIMESTAMP,
@@ -89,7 +87,8 @@ class TestMonitorNoFileOption(unittest.TestCase):
             self.env,
             CONFIG,
             self.instrument,
-            planning='heft',
+            planning_algorithm='heft',
+            planning_model=SHADOWPlanning('heft'),
             scheduling=DynamicAlgorithmFromPlan,
             delay=None,
             timestamp=self.ts,
@@ -97,6 +96,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
         simdf, taskdf = simulation.start(runtime=60)
         self.assertFalse(os.path.exists("test/simulation_pickles/0-sim.pkl"))
 
+    # @unittest.skip("testing")
     def test_multi_siulation_data_merge(self):
         global_sim_df = pd.DataFrame()
         global_task_df = pd.DataFrame()
@@ -106,7 +106,8 @@ class TestMonitorNoFileOption(unittest.TestCase):
                 env,
                 CONFIG,
                 self.instrument,
-                planning=algorithm,
+                planning_algorithm=algorithm,
+                planning_model=SHADOWPlanning(algorithm),
                 scheduling=DynamicAlgorithmFromPlan,
                 delay=None,
                 timestamp=self.ts,
@@ -114,8 +115,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
             simdf, taskdf = simulation.start()
             global_sim_df = global_sim_df.append(simdf)
             global_task_df = global_task_df.append(taskdf)
-
-        self.assertEqual(252, len(global_sim_df))
+        self.assertEqual(248, len(global_sim_df))
 
     def testResultsAgreeWithExpectations(self):
         pass

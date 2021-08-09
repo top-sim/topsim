@@ -49,35 +49,6 @@ class Machine(object):
         self.status = Status.IDLE
         self.current_task = None
 
-    def transfer_data_from(self, machine):
-        """
-        Transfer the data from :param: machine
-        Parameters
-        ----------
-        machine
-
-        Returns
-        -------
-
-        """
-        pass
-
-    def transfer_data_to(self, machine):
-        pass
-
-    def accommodate(self, task):
-        return self.cpu >= task.task_config.flops and \
-               self.memory >= task.task_config.memory and \
-               self.disk >= task.task_config.io
-
-    def state_summary(self):
-        return {
-            'id': self.id,
-            'cpu': self.cpu,
-            'memory': self.memory,
-            'disk': self.disk
-        }
-
     def to_df(self):
         d = {
             'id': [self.id],

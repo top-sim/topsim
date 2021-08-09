@@ -18,7 +18,6 @@ Unittests for the topsim.core.delay.DelayModel class
 """
 
 import unittest
-from numpy.random import seed
 import simpy
 
 from topsim.core.config import Config
@@ -29,7 +28,8 @@ from topsim.core.buffer import Buffer
 from topsim.core.delay import DelayModel
 
 from topsim.user.telescope import Telescope
-from topsim.user.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.plan.static_planning import SHADOWPlanning
 
 INTEGRATION = "test/data/config_update/integration_simulation.json"
 PLANNING_ALGORITHM = 'heft'
@@ -85,10 +85,11 @@ class TestDelaysInActors(unittest.TestCase):
         config = Config(INTEGRATION)
         self.cluster = Cluster(self.env, config)
         self.buffer = Buffer(self.env, self.cluster, config)
+        dm = DelayModel(0.9, "normal",
+                   DelayModel.DelayDegree.HIGH)
         self.planner = Planner(
             self.env, PLANNING_ALGORITHM,
-            self.cluster, delay_model=DelayModel(0.9, "normal",
-                                                 DelayModel.DelayDegree.HIGH)
+            self.cluster, SHADOWPlanning('heft',delay_model=dm), delay_model=dm
         )
 
         self.scheduler = Scheduler(
