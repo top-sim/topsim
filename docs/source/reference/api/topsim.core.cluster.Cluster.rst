@@ -23,6 +23,7 @@
       ~Cluster.get_finished_tasks
       ~Cluster.get_idle_resources
       ~Cluster.is_idle
+      ~Cluster.is_observation_provisioned
       ~Cluster.is_occupied
       ~Cluster.print_state
       ~Cluster.provision_batch_resources
@@ -34,5 +35,11 @@
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Cluster.num_provisioned_obs
    
    

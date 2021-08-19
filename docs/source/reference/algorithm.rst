@@ -1,9 +1,9 @@
-=========
-Algorithm
-=========
+==========
+Scheduling
+==========
 
 
-.. currentmodule:: topsim.core.algorithm
+.. currentmodule:: topsim.scheduling.algorithm
 
 .. autosummary::
 	:template: class.rst
