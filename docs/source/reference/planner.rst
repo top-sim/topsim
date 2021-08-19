@@ -1,13 +1,15 @@
 ==========
-Scheduling
+Planner
 ==========
 
 
-.. currentmodule:: topsim.algorithms.scheduling
+.. currentmodule:: topsim.core.planner
 
 .. autosummary::
 	:template: class.rst
 	:recursive:
 	:toctree: api/
 
-	Algorithm
+	Planner
+
+	WorkflowPlan

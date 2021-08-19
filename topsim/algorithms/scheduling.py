@@ -16,7 +16,8 @@ class Algorithm(ABC):
     
     Notes
     -----
-    It is important to note that the simulation will run with an 'incorrect' algorithm. An algorithm is 'incorrect' if it attempts to: 
+    It is important to note that the simulation will run with an 'incorrect' algorithm.
+    An algorithm is 'incorrect' if it attempts to:
 
     - Allocate to a machine that is already occupied
     - Schedule a task to a machine that has already been scheduled. 

@@ -14,29 +14,30 @@ class Cluster:
 
     Parameters
     ----------
-    machines : dict
-        a formatted string to print out what the animal says
-    resources : dict
-        Dictionary that maintains record of what resources are doing what:
-            * 'ingest' resources are being used to process ingest data from
-            currently running observation
-            * 'occupied' resources are those running workflow tasks
-            * 'idle' resources is a dictionary of observations that are
-            currently running in batch-processing mode, in which resources
-            are provisioned in bulk and then used over the course of the
-            workflow. These resources are returned to 'available' at the
-            conclusion of the workflow
-            * 'available' resources are those that are available for allocation
+    env : :py:obj:`simpy.Environment`
+        The environment for the current simulation.
 
-    tasks : dict
-        the sound that the animal makes
-    ingest : int
-        the number of legs the animal has (default 4)
+    config : :py:obj:`~topsim.core.config.Config`
+        The configuration object for the simulation. See
+        :py:obj:`~topsim.core.simulation.Simulation` for more details.
 
-    Methods
-    -------
-    says(sound=None)
-        Prints the animals name and what sound it makes
+    Notes
+    -----
+    TopSim defaults to a 'free-for-all' style of resource allocation; unless
+    otherwise stated, a resource that is marked as 'available' may be used
+    for any task (provided capacity restrictions are met etc.).
+
+    If a SLURM-type resource provisioning approach is wanted, where a portion
+    of resources are allocated to a specific workflow for the duration of
+    that workflow, it is possible to use the `provision_batch_resources` and
+    methods in your (online) Scheduling algorithm. This associates a set of
+    machines for your workflow based on a provisioning scheme of your design.
+
+    The clean-up of resources is completed by the Scheduler once all
+    :py:obj:`~topsim.core.planner.Task` s in the
+    :py:obj:`~topsim.core.planner.WorkflowPlan` have finished, and requires
+    no additional code on behalf of the user.
+
     """
 
     def __init__(self, env, config):
@@ -53,28 +54,32 @@ class Cluster:
             'available': [machine for machine in self.machines],
             'total': len(self.machines)
         }
+
         self.tasks = {
             'running': [],
             'finished': [],
             'waiting': [],
-        }
+        }  #: `Dictionary` of storage of tasks
+
         self.ingest = {
             'status': False,
             'pipeline': None,
             'observation': None,
             'completed': 0,
             'demand': 0
-        }
+        }  #: Dictionary of current ingest information
+
         self.usage_data = {
             'occupied': 0,
             'ingest': 0,
             'available': len(self.resources['available']),
             'running_tasks': 0,
             'finished_tasks': 0
-        }
-        self.finished_workflows = []
-        self.ingest_pipeline = None
-        self.ingest_obervation = None
+        }  #: Data to more easily create output data frame
+
+        # self.finished_workflows = []
+        # self.ingest_pipeline = None
+        # self.ingest_obervation = None
         self.clusters = {
             'default': {
                 'resources': self.resources,
@@ -220,10 +225,15 @@ class Cluster:
 
     def current_available_resources(self):
         """
+        Produce a list of current available resources
+
+        We use a list comprehension here because otherwise we would
+        return an actual reference to the resources, causing issues if we
+        want to remove elements from the list wherever we are using it.
 
         Returns
         -------
-
+        A list that duplicates the entries for current available resources
         """
         return [x for x in self.clusters['default']['resources']['available']]
 

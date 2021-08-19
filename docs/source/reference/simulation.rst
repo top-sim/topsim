@@ -1,6 +1,6 @@
-========
+===========
 Simulation
-========
+===========
 .. toctree::
 
 .. currentmodule:: topsim.core.simulation
