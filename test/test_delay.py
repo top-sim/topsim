@@ -114,13 +114,13 @@ class TestDelaysInActors(unittest.TestCase):
 
         self.env.run(until=1)
         # Remember - env starts at 0, we don't start until 1.
-        self.assertEqual(10, len(self.cluster.resources['available']))
+        self.assertEqual(10, len(self.cluster._resources['available']))
         self.env.run(until=2)
 
         # After 1 timestep, data in the HotBuffer should be 4
         self.assertEqual(496, self.buffer.hot[0].current_capacity)
         self.env.run(until=31)
-        self.assertEqual(5, len(self.cluster.tasks['finished']))
+        self.assertEqual(5, len(self.cluster._tasks['finished']))
         self.assertEqual(500, self.buffer.hot[0].current_capacity)
         self.env.run(until=44)
         # We know that the schedule has been delayed - however, we don't
@@ -148,13 +148,13 @@ class TestDelaysInActors(unittest.TestCase):
         """
         self.env.run(until=1)
         # Remember - env starts at 0, we don't start until 1.
-        self.assertEqual(10, len(self.cluster.resources['available']))
+        self.assertEqual(10, len(self.cluster._resources['available']))
         self.env.run(until=2)
 
         # After 1 timestep, data in the HotBuffer should be 4
         self.assertEqual(496, self.buffer.hot[0].current_capacity)
         self.env.run(until=31)
-        self.assertEqual(5, len(self.cluster.tasks['finished']))
+        self.assertEqual(5, len(self.cluster._tasks['finished']))
         self.assertEqual(500, self.buffer.hot[0].current_capacity)
         self.env.run(until=32)
         # Ensure the time

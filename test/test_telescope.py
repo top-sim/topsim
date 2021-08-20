@@ -79,7 +79,7 @@ class TestTelescopeIngest(unittest.TestCase):
         self.env.process(self.buffer.run())
         self.env.run(until=2)
         self.assertEqual(36, telescope.telescope_use)
-        self.assertEqual(5, len(self.cluster.resources['available']))
+        self.assertEqual(5, len(self.cluster._resources['available']))
         # After 1 timestep, data in the HotBuffer should be 2
         self.assertEqual(496, self.buffer.hot[0].current_capacity)
         self.env.run(until=11)
@@ -88,8 +88,8 @@ class TestTelescopeIngest(unittest.TestCase):
         self.assertEqual(248,self.buffer.cold[0].current_capacity)
         self.env.run(until=12)
         self.assertEqual(0, telescope.telescope_use)
-        self.assertEqual(10, len(self.cluster.resources['available']))
-        self.assertEqual(5, len(self.cluster.tasks['finished']))
+        self.assertEqual(10, len(self.cluster._resources['available']))
+        self.assertEqual(5, len(self.cluster._tasks['finished']))
 
 
 class TestTaskDelayDetection(unittest.TestCase):
