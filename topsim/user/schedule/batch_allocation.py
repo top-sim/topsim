@@ -122,7 +122,7 @@ class BatchProcessing(Algorithm):
 
         #  TODO do We need to make sure there's enough left for ingest to
         #   occur?
-        max_allowed = int(len(cluster.dmachine) / self.max_resources_split)
+        max_allowed = int(len(cluster) / self.max_resources_split)
         if available == 0:
             return 0
         if available < max_allowed:

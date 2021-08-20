@@ -179,7 +179,7 @@ class SHADOWPlanning(Planning):
         # TODO we have reverted to the entire list of machines; can we
         #  improve this moving forward?
         # TODO entire machines
-        available_resources = list(cluster.dmachine.values())
+        available_resources = cluster.machines
         dictionary = {
             "system": {
                 "resources": None,

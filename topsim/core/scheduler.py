@@ -473,40 +473,23 @@ class Scheduler:
         return df
 
 
-class Schedule:
-
-    def __init__(self):
-        self.allocation = []
-        self.replace = False
-        self.status = WorkflowStatus.SCHEDULED
-
-    def add_allocation(self, task, machine):
-        self.allocation.append((task, machine))
-
-    def replace_previous_schedule(self):
-        self.replace = True
-
-
-class Allocation:
-
-    def __init__(self, task, machine):
-        self.task = task
-        self.machine = machine
-
-    def __eq__(self, other):
-        return self.task == other.task.id and self.machine == other.machine.id
-
-    def __hash__(self):
-        return hash(self.task.id + self.machine.id)
-
-
 class SchedulerStatus(Enum):
+    """
+    The status of the Scheduler Actor
+
+    Used to determine if the Scheduler is running. If it is not running,
+    and is marked as SHUTDOWN, then this is one of the exit conditions for
+    a simulation.
+    """
     SLEEP = 'SLEEP'
     RUNNING = 'RUNNING'
     SHUTDOWN = 'SHUTDOWN'
 
 
 class ScheduleStatus(Enum):
+    """
+
+    """
     ONTIME = 'ONTIME'
     DELAYED = 'DELAYED'
     FAILURE = 'FAILURE'
