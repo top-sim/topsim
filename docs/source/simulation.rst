@@ -1,13 +1,14 @@
 The anatomy of a simulation
 ===========================
 
+.. currentmodule:: topsim.core
 
 Simulations are started from a simulation object, with the main actors
 initialised prior to a simulations;
 
-* Telescope
+* :py:class:`~telescope.Telescope`
 * Scheduler
-* Cluster
+* :py:class:`~cluster.Cluster`
 * Buffer
 * Monitor
 

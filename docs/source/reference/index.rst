@@ -3,10 +3,10 @@ Reference
 -----------------
 .. toctree::
 	:caption: Class and API Reference
-	:maxdepth: 3
+	:maxdepth: 4
 
 	simulation
 	cluster
 	algorithm
 	planner
-
+	task

@@ -1,16 +1,18 @@
 ==========
-Planner
+Scheduler
 ==========
 
 
-.. currentmodule:: topsim.core.planner
+.. currentmodule:: topsim.core.scheduler
 
 .. autosummary::
 	:template: class.rst
 	:recursive:
 	:toctree: api/
 
-	Planner
+	Scheduler
 
-	WorkflowPlan
+	SchedulerStatus
+
+	ScheduleStatus
 

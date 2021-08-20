@@ -1,16 +1,13 @@
 ==========
-Planner
+Config
 ==========
 
 
-.. currentmodule:: topsim.core.planner
+.. currentmodule:: topsim.core.config
 
 .. autosummary::
 	:template: class.rst
 	:recursive:
 	:toctree: api/
 
-	Planner
-
-	WorkflowPlan
-
+	Config
