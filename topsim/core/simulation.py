@@ -1,13 +1,5 @@
-"""
-The Simulation class is a wrapper for all Actors; we start the simulation
-through the simulation class, which in turn invokes the initial Actors and
-monitoring, and provides the conditions for checking if the simulation has
-finished.
-"""
-
 import logging
 import time
-import json
 from topsim.core.config import Config
 from topsim.core.monitor import Monitor
 from topsim.core.scheduler import Scheduler
@@ -29,41 +21,47 @@ class Simulation:
     Parameters
     ----------
 
-    env : simpy.Environment bject
-        This is how the TOpSim simulation maintains state across the
-        different actors, and interfaces with the simpy processes.
+    env : simpy.Environment object
+        The discrete-event simulation environment. This is the way TOpSim
+        simulation maintains state across the different actors,
+        and interfaces with the simpy processes.
 
-    telescope_config: `str`
-        This is a path to the telescope config that follows the TOpSim config
-        specification (JSON). This file will be parsed in the Telescope class
-        constructure
+    config : str
+        Path to the simulation JSOn configuration file
 
-    cluster_config: str
-        Path to the HPC cluster config that forms the computing component of
-        the SDP
+    instrument : :py:obj:`~topsim.core.instrument.Instrument`
+        User-defined implementation of the Instrument class.
 
-    buffer_config: str
-        Path to the buffer configuration
+    planning_model : :py:obj:`~topsim.algorithms.planning.Planning` object
+        User-defined implementation of the planning algorithm class
 
-    planning_algorithm: object
-        instance of the planning algorithm class interface as defined in
-        algorithms.examples/
+    planning_algorithm: str
+        Reference to the specific algorithm implementated in `planning_model`
 
-    scheduling_algorithm: object
-        instance of the  :py:obj:`~topsim.algorithms.scheduling.Algorithm` interface
+    scheduling: :py:obj:`~topsim.algorithms.planning.Planning`
+        User-defined implementation of the planning algorithm class
 
-    sim_timestamp: str
+    delay: :py:obj:`~topsim.core.delay.DelayModel`
+        The Delay model configuration for the simulation.
+
+    timestamp: str
         Optional Simulation start-time; this is useful for testing, to ensure we
         name the file and the tests match up. Also useful if you do not want to
         use the time of the simulation as the name.
 
-    visualisation: bool
-        If visualisation is required, True; else, False
-
+    to_file : bool
+        `True` if the simulation is to be written to a Pandas `pkl` file;
+        `False` will return pandas DataFrame objects at the completion of the
+        :py:meth:`~topsim.core.simulation.Simulation.run` function.
 
     Notes
     -----
-
+    If to_file left as`False`, simulation results and output will be returned
+    as Pandas DataFrames (see
+    :py:meth:`~topsim.core.simulation.Simulation.run`. This is designed for
+    running multiple simulations, allowing for the appending of individual
+    simulation results to a 'global' `DataFrame`. Current support for output
+    is limited to Panda's `.pkl` files.
 
     Examples
     --------
@@ -83,7 +81,6 @@ class Simulation:
     >>> simulation =  Simulation(
     >>>    env, config, instrument,plan,sched, delay=dm
     >>> )
-
 
     Raises
     ------
@@ -112,7 +109,7 @@ class Simulation:
             self.monitor = Monitor(self, sim_start_time)
         # Process necessary config files
 
-        self.cfgpath = config #: Configuration path
+        self.cfgpath = config  #: Configuration path
 
         # Initiaise Actor and Resource objects
         cfg = Config(config)
@@ -123,6 +120,8 @@ class Simulation:
         planning_model = planning_model
 
         if not delay:
+            # TODO Have this approach replicated so we don't specify the
+            #  model outside the simulation.
             delay = DelayModel(0.0, "normal", DelayModel.DelayDegree.NONE)
         self.planner = Planner(
             env, planning_algorithm, self.cluster, planning_model, delay
@@ -144,9 +143,10 @@ class Simulation:
 
     def start(self, runtime=-1):
         """
-
         Run the simulation, either for the specified runtime, OR until the
-        exit condition is reached:
+        exit conditions are reached.
+
+        The exit conditions are:
 
             * There are no more observations to process,
             * There is nothing left in the Buffer
@@ -163,6 +163,12 @@ class Simulation:
 
         Returns
         -------
+        If `to_file` is True:
+            sim_data_path, task_data_path : str
+                Path names for the global simulation runtime and the
+                individual task data output.
+        If `to_file` is False:
+            Two pandas.DataFrame objects for global sim runtime and task data.
 
         """
         if self.running:
@@ -190,10 +196,13 @@ class Simulation:
         LOGGER.info("Simulation Finished @ %s", self.env.now)
 
         if self.to_file:
+            sim_data_path = f''
+            task_data_path = f''
             self.monitor.df.to_pickle(f'{self.monitor.sim_timestamp}-sim.pkl')
             self._generate_final_task_data().to_pickle(
                 f'{self.monitor.sim_timestamp}-tasks.pkl'
             )
+
         else:
             return self.monitor.df, self._generate_final_task_data()
 

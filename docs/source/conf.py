@@ -54,7 +54,9 @@ html_theme = 'pydata_sphinx_theme'
 
 # html_theme_options = {"full_logo":"true"}
 html_theme_options = {
-    "show_toc_level": True
+    # "show_toc_level": True,
+    # "collapse_navigation": False,
+    # "navigation_depth": 2
 }
 html_logo = 'new_logo.svg'
 # Add any paths that contain custom static files (such as style sheets) here,

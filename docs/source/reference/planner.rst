@@ -8,7 +8,7 @@ Planner
 .. autosummary::
 	:template: class.rst
 	:recursive:
-	:toctree: api/
+	:toctree: api/core/
 
 	Planner
 

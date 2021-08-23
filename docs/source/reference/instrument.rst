@@ -1,14 +1,13 @@
 ===========
-Simulation
+Instrument
 ===========
 .. toctree::
 
-.. currentmodule:: topsim.core.simulation
+.. currentmodule:: topsim.core.instrument
 
 .. autosummary::
 	:template: class.rst
 	:recursive:
-	:toctree: api/core/
+	:toctree: api/user/
 
-	Simulation
-
+	Instrument

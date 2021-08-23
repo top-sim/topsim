@@ -359,6 +359,7 @@ class Cluster:
     def is_occupied(self, machine, observation=None, c='default'):
         """
         Check if the machine is occupied
+
         Parameters
         ----------
         machine : topsim.core.machine.Machine
@@ -378,6 +379,7 @@ class Cluster:
         -------
 
         """
+
         # TODO add 'is provisioned' check here
 
         return (machine in self._clusters[c]['resources']['occupied']
