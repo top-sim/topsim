@@ -18,7 +18,6 @@ import json
 from topsim.core.instrument import Observation
 from topsim.core.machine import Machine
 from topsim.core.buffer import HotBuffer, ColdBuffer
-import pandas as pd
 
 import logging
 

@@ -485,10 +485,10 @@ class SchedulerStatus(Enum):
     RUNNING = 'RUNNING'
     SHUTDOWN = 'SHUTDOWN'
 
-
+# TODO Update to WorkflowStatus to avoid SchedulerStatus single-letter typos
 class ScheduleStatus(Enum):
     """
-
+    # TODO docstring
     """
     ONTIME = 'ONTIME'
     DELAYED = 'DELAYED'

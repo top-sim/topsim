@@ -3,8 +3,9 @@ Reference
 -----------------
 .. toctree::
 	:caption: Class and API Reference
-	:maxdepth: 1
+	:maxdepth: 4
 
 	core
 	user
+	examples
 

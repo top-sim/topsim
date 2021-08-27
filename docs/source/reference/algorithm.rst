@@ -8,6 +8,6 @@ Scheduling
 .. autosummary::
 	:template: class.rst
 	:recursive:
-	:toctree: api/
+	:toctree: api/user
 
 	Algorithm

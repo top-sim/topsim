@@ -38,7 +38,7 @@ sections.
 Installation
 -------------
 .. toctree::
-	:maxdepth: 1
+	:maxdepth: 3
 
 	requirements
 	model_overview

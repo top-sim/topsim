@@ -21,7 +21,7 @@ class Simulation:
     Parameters
     ----------
 
-    env : simpy.Environment object
+    env : :py:obj:`simpy.Environment` object
         The discrete-event simulation environment. This is the way TOpSim
         simulation maintains state across the different actors,
         and interfaces with the simpy processes.
@@ -38,30 +38,31 @@ class Simulation:
     planning_algorithm: str
         Reference to the specific algorithm implementated in `planning_model`
 
-    scheduling: :py:obj:`~topsim.algorithms.planning.Planning`
-        User-defined implementation of the planning algorithm class
+    scheduling: :py:obj:`~topsim.algorithms.scheduling.Algorithm`
+        User-defined implementation of the scheduling algorithm
+        :py:obj:`abc.ABC`.
 
-    delay: :py:obj:`~topsim.core.delay.DelayModel`
-        The Delay model configuration for the simulation.
+    delay: :py:obj:`~topsim.core.delay.DelayModel`,  optional
+         for the simulation.
 
-    timestamp: str
+    timestamp: str, optional
         Optional Simulation start-time; this is useful for testing, to ensure we
         name the file and the tests match up. Also useful if you do not want to
         use the time of the simulation as the name.
 
-    to_file : bool
+    to_file : bool, optional
         `True` if the simulation is to be written to a Pandas `pkl` file;
         `False` will return pandas DataFrame objects at the completion of the
         :py:meth:`~topsim.core.simulation.Simulation.run` function.
 
     Notes
     -----
-    If to_file left as`False`, simulation results and output will be returned
+    If to_file left as `False`, simulation results and output will be returned
     as Pandas DataFrames (see
-    :py:meth:`~topsim.core.simulation.Simulation.run`. This is designed for
+    :py:meth:`~topsim.core.simulation.Simulation.run`) . This is designed for
     running multiple simulations, allowing for the appending of individual
-    simulation results to a 'global' `DataFrame`. Current support for output
-    is limited to Panda's `.pkl` files.
+    simulation results to a 'global' :py:obj:`~pandas.DataFrame` . Current
+    support for output is limited to Panda's `.pkl` files.
 
     Examples
     --------
@@ -82,6 +83,16 @@ class Simulation:
     >>>    env, config, instrument,plan,sched, delay=dm
     >>> )
 
+    Running a simulation to completion:
+
+    >>> df = simulation.run()
+
+    Running a simulation for a specific time period, then resuming:
+
+    >>> df = simulation.run(runtime=100)
+    >>> ### Check current status of simulatiion
+    >>> df = simulation.resume(until=150)
+
     Raises
     ------
     """
@@ -99,10 +110,11 @@ class Simulation:
             to_file=False,
     ):
 
-        #: simpy environment object
+        #: :py:obj:`simpy.Environment` object
         self.env = env
 
         if timestamp:
+            #: :py:obj:`~topsim.core.monitor.Monitor` instance
             self.monitor = Monitor(self, timestamp)
         else:
             sim_start_time = f'{time.time()}'.split('.')[0]
@@ -115,6 +127,7 @@ class Simulation:
         cfg = Config(config)
         #: :py:obj:`~topsim.core.cluster.Cluster` instance
         self.cluster = Cluster(env, cfg)
+        #: :py:obj:`~topsim.core.buffer.Buffer` instance
         self.buffer = Buffer(env, self.cluster, cfg)
         planning_algorithm = planning_algorithm
         planning_model = planning_model
@@ -127,9 +140,11 @@ class Simulation:
             env, planning_algorithm, self.cluster, planning_model, delay
         )
         scheduling_algorithm = scheduling()
+        #: :py:obj:`~topsim.core.scheduler.Scheduler` instance
         self.scheduler = Scheduler(
             env, self.buffer, self.cluster, scheduling_algorithm
         )
+        #: User-defined :py:obj:`~topsim.core.instrument.Instrument` instance
         self.instrument = instrument(
             env=self.env,
             config=cfg,
@@ -137,6 +152,8 @@ class Simulation:
             scheduler=self.scheduler
         )
 
+        #: :py:obj:`bool` Flag for producing simulation output in a `.pkl`
+        # file.
         self.to_file = to_file
 
         self.running = False

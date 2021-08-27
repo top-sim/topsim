@@ -1,13 +1,13 @@
 ==========
-Config
+Monitor
 ==========
 
 
-.. currentmodule:: topsim.core.config
+.. currentmodule:: topsim.core.monitor
 
 .. autosummary::
 	:template: class.rst
 	:recursive:
-	:toctree: api/core
+	:toctree: api/core/
 
-	Config
+	Monitor
