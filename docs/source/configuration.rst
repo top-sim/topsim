@@ -12,7 +12,7 @@ how many antennas are to be used during the observation (``demand``), and the lo
 workflow descrition file (``filename``).
 
 .. code-block:: html
- This branch is 5 commits ahead of development.
+
 	name,start,duration,demand,filename
 	emu,0,10,36,test/emu_spec.json
 	dingo,10,15,18,test/dingo_spec.json

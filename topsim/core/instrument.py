@@ -124,9 +124,7 @@ class Observation(object):
     the object also stores information about the workflow, and the generated
     plan for that workflow.
 
-    Array with associated photographic information.
-
-    Attributes
+    Parameters
     ----------
     name : str
         Observation name
@@ -153,25 +151,7 @@ class Observation(object):
 
     def __init__(self, name, start, duration, demand, workflow,
                  data_rate):
-        """
-        Parameters
-           ----------
-        name : str
-            Observation name/ID
-        start : int
-            Expected start-time of the observation
-        duration : int
-            Expected Duration of the observation
-        demand : int
-            Expected Telescope demand of (Number of arrays used) during observation
-        workflow : str
-            Path to the workflow specification (JSON file)
-        type : str
-            What type of observation (Continuum, Spectral, etc.)
-        data_rate: int
-            Expected incoming data rate produced by the observation (GB/s)
 
-        """
         # TODO change to self.id
         self.name = name
         self.buffer_id = 0
@@ -214,6 +194,17 @@ class Observation(object):
             return False
 
     def is_finished(self, current_time, telescope_status):
+        """
+        Check if the observation has finished on the telescope.
+        Parameters
+        ----------
+        current_time
+        telescope_status
+
+        Returns
+        -------
+
+        """
         if self.ast is None:
             return False
         elif current_time >= self.ast + self.duration \

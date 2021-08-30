@@ -11,3 +11,5 @@ Instrument
 	:toctree: api/user/
 
 	Instrument
+	Observation
+

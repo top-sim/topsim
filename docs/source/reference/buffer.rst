@@ -1,5 +1,5 @@
 ========
-Cluster
+Buffer
 ========
 
 
@@ -12,3 +12,7 @@ Cluster
 
 
 	Buffer
+
+	HotBuffer
+
+	ColdBuffer

@@ -177,11 +177,44 @@ class Telescope(Instrument):
             yield self.env.timeout(1)
 
     def begin_observation(self, observation):
+        """
+        Update the telescope use status based on observation demand for antennas
+
+        Parameters
+        ----------
+        observation : :py:obj:`~topsim.core.telescope.Observation`
+            Observation that is chosen for allocation to the telescope
+
+        Returns
+        -------
+            RunStatus.RUNNING
+
+        """
+        # TODO We do not actually do any sanity checking here to make sure
+        #  the telescope use isn't greater than the total_capacity.
+
         self.telescope_use += observation.demand
         self.telescope_status = True
         return RunStatus.RUNNING
 
     def finish_observation(self, observation):
+        """
+        Update the telescope use status based on observation demand for antennas
+
+        Parameters
+        ----------
+        observation : :py:obj:`~topsim.core.telescope.Observation`
+            Observation that is chosen for allocation to the telescope
+
+        Returns
+        -------
+            RunStatus.RUNNING
+
+        """
+
+        # TODO We do not actually do any sanity checking here to make sure
+        #  the telescope use isn't greater than the total_capacity.
+
         self.telescope_use -= observation.demand
 
         if self.telescope_use is 0:
