@@ -156,6 +156,16 @@ class Simulation:
         # file.
         self.to_file = to_file
 
+        my_data = []
+        if 'str' in my_data:
+            print('Hello!')
+
+        my_data = {}
+        if 'str' in my_data:
+            print('Hello, again!')
+
+
+
         self.running = False
 
     def start(self, runtime=-1):

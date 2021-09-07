@@ -101,6 +101,8 @@ class Cluster:
             'finished_tasks': 0
         }  # Data to more easily create output data frame
 
+        self.num_provisioned_obs = 0
+
         self._clusters = {
             'default': {
                 'resources': self._resources,
@@ -338,7 +340,7 @@ class Cluster:
 
         Returns
         -------
-
+        True if nothing is running, False otherwise
         """
 
         no_tasks_running = (
@@ -410,6 +412,8 @@ class Cluster:
             size = tmp
         for m in range(0, size):
             self._add_idle_resource(name, available_resources[0])
+
+        self.num_provisioned_obs+=1
         return True
 
     def release_batch_resources(self, observation, c='default'):
@@ -427,6 +431,7 @@ class Cluster:
         if observation in self._clusters[c]['resources']['idle']:
             self._update_available_resources(observation)
             self._reset_idle_resources(observation)
+
 
     def get_machine_from_id(self, id, c='default'):
         """
@@ -498,22 +503,6 @@ class Cluster:
         """
         return [x for x in self._clusters[c]['tasks']['finished']]
 
-    @property
-    def num_provisioned_obs(self, c='default'):
-        """
-        Return how many observations have been provisioned
-
-        Useful for
-
-        Returns
-        -------
-        Number of observtions that have been provisioned (int)
-        """
-        x = sum(
-            [1 if self._clusters[c]['resources']['idle'][x] else 0
-             for x in self._clusters[c]['resources']['idle']]
-        )
-        return x
 
     def get_finished_tasks(self, c='default'):
         """
@@ -621,7 +610,9 @@ class Cluster:
         -------
 
         """
-        self._clusters[c]['resources']['idle'][observation] = []
+        if self._clusters[c]['resources']['idle'][observation]:
+            self._clusters[c]['resources']['idle'].pop(observation)
+            self.num_provisioned_obs -=1
         return None
 
     def _remove_available_resource(self, machine, c='default'):
@@ -718,9 +709,28 @@ class Cluster:
             self._clusters['default']['usage_data']['running_tasks']]
         df['finished_tasks'] = [
             self._clusters['default']['usage_data']['finished_tasks']]
+
+        df['provisioned_observations'] = [
+            len(self._clusters['default']['resources']['idle'])
+        ]
         # df['waiting_tasks'] = [len(self.tasks['waiting'])]
 
         return df
+
+    def _update_usage_data(self, resource: str, value):
+        """
+        Update the usage statistics of the resource with the new value
+        Parameters
+        ----------
+        resource : str
+            A string value from the 'usage_data' dictionary
+
+        Returns
+        -------
+        The new value
+        """
+        self._clusters['default']['usage_data']['resource'] = value
+        return value
 
     def finished_task_time_data(self):
         """

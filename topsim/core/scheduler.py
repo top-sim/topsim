@@ -60,6 +60,8 @@ class Scheduler:
         self.schedule_status = ScheduleStatus.ONTIME
         self.algtime = {}
         self.delay_offset = 0
+        self._finished_observations = 0
+
 
     def start(self):
         """
@@ -341,6 +343,7 @@ class Scheduler:
         if not schedule and status is WorkflowStatus.FINISHED:
             if self.buffer.mark_observation_finished(observation):
                 self.cluster.release_batch_resources(observation.name)
+                LOGGER.info(f'{observation.name} resources released')
                 self.observation_queue.remove(observation)
                 finished = True
 
@@ -457,12 +460,25 @@ class Scheduler:
         return pred_allocations
 
     def to_df(self):
+        """
+        Convert scheduling timestep data into dataframe for the
+        :py:obj:`~topsim.core.monitor.Monitor` actor.
+
+        Returns
+        -------
+        df : pandas.DataFrame
+            Dataframe object with all the relevant data.
+
+        """
         df = pd.DataFrame()
         queuestr = f''
         for obs in self.observation_queue:
             queuestr += f'{obs.name}'
+        df['scheduler_observation_queue'] = [len(self.observation_queue)]
+        # df['observations_waiting'] = [0]
+        df['finished_observations'] = [self._finished_observations]
         df['observation_queue'] = queuestr
-        df['schedule_status'] = [str(self.schedule_status)]
+        df['schedule_status'] = [str(self.  schedule_status)]
         df['delay_offset'] = [str(self.schedule_status)]
         tmp = f'alg'
         if self.algtime:
