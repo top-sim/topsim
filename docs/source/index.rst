@@ -26,7 +26,8 @@ Telescope); or they may be independent of any Actor (as is the case with the
 Cluster). More information can be found in :ref:`resources`. 
 
 The primary motivation of TopSim is to test new models of scheduling and
-planning for Radio Astronomy post-processing. As a result, the focus of TopSim is primarily on the design and implementation of the workflow, plan and
+planning for Radio Astronomy post-processing. As a result, the focus of
+TopSim is primarily on the design and implementation of the workflow, plan
 scheduling models. This means the relative granularity and expressiveness of
 other parts of the system - such as observation specifications - are low. More
 discussion on the different levels of abstraction of the different actors and
