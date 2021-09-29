@@ -216,6 +216,9 @@ class Buffer:
         -------
 
         """
+
+        # TODO Support multiple observation transfers 
+
         if not self.hot[b].observations["stored"]:
             raise RuntimeError(
                 "No observations in Hot Buffer"
@@ -256,6 +259,7 @@ class Buffer:
                 )
             yield self.env.timeout(TIMESTEP)
         return True
+
 
     def ingest_data_stream(self, observation):
         """

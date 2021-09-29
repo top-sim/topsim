@@ -478,8 +478,10 @@ class Scheduler:
         # df['observations_waiting'] = [0]
         df['finished_observations'] = [self._finished_observations]
         df['observation_queue'] = queuestr
-        df['schedule_status'] = [str(self.  schedule_status)]
-        df['delay_offset'] = [str(self.schedule_status)]
+        df['schedule_status'] = pd.Series(
+            [self.schedule_status.value], dtype="string"
+        )
+        df['delay_offset'] = pd.Series([self.delay_offset])
         tmp = f'alg'
         if self.algtime:
             for key, value in self.algtime.items():
