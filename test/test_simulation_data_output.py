@@ -25,11 +25,7 @@ from topsim.user.telescope import Telescope
 from topsim.user.plan.static_planning import SHADOWPlanning
 
 CONFIG = "test/simulation_pickles/heft_single_observation_simulation.json"
-
 SIM_TIMESTAMP = f'test/simulation_pickles/{0}'
-EVENT_PICKLE = f'{SIM_TIMESTAMP}-heft-GreedyAlgorithmFromPlan-sim.pkl'
-TASKS_PICKLE = f'{SIM_TIMESTAMP}-heft-GreedyAlgorithmFromPlan-tasks.pkl'
-
 cwd = os.getcwd()
 
 
@@ -53,19 +49,36 @@ class TestMonitorPandasPickle(unittest.TestCase):
             scheduling=DynamicAlgorithmFromPlan,
             delay=None,
             timestamp=SIM_TIMESTAMP,
-            to_file=True
+            to_file=True,
+            hdf5_path='test/simulation_data/test_hdf5.h5',
+            delimiters=f'test/'
         )
 
     def tearDown(self):
         output = f'{cwd}/test/simulation_pickles/{0}'
-        os.remove(f'{output}-sim.pkl')
-        os.remove(f'{output}-tasks.pkl')
+        # os.remove(f'{output}-sim.pkl')
+        # os.remove(f'{output}-tasks.pkl')
+
+    def testHDF5GeneratedAfterSimulation(self):
+        """
+        Test that after a simulation, a HDF5 storage file is generated
+
+        """
+        self.simulation.start()
+        self.assertTrue(os.path.exists('test/simulation_data/test_hdf5.h5'))
+
+    def testHDF5KeysAndDataFramesExist(self):
+        """
+        Ensure that the generated HDF5 contains the correct results in the
+        keys
+
+        """
 
     def testPickleGeneratedAfterSimulation(self):
         res = self.simulation.start(-1)
 
-        sim_df = pd.read_pickle('test/simulation_pickles/0-sim.pkl')
-        tasks_df = pd.read_pickle('test/simulation_pickles/0-tasks.pkl')
+        sim_df = pd.read_pickle('simulation_data/0-sim.pkl')
+        tasks_df = pd.read_pickle('simulation_data/0-tasks.pkl')
         self.assertTrue('running_tasks' in sim_df)
 
 
@@ -94,12 +107,13 @@ class TestMonitorNoFileOption(unittest.TestCase):
             timestamp=self.ts,
         )
         simdf, taskdf = simulation.start(runtime=60)
-        self.assertFalse(os.path.exists("test/simulation_pickles/0-sim.pkl"))
+        self.assertFalse(os.path.exists("simulation_data/0-sim.pkl"))
 
     # @unittest.skip("testing")
     def test_multi_siulation_data_merge(self):
-        global_sim_df = pd.DataFrame()
-        global_task_df = pd.DataFrame()
+        # global_sim_df = pd.DataFrame()
+        # global_task_df = pd.DataFrame()
+
         for algorithm in ['heft', 'fcfs']:
             env = simpy.Environment()
             simulation = Simulation(

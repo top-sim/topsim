@@ -2,6 +2,8 @@ import unittest
 import simpy
 import logging
 import os
+import datetime
+import pandas as pd
 
 from topsim.core.simulation import Simulation
 from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
@@ -46,13 +48,15 @@ class TestSimulationFileOptions(unittest.TestCase):
 
     def setUp(self) -> None:
         self.env = simpy.Environment()
+        self.output = f'{cwd}/test/data/output/hdf5.h5'
 
     def tearDown(self):
-        output = f'{cwd}/test/data/output/0'
-        os.remove(f'{output}-sim.pkl')
-        os.remove(f'{output}-tasks.pkl')
+        output = f'{cwd}/test/data/output/hdf5.h5'
+        # os.remove(f'{output}')
+        # os.remove(f'{output}-tasks.pkl')
 
     def test_simulation_produces_file(self):
+        ts = f'{datetime.datetime(2021,1,1).strftime("%y_%m_%d_%H_%M_%S")}'
         simulation = Simulation(
             self.env,
             CONFIG,
@@ -61,11 +65,19 @@ class TestSimulationFileOptions(unittest.TestCase):
             planning_algorithm='heft',
             scheduling=DynamicAlgorithmFromPlan,
             delay=None,
-            timestamp=f'{cwd}/test/data/output/{0}',
-            to_file=True
+            timestamp=ts,
+            to_file=True,
+            hdf5_path=self.output
         )
 
         simulation.start(runtime=60)
+        self.assertTrue(os.path.exists(self.output))
+
+        store = pd.HDFStore(self.output)
+
+        store[f'd{ts}/standard_simulation/sim']
+
+    # def
 
 
 class TestSimulationBatchProcessing(unittest.TestCase):
@@ -84,7 +96,7 @@ class TestSimulationBatchProcessing(unittest.TestCase):
             timestamp=f'{cwd}/test/data/output/{0}'
         )
         sim, task = simulation.start()
-        self.assertGreater(len(sim),0)
+        self.assertGreater(len(sim), 0)
 
 
 LARGE_CONFIG = 'test/data/config/mos_sw10.json'

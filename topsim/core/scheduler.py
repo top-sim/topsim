@@ -479,7 +479,7 @@ class Scheduler:
         df['finished_observations'] = [self._finished_observations]
         df['observation_queue'] = queuestr
         df['schedule_status'] = pd.Series(
-            [self.schedule_status.value], dtype="string"
+            [self.schedule_status.value]
         )
         df['delay_offset'] = pd.Series([self.delay_offset])
         tmp = f'alg'
