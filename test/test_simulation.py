@@ -16,7 +16,7 @@ logging.basicConfig(level='WARNING')
 logger = logging.getLogger(__name__)
 
 cwd = os.getcwd()
-CONFIG = f'{cwd}/test/data/config_update/standard_simulation.json'
+CONFIG = f'{cwd}/test/data/config/standard_simulation.json'
 
 
 class TestSimulationConfig(unittest.TestCase):

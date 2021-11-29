@@ -31,7 +31,7 @@ from topsim.user.schedule.batch_allocation import BatchProcessing
 
 from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
 
-CONFIG = "test/data/config_update/standard_simulation.json"
+CONFIG = "test/data/config/standard_simulation.json"
 
 
 class TestFifoAlgorithm(unittest.TestCase):

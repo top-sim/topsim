@@ -13,7 +13,10 @@ class Algorithm(ABC):
 
     The Algorithm base class only requires the single `run()` method to be 
     implemented; the `to_df` may simply be used as a stubb. 
-    
+
+    Attributes
+    ----------
+
     Notes
     -----
     It is important to note that the simulation will run with an 'incorrect' algorithm.

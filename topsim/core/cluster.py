@@ -325,7 +325,7 @@ class Cluster:
                 else:
                     # self.clusters[c]['resources']['occupied'].remove(machine)
                     self._set_machine_available(machine, observation)
-                # self.clusters[c]['usage_data']['available'] += 1
+                self._clusters[c]['usage_data']['available'] += 1
                 task.task_status = TaskStatus.FINISHED
                 task.delay_flag = task.delay_flag
                 return task.task_status
@@ -502,7 +502,6 @@ class Cluster:
         `list` of finished :py:obj:`topsim.core.task.Task` objects
         """
         return [x for x in self._clusters[c]['tasks']['finished']]
-
 
     def get_finished_tasks(self, c='default'):
         """

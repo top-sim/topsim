@@ -24,8 +24,7 @@ from topsim.core.cluster import Cluster
 from topsim.core.planner import Planner
 from topsim.user.plan.static_planning import SHADOWPlanning
 
-
-CONFIG = 'test/data/config_update/standard_simulation_longtask.json'
+CONFIG = 'test/data/config/standard_simulation_longtask.json'
 
 
 class TestTelescopeConfig(unittest.TestCase):
@@ -64,7 +63,8 @@ class TestTelescopeIngest(unittest.TestCase):
             env=self.env, buffer=self.buffer, cluster=self.cluster,
             algorithm=None
         )
-        self.planner = Planner(self.env, 'heft', self.cluster, SHADOWPlanning('heft'))
+        self.planner = Planner(self.env, 'heft', self.cluster,
+                               SHADOWPlanning('heft'))
 
     def testIngest(self):
         telescope = Telescope(
@@ -83,9 +83,12 @@ class TestTelescopeIngest(unittest.TestCase):
         # After 1 timestep, data in the HotBuffer should be 2
         self.assertEqual(496, self.buffer.hot[0].current_capacity)
         self.env.run(until=11)
-        self.assertEqual(len([self.buffer.hot[0].observations["transfer"]]),1)
+        self.assertEqual(
+            len([self.buffer.hot[0].observations["transfer"]]),
+            1
+        )
         self.assertEqual(462, self.buffer.hot[0].current_capacity)
-        self.assertEqual(248,self.buffer.cold[0].current_capacity)
+        self.assertEqual(248, self.buffer.cold[0].current_capacity)
         self.env.run(until=12)
         self.assertEqual(0, telescope.telescope_use)
         self.assertEqual(10, len(self.cluster._resources['available']))
@@ -96,7 +99,6 @@ class TestTaskDelayDetection(unittest.TestCase):
     """
     The telescope will flag delays and report this as a flag.
     """
-
 
 
 class TestObservationConfig(unittest.TestCase):

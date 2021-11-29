@@ -4,14 +4,14 @@
 			"total_arrays": 36,
 			"max_ingest_resources": 5,
 			"pipelines": {
-				"continuum": {
-					"demand": 5
+				"emu":
+				{
+					"workflow": "test/data/config/workflow_config_heft_sim.json",
+					"ingest_demand": 5
 				},
-				"spectral": {
-					"demand": 10
-				},
-				"pulsar": {
-					"demand": 5
+				"dingo": {
+					"workflow": "test/data/config/workflow_config_heft_sim.json",
+					"ingest_demand": 10
 				}
 			},
 		"observations": [
@@ -19,18 +19,14 @@
 				"name": "emu",
 				"start": 1,
 				"duration": 10,
-				"demand": 36,
-				"workflow": "test/data/config/workflow_config_heft_sim.json",
-				"type": "continuum",
+				"instrument_demand": 36,
 				"data_product_rate": 4
 			},
 			{
 				"name": "dingo",
 				"start": 15,
 				"duration": 20,
-				"demand": 18,
-				"workflow": "test/data/config/workflow_config_heft_sim.json",
-				"type": "spectral",
+				"instrument_demand": 18,
 				"data_product_rate": 5
 			}
 		]

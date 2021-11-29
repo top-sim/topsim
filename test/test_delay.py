@@ -31,7 +31,7 @@ from topsim.user.telescope import Telescope
 from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.plan.static_planning import SHADOWPlanning
 
-INTEGRATION = "test/data/config_update/integration_simulation.json"
+INTEGRATION = "test/data/config/integration_simulation.json"
 PLANNING_ALGORITHM = 'heft'
 
 

@@ -1,6 +1,7 @@
 {
 	"header": {
-		"time": false
+		"time": false,
+		"units": "flops_per_minute"
 	},
 	"graph": {
 		"directed": true,

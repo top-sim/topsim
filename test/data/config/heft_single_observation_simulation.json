@@ -4,14 +4,9 @@
 			"total_arrays": 36,
 			"max_ingest_resources": 1,
 			"pipelines": {
-				"continuum": {
-					"demand": 1
-				},
-				"spectral": {
-					"demand": 1
-				},
-				"pulsar": {
-					"demand": 1
+				"emu": {
+					"workflow": "test/data/config/workflow_config_minutes_longtask.json",
+					"ingest_demand": 1
 				}
 			},
 			"observations": [
@@ -19,9 +14,7 @@
 					"name": "emu",
 					"start": 1,
 					"duration": 10,
-					"demand": 36,
-					"workflow": "test/data/config/workflow_config_minutes.json",
-					"type": "continuum",
+					"instrument_demand": 36,
 					"data_product_rate": 0.03333333333333333
 				}
 			]

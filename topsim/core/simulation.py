@@ -145,6 +145,7 @@ class Simulation:
             self._timestamp = timestamp
         else:
             sim_start_time = f'{time.time()}'.split('.')[0]
+            self._timestamp = sim_start_time
             self.monitor = Monitor(self, sim_start_time)
         # Process necessary config files
 
@@ -190,6 +191,7 @@ class Simulation:
                         'simulation appended to existing file'
                     )
                 self._hdf5_store = pd.HDFStore(hdf5_path)
+                self._hdf5_store.close()
             except ValueError(
                     'Check pandas.HDFStore documentation for valid file path'
             ):
@@ -203,7 +205,7 @@ class Simulation:
             LOGGER.info('Simulation output will not be stored directly to file')
 
         if 'delimiters' in kwargs:
-            #: Delimiters used to separate different simulations in HDF5 file
+            #: Used to separate different simulations in HDF5 output
             self._delimiters = kwargs['delimiters']
         else:
             self._delimiters = ''
@@ -267,9 +269,9 @@ class Simulation:
         if self.to_file and self._hdf5_store is not None:
             global_df = self.monitor.df
             task_df = self._generate_final_task_data()
+            self._hdf5_store.open()
             self._compose_hdf5_output(global_df, task_df)
             self._hdf5_store.close()
-
 
         else:
             return self.monitor.df, self._generate_final_task_data()
@@ -301,6 +303,24 @@ class Simulation:
         self.env.run(until=until)
 
     def is_finished(self):
+        """
+        Check if simulation is finished based on the following finish
+        conditions:
+
+        * The Instrument is idle (i.e. has no more observations left to run)
+        * The Cluster is idle (no tasks are running)
+        * The Buffer is empty (no data sits on the buffer)
+        * The Schedule is idle (there are no more workflows/tasks queued)
+
+        It is only when all of these return True that the simulation is
+        regarded as finished.
+
+        Returns
+        -------
+        True if the above requirements are met; False otherwise (i.e. the
+        simulation is still running).
+
+        """
         if (
                 self.buffer.is_empty() and self.cluster.is_idle() and
                 self.scheduler.is_idle() and self.instrument.is_idle()

@@ -27,7 +27,7 @@ from topsim.core.task import Task
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
-CONFIG = "test/data/config_update/standard_simulation_longtask.json"
+CONFIG = "test/data/config/standard_simulation_longtask.json"
 OBS_START_TME = 0
 OBS_DURATION = 10
 OBS_DEMAND = 15
