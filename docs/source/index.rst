@@ -43,7 +43,6 @@ Installation
 
 	requirements
 	model_overview
-	configuration
 	simulation
 
 	reference/index

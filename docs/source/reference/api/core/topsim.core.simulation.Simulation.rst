@@ -14,7 +14,6 @@
    
       ~Simulation.env
       ~Simulation.monitor
-      ~Simulation.cfgpath
       ~Simulation.cluster
       ~Simulation.buffer
       ~Simulation.scheduler

@@ -20,7 +20,7 @@ import sphinx
 # -- Project information -----------------------------------------------------
 
 project = 'TopSim'
-copyright = '2019, RW Bunney'
+copyright = '2019-2021, RW Bunney'
 author = 'RW Bunney'
 
 master_doc = 'index'

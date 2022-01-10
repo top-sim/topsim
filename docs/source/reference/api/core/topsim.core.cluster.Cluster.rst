@@ -13,7 +13,6 @@
    .. autosummary::
    
       ~Cluster.finished_tasks
-      ~Cluster.num_provisioned_obs
       ~Cluster.env
       ~Cluster.system_bandwidth
    
