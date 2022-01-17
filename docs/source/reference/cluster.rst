@@ -6,6 +6,9 @@ Cluster
 .. currentmodule:: topsim.core.cluster
 
 .. autosummary::
-	:toctree: api/
+	:template: class.rst
+	:recursive:
+	:toctree: api/core/
+
 
 	Cluster

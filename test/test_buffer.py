@@ -34,7 +34,7 @@ OBS_DEMAND = 15
 OBS_WORKFLOW = 'test/data/config/workflow_config.json'
 PLAN_ALGORITHM = 'heft'
 
-CONFIG = "test/data/config_update/standard_simulation_longtask.json"
+CONFIG = "test/data/config/standard_simulation_longtask.json"
 
 BUFFER_ID = 0
 

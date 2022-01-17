@@ -3,11 +3,11 @@ Scheduling
 ==========
 
 
-.. currentmodule:: topsim.scheduling.algorithm
+.. currentmodule:: topsim.algorithms.scheduling
 
 .. autosummary::
 	:template: class.rst
 	:recursive:
-	:toctree: api/
+	:toctree: api/user
 
 	Algorithm

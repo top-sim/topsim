@@ -60,6 +60,8 @@ class Scheduler:
         self.schedule_status = ScheduleStatus.ONTIME
         self.algtime = {}
         self.delay_offset = 0
+        self._finished_observations = 0
+
 
     def start(self):
         """
@@ -341,6 +343,7 @@ class Scheduler:
         if not schedule and status is WorkflowStatus.FINISHED:
             if self.buffer.mark_observation_finished(observation):
                 self.cluster.release_batch_resources(observation.name)
+                LOGGER.info(f'{observation.name} resources released')
                 self.observation_queue.remove(observation)
                 finished = True
 
@@ -457,13 +460,28 @@ class Scheduler:
         return pred_allocations
 
     def to_df(self):
+        """
+        Convert scheduling timestep data into dataframe for the
+        :py:obj:`~topsim.core.monitor.Monitor` actor.
+
+        Returns
+        -------
+        df : pandas.DataFrame
+            Dataframe object with all the relevant data.
+
+        """
         df = pd.DataFrame()
         queuestr = f''
         for obs in self.observation_queue:
             queuestr += f'{obs.name}'
+        df['scheduler_observation_queue'] = [len(self.observation_queue)]
+        # df['observations_waiting'] = [0]
+        df['finished_observations'] = [self._finished_observations]
         df['observation_queue'] = queuestr
-        df['schedule_status'] = [str(self.schedule_status)]
-        df['delay_offset'] = [str(self.schedule_status)]
+        df['schedule_status'] = pd.Series(
+            [self.schedule_status.value]
+        )
+        df['delay_offset'] = pd.Series([self.delay_offset])
         tmp = f'alg'
         if self.algtime:
             for key, value in self.algtime.items():
@@ -473,40 +491,23 @@ class Scheduler:
         return df
 
 
-class Schedule:
-
-    def __init__(self):
-        self.allocation = []
-        self.replace = False
-        self.status = WorkflowStatus.SCHEDULED
-
-    def add_allocation(self, task, machine):
-        self.allocation.append((task, machine))
-
-    def replace_previous_schedule(self):
-        self.replace = True
-
-
-class Allocation:
-
-    def __init__(self, task, machine):
-        self.task = task
-        self.machine = machine
-
-    def __eq__(self, other):
-        return self.task == other.task.id and self.machine == other.machine.id
-
-    def __hash__(self):
-        return hash(self.task.id + self.machine.id)
-
-
 class SchedulerStatus(Enum):
+    """
+    The status of the Scheduler Actor
+
+    Used to determine if the Scheduler is running. If it is not running,
+    and is marked as SHUTDOWN, then this is one of the exit conditions for
+    a simulation.
+    """
     SLEEP = 'SLEEP'
     RUNNING = 'RUNNING'
     SHUTDOWN = 'SHUTDOWN'
 
-
+# TODO Update to WorkflowStatus to avoid SchedulerStatus single-letter typos
 class ScheduleStatus(Enum):
+    """
+    # TODO docstring
+    """
     ONTIME = 'ONTIME'
     DELAYED = 'DELAYED'
     FAILURE = 'FAILURE'

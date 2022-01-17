@@ -49,9 +49,9 @@ from topsim.user.plan.static_planning import SHADOWPlanning
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
-CONFIG = "test/data/config_update/standard_simulation_longtask.json"
-INTEGRATION = "test/data/config_update/integration_simulation.json"
-HEFT_CONFIG = "test/data/config_update/heft_single_observation_simulation.json"
+CONFIG = "test/data/config/standard_simulation_longtask.json"
+INTEGRATION = "test/data/config/integration_simulation.json"
+HEFT_CONFIG = "test/data/config/heft_single_observation_simulation.json"
 LONG_CONFIG = "test/data/config/mos_sw10_long.json"
 PLANNING_ALGORITHM = 'heft'
 
@@ -97,15 +97,15 @@ class TestSchedulerIngest(unittest.TestCase):
         self.assertTrue(ret)
 
         # Let's remove capacity to check it returns false
-        tmp = self.cluster.resources['available']
-        self.cluster.resources['available'] = self.cluster.resources[
+        tmp = self.cluster._resources['available']
+        self.cluster._resources['available'] = self.cluster._resources[
                                                   'available'][:3]
         ret = self.scheduler.check_ingest_capacity(
             observation, pipelines, max_ingest
         )
         self.assertFalse(ret)
-        self.cluster.resources['available'] = tmp
-        self.assertEqual(10, len(self.cluster.resources['available']))
+        self.cluster._resources['available'] = tmp
+        self.assertEqual(10, len(self.cluster._resources['available']))
 
     def testSchedulerProvisionsIngest(self):
         """
@@ -136,12 +136,12 @@ class TestSchedulerIngest(unittest.TestCase):
         )
 
         self.env.run(until=1)
-        self.assertEqual(5, len(self.cluster.resources['available']))
+        self.assertEqual(5, len(self.cluster._resources['available']))
         # After 1 timestep, data in the HotBuffer should be 2
         self.assertEqual(496, self.buffer.hot[0].current_capacity)
         self.env.run(until=30)
-        self.assertEqual(10, len(self.cluster.resources['available']))
-        self.assertEqual(5, len(self.cluster.tasks['finished']))
+        self.assertEqual(10, len(self.cluster._resources['available']))
+        self.assertEqual(5, len(self.cluster._tasks['finished']))
         self.assertEqual(500, self.buffer.hot[0].current_capacity)
         self.assertEqual(210, self.buffer.cold[0].current_capacity)
 
@@ -220,8 +220,8 @@ class TestSchedulerDynamicPlanAllocation(unittest.TestCase):
         )
         self.buffer.cold[0].observations['stored'].append(curr_obs)
         self.env.run(until=99)
-        self.assertEqual(10, len(self.cluster.tasks['finished']))
-        self.assertEqual(0, len(self.cluster.tasks['running']))
+        self.assertEqual(10, len(self.cluster._tasks['finished']))
+        self.assertEqual(0, len(self.cluster._tasks['running']))
         self.assertEqual(0, len(self.scheduler.observation_queue))
 
 
@@ -266,9 +266,9 @@ class TestSchedulerEdgeCases(unittest.TestCase):
             existing_schedule, allocation_pairs={},
             workflow_id='test_id'
         )
-        self.assertFalse(task in self.cluster.tasks['running'])
+        self.assertFalse(task in self.cluster._tasks['running'])
         self.env.run(until=1)
-        self.assertTrue(task in self.cluster.tasks['running'])
+        self.assertTrue(task in self.cluster._tasks['running'])
         self.assertTrue(dup_task in new_schedule)
         self.assertFalse(task in new_schedule)
         self.assertTrue(task.id in new_pairs)
@@ -371,13 +371,13 @@ class TestSchedulerIntegration(unittest.TestCase):
         """
         self.env.run(until=1)
 
-        self.assertEqual(10, len(self.cluster.resources['available']))
+        self.assertEqual(10, len(self.cluster._resources['available']))
         # This takes timestep, data in the HotBuffer should be 4
         self.env.run(until=2)
-        self.assertEqual(5, len(self.cluster.resources['available']))
+        self.assertEqual(5, len(self.cluster._resources['available']))
         self.assertEqual(496, self.buffer.hot[0].current_capacity)
         self.env.run(until=31)
-        self.assertEqual(5, len(self.cluster.tasks['finished']))
+        self.assertEqual(5, len(self.cluster._tasks['finished']))
         # self.assertEqual(500, self.buffer.hot[0].current_capacity)
         self.assertEqual(210, self.buffer.cold[0].current_capacity)
         self.env.run(until=32)

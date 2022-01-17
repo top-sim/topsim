@@ -27,7 +27,7 @@ from topsim.core.task import Task
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
-CONFIG = "test/data/config_update/standard_simulation_longtask.json"
+CONFIG = "test/data/config/standard_simulation_longtask.json"
 OBS_START_TME = 0
 OBS_DURATION = 10
 OBS_DEMAND = 15
@@ -111,11 +111,11 @@ class TestIngest(unittest.TestCase):
         )
         self.env.run(until=1)
         self.assertEqual(1, self.env.now)
-        self.assertEqual(5, len(self.cluster.resources['available']))
-        self.assertEqual(5, len(self.cluster.tasks['running']))
-        self.assertEqual(5, len(self.cluster.resources['available']))
+        self.assertEqual(5, len(self.cluster._resources['available']))
+        self.assertEqual(5, len(self.cluster._tasks['running']))
+        self.assertEqual(5, len(self.cluster._resources['available']))
         self.env.run(until=11)
-        self.assertEqual(10, len(self.cluster.resources['available']))
+        self.assertEqual(10, len(self.cluster._resources['available']))
 
     def test_ingest_capacity_check(self):
         """
@@ -168,7 +168,7 @@ class TestClusterTaskAllocation(unittest.TestCase):
             self.cluster.allocate_task_to_cluster(self.task, self.machine)
         )
         self.env.run(until=1)
-        self.assertEqual(self.task, self.cluster.tasks['running'][0])
+        self.assertEqual(self.task, self.cluster._tasks['running'][0])
 
     def test_duplication_allocation(self):
         ret = self.env.process(

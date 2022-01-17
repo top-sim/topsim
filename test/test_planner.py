@@ -38,8 +38,8 @@ OBS_PIPELINE = 'continuum'
 TEL_MAX_INGEST = 5
 PLAN_ALGORITHM = 'heft'
 
-CONFIG = "test/data/config_update/standard_simulation_longtask.json"
-HEFT_CONFIG = "test/data/config_update/heft_single_observation_simulation.json"
+CONFIG = "test/data/config/standard_simulation_longtask.json"
+HEFT_CONFIG = "test/data/config/heft_single_observation_simulation.json"
 MACHINE_CONFIG = None
 OBS_WORKFLOW = "test/data/config/workflow_config_minutes_longtask.json"
 

@@ -18,20 +18,103 @@ from enum import Enum
 
 
 class Instrument(ABC):
+    """
 
-    def __init__(self):
-        super().__init__()
+    The Simulation class is a wrapper for all Actors; we start the simulation
+    through the simulation class, which in turn invokes the initial Actors and
+    monitoring, and provides the conditions for checking if the simulation has
+    finished.
+
+    Parameters
+    ----------
+    env : :py:obj:`simpy.Environment` object
+        The discrete-event simulation environment. This is the way TOpSim
+        simulation maintains state across the different actors,
+        and interfaces with the simpy processes.
+
+    config : :py:obj:`~topsim.core.config.Config` instance
+        Config object wrapper for the configuration file.
+
+    planner : :py:obj:`~topsim.core.planner.Planner` instance
+        The Planner Actor for the current simulation
+
+    scheduler : :py:obj:`~topsim.core.scheduler.Scheduler` instance
+        The Scheduler Actor for the current simulation
+
+    Notes
+    -----
+
+    This class is a Python :py:obj:`~abc.ABC`, meaning it requires user
+    addition to implement the metaclasses.
+
+    Recommended decisions to make in the `run()` method include:
+
+    Check observation and instrument are ready given current instrument
+    demand:
+
+    >>> # Assuming self.capacity is a user-defined attribute
+    >>> if(observation.is_ready(self.env.now, self.capacity))
+
+    Communicate with Scheduler to determine if the Buffer and Cluster have
+    capacity to run a new Observation (Ingest and Storage conditions):
+
+    >>> self.scheduler.check_ingest_capacity(
+    >>>    observation, pipelines, max_ingest
+    >>>)
+
+    If above conditions are reached, begin observations and request ingest
+    allocation via scheduler:
+
+    >>> self.begin_observation(observation)
+    >>> self.env.process(self.scheduler.allocate_ingest(
+    >>> observation, pipelines, planner))
+
+    **Note:** :py:meth:`~topsim.core.scheduler.Scheduler.allocate_ingest`
+    generates a timeout on the `SimPy` discrete-event queue, which is why
+    we call `env.process`.
+
+    Finalise an Observation and initiate the 'clean-up'.
+
+    >>> observation.status = self.finish_observation(observation)
+
+
+    See Also
+    ---------
+    :py:obj:`~topsim.user.telescope.Telescope`
+
+    Raises
+    ------
+
+    """
+
+    def __init__(self, env, config, planner, scheduler):
+        pass
 
     @abstractmethod
     def run(self):
-        pass
+        """
+        The starting point for the Instrument actor; this will make
+        decisions per timestep and then once these decisions have been
+        resolved, yield a timeout to indicate a single timestep has passed
+        for the Telescope.
 
-    # @abstractmethod
-    # def is_finished(self):
-    #     pass
+        Yields
+        ------
+        self.env.timeout(x)
+            A single simulation timestep of `x` time.
+        """
+
+        pass
 
     @abstractmethod
     def to_df(self):
+        """
+        Produce a `pandas.DataFrame` of output for the Simulation
+        :py:obj:`~topsim.core.monitor.Monitor`.
+        Returns
+        -------
+
+        """
         pass
 
 
@@ -41,9 +124,7 @@ class Observation(object):
     the object also stores information about the workflow, and the generated
     plan for that workflow.
 
-    Array with associated photographic information.
-
-    Attributes
+    Parameters
     ----------
     name : str
         Observation name
@@ -70,25 +151,7 @@ class Observation(object):
 
     def __init__(self, name, start, duration, demand, workflow,
                  data_rate):
-        """
-        Parameters
-           ----------
-        name : str
-            Observation name/ID
-        start : int
-            Expected start-time of the observation
-        duration : int
-            Expected Duration of the observation
-        demand : int
-            Expected Telescope demand of (Number of arrays used) during observation
-        workflow : str
-            Path to the workflow specification (JSON file)
-        type : str
-            What type of observation (Continuum, Spectral, etc.)
-        data_rate: int
-            Expected incoming data rate produced by the observation (GB/s)
 
-        """
         # TODO change to self.id
         self.name = name
         self.buffer_id = 0
@@ -131,6 +194,17 @@ class Observation(object):
             return False
 
     def is_finished(self, current_time, telescope_status):
+        """
+        Check if the observation has finished on the telescope.
+        Parameters
+        ----------
+        current_time
+        telescope_status
+
+        Returns
+        -------
+
+        """
         if self.ast is None:
             return False
         elif current_time >= self.ast + self.duration \
@@ -142,6 +216,9 @@ class Observation(object):
 
 
 class RunStatus(str, Enum):
+    """
+    The status of an observation
+    """
     WAITING = 'WAITING'
     RUNNING = 'RUNNING'
     FINISHED = 'FINISHED'

@@ -1,6 +1,9 @@
-========
+.. _simulation:
+
+
+===========
 Simulation
-========
+===========
 .. toctree::
 
 .. currentmodule:: topsim.core.simulation
@@ -8,6 +11,7 @@ Simulation
 .. autosummary::
 	:template: class.rst
 	:recursive:
-	:toctree: api/
+	:toctree: api/core/
 
 	Simulation
+

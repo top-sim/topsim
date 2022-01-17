@@ -52,9 +52,8 @@ class BatchProcessing(Algorithm):
         """
         Generate a list of allocations for the current timestep using the
         existing schedule as a basis.
-
-
         """
+
         provision = False
         allocations = copy.copy(existing_schedule)
         provision = self._provision_resources(cluster, workflow_plan)
@@ -122,7 +121,7 @@ class BatchProcessing(Algorithm):
 
         #  TODO do We need to make sure there's enough left for ingest to
         #   occur?
-        max_allowed = int(len(cluster.dmachine) / self.max_resources_split)
+        max_allowed = int(len(cluster) / self.max_resources_split)
         if available == 0:
             return 0
         if available < max_allowed:
@@ -145,17 +144,20 @@ class BatchProcessing(Algorithm):
 
         """
         if cluster.is_observation_provisioned(workflow_plan.id):
-#             logger.info(f"{workflow_plan.id} already provisioned.")
+            # logger.info(f"{workflow_plan.id} already provisioned.")
             return True
         else:
-            if cluster.num_provisioned_obs >= self.max_resources_split:
-                return False
-            else:
+            if cluster.num_provisioned_obs < self.max_resources_split:
                 provision = self._max_resource_provision(cluster)
                 if provision < self.min_resource_per_workflow:
                     return False
                 else:
                     logger.info(f"{provision} machines for {workflow_plan.id}")
+                    logger.info(
+                        f"{cluster.num_provisioned_obs} provisioned"
+                    )
                     return cluster.provision_batch_resources(
                         provision, workflow_plan.id
                     )
+            else:
+                return False

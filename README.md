@@ -1,7 +1,7 @@
 # Telescope Operations Simulator
-[![Build Status](https://travis-ci.com/top-sim/topsim.svg?branch=master
+[![Build Status](https://travis-ci.com/top-sim/topsim.svg?branch=development
 )](https://travis-ci.com/top-sim/topsim)
-[![Coverage Status](https://coveralls.io/repos/github/top-sim/topsim/badge.svg?branch=master)](https://coveralls.io/github/top-sim/topsim?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/top-sim/topsim/badge.svg?branch=development)](https://coveralls.io/github/top-sim/topsim?branch=master)
 
 TopSim is a telescope observation and data post-processing simulator, based on
 a fork of Robert Lexis' CloudSimPy. The intention of TopSim is to provide an

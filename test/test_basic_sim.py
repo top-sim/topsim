@@ -79,7 +79,7 @@ class TestBasicIngest(unittest.TestCase):
         self.assertEqual(0, self.env.now)
         self.simulation.start(runtime=7)
         self.assertEqual(
-            2, self.simulation.cluster.ingest['completed']
+            2, self.simulation.cluster._ingest['completed']
         )
 
         self.assertEqual(

@@ -29,10 +29,10 @@ class GreedyAlgorithmFromPlan(Algorithm):
     Algorithm that Greedily re-allocates a schedule based on run-time
     resource availability.
     """
+
     def __init__(self):
         super().__init__()
         self.name = "GreedyAlgorithmFromPlan"
-
 
     def parse_workflow_plan(self):
         """
@@ -53,7 +53,7 @@ class GreedyAlgorithmFromPlan(Algorithm):
         workflow_plan
         existing_schedule
         """
-        self.cluster = cluster
+        cluster = cluster
         machines = cluster.machines
         workflow_id = workflow_plan.id
         # tasks = cluster.tasks_which_has_waiting_instance
@@ -67,7 +67,7 @@ class GreedyAlgorithmFromPlan(Algorithm):
         allocations = copy.copy(existing_schedule)
         self.accurate = 0
         self.alternate = 0
-        temporary_resources = self.cluster.current_available_resources()
+        temporary_resources = cluster.current_available_resources()
 
         for task in tasks:
             # Allocate the first element in the Task list:
@@ -76,29 +76,24 @@ class GreedyAlgorithmFromPlan(Algorithm):
                 if workflow_plan.ast > workflow_plan.est:
                     workflow_plan.status = WorkflowStatus.DELAYED
                 if not task.pred:
-                    machine = cluster.dmachine[task.machine]
+                    # machine = cluster.dmachine[task.machine]
+                    machine = cluster.get_machine_from_id(task.machine)
                     workflow_plan.status = WorkflowStatus.SCHEDULED
-                    if self.cluster.is_occupied(machine):
-                        # Is there another machine
-                        if temporary_resources:
-                            machine = temporary_resources[0]
-                            allocations[task] = machine
-                            temporary_resources.remove(machine)
-                            self.alternate += 1
-                    else:
-                        allocations[task] = machine
-                        temporary_resources.remove(machine)
-                        self.accurate += 1
-
+                    allocations, temporary_resources = (
+                        self._attempt_machine_allocation(
+                            cluster, machine, task, allocations,
+                            temporary_resources
+                        )
+                    )
                 # The task has predecessors
                 else:
                     # If the set of finished tasks does not contain all of the
                     # previous tasks, we cannot start yet.
                     pred = set(task.pred)
-                    finished = set(t.id for t in cluster.tasks['finished'])
-
-                    machine = cluster.dmachine[task.machine]
-
+                    # finished = set(t.id for t in cluster.tasks['finished'])
+                    finished = set(t.id for t in cluster.finished_tasks)
+                    # machine = cluster.dmachine[task.machine]
+                    machine = cluster.get_machine_from_id(task.machine)
                     # Check if there is an overlap between the two sets
                     if not pred.issubset(finished):
                         # One of the predecessors of 't' is still running
@@ -106,16 +101,12 @@ class GreedyAlgorithmFromPlan(Algorithm):
                     else:
                         # A machine may not be occupied, but we may have
                         # provisionally allocated it within this scheduling run
-                        if self.cluster.is_occupied(machine):
-                            if temporary_resources:
-                                machine = temporary_resources[0]
-                                allocations[task] = machine
-                                temporary_resources.remove(machine)
-                                self.alternate += 1
-                        else:
-                            allocations[task] = machine
-                            temporary_resources.remove(machine)
-                            self.accurate += 1
+                        allocations, temporary_resources = (
+                            self._attempt_machine_allocation(
+                                cluster, machine, task, allocations,
+                                temporary_resources
+                            )
+                        )
 
         if len(workflow_plan.tasks) == 0:
             workflow_plan.status = WorkflowStatus.FINISHED
@@ -124,7 +115,47 @@ class GreedyAlgorithmFromPlan(Algorithm):
         return allocations, workflow_plan.status
 
     def to_df(self):
+        """
+        Create data frame for montior
+
+        Returns
+        -------
+        df : pd.DataFrame
+            Pandas DataFrame object
+        """
         df = pd.DataFrame()
         df['alternate'] = [self.alternate]
         df['accurate'] = [self.accurate]
         return df
+
+    def _attempt_machine_allocation(
+            self, cluster, machine, task, allocations, temporary_resources
+    ):
+        """
+        If there are no precedence constraints on the current task,
+        try allocating to the machine
+
+        Notes
+        -----
+        If the machine is occupied, we attempt to find an alternative resource
+        (this approach is greedy).
+
+        Returns
+        -------
+        allocations
+        temporary_resources
+
+        """
+        if cluster.is_occupied(machine):
+            if temporary_resources:
+                # so greedy we pop the first resource available
+                machine = temporary_resources[0]
+                allocations[task] = machine
+                temporary_resources.remove(machine)
+                self.alternate += 1
+        else:
+            allocations[task] = machine
+            temporary_resources.remove(machine)
+            self.accurate += 1
+
+        return allocations, temporary_resources

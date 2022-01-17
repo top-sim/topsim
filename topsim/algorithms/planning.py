@@ -19,7 +19,7 @@ Abstract class for building a workflow plan
 """
 
 from abc import ABC, abstractmethod
-from topsim.core.planner import WorkflowPlan
+from topsim.core.planner import Planner, WorkflowPlan
 
 
 class Planning(ABC):
@@ -68,6 +68,7 @@ class Planning(ABC):
         -------
         df : pandas.DataFrame
         """
+        
         pass
 
     def _calc_workflow_est(self,observation, buffer):

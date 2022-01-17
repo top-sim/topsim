@@ -8,6 +8,7 @@ Getting Started
 	configuration
 	additional_materials
 
+
 TopSim, in addition to the **SimPy** library, makes use of the following Python libraries:
 
 * **numpy**

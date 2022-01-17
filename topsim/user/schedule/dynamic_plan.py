@@ -67,11 +67,12 @@ class DynamicAlgorithmFromPlan(Algorithm):
             if task not in allocations:
                 if (task.task_status is TaskStatus.UNSCHEDULED and
                         task not in allocations):
-                    # Are we workkflow - delayed?
+                    # Are we workflow - delayed?
                     if workflow_plan.ast > workflow_plan.est:
                         workflow_plan.status = WorkflowStatus.DELAYED
                     if not task.pred:
-                        machine = cluster.dmachine[task.machine]
+                        # machine = cluster.dmachine[task.machine]
+                        machine = cluster.get_machine_from_id(task.machine)
                         workflow_plan.status = WorkflowStatus.SCHEDULED
                         # We do not update the allocations
                         allocations[task] = machine
@@ -82,9 +83,10 @@ class DynamicAlgorithmFromPlan(Algorithm):
                         # If the set of finished tasks does not contain all
                         # of the previous tasks, we cannot start yet.
                         pred = set(task.pred)
-                        machine = cluster.dmachine[task.machine]
-                        finished = set(t.id for t in cluster.tasks['finished'])
-
+                        # machine = cluster.dmachine[task.machine]
+                        machine = cluster.get_machine_from_id(task.machine)
+                        # finished = set(t.id for t in cluster.tasks['finished'])
+                        finished = set(t.id for t in cluster.finished_tasks)
                         # Check if there is an overlap between the two sets
                         if not pred.issubset(finished):
                             # One of the predecessors of 't' is still running
@@ -114,59 +116,6 @@ class DynamicAlgorithmFromPlan(Algorithm):
         True if machine is occupied
         """
         return self.cluster.is_occupied(machine)
-
-
-class BatchProcessing(Algorithm):
-    """
-    Mimic a batch-processing heuristic, in which tasks are allocated to an
-    available resource if it matches the requirements. There is no checking
-    of task times or ESTs/EFTs; we just ensure that the tasks' precedence
-    constraints are met.
-    """
-
-    def run(self, cluster, clock, workflow_plan, existing_schedule):
-        if workflow_plan.algorithm != 'batch':
-            raise RuntimeError("Workflow Plan is not compatible with this "
-                               "dynamic scheduler")
-        else:
-            allocated_machines = cluster.resources_for_batch_processing()
-
-        for t in workflow_plan.tasks:
-            # Allocate the first element in the Task list:
-            if t.task_status is TaskStatus.UNSCHEDULED:
-                # Are we workkflow - delayed?
-                if workflow_plan.ast > workflow_plan.est:
-                    workflow_plan.status = WorkflowStatus.DELAYED
-                if not t.pred:
-                    machine = cluster.dmachine[t.machine.id]
-
-                # The task has predecessors
-                else:
-                    # If the set of finished tasks does not contain all of the
-                    # previous tasks, we cannot start yet.
-
-                    pred = set(t.pred)
-                    finished = set(t.id for t in cluster.tasks['finished'])
-
-                    # Check if there is an overlap between the two sets
-                    if not pred.issubset(finished):
-                        # One of the predecessors of 't' is still running
-                        continue
-                    else:
-                        machine = cluster.dmachine[t.machine.id]
-                        if cluster.is_occupied(machine):
-                            return None, None, workflow_plan.status
-                        return machine, t, workflow_plan.status
-
-        if len(workflow_plan.tasks) == 0:
-            workflow_plan.status = WorkflowStatus.FINISHED
-            logger.debug("is finished %s", workflow_plan)
-
-        return None, None, WorkflowStatus.SCHEDULED
-
-    def to_df(self):
-        df = pd.DataFrame()
-        return df
 
 
 class GlobalDagDelayHeuristic(Algorithm):

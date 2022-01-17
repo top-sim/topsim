@@ -29,7 +29,7 @@ class Planner:
     the only library that the Planner is aligned with; this may change in the
     future.
 
-    Attributes
+    Parameters
     ----------
     env : simpy.Environment
         Simulation environment object
@@ -48,7 +48,8 @@ class Planner:
     """
 
     def __init__(self, env, algorithm, cluster, model, delay_model=None):
-        self.env = env
+        self.env = env  #: :py:object:~`simpy.Environment object for the
+        # simulation`
         self.cluster = cluster
         # self.envconfig = envconfig
         self.algorithm = algorithm

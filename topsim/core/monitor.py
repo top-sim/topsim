@@ -60,7 +60,9 @@ class Monitor(object):
                 'scheduling': [repr(self.simulation.scheduler.algorithm)]
             },
         )
-        cf = pd.DataFrame({'config': [self.simulation.cfgpath]})
-        df = df.join([cluster, buffer, instrument, scheduler, algs, cf, delay],
-                     how='outer')
+        cf = pd.DataFrame({'config': [self.simulation._cfg_path]})
+        df = df.join(
+            [cluster, buffer, instrument, scheduler, algs, cf, delay],
+            how='outer'
+        )
         return df
