@@ -1,6 +1,6 @@
 .. _model_overview:
 
-Model Overview
+Runtime Design
 ==============
 
 Each Actor within TOpSim has a `run()` function. These are generators
@@ -10,4 +10,3 @@ actors is to set up a continual call-back loop, where each actor processes
 the current simulation state at each timestep to see if the state has changed
 and they need to act.
 
-.. autoclass:: topsim.core.simulation.Simulation

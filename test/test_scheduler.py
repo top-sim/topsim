@@ -39,21 +39,20 @@ from topsim.core.planner import Planner
 from topsim.core.buffer import Buffer
 from topsim.core.instrument import RunStatus
 from topsim.core.delay import DelayModel
+from topsim.core.task import Task
 
 from topsim.user.telescope import Telescope
-from topsim.user.scheduling import GreedyAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.greedy import GreedyAlgorithmFromPlan
+from topsim.user.plan.static_planning import SHADOWPlanning
 
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
-CONFIG = "test/data/config_update/standard_simulation.json"
-INTEGRATION = "test/data/config_update/integration_simulation.json"
-HEFT_CONFIG = "test/data/config_update/heft_single_observation_simulation.json"
-# Globals
-OBS_START_TME = 0
-OBS_DURATION = 10
-OBS_DEMAND = 15
-OBS_WORKFLOW = "test/data/config/workflow_config.json"
+CONFIG = "test/data/config/standard_simulation_longtask.json"
+INTEGRATION = "test/data/config/integration_simulation.json"
+HEFT_CONFIG = "test/data/config/heft_single_observation_simulation.json"
+LONG_CONFIG = "test/data/config/mos_sw10_long.json"
 PLANNING_ALGORITHM = 'heft'
 
 
@@ -74,12 +73,13 @@ class TestSchedulerIngest(unittest.TestCase):
         self.cluster = Cluster(self.env, config)
         self.buffer = Buffer(self.env, self.cluster, config)
         self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, GreedyAlgorithmFromPlan
+            self.env, self.buffer, self.cluster, DynamicAlgorithmFromPlan
         )
         self.planner = Planner(self.env, PLANNING_ALGORITHM,
-                               self.cluster)
-        planner = None
-        self.telescope = Telescope(self.env, config, planner, self.scheduler)
+                               self.cluster, SHADOWPlanning('heft'))
+        # planner = None
+        self.telescope = Telescope(self.env, config, self.planner,
+                                   self.scheduler)
 
     def testSchdulerCheckIngestReady(self):
         """
@@ -97,15 +97,15 @@ class TestSchedulerIngest(unittest.TestCase):
         self.assertTrue(ret)
 
         # Let's remove capacity to check it returns false
-        tmp = self.cluster.resources['available']
-        self.cluster.resources['available'] = self.cluster.resources[
+        tmp = self.cluster._resources['available']
+        self.cluster._resources['available'] = self.cluster._resources[
                                                   'available'][:3]
         ret = self.scheduler.check_ingest_capacity(
             observation, pipelines, max_ingest
         )
         self.assertFalse(ret)
-        self.cluster.resources['available'] = tmp
-        self.assertEqual(10, len(self.cluster.resources['available']))
+        self.cluster._resources['available'] = tmp
+        self.assertEqual(10, len(self.cluster._resources['available']))
 
     def testSchedulerProvisionsIngest(self):
         """
@@ -136,25 +136,30 @@ class TestSchedulerIngest(unittest.TestCase):
         )
 
         self.env.run(until=1)
-        self.assertEqual(5, len(self.cluster.resources['available']))
+        self.assertEqual(5, len(self.cluster._resources['available']))
         # After 1 timestep, data in the HotBuffer should be 2
         self.assertEqual(496, self.buffer.hot[0].current_capacity)
         self.env.run(until=30)
-        self.assertEqual(10, len(self.cluster.resources['available']))
-        self.assertEqual(5, len(self.cluster.tasks['finished']))
+        self.assertEqual(10, len(self.cluster._resources['available']))
+        self.assertEqual(5, len(self.cluster._tasks['finished']))
         self.assertEqual(500, self.buffer.hot[0].current_capacity)
         self.assertEqual(210, self.buffer.cold[0].current_capacity)
 
 
-class TestSchedulerGreedyAllocation(unittest.TestCase):
+class TestSchedulerAllocations(unittest.TestCase):
+    def setUp(self) -> None:
+        pass
+
+
+class TestSchedulerDynamicPlanAllocation(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
-        sched_algorithm = GreedyAlgorithmFromPlan()
+        sched_algorithm = DynamicAlgorithmFromPlan()
         config = Config(HEFT_CONFIG)
         self.cluster = Cluster(self.env, config)
         self.planner = Planner(self.env, PLANNING_ALGORITHM,
-                               self.cluster)
+                               self.cluster, SHADOWPlanning('heft'))
         self.buffer = Buffer(self.env, self.cluster, config)
         self.scheduler = Scheduler(self.env, self.buffer,
                                    self.cluster, sched_algorithm)
@@ -205,7 +210,8 @@ class TestSchedulerGreedyAllocation(unittest.TestCase):
         ]
         self.scheduler.observation_queue.append(curr_obs)
         curr_obs.ast = self.env.now
-        self.env.process(self.planner.run(curr_obs, self.buffer))
+        curr_obs.plan = self.planner.run(
+            curr_obs, self.buffer, self.telescope.max_ingest)
         self.env.process(self.scheduler.allocate_tasks(curr_obs))
         self.env.run(1)
         self.assertListEqual(
@@ -213,9 +219,118 @@ class TestSchedulerGreedyAllocation(unittest.TestCase):
             [a.task.tid for a in curr_obs.plan.exec_order]
         )
         self.buffer.cold[0].observations['stored'].append(curr_obs)
-        self.env.run(until=98)
-        self.assertEqual(10, len(self.cluster.tasks['finished']))
-        self.assertEqual(0, len(self.cluster.tasks['running']))
+        self.env.run(until=99)
+        self.assertEqual(10, len(self.cluster._tasks['finished']))
+        self.assertEqual(0, len(self.cluster._tasks['running']))
+        self.assertEqual(0, len(self.scheduler.observation_queue))
+
+
+class TestSchedulerEdgeCases(unittest.TestCase):
+
+    def setUp(self) -> None:
+        """
+        This test scenario is going to test the edge cases like
+        double-allocation that may happen.
+
+        For example - the use of curr_allocs should result in the
+        _process_current_schedule not double_allocation, so we will test this.
+        Returns
+        -------
+
+        """
+        self.env = simpy.Environment()
+        config = Config(CONFIG)
+        sched_algorithm = DynamicAlgorithmFromPlan()
+
+        self.cluster = Cluster(env=self.env, config=config)
+        self.telescope = Telescope(
+            self.env, config, planner=None, scheduler=None
+        )
+        self.buffer = Buffer(self.env, self.cluster, config)
+
+        self.scheduler = Scheduler(self.env, self.buffer,
+                                   self.cluster, sched_algorithm)
+
+        self.observation = self.telescope.observations[0]
+        self.machine = self.cluster.machines[0]
+
+    def test_double_allocation(self):
+        """
+        Given an existing schedule, add multiple allocations to ensure
+        duplicates do not exist
+        """
+        task = Task('test_0', 0, 2, self.machine, [])
+        dup_task = Task('test_2', 8, 12, self.machine, [])
+        existing_schedule = {task: self.machine, dup_task: self.machine}
+        new_schedule, new_pairs = self.scheduler._process_current_schedule(
+            existing_schedule, allocation_pairs={},
+            workflow_id='test_id'
+        )
+        self.assertFalse(task in self.cluster._tasks['running'])
+        self.env.run(until=1)
+        self.assertTrue(task in self.cluster._tasks['running'])
+        self.assertTrue(dup_task in new_schedule)
+        self.assertFalse(task in new_schedule)
+        self.assertTrue(task.id in new_pairs)
+
+
+class TestSchedulerLongWorkflow(unittest.TestCase):
+
+    def setUp(self):
+        self.env = simpy.Environment()
+        sched_algorithm = DynamicAlgorithmFromPlan()
+        config = Config(LONG_CONFIG)
+        self.cluster = Cluster(self.env, config)
+        planning_model = SHADOWPlanning(algorithm=PLANNING_ALGORITHM)
+        self.planner = Planner(self.env, PLANNING_ALGORITHM,
+                               self.cluster, planning_model)
+        self.buffer = Buffer(self.env, self.cluster, config)
+        self.scheduler = Scheduler(self.env, self.buffer,
+                                   self.cluster, sched_algorithm)
+        self.telescope = Telescope(
+            self.env, config, self.planner, self.scheduler
+        )
+
+    def testAllocationTasksLongWorkflow(self):
+        curr_obs = self.telescope.observations[0]
+        self.scheduler.observation_queue.append(curr_obs)
+        curr_obs.ast = self.env.now
+        curr_obs.plan = self.planner.run(
+            curr_obs, self.buffer, self.telescope.max_ingest
+        )
+        self.env.process(self.scheduler.allocate_tasks(curr_obs))
+        self.env.run(1)
+        self.buffer.cold[0].observations['stored'].append(curr_obs)
+        self.env.run(until=299)
+        self.assertEqual(0, len(self.scheduler.observation_queue))
+
+
+class TestSchedulerDynamicReAllocation(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.env = simpy.Environment()
+        sched_algorithm = GreedyAlgorithmFromPlan()
+        config = Config(LONG_CONFIG)
+        self.cluster = Cluster(self.env, config)
+        self.planner = Planner(self.env, PLANNING_ALGORITHM,
+                               self.cluster, SHADOWPlanning('heft'))
+        self.buffer = Buffer(self.env, self.cluster, config)
+        self.scheduler = Scheduler(self.env, self.buffer,
+                                   self.cluster, sched_algorithm)
+        self.telescope = Telescope(
+            self.env, config, self.planner, self.scheduler
+        )
+
+    def test_reallocation_with_plan(self):
+        curr_obs = self.telescope.observations[0]
+        self.scheduler.observation_queue.append(curr_obs)
+        curr_obs.ast = self.env.now
+        curr_obs.plan = self.planner.run(curr_obs, self.buffer,
+                                         self.telescope.max_ingest)
+        self.env.process(self.scheduler.allocate_tasks(curr_obs))
+        self.env.run(1)
+        self.buffer.cold[0].observations['stored'].append(curr_obs)
+        self.env.run(until=299)
         self.assertEqual(0, len(self.scheduler.observation_queue))
 
 
@@ -227,10 +342,10 @@ class TestSchedulerIntegration(unittest.TestCase):
         self.cluster = Cluster(self.env, config)
         self.buffer = Buffer(self.env, self.cluster, config)
         self.planner = Planner(self.env, PLANNING_ALGORITHM,
-                               self.cluster)
+                               self.cluster, SHADOWPlanning('heft'))
 
         self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, GreedyAlgorithmFromPlan()
+            self.env, self.buffer, self.cluster, DynamicAlgorithmFromPlan()
         )
         self.telescope = Telescope(
             self.env, config, self.planner, self.scheduler
@@ -256,13 +371,13 @@ class TestSchedulerIntegration(unittest.TestCase):
         """
         self.env.run(until=1)
 
-        self.assertEqual(10, len(self.cluster.resources['available']))
+        self.assertEqual(10, len(self.cluster._resources['available']))
         # This takes timestep, data in the HotBuffer should be 4
         self.env.run(until=2)
-        self.assertEqual(5, len(self.cluster.resources['available']))
+        self.assertEqual(5, len(self.cluster._resources['available']))
         self.assertEqual(496, self.buffer.hot[0].current_capacity)
         self.env.run(until=31)
-        self.assertEqual(5, len(self.cluster.tasks['finished']))
+        self.assertEqual(5, len(self.cluster._tasks['finished']))
         # self.assertEqual(500, self.buffer.hot[0].current_capacity)
         self.assertEqual(210, self.buffer.cold[0].current_capacity)
         self.env.run(until=32)
@@ -285,11 +400,12 @@ class TestSchedulerDelayHelpers(unittest.TestCase):
         self.buffer = Buffer(self.env, self.cluster, config)
         self.planner = Planner(
             self.env, PLANNING_ALGORITHM,
-            self.cluster, delay_model=DelayModel(0.3, "normal")
+            self.cluster, SHADOWPlanning('heft'),
+            delay_model=DelayModel(0.3, "normal")
         )
 
         self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, GreedyAlgorithmFromPlan()
+            self.env, self.buffer, self.cluster, DynamicAlgorithmFromPlan()
         )
         self.telescope = Telescope(
             self.env, config, self.planner, self.scheduler
@@ -309,3 +425,13 @@ class TestSchedulerDelayHelpers(unittest.TestCase):
         -------
 
         """
+
+
+class TestSchedulerBatchPlanning(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.env = simpy.Environment()
+        config = Config(CONFIG)
+        self.cluster = Cluster(self.env, config)
+        self.buffer = Buffer(self.env, self.cluster, config)
+        # self.planer = Planner()

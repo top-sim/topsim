@@ -1,7 +1,10 @@
 import pandas as pd
+import logging
 
 from topsim.core.task import Task, TaskStatus
 from topsim.common.globals import TIMESTEP
+
+logger = logging.getLogger(__name__)
 
 
 class Cluster:
@@ -9,84 +12,126 @@ class Cluster:
     A class used to represent the Cluster, the abstract representation
     of computing resources in the Science Data Processor
 
-    Attributes
-    ----------
-    machines : dict
-        a formatted string to print out what the animal says
-    resources : dict
-        the name of the animal
-    tasks : dict
-        the sound that the animal makes
-    ingest : int
-        the number of legs the animal has (default 4)
+    The Cluster runs on a per-timestep capacity through its `run()` function
+    in the same way other actors do; however, it's runtime work is minimal.
 
-    Methods
-    -------
-    says(sound=None)
-        Prints the animals name and what sound it makes
+    The main purpose of the Cluster is to provide access methods for
+    requesting machine data (either aggregate or individual), and for
+    requesting allocations to schedule. The majority of the Cluster is
+    therefore 'read-only' from a user perspective. The only situations in
+    which a user will change the system on the cluster is by using a
+    non-default resource provisioning policy (see Notes below).
+
+
+
+    Parameters
+    ----------
+    env : :py:obj:`simpy.Environment`
+        The environment for the current simulation.
+
+    config : :py:obj:`~topsim.core.config.Config`
+        The configuration object for the simulation. See
+        :py:obj:`~topsim.core.simulation.Simulation` for more details.
+
+    Notes
+    -----
+    TopSim defaults to a 'free-for-all' style of resource allocation; unless
+    otherwise stated, a resource that is marked as 'available' may be used
+    for any task (provided capacity restrictions are met etc.).
+
+    If a SLURM-type resource provisioning approach is wanted, where a portion
+    of resources are allocated to a specific workflow for the duration of
+    that workflow, it is possible to use the
+    :py:meth:`~topsim.core.cluster.Cluster.provision_batch_resources`
+    class method in your (online) Scheduling
+    algorithm. This associates a set of machines for your workflow based
+    on a provisioning scheme of your design.
+
+    The clean-up of resources is completed by the Scheduler once all
+    :py:obj:`~topsim.core.task.Task` objects in the
+    :py:obj:`~topsim.core.planner.WorkflowPlan` have finished running,
+    and requires no additional code on behalf of the user.
+
     """
 
     def __init__(self, env, config):
         """
-        :param env:
-        :param spec:
+        Initialising a Cluster object requires only the Simpy environment and a
+        Config object.
+
         """
-        self.machines, self.system_bandwidth = config.parse_cluster_config()
-        self.dmachine = {machine.id: machine for machine in self.machines}
+        self.env = env  #: Simulation Environment object
+        machines, system_bandwidth = config.parse_cluster_config()
+        self.machines = machines
+        #: `list` of :py:obj:`~topsim.core.machine.Machine objects`
+        self.system_bandwidth = system_bandwidth
+        #: System bandwidth across the cluster
+
+        # TODO dmachine is a hack, we should improve this
+        self.machine_ids = {machine.id: machine for machine in self.machines}
         self.cl = ['default']
-        self.resources = {
+
+        self._resources = {
             'ingest': [],
             'occupied': [],
+            'idle': {},
             'available': [machine for machine in self.machines],
             'total': len(self.machines)
         }
-        self.tasks = {
+
+        self._tasks = {
             'running': [],
             'finished': [],
             'waiting': [],
-        }
-        self.ingest = {
+        }  # Dictionary of tasks on system
+
+        self._ingest = {
             'status': False,
             'pipeline': None,
             'observation': None,
             'completed': 0,
             'demand': 0
-        }
-        self.usage_data = {
+        }  # Dictionary of current ingest information
+
+        self._usage_data = {
             'occupied': 0,
             'ingest': 0,
-            'available': len(self.resources['available']),
+            'available': len(self._resources['available']),
             'running_tasks': 0,
             'finished_tasks': 0
-        }
-        self.finished_workflows = []
-        self.ingest_pipeline = None
-        self.ingest_obervation = None
-        self.clusters = {
+        }  # Data to more easily create output data frame
+
+        self.num_provisioned_obs = 0
+
+        self._clusters = {
             'default': {
-                'resources': self.resources,
-                'tasks': self.tasks,
-                'ingest': self.ingest,
-                'usage_data': self.usage_data,
+                'resources': self._resources,
+                'tasks': self._tasks,
+                'ingest': self._ingest,
+                'usage_data': self._usage_data,
                 'ingest_pipeline': None,
                 'ingest_observation': None,
             }
         }
 
-        self.env = env
-
     def run(self):
+        """
+        Start the runtime loop for the cluster, and manage checks on the
+        machine
+
+
+
+        Yields
+        -------
+        Standard TIMESTEP timeout for the simulation.
+        """
         while True:
+            # Manage each cluster
             for c in self.cl:
-                if not self.clusters[c]['ingest']['status']:
-                    self.clusters[c]['usage_data']['ingest'] = 0
-                    self.clusters[c]['ingest']['demand'] = 0
-                if self.clusters[c]['tasks']['waiting']:
-                    for task in self.clusters[c]['tasks']['waiting']:
-                        if task.task_status is TaskStatus.FINISHED:
-                            self.clusters[c]['tasks']['waiting'].remove(task)
-                            self.clusters[c]['tasks']['finished'].append(task)
-            yield self.env.timeout(1)
+                if not self._clusters[c]['ingest']['status']:
+                    self._clusters[c]['usage_data']['ingest'] = 0
+                    self._clusters[c]['ingest']['demand'] = 0
+            yield self.env.timeout(TIMESTEP)
 
     def check_ingest_capacity(self, pipeline_demand, max_ingest_resources,
                               c='default'):
@@ -122,15 +167,15 @@ class Cluster:
         # Length is how long the pipeline will take to
         # ingest/observation will take
 
-        num_available = len(self.clusters[c]['resources']['available'])
-        num_ingest = len(self.clusters[c]['resources']['ingest'])
+        num_available = len(self._clusters[c]['resources']['available'])
+        num_ingest = len(self._clusters[c]['resources']['ingest'])
 
         if pipeline_demand > max_ingest_resources:
             return False
 
-        if len(self.clusters[c]['resources']['available']) >= pipeline_demand \
+        if len(self._clusters[c]['resources']['available']) >= pipeline_demand \
                 and len(
-            self.clusters[c]['resources']['ingest'])+pipeline_demand <= \
+            self._clusters[c]['resources']['ingest']) + pipeline_demand <= \
                 max_ingest_resources:
             return True
         else:
@@ -144,56 +189,43 @@ class Cluster:
         Parameters
         ----------
 
+        c
+        observation
         demand : int
             The type of ingest pipeline - see Observation
-        duration : int
 
         Returns
         -------
         """
 
+        if demand > len(self.current_available_resources()):
+            raise RuntimeError(
+                f"Failed to check system capacity"
+                f" before allocating resources to ingest!"
+            )
+
         tasks = self._generate_ingest_tasks(demand, observation)
 
         pairs = []
-        temp_intest_resources = self.clusters[c]['resources']['available'][:demand]
-        # self.clusters[c]['resources']['ingest'].extend(
-        #     self.clusters[c]['resources']['available'][:demand])
-        self.clusters[c]['resources']['available'] = \
-            self.clusters[c]['resources']['available'][demand:]
 
-        # self.usage_data['available'] = len(
-        #     self.clusters[c]['resources']['available']
-        # )
+        temp_ingest_resources = (
+            self._clusters[c]['resources']['available'][:demand]
+        )
 
-
-        for i, machine in enumerate(temp_intest_resources):
+        for i, machine in enumerate(temp_ingest_resources):
             pairs.append((machine, tasks[i]))
-            self.clusters[c]['usage_data']['available'] -= 1
-            self.clusters[c]['usage_data']['running_tasks'] += 1
-        self.clusters[c]['resources']['ingest'].extend(temp_intest_resources)
-        # self.clusters[c]['ingest'] = len(self.clusters[c]['resources'][
-        #                                      'ingest'])
 
-        self.clusters[c]['ingest']['status'] = True
-        self.clusters[c]['ingest']['demand'] = demand
-        # self.clusters[c]['usage_data']['running_tasks'] + len(
-        #     self.clusters[c][
-        #     'ingest']['demand'])
-
-        curr_tasks = {}
+        self._clusters[c]['ingest']['status'] = True
+        self._clusters[c]['ingest']['demand'] = demand
+        id = observation.name
         while True:
             for pair in pairs:
                 (machine, task) = pair
-                # if task not in self.tasks['running']:
-                #     self.tasks['running'].append(task)
                 ret = self.env.process(
-                    self.allocate_task_to_cluster(task, machine, ingest=True)
+                    self.allocate_task_to_cluster(
+                        task, machine, observation=id, ingest=True
+                    )
                 )
-            if len(self.clusters[c]['resources']['ingest']) == 0:
-                self.clusters[c]['ingest']['completed'] += 1
-                self.clusters[c]['ingest']['status'] = False
-                # We've finished ingest
-                break
             else:
                 break
         yield self.env.timeout(TIMESTEP)
@@ -207,58 +239,95 @@ class Cluster:
         -------
 
         """
-        self.clusters[c]['ingest']['completed'] += 1
-        self.clusters[c]['ingest']['status'] = False
+        self._clusters[c]['ingest']['completed'] += 1
+        self._clusters[c]['ingest']['status'] = False
 
-    def allocate_task_to_cluster(self, task, machine, ingest=False,
-                                 c='default'):
+    def current_available_resources(self):
+        """
+        Produce a list of current available resources
+
+        We use a list comprehension here because otherwise we would
+        return an actual reference to the resources, causing issues if we
+        want to remove elements from the list wherever we are using it.
+
+        Returns
+        -------
+        A list that duplicates the entries for current available resources
+        """
+        return [x for x in self._clusters['default']['resources']['available']]
+
+    def allocate_task_to_cluster(
+            self, task, machine,
+            predecessor_allocations=None, observation=None, ingest=False,
+            c='default'
+    ):
         """
         Receive task from scheduler for allocation to specified machine
+
+        Parameters
+        ----------
+        task :
+        machine :
+        predecessor_allocations
+        ingest
+        observation
+
+        pred : list of predecessors machine allocations, for use if the task
+        is allocated to a different machine.
 
         Returns
         -------
         True if task successfully completed
         """
+
         ret = None
 
         while True:
-            if task not in self.clusters[c]['tasks']['running']:
-                self.clusters[c]['tasks']['running'].append(task)
-                if not ingest:
+            if task not in self._clusters[c]['tasks']['running']:
+                if (machine not in
+                        self._clusters[c]['resources']['available'] and
+                        machine not in self._clusters[c]['resources']['ingest']
+                        and machine not in self.get_idle_resources(observation)
+                ):
+                    raise RuntimeError
+                if ingest:
                     # Ingest resources are allocated in bulk, so we do that
                     # elsewhere
-                    self.clusters[c]['resources']['occupied'].append(machine)
-                    self.clusters[c]['resources']['available'].remove(machine)
-                    self.clusters[c]['usage_data']['available'] -= 1
-                    self.clusters[c]['usage_data']['running_tasks'] += 1
-                    duration = round(task.flops / machine.cpu)
-                    if duration != task.duration:
-                        task.duration = duration
-
-                task.task_status = TaskStatus.SCHEDULED
-
-                # The currently-stored duration may be a result of a
-                # preliminary allocation to another machine. Here we make
-                # sure we update that.
-
-                # ret = self.env.process(machine.run(task, self.env))
-                machine.run_task(task)
-                ret = self.env.process(task.do_work(self.env))
-                yield self.env.timeout(0)
-            if ret.triggered:
-                machine.stop_task(task)
-                self.clusters[c]['tasks']['running'].remove(task)
-                self.clusters[c]['usage_data']['running_tasks'] -= 1
-                self.clusters[c]['tasks']['finished'].append(task)
-                self.clusters[c]['usage_data']['finished_tasks'] += 1
-                if ingest:
-                    self.clusters[c]['resources']['ingest'].remove(machine)
-                    # self.clusters[c]['usage_data']['available'] += 1
+                    self._clusters[c]['tasks']['running'].append(task)
+                    self._clusters[c]['resources']['ingest'].append(machine)
+                    self._clusters[c]['resources']['available'].remove(machine)
+                    self._clusters[c]['usage_data']['available'] -= 1
+                    self._clusters[c]['usage_data']['running_tasks'] += 1
+                    task.task_status = TaskStatus.SCHEDULED
+                    ret = self.env.process(task.do_work(self.env, machine,
+                                                        predecessor_allocations))
                 else:
-                    self.clusters[c]['resources']['occupied'].remove(machine)
-                self.clusters[c]['resources']['available'].append(machine)
-                self.clusters[c]['usage_data']['available'] += 1
+                    # self.clusters[c]['resources']['available'].remove(machine)
+                    # self.clusters[c]['resources']['occupied'].append(machine)
+                    self._set_machine_occupied(machine, observation)
+                    self._clusters[c]['tasks']['running'].append(task)
+                    self._clusters[c]['usage_data']['available'] -= 1
+                    self._clusters[c]['usage_data']['running_tasks'] += 1
+
+                    task.task_status = TaskStatus.SCHEDULED
+                    ret = self.env.process(task.do_work(self.env, machine,
+                                                        predecessor_allocations))
+                    yield self.env.timeout(1)
+            if ret.triggered:
+                # machine.stop_task(task)
+                self._clusters[c]['tasks']['running'].remove(task)
+                self._clusters[c]['usage_data']['running_tasks'] -= 1
+                self._clusters[c]['tasks']['finished'].append(task)
+                self._clusters[c]['usage_data']['finished_tasks'] += 1
+                if ingest:
+                    self._clusters[c]['resources']['ingest'].remove(machine)
+                    self._clusters[c]['resources']['available'].append(machine)
+                else:
+                    # self.clusters[c]['resources']['occupied'].remove(machine)
+                    self._set_machine_available(machine, observation)
+                self._clusters[c]['usage_data']['available'] += 1
                 task.task_status = TaskStatus.FINISHED
+                task.delay_flag = task.delay_flag
                 return task.task_status
             else:
                 yield self.env.timeout(TIMESTEP)
@@ -271,30 +340,38 @@ class Cluster:
 
         Returns
         -------
-
+        True if nothing is running, False otherwise
         """
 
         no_tasks_running = (
-                (len(self.clusters['default']['tasks']['running']) == 0) or
-                (len(self.clusters['default']['tasks']['waiting']) == 0)
+                (len(self._clusters['default']['tasks']['running']) == 0) or
+                (len(self._clusters['default']['tasks']['waiting']) == 0)
         )
 
         no_resources_occupied = (
-                (len(self.clusters['default']['resources']['occupied']) == 0) or
-                (len(self.clusters['default']['resources']['ingest']) == 0)
+                (len(
+                    self._clusters['default']['resources']['occupied']) == 0) or
+                (len(self._clusters['default']['resources']['ingest']) == 0)
         )
         if no_tasks_running and no_resources_occupied:
             return True
         else:
             return False
 
-    def is_occupied(self, machine, c='default'):
+    def is_occupied(self, machine, observation=None, c='default'):
         """
         Check if the machine is occupied
+
         Parameters
         ----------
         machine : topsim.core.machine.Machine
             The machine with which we are concerned.
+
+        observation : topsim.core.Observation
+            (option) The observation that is associated with the current
+            check. This is useful for ensuring machines are not reserved for
+            a batch-processing
+
         c : object
             The identifier for the cluster that is being accessed (in the
             event of multiple clusters). Access the 'default' cluster by
@@ -304,23 +381,277 @@ class Cluster:
         -------
 
         """
-        return (machine in self.clusters[c]['resources']['occupied']
-                or machine in self.clusters[c]['resources']['ingest'])
 
-    # TODO
-    def find_unnoccupied_resources(self, task_reqs):
+        # TODO add 'is provisioned' check here
+
+        return (machine in self._clusters[c]['resources']['occupied']
+                or machine in self._clusters[c]['resources']['ingest'])
+
+    def provision_batch_resources(self, size, name, c='default'):
         """
-        Return a list of unnoccupied machines that have the capacity based
-        on the task requirements. Task requirements will be any combination
-        of machine resources (FLOPs, IO, Memory).
-
-        This is intended to be used by a scheduling Actor in the event that
-        a resource identified in a WorkflowPlan is no longer available.
+        Mark a machine on the cluster as being allocated to a workflow, without
+        the allocation place just yet.
 
         Parameters
         ----------
-        task_reqs : dict
-            Dictionary of required resources for a given task.
+        size: int
+            The number of resources to be provisioned based on the
+            observation workflow
+        name : the observation that is associated with the provisioning
+        c :  str
+            The name of the cluster (defaults to 'default' if we are only
+            using one).
+
+        Returns
+        -------
+        """
+        available_resources = self.get_available_resources()
+
+        tmp = len(available_resources)
+        if size > tmp > 0:
+            size = tmp
+        for m in range(0, size):
+            self._add_idle_resource(name, available_resources[0])
+
+        self.num_provisioned_obs+=1
+        return True
+
+    def release_batch_resources(self, observation, c='default'):
+        """
+        For a given observation, release these observations from the
+        idle-resources section and add them to the available resources 'pile'
+
+        Parameters
+        ----------
+        observation
+
+        Returns
+        -------
+        """
+        if observation in self._clusters[c]['resources']['idle']:
+            self._update_available_resources(observation)
+            self._reset_idle_resources(observation)
+
+
+    def get_machine_from_id(self, id, c='default'):
+        """
+
+        Parameters
+        ----------
+        id : str
+            The str-id of the machine we want to access
+        c
+
+        Returns
+        -------
+        :py:obj:`~topsim.core.machine.Machine`
+        """
+        return self.machine_ids[id]
+
+    def _update_available_resources(self, observation, c='default'):
+        """
+        De-allacote resources to a given observation (batch-reservation) and
+        add them to the 'available' pool of resources.
+
+        Parameters
+        ----------
+        machine
+
+        Returns
+        -------
+
+        """
+        idle_resources = self.get_idle_resources(observation)
+        for m in idle_resources:
+            self._clusters[c]['resources']['available'].append(m)
+
+    def get_available_resources(self, c='default'):
+        return self._clusters[c]['resources']['available']
+
+    def is_observation_provisioned(self, observation, c='default'):
+        return observation in self._clusters[c]['resources']['idle']
+
+    def get_idle_resources(self, observation, c='default'):
+        """
+        List the resources that are currently provisioned for the
+        specified observation.
+
+        Parameters
+        ----------
+        observation : :py:obj:
+        c
+
+        Returns
+        -------
+
+        """
+        if observation in self._clusters[c]['resources']['idle']:
+            return [x for x in
+                    self._clusters[c]['resources']['idle'][observation]
+                    ]
+        else:
+            return []
+
+    @property
+    def finished_tasks(self, c='default'):
+        """
+        Returns the tasks that are finished on the cluster
+
+        Returns
+        -------
+        `list` of finished :py:obj:`topsim.core.task.Task` objects
+        """
+        return [x for x in self._clusters[c]['tasks']['finished']]
+
+    def get_finished_tasks(self, c='default'):
+        """
+        Return a list of the tasks that are finished
+        Parameters
+        ----------
+        c
+
+        Returns
+        -------
+
+        """
+        return [x for x in self._clusters[c]['tasks']['finished']]
+
+    def _set_machine_occupied(self, machine, observation, c='default'):
+        """
+
+        Parameters
+        ----------
+        machine
+        observation
+
+        Returns
+        -------
+
+        """
+        if machine in self.get_available_resources():
+            self._clusters[c]['resources']['available'].remove(machine)
+            self._clusters[c]['resources']['occupied'].append(machine)
+            return True
+        elif observation in self._clusters[c]['resources']['idle']:
+            self._clusters[c]['resources']['idle'][observation].remove(machine)
+            self._clusters[c]['resources']['occupied'].append(machine)
+            return True
+        else:
+            return False
+
+    def _set_machine_available(self, machine, observation, c='default'):
+        """
+        Take a machine marked as 'occupied' on the cluster and mark it either
+        as available or return it to an observation's pool of resources.
+        Parameters
+        ----------
+        observation
+
+        Returns
+        -------
+
+        """
+        self._clusters[c]['resources']['occupied'].remove(machine)
+        if observation in self._clusters[c]['resources']['idle']:
+            self._clusters[c]['resources']['idle'][observation].append(machine)
+        else:
+            self._clusters[c]['resources']['available'].append(machine)
+
+    def _clean_up_finished_task(self, task, machine, observation):
+        pass
+
+    # TODO
+    # def _set_task_running(self, task, c='default'):
+    #
+    #     return self.clusters[c]['tasks']['running'].append(task)
+
+    def _add_idle_resource(self, observation, machine, c='default'):
+        """
+        Add a resource to the dictionary of idle batch resources for the
+        current observation
+
+        Parameters
+        ----------
+        observation
+        machine
+        c
+
+        Returns
+        -------
+
+        """
+        if observation not in self._clusters[c]['resources']['idle']:
+            self._clusters[c]['resources']['idle'][observation] = []
+        if machine in self.get_available_resources():
+            self._clusters[c]['resources']['idle'][observation].append(machine)
+            self._remove_available_resource(machine)
+        else:
+            raise RuntimeError(
+                'Attempting to provision resources on machine that is not '
+                'available'
+            )
+
+    def _get_batch_observations(self, c='default'):
+        return list(self._clusters[c]['resources']['idle'].keys())
+
+    def _reset_idle_resources(self, observation, c='default'):
+        """
+        Remove observation from idle resource dictionary.
+
+        This clears the machine allocations from the idle resources
+
+        Parameters
+        ----------
+        observation
+        c
+
+        Returns
+        -------
+
+        """
+        if self._clusters[c]['resources']['idle'][observation]:
+            self._clusters[c]['resources']['idle'].pop(observation)
+            self.num_provisioned_obs -=1
+        return None
+
+    def _remove_available_resource(self, machine, c='default'):
+        """
+
+        Parameters
+        ----------
+        machine
+        c
+
+        Returns
+        -------
+
+        """
+        self._clusters[c]['resources']['available'].remove(machine)
+
+    def _set_machine_task_occupied(self):
+        """
+        Update allocation dictionaries and output data dictionaries
+        Returns
+        -------
+
+        """
+
+        pass
+
+    def _set_machine_task_available(self):
+        """
+        Update allocation dictionaries and output data dictionaries
+
+        Returns
+        -------
+
+        """
+        pass
+
+    def _set_machine_task_ingest(self):
+        """
+        Update allocation dictionaries to indicate machine is being used for
+        ingest
 
         Returns
         -------
@@ -366,20 +697,39 @@ class Cluster:
         """
         df = pd.DataFrame()
         df['available_resources'] = [
-            self.clusters['default']['usage_data']['available']
+            self._clusters['default']['usage_data']['available']
         ]
         df['occupied_resources'] = [
-            self.clusters['default']['usage_data']['occupied']]
+            self._clusters['default']['usage_data']['occupied']]
         df['ingest_resources'] = [
-            self.clusters['default']['usage_data']['ingest']
+            self._clusters['default']['usage_data']['ingest']
         ]
         df['running_tasks'] = [
-            self.clusters['default']['usage_data']['running_tasks']]
+            self._clusters['default']['usage_data']['running_tasks']]
         df['finished_tasks'] = [
-            self.clusters['default']['usage_data']['finished_tasks']]
+            self._clusters['default']['usage_data']['finished_tasks']]
+
+        df['provisioned_observations'] = [
+            len(self._clusters['default']['resources']['idle'])
+        ]
         # df['waiting_tasks'] = [len(self.tasks['waiting'])]
 
         return df
+
+    def _update_usage_data(self, resource: str, value):
+        """
+        Update the usage statistics of the resource with the new value
+        Parameters
+        ----------
+        resource : str
+            A string value from the 'usage_data' dictionary
+
+        Returns
+        -------
+        The new value
+        """
+        self._clusters['default']['usage_data']['resource'] = value
+        return value
 
     def finished_task_time_data(self):
         """
@@ -391,7 +741,7 @@ class Cluster:
         -------
         """
 
-        finished_tasks = self.clusters['default']['tasks']['finished']
+        finished_tasks = self._clusters['default']['tasks']['finished']
         task_data = {}
         for task in finished_tasks:
             task_data[task.id] = {}
@@ -405,14 +755,5 @@ class Cluster:
 
         return pd.DataFrame(task_data)
 
-    def print_state(self):
-        # self.clusters[c]['resources']
-        self.tasks
-        self.ingest
-
-        return {
-            'machines': [machine.print_state() for machine in self.machines],
-            # 'resources': repr(self.clusters[c]['resources']),
-            'tasks': repr(self.tasks),
-            # 'ingest': repr(self.clusters[c]['ingest'])
-        }
+    def __len__(self):
+        return len(self.machines)

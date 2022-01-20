@@ -89,7 +89,7 @@ class Buffer:
         A simpy.env.timeout() of duration topsim.common.globals.TIMESTEP
         """
         while True:
-            LOGGER.info(
+            LOGGER.debug(
                 "HotBuffer: %s \nColdBuffer: %s",
                 [self.hot[b].current_capacity for b in self.hot],
                 [self.cold[b].current_capacity for b in self.cold]
@@ -118,6 +118,21 @@ class Buffer:
             If both buffers have capacity
         False :
             If at least one buffer does not have capacity
+
+        TODO Ensure that we do not start observations if the size of the data +
+        the total size of the TRANSFERRING observation data is > than the total
+        data of the cold buffer.
+
+        NOTE This is necessary only for if we want to move data from
+        hot-to-cold. This avoids the possibility for an observation to
+        go ahead when both hot buffer and cold buffer have capacity
+        mid-transfer, but the cold buffer does not have capacity post-transfer.
+        For example, if we both buffers have capacity of 150, we ingest a 125
+        tb ingest, we start to transfer that to the buffer, then we get a 50tb
+        ingest when the HotBuffer is at 80 and the ColdBuffer is at 70 (
+        mid-transfer), this means will will accept an ingest of 50 data because
+        both  separately are fine, but after ingest will not be.
+
         """
         b = observation.buffer_id
         size = observation.ingest_data_rate * observation.duration
@@ -201,6 +216,9 @@ class Buffer:
         -------
 
         """
+
+        # TODO Support multiple observation transfers 
+
         if not self.hot[b].observations["stored"]:
             raise RuntimeError(
                 "No observations in Hot Buffer"
@@ -241,6 +259,7 @@ class Buffer:
                 )
             yield self.env.timeout(TIMESTEP)
         return True
+
 
     def ingest_data_stream(self, observation):
         """
@@ -338,30 +357,6 @@ class Buffer:
         """
         current_state = pd.DataFrame()
 
-        # current_state['hotbuffer_total_capacity'] = [self.hot.total_capacity]
-        # current_state['hotbuffer_current_capacity'] = [
-        #     self.hot.current_capacity
-        # ]
-        # current_state['hotbuffer_stored_observations'] = [len(
-        #     self.hot.observations['stored']
-        # )]
-        # if self.hot.observations['transfer'] is not None:
-        #     current_state['hot_transfer_observations'] = [1]
-        # else:
-        #     current_state['hot_transfer_observations'] = [0]
-        #
-        # current_state['coldbuffer_total_capacity'] = [self.cold.total_capacity]
-        # current_state['coldbuffer_current_capacity'] = [
-        #     self.cold.current_capacity
-        # ]
-        # current_state['coldbuffer_stored_observations'] = [len(
-        #     self.cold.observations['stored']
-        # )]
-        # if self.cold.observations['transfer'] is not None:
-        #     current_state['cold_transfer_observations'] = [1]
-        # else:
-        #     current_state['cold_transfer_observations'] = [0]
-
         return current_state
 
 
@@ -387,6 +382,14 @@ class HotBuffer:
         }
 
     def has_waiting_observations(self):
+        """
+        Check if there are observations in the buffer to transfer to cold
+        buffer.
+
+        Returns
+        -------
+
+        """
         return bool(self.observations['stored'])
 
     def process_incoming_data_stream(self, incoming_datarate, time):

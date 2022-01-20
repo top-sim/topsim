@@ -8,6 +8,17 @@ logger = logging.getLogger(__name__)
 
 
 class Monitor(object):
+    """
+    The Monitor actor for a TopSim simulation
+
+    Parameters
+    ----------
+    simulation : topsim.core.Simulation
+        The simulation object
+
+    Attributes
+    ----------
+    """
     def __init__(self, simulation, start_time):
         self.simulation = simulation
         self.env = simulation.env
@@ -19,20 +30,10 @@ class Monitor(object):
         while True:
             logger.debug('SimTime=%s', self.env.now)
             # time.sleep(0.5)
-            state = {
-                'cluster_state': self.simulation.cluster.print_state(),
-                'instrument_state': self.simulation.instrument.print_state(),
-                'scheduler_state': self.simulation.scheduler.print_state(),
-            }
-
             self.df = self.df.append(
                 self.collate_actor_dataframes(), ignore_index=True
             )
             yield self.env.timeout(1)
-
-    def write_to_file(self):
-        with open(self.sim_timestamp, 'w+') as f:
-            json.dump(self.events, f, indent=4)
 
     def collate_actor_dataframes(self):
         """
@@ -51,7 +52,7 @@ class Monitor(object):
         instrument = self.simulation.instrument.to_df()
         scheduler = self.simulation.scheduler.to_df()
         delay = pd.DataFrame(
-            {'delay': [str(self.simulation.planner.delay_model)]}
+            {'delay': [self.simulation.planner.delay_model.degree.value]}
         )
         algs = pd.DataFrame(
             {
@@ -59,7 +60,9 @@ class Monitor(object):
                 'scheduling': [repr(self.simulation.scheduler.algorithm)]
             },
         )
-        cf = pd.DataFrame({'config': [self.simulation.cfgpath]})
-        df = df.join([cluster, buffer, instrument, scheduler, algs, cf, delay],
-                     how='outer')
+        cf = pd.DataFrame({'config': [self.simulation._cfg_path]})
+        df = df.join(
+            [cluster, buffer, instrument, scheduler, algs, cf, delay],
+            how='outer'
+        )
         return df

@@ -1,6 +1,7 @@
 {
 	"header": {
-		"time": false
+		"time": false,
+		"units": "flops_per_minute"
 	},
 	"graph": {
 		"directed": true,
@@ -12,43 +13,43 @@
 		},
 		"nodes": [
 			{
-				"comp": 7140000,
+				"comp": 71400,
 				"id": 0
 			},
 			{
-				"comp": 5520000,
+				"comp": 55200,
 				"id": 1
 			},
 			{
-				"comp": 5700000,
+				"comp": 57000,
 				"id": 2
 			},
 			{
-				"comp": 6540000,
+				"comp": 65400,
 				"id": 3
 			},
 			{
-				"comp": 6420000,
+				"comp": 64200,
 				"id": 4
 			},
 			{
-				"comp": 10140000,
+				"comp": 101400,
 				"id": 5
 			},
 			{
-				"comp": 6600000,
+				"comp": 66000,
 				"id": 6
 			},
 			{
-				"comp": 8820000,
+				"comp": 88200,
 				"id": 7
 			},
 			{
-				"comp": 8760000,
+				"comp": 87600,
 				"id": 8
 			},
 			{
-				"comp": 6060000,
+				"comp": 60600,
 				"id": 9
 			}
 		],

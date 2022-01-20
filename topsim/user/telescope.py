@@ -4,9 +4,9 @@
 import pandas as pd
 import logging
 
-
 from topsim.core.instrument import Instrument, RunStatus
 from topsim.core.scheduler import ScheduleStatus
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -48,30 +48,6 @@ class Telescope(Instrument):
     scheduler : core.scheduler.Scheduler object
         The Scheduler actor for the current simulation
 
-    Attributes
-    ----------
-    env :
-
-    total_arrays :
-
-    pipelines : dict
-        dictionary of the different pipelines that may be observed with this
-        telescope setup. pipelines have a name associated with them, and an
-        associated cluster-demand, which is the number of machines used during
-        execution of the INGEST pipeline
-
-    observations : list
-
-    scheduler : core.Scheduler object
-
-    planner : core.Scheduler object
-
-    observation_types = None
-
-    telescope_status = False
-
-    telescope_use = 0
-
     Raises
     ------
     OSError
@@ -85,22 +61,31 @@ class Telescope(Instrument):
     def __init__(
             self, env, config, planner, scheduler
     ):
-        super().__init__()
+        super().__init__(env, config, planner, scheduler)
         self.env = env
         try:
             (
-                self.total_arrays,
-                self.pipelines,
-                self.observations,
-                self.max_ingest
+                total_arrays,
+                pipelines,
+                observations,
+                max_ingest
             ) = config.parse_instrument_config(Telescope.name)
         except OSError:
             raise
+        #: int: Total number of arrays used to observe
+        self.total_arrays = total_arrays
+        #:  `dict` of different `observation: pipeline` pairs
+        self.pipelines = pipelines
+        self.observations = observations
+        self.max_ingest = max_ingest
+
+        #: :py:obj:`~topsim.core.scheduler.Scheduler` object of Simulation
         self.scheduler = scheduler
+        #: :py:obj:`~topsim.core.olanner.Planner` object of Simulation
+        self.planner = planner
         self.observation_types = None
         self.telescope_status = False
         self.telescope_use = 0
-        self.planner = planner
         self.delayed = False
 
     def run(self):
@@ -121,6 +106,17 @@ class Telescope(Instrument):
             and observation is scheduled for observation.
 
             * Finalise an Observation and initiate the 'clean-up'.
+
+        Notes
+        -----
+        The procedure here follows an 'observation-led' approach to
+        determining if the observation is able to run (hence
+        `observation.is_ready()`. The idea is the
+        observation is standard across any implementation of Instrument,
+        so it's easier for user-definied instruments to defer to the
+        observation to determine if it is possible to run the observation (
+        i.e. have the observation check if it's Start/End time conditions
+        have been met).
 
         Returns
         -------
@@ -181,11 +177,44 @@ class Telescope(Instrument):
             yield self.env.timeout(1)
 
     def begin_observation(self, observation):
+        """
+        Update the telescope use status based on observation demand for antennas
+
+        Parameters
+        ----------
+        observation : :py:obj:`~topsim.core.telescope.Observation`
+            Observation that is chosen for allocation to the telescope
+
+        Returns
+        -------
+            RunStatus.RUNNING
+
+        """
+        # TODO We do not actually do any sanity checking here to make sure
+        #  the telescope use isn't greater than the total_capacity.
+
         self.telescope_use += observation.demand
         self.telescope_status = True
         return RunStatus.RUNNING
 
     def finish_observation(self, observation):
+        """
+        Update the telescope use status based on observation demand for antennas
+
+        Parameters
+        ----------
+        observation : :py:obj:`~topsim.core.telescope.Observation`
+            Observation that is chosen for allocation to the telescope
+
+        Returns
+        -------
+            RunStatus.RUNNING
+
+        """
+
+        # TODO We do not actually do any sanity checking here to make sure
+        #  the telescope use isn't greater than the total_capacity.
+
         self.telescope_use -= observation.demand
 
         if self.telescope_use is 0:

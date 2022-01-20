@@ -1,6 +1,6 @@
 .. _configuration:
 
-TopSim Config files
+Simulations
 =========================
 
 Observations

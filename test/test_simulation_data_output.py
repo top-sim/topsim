@@ -16,24 +16,18 @@
 import os
 import unittest
 import simpy
-import logging
 
 import pandas as pd
 
 from topsim.core.simulation import Simulation
-from topsim.user.scheduling import GreedyAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.telescope import Telescope
+from topsim.user.plan.static_planning import SHADOWPlanning
 
-logging.basicConfig(level="WARNING")
-logger = logging.getLogger(__name__)
-
-CONFIG = "test/simulation_pickles/heft_single_observation_simulation.json"
-
-SIM_TIMESTAMP = f'test/simulation_pickles/{0}'
-EVENT_PICKLE = f'{SIM_TIMESTAMP}-heft-GreedyAlgorithmFromPlan-sim.pkl'
-TASKS_PICKLE = f'{SIM_TIMESTAMP}-heft-GreedyAlgorithmFromPlan-tasks.pkl'
-
+CONFIG = "test/data/config/heft_single_observation_simulation.json"
+# SIM_TIMESTAMP = f'test/simulation_pickles/{0}'
 cwd = os.getcwd()
+
 
 class TestMonitorPandasPickle(unittest.TestCase):
 
@@ -45,29 +39,76 @@ class TestMonitorPandasPickle(unittest.TestCase):
         -------
         """
         env = simpy.Environment()
-        instrument = Telescope
+        self.instrument = Telescope
         self.simulation = Simulation(
             env=env,
             config=CONFIG,
-            instrument=instrument,
-            planning='heft',
-            scheduling=GreedyAlgorithmFromPlan,
+            instrument=self.instrument,
+            planning_algorithm='heft',
+            planning_model=SHADOWPlanning('heft'),
+            scheduling=DynamicAlgorithmFromPlan,
             delay=None,
-            timestamp=SIM_TIMESTAMP,
-            to_file=True
+            timestamp='unittest',
+            to_file=True,
+            hdf5_path='test/simulation_data/test_hdf5.h5',
+            delimiters=f'test/'
         )
 
     def tearDown(self):
         output = f'{cwd}/test/simulation_pickles/{0}'
-        os.remove(f'{output}-sim.pkl')
-        os.remove(f'{output}-tasks.pkl')
+        os.remove('test/simulation_data/test_hdf5.h5')
+        # os.remove(f'{output}-sim.pkl')
+        # os.remove(f'{output}-tasks.pkl')
 
-    def testPickleGeneratedAfterSimulation(self):
-        res = self.simulation.start(-1)
+    def testHDF5GeneratedAfterSimulation(self):
+        """
+        Test that after a simulation, a HDF5 storage file is generated
 
-        sim_df = pd.read_pickle('test/simulation_pickles/0-sim.pkl')
-        tasks_df = pd.read_pickle('test/simulation_pickles/0-tasks.pkl')
-        self.assertTrue('running_tasks' in sim_df)
+        """
+        self.simulation.start()
+        self.assertTrue(os.path.exists('test/simulation_data/test_hdf5.h5'))
+
+    def testHDF5KeysAndDataFramesExist(self):
+        """
+        Ensure that the generated HDF5 contains the correct results in the
+        keys
+
+        """
+
+    def test_multi_simulation_data_merge(self):
+        # global_sim_df = pd.DataFrame()
+        # global_task_df = pd.DataFrame()
+
+        for algorithm in ['heft', 'fcfs']:
+            env = simpy.Environment()
+            simulation = Simulation(
+                env,
+                CONFIG,
+                self.instrument,
+                planning_algorithm=algorithm,
+                planning_model=SHADOWPlanning(algorithm),
+                scheduling=DynamicAlgorithmFromPlan,
+                delay=None,
+                timestamp='unittest',
+                hdf5_path='test/simulation_data/test_hdf5.h5',
+                to_file=True,
+                delimiters=f'{algorithm}'
+            )
+            simulation.start()
+        self.assertTrue(
+            os.path.exists('test/simulation_data/test_hdf5.h5')
+        )
+        heft_key = '/dunittest/heft/heft_single_observation_simulation/sim/'
+        fcfs_key = '/dunittest/fcfs/heft_single_observation_simulation/sim/'
+        heft_sim = pd.read_hdf(
+            'test/simulation_data/test_hdf5.h5', key=heft_key
+        )
+        self.assertEqual(120, len(heft_sim))
+        self.assertEqual(3, heft_sim.iloc[-1]['available_resources'])
+        # length of both simulations is 248
+        # self.assertEqual(248, len(global_sim_df))
+
+
 
 
 class TestMonitorNoFileOption(unittest.TestCase):
@@ -81,40 +122,36 @@ class TestMonitorNoFileOption(unittest.TestCase):
         """
         self.env = simpy.Environment()
         self.instrument = Telescope
-        self.ts = f'{cwd}/test/simulation_pickles/{0}'
+        # self.ts = f'{cwd}/test/simulation_pickles/{0}'
 
     def test_simulation_nofile_option(self):
         simulation = Simulation(
             self.env,
             CONFIG,
             self.instrument,
-            planning='heft',
-            scheduling=GreedyAlgorithmFromPlan,
+            planning_algorithm='heft',
+            planning_model=SHADOWPlanning('heft'),
+            scheduling=DynamicAlgorithmFromPlan,
             delay=None,
-            timestamp=self.ts,
+            timestamp=None,
         )
-        simdf, taskdf = simulation.start(runtime=60)
-        self.assertFalse(os.path.exists("test/simulation_pickles/0-sim.pkl"))
+        simdf, taskdf = simulation.start()
+        self.assertEqual(120, len(simdf))
+        self.env = simpy.Environment()
+        simulation = Simulation(
+            self.env,
+            CONFIG,
+            self.instrument,
+            planning_algorithm='fcfs',
+            planning_model=SHADOWPlanning('fcfs'),
+            scheduling=DynamicAlgorithmFromPlan,
+            delay=None,
+            timestamp=None,
+            # delimiters=f'test/{algorithm}'
+        )
+        simdf, taskdf = simulation.start()
+        self.assertEqual(128, len(simdf))
 
-    def test_multi_siulation_data_merge(self):
-        global_sim_df = pd.DataFrame()
-        global_task_df = pd.DataFrame()
-        for algorithm in ['heft', 'fcfs']:
-            env = simpy.Environment()
-            simulation = Simulation(
-                env,
-                CONFIG,
-                self.instrument,
-                planning=algorithm,
-                scheduling=GreedyAlgorithmFromPlan,
-                delay=None,
-                timestamp=self.ts,
-            )
-            simdf, taskdf = simulation.start()
-            global_sim_df = global_sim_df.append(simdf)
-            global_task_df = global_task_df.append(taskdf)
-
-        self.assertEqual(250, len(global_sim_df))
 
     def testResultsAgreeWithExpectations(self):
         pass

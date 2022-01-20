@@ -18,7 +18,6 @@ import json
 from topsim.core.instrument import Observation
 from topsim.core.machine import Machine
 from topsim.core.buffer import HotBuffer, ColdBuffer
-import pandas as pd
 
 import logging
 
@@ -28,6 +27,33 @@ LOGGER = logging.getLogger(__name__)
 class Config:
     """
     Process the configuration of the current simulation
+
+    Parameters
+    ----------
+    config : str
+        File path to the JSON config file
+
+    Attributes
+    -----------
+    instrument : dict
+        Data for the instrument constructor
+    cluster : dict
+        Data for the cluster constructor
+    buffer : dict
+        Data for buffer constructor
+    timestep_unit: str
+        String value that specifies what granualirity of time is being used
+        in the simulation
+
+    Raises
+    ------
+    OSError
+        This is raised if we cannot read the configuration file/it does not
+        exist
+    json.JSONDecodeError
+        This is raised if the JSON file is in the wrong format
+    KeyError
+        Raised if one of the attribute-keys is not found in the provided JSON file.
     """
 
     def __init__(self, config):
@@ -139,31 +165,3 @@ class Config:
 
         return {0: hot}, {0: cold}
 
-
-class TaskInstanceConfig(object):
-    def __init__(self, task_config):
-        self.cpu = task_config.cpu
-        self.memory = task_config.memory
-        self.disk = task_config.disk
-        self.duration = task_config.duration
-
-
-class TaskConfig(object):
-    def __init__(self, task_index, instances_number, cpu, memory, disk,
-                 duration):
-        self.task_index = task_index
-        self.instances_number = instances_number
-        self.cpu = cpu
-        self.memory = memory
-        self.disk = disk
-        self.duration = duration
-
-
-class JobConfig(object):
-    def __init__(self, idx, submit_time, task_configs):
-        self.submit_time = submit_time
-        self.task_configs = task_configs
-        self.id = idx
-
-    def __repr__(self):
-        return str(self.id)

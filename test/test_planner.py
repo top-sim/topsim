@@ -22,8 +22,10 @@ from topsim.core.cluster import Cluster
 from topsim.core.buffer import Buffer
 from topsim.core.instrument import Observation
 from topsim.core.delay import DelayModel
-
-from topsim.user.scheduling import GreedyAlgorithmFromPlan
+from topsim.user.telescope import Telescope
+from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.plan.static_planning import SHADOWPlanning
+from topsim.user.plan.batch_planning import BatchPlanning
 
 current_dir = os.path.abspath('')
 
@@ -33,12 +35,13 @@ OBS_DURATION = 10
 OBS_DEMAND = 15
 OBS_DATA_RATE = 5
 OBS_PIPELINE = 'continuum'
+TEL_MAX_INGEST = 5
 PLAN_ALGORITHM = 'heft'
 
-CONFIG = "test/data/config_update/standard_simulation.json"
-HEFT_CONFIG = "test/data/config_update/heft_single_observation_simulation.json"
+CONFIG = "test/data/config/standard_simulation_longtask.json"
+HEFT_CONFIG = "test/data/config/heft_single_observation_simulation.json"
 MACHINE_CONFIG = None
-OBS_WORKFLOW = "test/data/config/workflow_config_minutes.json"
+OBS_WORKFLOW = "test/data/config/workflow_config_minutes_longtask.json"
 
 
 class TestPlannerConfig(unittest.TestCase):
@@ -46,12 +49,19 @@ class TestPlannerConfig(unittest.TestCase):
     def setUp(self):
         self.env = simpy.Environment()
         config = Config(CONFIG)
+        self.model = SHADOWPlanning('heft')
         self.cluster = Cluster(env=self.env, config=config)
         self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
 
     def testPlannerBasicConfig(self):
-        planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
-        available_resources = planner.cluster_to_shadow_format()
+        planner = Planner(
+            env=self.env,
+            algorithm=PLAN_ALGORITHM,
+            cluster=self.cluster,
+            model=self.model
+        )
+        available_resources = planner.model._cluster_to_shadow_format(
+            self.cluster)
         # Bandwidth set at 1gb/s = 60gb/min.
         self.assertEqual(60.0, available_resources['system']['bandwidth'])
         machine = available_resources['system']['resources']['cat0_m0']
@@ -65,10 +75,12 @@ class TestWorkflowPlan(unittest.TestCase):
     def setUp(self):
         self.env = simpy.Environment()
         config = Config(CONFIG)
+        self.model = SHADOWPlanning('heft')
         self.cluster = Cluster(self.env, config=config)
         self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
-
-        self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster)
+        self.planner = Planner(
+            self.env, PLAN_ALGORITHM, self.cluster, self.model,
+        )
         self.observation = Observation(
             'planner_observation',
             OBS_START_TME,
@@ -102,18 +114,20 @@ class TestWorkflowPlan(unittest.TestCase):
         """
 
         time = self.env.now
-        self.assertRaises(
-            RuntimeError,
-            next, self.planner.run(self.observation, self.buffer)
-        )
+        # self.assertRaises(
+        #     RuntimeError,
+        #     next, self.planner.run(self.observation, self.buffer)
+        # )
         self.observation.ast = self.env.now
-
-        plan = self.planner.plan(
-            self.observation,
-            self.observation.workflow,
-            'heft',
-            self.buffer
-        )
+        plan = self.planner.run(self.observation, self.buffer,
+                                TEL_MAX_INGEST
+                                )
+        # plan = self.planner.plan(
+        #     self.observation,
+        #     self.observation.workflow,
+        #     'heft',
+        #     self.buffer
+        # )
 
         expected_exec_order = [0, 5, 3, 4, 2, 1, 6, 8, 7, 9]
         self.assertEqual(len(plan.tasks), len(expected_exec_order))
@@ -133,12 +147,14 @@ class TestPlannerDelay(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
-        sched_algorithm = GreedyAlgorithmFromPlan()
+        sched_algorithm = DynamicAlgorithmFromPlan()
         config = Config(HEFT_CONFIG)
         dm = DelayModel(0.1, "normal")
+        self.model = SHADOWPlanning('heft', dm)
         self.cluster = Cluster(self.env, config=config)
         self.buffer = Buffer(self.env, self.cluster, config)
-        self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster, dm)
+        self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster,
+                               self.model, delay_model=dm)
         self.observation = Observation(
             'planner_observation',
             OBS_START_TME,
@@ -158,13 +174,14 @@ class TestPlannerDelay(unittest.TestCase):
         and thus run the rest of the code in run()  next(val)
         """
 
-        self.assertRaises(
-            RuntimeError,
-            next,
-            self.planner.run(self.observation, self.buffer)
-        )
+        # self.assertRaises(
+        #     RuntimeError,
+        #     next,
+        #     self.planner.run(self.observation, self.buffer)
+        # )
         self.observation.ast = self.env.now
-        next(self.planner.run(self.observation, self.buffer))
+        self.observation.plan = self.planner.run(self.observation,
+                                                 self.buffer, TEL_MAX_INGEST)
         self.assertTrue(self.observation.plan is not None)
         self.assertTrue(0.1, self.observation.plan.tasks[0].delay.prob)
 
@@ -172,4 +189,49 @@ class TestPlannerDelay(unittest.TestCase):
         pass
 
     def testIncorrectParameters(self):
+        pass
+
+
+class TestBatchProcessingPlan(unittest.TestCase):
+
+    def setUp(self) -> None:
+        """
+        Create a planner and a `simpy` environment in which to run dummy
+        simulations for the purpose of ensuring the planner works nicely
+        when selecting 'batch' as a static scheduling method.
+        Returns
+        -------
+
+        """
+        self.env = simpy.Environment()
+        config = Config(CONFIG)
+        self.model = BatchPlanning('batch')
+
+        self.cluster = Cluster(self.env, config=config)
+        self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
+        self.planner = Planner(
+            self.env, PLAN_ALGORITHM, self.cluster, self.model,
+        )
+        self.telescope = Telescope(
+            self.env, config, planner=None, scheduler=None
+        )
+
+    def test_generate_topological_sort(self):
+        """
+        This is the main component of the batch_planning system - we just
+        return a topological sort of the tasks and a list of precedence
+        resources and wrap it into the 'WorkflowPlan' object.
+
+        Returns
+        -------
+        plan : core.planner.WorkflowPlan
+            WorkflowPlan object for the observation
+        """
+        obs = self.telescope.observations[0]
+        plan = self.planner.run(obs, self.buffer, TEL_MAX_INGEST)
+        order = [0, 1, 2, 3, 4, 5, 6, 8, 7, 9]
+        self.assertIsNotNone(plan)
+        self.assertListEqual(order, plan.exec_order)
+
+    def tearDown(self) -> None:
         pass

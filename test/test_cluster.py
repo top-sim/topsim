@@ -21,12 +21,13 @@ import simpy
 from topsim.core.config import Config
 from topsim.core.cluster import Cluster
 from topsim.core.instrument import Observation
-from topsim.core.task import TaskStatus
+from topsim.user.telescope import Telescope
+from topsim.core.task import Task
 
 logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
-CONFIG = "test/data/config/standard_simulation.json"
+CONFIG = "test/data/config/standard_simulation_longtask.json"
 OBS_START_TME = 0
 OBS_DURATION = 10
 OBS_DEMAND = 15
@@ -54,18 +55,17 @@ class TestClusterConfig(unittest.TestCase):
 class TestIngest(unittest.TestCase):
 
     def setUp(self) -> None:
+        """
+        Setup a cluster and a simulation environment to test ingest pipelines
+        """
         self.env = simpy.Environment()
         config = Config(CONFIG)
 
         self.cluster = Cluster(env=self.env, config=config)
-        self.observation = Observation(
-            'planner_observation',
-            OBS_START_TME,
-            OBS_DURATION,
-            OBS_DEMAND,
-            OBS_WORKFLOW,
-            data_rate=None
+        self.telescope = Telescope(
+            self.env, config, planner=None, scheduler=None
         )
+        self.observation = self.telescope.observations[0]
 
     def testClusterCheckIngest(self):
         """
@@ -83,6 +83,25 @@ class TestIngest(unittest.TestCase):
         self.assertTrue(retval)
 
     def testClusterProvisionIngest(self):
+        """
+
+        Notes:
+
+        When we run this test, we have the simulation run 'until time 10'.
+        AS Far as the simulation is concerned, we this occurs 'before' 10
+        seconds in simtime; however, the rest of the simulation is
+        operating AT time = 10, which is when the tasks are "Due" to
+        finish. Here we are running the tasks for "1 -timestep less" than
+        is necessary, but within the simulation time this allows us to run
+        "on time". I.e. at time = 10 (in the simulation), there _will_ be
+        10 resources available, because it's the time period in which all
+        ingest tasks will finish. However, in real terms, these tasks
+        technically finished one timestep earlier.
+
+        Returns
+        -------
+
+        """
         pipeline_demand = 5
         self.env.process(self.cluster.run())
         peek = self.env.peek()
@@ -92,71 +111,131 @@ class TestIngest(unittest.TestCase):
         )
         self.env.run(until=1)
         self.assertEqual(1, self.env.now)
-        # self.process(self.run_ingest(duration,pipeline_demand))
-        # for task in self.cluster.running_tasks:
-        #  	self.assertEqual(TaskStatus.RUNNING, task.task_status)
-        self.assertEqual(5, len(self.cluster.resources['available']))
-        self.assertEqual(5, len(self.cluster.tasks['running']))
-        self.assertEqual(5, len(self.cluster.resources['available']))
-        self.env.run(until=10)
-        # AS Far as the simulation is concerned, we this occurs 'before' 10
-        # seconds in simtime; however, the rest of the simulation is
-        # operating AT time = 10, which is when the tasks are "Due" to
-        # finish. Here we are running the tasks for "1 -timestep less" than
-        # is necessary, but within the simulation time this allows us to run
-        # "on time". I.e. at time = 10 (in the simulation), there _will_ be
-        # 10 resources available, because it's the time period in which all
-        # ingest tasks will finish. However, in real terms, these tasks
-        # technically finished one timestep earlier.
-        self.assertEqual(10, len(self.cluster.resources['available']))
-        # self.env.run(until=20)
-        # self.assertEqual(10, len(self.cluster.resources['available']))
-        # self.assertEqual(20, self.env.now)
+        self.assertEqual(5, len(self.cluster._resources['available']))
+        self.assertEqual(5, len(self.cluster._tasks['running']))
+        self.assertEqual(5, len(self.cluster._resources['available']))
+        self.env.run(until=11)
+        self.assertEqual(10, len(self.cluster._resources['available']))
 
-    def testIngestPipelineExceedsIngestCapacity(self):
+    def test_ingest_capacity_check(self):
+        """
+        Given a pipeline demand that is too great, return 'false' to ensure
+        that we do not attempt to run observations.
+        """
+
+        pipeline_demand = 11
+        max_ingest = 5
+        self.assertFalse(
+            self.cluster.check_ingest_capacity(pipeline_demand, max_ingest)
+        )
+
+    def test_ingest_demand_exceeds_cluster_capacity_runtime(self):
         """
         If we have a pipeline that requests too many ingest pipelines then we
-        need to reject its observation.
+        need to reject its observation. If - for some unknown reasons - we
+        do not call this check, make sure the simulation fails at runtime.
+
+        Returns
+        -------
+        """
+        pipeline_demand = 11
+        self.env.process(self.cluster.provision_ingest_resources(
+            pipeline_demand, self.observation
+        ))
+        self.assertRaises(RuntimeError, self.env.run, until=1)
+
+
+class TestClusterTaskAllocation(unittest.TestCase):
+
+    def setUp(self) -> None:
+        """
+        TODO
+        Set up tasks and cluster to attempt allocation of tasks to resources
+        """
+        self.env = simpy.Environment()
+        config = Config(CONFIG)
+
+        self.cluster = Cluster(env=self.env, config=config)
+        self.telescope = Telescope(
+            self.env, config, planner=None, scheduler=None
+        )
+        self.observation = self.telescope.observations[0]
+        self.machine = self.cluster.machines[0]
+        self.task = Task('test_0', 0, 2, self.machine, [])
+
+    def test_allocate_task_to_cluster(self):
+        self.env.process(
+            self.cluster.allocate_task_to_cluster(self.task, self.machine)
+        )
+        self.env.run(until=1)
+        self.assertEqual(self.task, self.cluster._tasks['running'][0])
+
+    def test_duplication_allocation(self):
+        ret = self.env.process(
+            self.cluster.allocate_task_to_cluster(self.task, self.machine)
+        )
+        self.env.run(until=1)
+        newtask = Task('test_2', 8, 12, self.machine, [])
+        new_ret = self.env.process(
+            self.cluster.allocate_task_to_cluster(newtask, self.machine)
+        )
+        self.assertRaises(RuntimeError, self.env.run, until=2)
+
+
+        # self.assertEqual(self.task, self.cluster.tasks['running'][0])
+
+
+class TestClusterBatchScheduling(unittest.TestCase):
+
+    def setUp(self) -> None:
+        """
+        Batch scheduling setup
+        """
+        self.env = simpy.Environment()
+        config = Config(CONFIG)
+
+        self.cluster = Cluster(env=self.env, config=config)
+        self.telescope = Telescope(
+            self.env, config, planner=None, scheduler=None
+        )
+        self.observation = self.telescope.observations[0]
+
+    def test_provision_resources(self):
+        """
+        Test that resource provisioning occurs and the right number of
+        resources exist in the right place
+
         Returns
         -------
 
         """
-
-    def test_cluster_ingest_complex_pipelin(self):
-        pass
-
-    def run_ingest(self, duration, demand):
-        retval = self.cluster.provision_ingest_resources(
-            demand,
-            duration
+        provision_size = 5
+        self.cluster.provision_batch_resources(
+            provision_size, self.observation
         )
-        for task in self.cluster.tasks['running']:
-            self.assertEqual(TaskStatus.SCHEDULED, task.task_status)
+        self.assertEqual(5, len(self.cluster.get_available_resources()))
+        self.assertEqual(
+            5, len(self.cluster.get_idle_resources(self.observation))
+        )
+        self.assertListEqual(
+            self.cluster._get_batch_observations(), [self.observation]
+        )
+
+    def test_batch_removal(self):
+        provision_size = 5
+        self.cluster.provision_batch_resources(
+            provision_size, self.observation
+        )
+        self.cluster.release_batch_resources(self.observation)
+        self.assertListEqual(
+            [], self.cluster.get_idle_resources(self.observation)
+        )
+        self.assertEqual(10, len(self.cluster.get_available_resources()))
 
 
-class TestCluster(unittest.TestCase):
-
-    def setUp(self):
+    def tearDown(self) -> None:
+        """
+        TODO
+        Batch scheduling tear down
+        """
         pass
-
-    def tearDown(self):
-        pass
-
-    def testClusterQueue(self):
-        env = simpy.Environment()
-        env.process(self.run_env(env))
-        env.run(until=20)
-
-    def run_env(self, env):
-        i = 0
-        while i < 15:
-            logger.debug(env.now)
-            if env.now == 5:
-                env.process(self.secret(env))
-            i += 1
-            yield env.timeout(1)
-
-    def secret(self, env):
-        logger.debug('Started secret business @ {0}'.format(env.now))
-        yield env.timeout(4)
-        logger.debug('Finished secret business @ {0}'.format(env.now))

@@ -31,12 +31,12 @@ class TaskInit(unittest.TestCase):
         self.machine = 'x1'
         self.flops = 10000
         self.pred = []
-
+        
     def test_task_init(self):
         t = Task(
-            tid = self.task_id,
-            est = self.est,
-            eft = self.eft,
+            tid=self.task_id,
+            est=self.est,
+            eft=self.eft,
             machine=self.machine,
             predecessors=None,
             flops=0, memory=0, io=0,
@@ -106,11 +106,11 @@ class TestTaskDelay(unittest.TestCase):
             delay=dm)
         # t.ast = 0
         t.duration = t.eft - t.est
-        self.env.process(t.do_work(self.env))
+        self.env.process(t.do_work(self.env, None))
         self.env.run()
         self.assertEqual(11, t.aft)
 
-
+    # TODO update task with data transfer data
     def testTaskDoWorkWithDelay(self):
         dm = copy.copy(self.dm_delay)
         t = Task(
@@ -121,8 +121,7 @@ class TestTaskDelay(unittest.TestCase):
             predecessors=None,
             flops=0, memory=0, io=0,
             delay=dm)
-        self.env.process(t.do_work(self.env))
+        self.env.process(t.do_work(self.env, None))
         self.env.run()
         self.assertEqual(12, t.aft)
         self.assertTrue(t.delay_flag)
-
