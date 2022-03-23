@@ -5,7 +5,7 @@
 			"max_ingest_resources": 5,
 			"pipelines": {
 				"dingo": {
-					"workflow": "test/data/config/shadow_Continuum_ChannelSplit_10_long.json",
+					"workflow": "longconfig/shadow_Continuum_ChannelSplit_10_long.json",
 					"ingest_demand": 5
 				}
 			},

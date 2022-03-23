@@ -5,15 +5,15 @@
 			"max_ingest_resources": 1,
 			"pipelines": {
 				"first": {
-					"workflow": "test/basic-workflow-data/basic_workflow_config.json",
+					"workflow": "workflows/basic_workflow_config.json",
 					"ingest_demand": 1
 				},
 				"second": {
-					"workflow": "test/basic-workflow-data/basic_workflow_config.json",
+					"workflow": "workflows/basic_workflow_config.json",
 					"ingest_demand": 1
 				},
 				"third": {
-					"workflow": "test/basic-workflow-data/basic_workflow_config.json",
+					"workflow": "workflows/basic_workflow_config.json",
 					"ingest_demand": 1
 				}
 			},

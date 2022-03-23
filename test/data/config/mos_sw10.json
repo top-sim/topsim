@@ -5,19 +5,19 @@
 			"max_ingest_resources": 5,
 			"pipelines": {
 				"dingo": {
-					"workflow": "test/data/config/shadow_Continuum_ChannelSplit_10.json",
+					"workflow": "largeconfig/shadow_Continuum_ChannelSplit_10.json",
 					"ingest_demand": 5
 				},
 				"emu1": {
-					"workflow": "test/data/config/shadow_Continuum_ChannelSplit_10.json",
+					"workflow": "largeconfig/shadow_Continuum_ChannelSplit_10.json",
 					"ingest_demand": 5
 				},
 				"emu2": {
-					"workflow": "test/data/config/shadow_Continuum_ChannelSplit_10.json",
+					"workflow": "largeconfig/shadow_Continuum_ChannelSplit_10.json",
 					"ingest_demand": 5
 				},
 				"wallaby": {
-					"workflow": "test/data/config/shadow_Continuum_ChannelSplit_10.json",
+					"workflow": "largeconfig/shadow_Continuum_ChannelSplit_10.json",
 					"ingest_demand": 5
 				}
 			},

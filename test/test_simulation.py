@@ -48,10 +48,10 @@ class TestSimulationFileOptions(unittest.TestCase):
 
     def setUp(self) -> None:
         self.env = simpy.Environment()
-        self.output = f'{cwd}/test/data/output/hdf5.h5'
+        self.output = f'test/data/output/hdf5.h5'
 
     def tearDown(self):
-        output = f'{cwd}/test/data/output/hdf5.h5'
+        output = f'test/data/output/hdf5.h5'
         # os.remove(f'{output}')
         # os.remove(f'{output}-tasks.pkl')
 

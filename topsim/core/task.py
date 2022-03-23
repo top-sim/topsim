@@ -102,7 +102,9 @@ class Task(object):
         # Process potential updates to duration:
 
         duration = self._calc_task_delay()
-
+        if duration < 1:
+            raise ValueError(f'Duration is {duration} which is not a valid '
+                             f'time. Please check configuration.')
         yield env.timeout(duration-1)
         if self.duration < duration:
             self.delay_flag = True

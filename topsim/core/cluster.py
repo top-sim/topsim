@@ -678,7 +678,7 @@ class Cluster:
                 f"{observation.name}_ingest_t{i}",
                 0, 0, None, None, 0, 0, 0, None
             )
-
+            # obseration.start_time
             t.duration = observation.duration
             t.task_status = TaskStatus.SCHEDULED
             tasks.append(t)

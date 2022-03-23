@@ -125,3 +125,11 @@ class TestTaskDelay(unittest.TestCase):
         self.env.run()
         self.assertEqual(12, t.aft)
         self.assertTrue(t.delay_flag)
+
+class TestTaskRuntimes(unittest.TestCase):
+
+    def setUp(self) -> None:
+        pass
+
+    def tearDown(self) -> None:
+        pass

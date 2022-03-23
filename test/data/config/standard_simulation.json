@@ -5,26 +5,26 @@
 			"max_ingest_resources": 5,
 			"pipelines": {
 				"emu": {
-					"workflow": "test/data/config/workflow_config_minutes.json",
+					"workflow": "standard/workflow_config_minutes.json",
 					"ingest_demand": 5
 				},
 				"dingo": {
-					"workflow": "test/data/config/workflow_config_minutes.json",
+					"workflow": "standard/workflow_config_minutes.json",
 					"ingest_demand": 5
 				}
 			},
 			"observations": [
 				{
 					"name": "emu",
-					"start": 1,
-					"duration": 10,
+					"start": 0,
+					"duration": 600,
 					"instrument_demand": 36,
 					"data_product_rate": 0.06666666666666667
 				},
 				{
 					"name": "dingo",
-					"start": 15,
-					"duration": 20,
+					"start": 900,
+					"duration": 1200,
 					"instrument_demand": 18,
 					"data_product_rate": 0.08333333333333333
 				}

@@ -5,15 +5,15 @@
 			"max_ingest_resources": 1,
 			"pipelines": {
 				"emu": {
-					"workflow": "test/data/config/workflow_config_minutes_longtask.json",
+					"workflow": "longtask/workflow_config_minutes_longtask.json",
 					"ingest_demand": 1
 				}
 			},
 			"observations": [
 				{
 					"name": "emu",
-					"start": 1,
-					"duration": 10,
+					"start": 0,
+					"duration": 600,
 					"instrument_demand": 36,
 					"data_product_rate": 0.03333333333333333
 				}

@@ -31,7 +31,7 @@ CONFIG = "test/data/config/standard_simulation_longtask.json"
 OBS_START_TME = 0
 OBS_DURATION = 10
 OBS_DEMAND = 15
-OBS_WORKFLOW = "test/data/config/workflow_config.json"
+# OBS_WORKFLOW = "test/data/config/workflow_config.json"
 
 
 class TestClusterConfig(unittest.TestCase):

@@ -15,6 +15,7 @@
 
 
 import json
+from pathlib import Path
 from topsim.core.instrument import Observation
 from topsim.core.machine import Machine
 from topsim.core.buffer import HotBuffer, ColdBuffer
@@ -66,6 +67,7 @@ class Config:
         except json.JSONDecodeError:
             raise
 
+        self.path = Path(config)
         if 'instrument' in cfg and cfg['instrument'] is not None:
             self.instrument = cfg['instrument']
         else:
@@ -133,18 +135,24 @@ class Config:
                 ingest_demand = pipelines[name]['ingest_demand']
                 o = Observation(
                     name=name,
-                    start=observation['start'],
-                    duration=observation['duration'],
+                    start=observation['start'] / timestep_multiplier,
+                    duration=observation['duration'] / timestep_multiplier,
                     demand=observation['instrument_demand'],
-                    workflow=workflow_path,
-                    data_rate=observation[
-                                  'data_product_rate'] * timestep_multiplier
+                    workflow=(
+                        (self.path.parent / workflow_path).as_posix()
+                    ),
+                    data_rate=(
+                        observation['data_product_rate'] * timestep_multiplier
+                    )
                 )
                 observations.append(o)
             except KeyError:
                 raise
+
+
         max_ingest_resources = cfg[instrument_name]['max_ingest_resources']
         return total_arrays, pipelines, observations, max_ingest_resources
+
 
     def parse_buffer_config(self):
         config = self.buffer
@@ -164,4 +172,3 @@ class Config:
         )
 
         return {0: hot}, {0: cold}
-

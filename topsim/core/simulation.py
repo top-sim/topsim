@@ -152,11 +152,11 @@ class Simulation:
         self._cfg_path = config  #: Configuration path
 
         # Initiaise Actor and Resource objects
-        cfg = Config(config)
+        self._cfg = Config(config)
         #: :py:obj:`~topsim.core.cluster.Cluster` instance
-        self.cluster = Cluster(env, cfg)
+        self.cluster = Cluster(env, self._cfg)
         #: :py:obj:`~topsim.core.buffer.Buffer` instance
-        self.buffer = Buffer(env, self.cluster, cfg)
+        self.buffer = Buffer(env, self.cluster, self._cfg)
         planning_algorithm = planning_algorithm
         planning_model = planning_model
 
@@ -175,7 +175,7 @@ class Simulation:
         #: User-defined :py:obj:`~topsim.core.instrument.Instrument` instance
         self.instrument = instrument(
             env=self.env,
-            config=cfg,
+            config=self._cfg,
             planner=self.planner,
             scheduler=self.scheduler
         )
@@ -381,7 +381,7 @@ class Simulation:
 
         return self._hdf5_store
 
-    def _stringify_json_data(self, path):
+    def _stringify_json_data(self, path, relative=True):
         """
         From a given file pointer, get a string representation of the data stored
 
@@ -397,8 +397,13 @@ class Simulation:
 
         """
 
+        if relative:
+            fpath = self._cfg.path.parent / path
+        else:
+            fpath = path
+
         try:
-            with open(path) as fp:
+            with open(fpath) as fp:
                 jdict = json.load(fp)
         except json.JSONDecodeError:
             raise
@@ -420,7 +425,7 @@ class Simulation:
 
         """
 
-        cfg_str = self._stringify_json_data(path)
+        cfg_str = self._stringify_json_data(path, relative=False)
         jdict = json.loads(cfg_str)
         pipelines = jdict['instrument']['telescope']['pipelines']
         ds = [['simulation_config', path, cfg_str]]
