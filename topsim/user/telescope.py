@@ -274,7 +274,7 @@ class Telescope(Instrument):
 
     def observations_waiting(self):
         return sum(
-            [1 if x.status == RunStatus.FINISHED
+            [1 if x.status == RunStatus.WAITING
              else 0
              for x in self.observations]
         )
