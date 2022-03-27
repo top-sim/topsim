@@ -17,6 +17,7 @@ import logging
 import pandas as pd
 
 from enum import Enum
+from tqdm import tqdm
 
 from topsim.common.globals import TIMESTEP
 from topsim.core.instrument import RunStatus
@@ -93,7 +94,6 @@ class Scheduler:
         -------
         Timeout of common.config.TIMESTEP.
         """
-
         if self.status is not SchedulerStatus.RUNNING:
             raise RuntimeError("Scheduler has not been initialised! Call init")
         LOGGER.debug("Scheduler starting up...")
@@ -285,11 +285,20 @@ class Scheduler:
 
         schedule = {}
         allocation_pairs = {}
+        _total_tasks = len(current_plan.tasks)
+        _curr_tasks = len(current_plan.tasks)
+        pbar = tqdm(total=_total_tasks,desc=f'Scheduler: {observation.name}',
+                    unit="Tasks",leave=True)#,position=)
         while True:
             current_plan.tasks = self._update_current_plan(current_plan)
             current_plan, schedule, finished = self._generate_current_schedule(
                 observation, current_plan, schedule
             )
+            prev_tasks = _curr_tasks
+            _curr_tasks = len(current_plan.tasks)
+            nupdate = prev_tasks-_curr_tasks
+            pbar.update(nupdate)
+
             if finished:
                 # We have finished this observation
                 LOGGER.info(f'{observation.name} Removed from Queue @'
@@ -304,9 +313,8 @@ class Scheduler:
                 schedule, allocation_pairs = self._process_current_schedule(
                     schedule, allocation_pairs, current_plan.id
                 )
-
                 yield self.env.timeout(TIMESTEP)
-
+        pbar.close()
         yield self.env.timeout(TIMESTEP)
 
     def _generate_current_schedule(self, observation, current_plan, schedule):

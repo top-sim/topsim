@@ -30,7 +30,11 @@ moved and from where post-processing pipelines access workflow data.
 
 import logging
 import json
+from time import sleep
+
 import pandas as pd
+
+from tqdm import tqdm
 
 from topsim.common.globals import TIMESTEP
 from topsim.core.instrument import RunStatus
@@ -226,6 +230,8 @@ class Buffer:
         current_obs = self.hot[b].observation_for_transfer()
         # current_obs = self.hot.observations['transfer']
         data_left_to_transfer = current_obs.total_data_size
+        _total_data = current_obs.total_data_size
+        pbar = tqdm(total=_total_data,desc=f'Buffer: {current_obs.name}')
         if not self.cold[b].has_capacity(data_left_to_transfer):
             # We cannot actually transfer the observation due to size
             # constraints
@@ -252,12 +258,13 @@ class Buffer:
             data_left_to_transfer = self.hot[b].transfer_observation(
                 current_obs, self.cold[b].max_data_rate, data_left_to_transfer
             )
-
             if check != data_left_to_transfer:
                 raise RuntimeError(
                     "Hot and Cold Buffer receiving data at a differen rate"
                 )
+            pbar.update(n=self.cold[b].max_data_rate)
             yield self.env.timeout(TIMESTEP)
+        pbar.close()
         return True
 
 

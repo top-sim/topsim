@@ -26,17 +26,16 @@ import simpy
 import logging
 
 from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.plan.static_planning import SHADOWPlanning
 from topsim.user.telescope import Telescope
 from topsim.core.simulation import Simulation
 from topsim.core.delay import DelayModel
 
-logging.basicConfig(level="WARNING")
+# logging.basicConfig(level="INFO")
 LOGGER = logging.getLogger(__name__)
-EVENT_FILE = 'simulations/heft_sim/output/heft_sim_delay_low.trace'
 
-CONFIG = 'simulations/heft_sim/input/heft_single_observation_simulation.json'
+CONFIG = 'simulations/heft_sim/input/standard_simulation.json'
 env = simpy.Environment()
-
 planning_algorithm = 'heft'
 scheduling_algorithm = DynamicAlgorithmFromPlan
 instrument = Telescope
@@ -46,10 +45,37 @@ simulation = Simulation(
     env=env,
     config=CONFIG,
     instrument=instrument,
-    algorithm_map={'pheft': 'pheft', 'heft': 'heft', 'fifo': DynamicAlgorithmFromPlan},
-    event_file=EVENT_FILE,
-    delay=dm
+    planning_algorithm='heft',
+    planning_model=SHADOWPlanning('heft'),
+    scheduling=DynamicAlgorithmFromPlan,
+    delay=None,
+    timestamp='heft_sim',
+    to_file=False
 )
 
-simulation.start(-1)
+simulation.start()
 # simulation.resume(200)
+
+
+"""
+            env = simpy.Environment()
+            instrument = Telescope
+            # timestamp = f'{time.time()}'.split('.')[0]
+            simulation = Simulation(
+                env=env,
+                config=cfg,
+                instrument=instrument,
+                planning_algorithm='heft',
+                planning_model=SHADOWPlanning('heft'),
+                scheduling=DynamicAlgorithmFromPlan,
+                delay=None,
+                timestamp='skaworkflows_test',
+                to_file=True,
+                hdf5_path=f'{RUN_PATH}/{FOLDER_PATH}/results.h5'
+                # hdf5_path='',
+                # delimiters=f'test/'
+            )
+            simulation.start(runtime=60)
+            simulation.resume(100)
+
+"""
