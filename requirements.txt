@@ -10,3 +10,4 @@ coveralls>=1.8.2
 bokeh>=1.4
 nbserverproxy
 tables >= 3.6
+tqdm
