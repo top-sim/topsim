@@ -13,7 +13,7 @@ setup(
         'shadow @ git+https://github.com/myxie/shadow.git'
     ],
     dependency_links=[
-        'http://github.com/myxie/shadow/tarball/master#egg=shadow'
+        'https://github.com/myxie/shadow/tarball/master#egg=shadow'
     ],
 
     # package_dir={'': 'shadow'},

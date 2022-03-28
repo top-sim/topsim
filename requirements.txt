@@ -1,4 +1,4 @@
-git+git://github.com/myxie/shadow@development#egg=shadow
+git+https://github.com/myxie/shadow@development#egg=shadow
 alabaster>=0.7.12
 networkx>=2.6
 pandas>=1.2.4
