@@ -12,10 +12,6 @@ setup(
         'tables',
         'shadow @ git+https://github.com/myxie/shadow.git'
     ],
-    dependency_links=[
-        'https://github.com/myxie/shadow/tarball/master#egg=shadow'
-    ],
-
     # package_dir={'': 'shadow'},
     url='https://github.com/top-sim/topsim',
     license='GNU',
