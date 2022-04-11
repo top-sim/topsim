@@ -99,7 +99,9 @@ class Scheduler:
         LOGGER.debug("Scheduler starting up...")
 
         while self.status is SchedulerStatus.RUNNING:
-            LOGGER.debug('Time on Scheduler: {0}'.format(self.env.now))
+            if self.env.now % 1000 == 0:
+                LOGGER.debug('Time on Scheduler: {0}'.format(self.env.now))
+                LOGGER.debug("Scheduler Status: %s", self.status)
             if self.buffer.has_observations_ready_for_processing():
                 obs = self.buffer.next_observation_for_processing()
                 if obs not in self.observation_queue:
@@ -113,7 +115,6 @@ class Scheduler:
             # for obs in self.observation_queue:
             #     if obs.workflow_plan.status == WorkflowStatus.FINISHED:
             #         self.cluster.release_batch_resources(obs)
-            LOGGER.debug("Scheduler Status: %s", self.status)
             yield self.env.timeout(TIMESTEP)
 
     def is_idle(self):
