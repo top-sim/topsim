@@ -93,11 +93,13 @@ class Buffer:
         A simpy.env.timeout() of duration topsim.common.globals.TIMESTEP
         """
         while True:
-            LOGGER.debug(
-                "HotBuffer: %s \nColdBuffer: %s",
-                [self.hot[b].current_capacity for b in self.hot],
-                [self.cold[b].current_capacity for b in self.cold]
-            )
+            if self.env.now % 1000 == 0:
+                LOGGER.debug(
+                    "HotBuffer: %s \nColdBuffer: %s @ %d",
+                    [self.hot[b].current_capacity for b in self.hot],
+                    [self.cold[b].current_capacity for b in self.cold],
+                    self.env.now
+                )
             for b in self.hot:
                 if self.hot[b].has_waiting_observations():
                     if self.cold[b].has_capacity(
@@ -247,8 +249,8 @@ class Buffer:
             if data_left_to_transfer <= 0:
                 break
 
-            LOGGER.debug("Removing observation from buffer at time %s",
-                         self.env.now)
+            # LOGGER.debug("Removing observation from buffer at time %s",
+            #              self.env.now)
 
             check = self.cold[b].receive_observation(
                 current_obs,
@@ -422,8 +424,8 @@ class HotBuffer:
             )
 
         self.current_capacity -= incoming_datarate
-        LOGGER.debug("Current HotBuffer capacity is %s @ %s",
-                     self.current_capacity, time)
+        # LOGGER.debug("Current HotBuffer capacity is %s @ %s",
+        #              self.current_capacity, time)
 
         return self.current_capacity
 
@@ -441,12 +443,17 @@ class HotBuffer:
             self.observations['transfer'] = observation
         # We are doing a 'real-time' simulation, which means we treat the hot
         # and cold buffers as one buffer.
+
         if transfer_rate < 0:
             self.current_capacity += observation.total_data_size
             residual_data -= observation.total_data_size
+        elif residual_data < transfer_rate:
+            self.current_capacity += residual_data
+            residual_data = 0
         else:
             self.current_capacity += transfer_rate
             residual_data -= transfer_rate
+
         if residual_data == 0:
             self.observations['transfer'] = None
         return residual_data
@@ -539,10 +546,16 @@ class ColdBuffer:
         """
 
         self.observations['transfer'] = observation
+
         if self.max_data_rate > 0:
-            self.current_capacity -= self.max_data_rate
-            residual_data -= self.max_data_rate
-        elif self.max_data_rate < 0:
+            if residual_data < self.max_data_rate:
+                self.current_capacity -= residual_data
+                residual_data = 0
+            else:
+                self.current_capacity -= self.max_data_rate
+                residual_data -= self.max_data_rate
+
+        else:
             self.current_capacity -= observation.total_data_size
             residual_data -= observation.total_data_size
 

@@ -350,6 +350,14 @@ class TestBufferRequests(unittest.TestCase):
         self.assertEqual(None,
                          self.buffer.cold[BUFFER_ID].observations['transfer'])
 
+    def testColdBufferReceiveOverlap(self):
+
+        res = self.buffer.cold[BUFFER_ID].receive_observation(
+            self.observation,1
+        )
+        self.assertEqual(0,res)
+
+
     # @unittest.skip("Functionality has changed")
     def testWorkflowAddedToQueue(self):
         """
