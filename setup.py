@@ -9,7 +9,7 @@ setup(
         'matplotlib>=3.0',
         'simpy>=3.0',
         'pandas>=0.20',
-        'tables'
+        'tables',
         'shadow @ git+https://github.com/myxie/shadow.git'
     ],
     dependency_links=[
