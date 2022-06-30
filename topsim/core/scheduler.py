@@ -177,6 +177,8 @@ class Scheduler:
                     observation.name
                 )
             else:
+                LOGGER.debug('pipeline demand %s + provision_ingest %s',
+                             pipeline_demand,self.provision_ingest)
                 LOGGER.debug('Cluster is unable to process ingest as two'
                              'observations are scheduled at the same time')
 
@@ -308,6 +310,7 @@ class Scheduler:
                 break
             # If there are no allocations made this timestep
             elif not schedule:
+                LOGGER.debug('No new schedule at time %s', self.env.now)
                 yield self.env.timeout(TIMESTEP)
             else:
                 # This is where allocations are made to the cluster

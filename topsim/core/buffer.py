@@ -95,7 +95,7 @@ class Buffer:
         while True:
             if self.env.now % 1000 == 0:
                 LOGGER.debug(
-                    "HotBuffer: %s \nColdBuffer: %s @ %d",
+                    "\nHotBuffer: %s \nColdBuffer: %s @ %d",
                     [self.hot[b].current_capacity for b in self.hot],
                     [self.cold[b].current_capacity for b in self.cold],
                     self.env.now
