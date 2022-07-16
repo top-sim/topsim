@@ -81,7 +81,7 @@ class Cluster:
 
         self._tasks = {
             'running': [],
-            'finished': [],
+            'finished': {},
             'waiting': [],
         }  # Dictionary of tasks on system
 
@@ -294,6 +294,7 @@ class Cluster:
                     # Ingest resources are allocated in bulk, so we do that
                     # elsewhere
                     self._clusters[c]['tasks']['running'].append(task)
+                    self._clusters[c]['tasks']['finished'][task.id] = False
                     self._clusters[c]['resources']['ingest'].append(machine)
                     self._clusters[c]['resources']['available'].remove(machine)
                     self._clusters[c]['usage_data']['available'] -= 1
@@ -317,7 +318,8 @@ class Cluster:
                 # machine.stop_task(task)
                 self._clusters[c]['tasks']['running'].remove(task)
                 self._clusters[c]['usage_data']['running_tasks'] -= 1
-                self._clusters[c]['tasks']['finished'].append(task)
+                # self._clusters[c]['tasks']['finished'].append(task)
+                self._clusters[c]['tasks']['finished'][task.id] = True
                 self._clusters[c]['usage_data']['finished_tasks'] += 1
                 if ingest:
                     self._clusters[c]['resources']['ingest'].remove(machine)

@@ -297,10 +297,12 @@ class Scheduler:
             current_plan, schedule, finished = self._generate_current_schedule(
                 observation, current_plan, schedule
             )
-            prev_tasks = _curr_tasks
+            # prev_tasks = _curr_tasks
+            # _curr_tasks = len(current_plan.tasks)
+            tmp = _curr_tasks
             _curr_tasks = len(current_plan.tasks)
-            nupdate = prev_tasks-_curr_tasks
-            pbar.update(nupdate)
+            _nupdate = tmp - _curr_tasks
+            pbar.update(_nupdate)
 
             if finished:
                 # We have finished this observation

@@ -89,11 +89,12 @@ class WorkflowPlan:
     """
 
     def __init__(self,
-                 id, est, eft, tasks, exec_order,status, max_ingest):
+                 id, est, eft, tasks, exec_order,status, max_ingest,graph=None):
         self.id = id
         self.est = est
         self.eft = eft
         self.tasks = tasks
+        self.graph = graph
         self.exec_order = exec_order
         self.status = status
         self.max_ingest = max_ingest
@@ -131,3 +132,8 @@ class WorkflowPlan:
         return self.status == WorkflowStatus.FINISHED
 
 
+    def get_task_successors(self, task_id):
+        return self.graph.successors(task_id)
+
+    def get_task_predecessors(self, task_id):
+        return self.graph.successors(task_id)
