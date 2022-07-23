@@ -36,7 +36,7 @@ class Algorithm(ABC):
         self.name = "AbstractAlgorithm"
 
     @abstractmethod
-    def run(self, cluster, clock, plan, schedule):
+    def run(self, cluster, clock, plan, schedule, task_pool):
         """
 
         Parameters

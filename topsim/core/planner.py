@@ -94,10 +94,10 @@ class WorkflowPlan:
         self.est = est
         self.eft = eft
         self.tasks = tasks
-        self.graph = graph
         self.exec_order = exec_order
         self.status = status
         self.max_ingest = max_ingest
+        self.graph = graph
         self.priority = None
 
     def __lt__(self, other):
@@ -137,3 +137,6 @@ class WorkflowPlan:
 
     def get_task_predecessors(self, task_id):
         return self.graph.successors(task_id)
+
+    def get_data_cost(self, task_u, task_v):
+        pass

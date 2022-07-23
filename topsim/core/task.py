@@ -41,7 +41,7 @@ class Task(object):
     # NB I don't want tasks to have null defaults; should we improve on this
     # by initialising everything in a task at once?
     def __init__(self, tid, est, eft, machine, predecessors, flops=0, memory=0,
-            io=None, delay=None):
+            io=None, delay=None,gid=None):
         """
         :param tid: ID of the Task object
         :param env: Simulation environment to which the task will be added,
@@ -62,6 +62,7 @@ class Task(object):
         self.delay = delay
         self.delay_offset = 0
         self.workflow_offset = 0
+        self.graph_id = gid
 
         # Machine information that is less important
         # currently (will update this in future versions)

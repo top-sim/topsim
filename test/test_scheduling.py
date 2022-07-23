@@ -109,8 +109,9 @@ class TestBatchSchedulerAllocation(unittest.TestCase):
         obs.plan = self.planner.run(obs, self.buffer, self.telescope.max_ingest)
         # Replicate the Scheduler allocate_task() methods
         existing_schedule = {}
+        task_pool = set()
         existing_schedule, status = self.algorithm.run(
-            self.cluster, self.env.now, obs.plan, existing_schedule
+            self.cluster, self.env.now, obs.plan, existing_schedule,task_pool
         )
         self.assertTrue(obs.plan.tasks[0] in existing_schedule)
 

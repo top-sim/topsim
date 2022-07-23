@@ -288,6 +288,7 @@ class Scheduler:
 
         schedule = {}
         allocation_pairs = {}
+        task_pool = set()
         _total_tasks = len(current_plan.tasks)
         _curr_tasks = len(current_plan.tasks)
         pbar = tqdm(total=_total_tasks,desc=f'Scheduler: {observation.name}',
@@ -295,7 +296,7 @@ class Scheduler:
         while True:
             current_plan.tasks = self._update_current_plan(current_plan)
             current_plan, schedule, finished = self._generate_current_schedule(
-                observation, current_plan, schedule
+                observation, current_plan, schedule, task_pool
             )
             # prev_tasks = _curr_tasks
             # _curr_tasks = len(current_plan.tasks)
@@ -323,7 +324,8 @@ class Scheduler:
         pbar.close()
         yield self.env.timeout(TIMESTEP)
 
-    def _generate_current_schedule(self, observation, current_plan, schedule):
+    def _generate_current_schedule(self, observation, current_plan, schedule,
+                                   task_pool):
         """
         Each timestep, we want to generate a schedule based on the observation
         plan and an existing schedule.
@@ -344,7 +346,8 @@ class Scheduler:
             cluster=self.cluster,
             clock=self.env.now,
             workflow_plan=current_plan,
-            existing_schedule=schedule
+            existing_schedule=schedule,
+            task_pool=task_pool
         )
         self.algtime[nm] = (time.time() - self.algtime[nm])
 
