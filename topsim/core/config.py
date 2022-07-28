@@ -100,7 +100,7 @@ class Config:
         machine_list = []
         timestep_multiplier = 1
         if self.timestep_unit == 'minutes':
-            timestep_multiplier = 60
+            timestep_multiplier = 10
         if self.timestep_unit == 'hours':
             timestep_multiplier = 3600
         for machine in machines:

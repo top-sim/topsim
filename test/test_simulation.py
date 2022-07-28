@@ -4,6 +4,7 @@ import logging
 import os
 import datetime
 import pandas as pd
+from pathlib import Path
 
 from topsim.core.simulation import Simulation
 from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
@@ -16,7 +17,7 @@ logging.basicConfig(level='WARNING')
 logger = logging.getLogger(__name__)
 
 cwd = os.getcwd()
-CONFIG = f'{cwd}/test/data/config/standard_simulation.json'
+CONFIG = Path(f'{cwd}/test/data/config/standard_simulation.json')
 
 
 class TestSimulationConfig(unittest.TestCase):

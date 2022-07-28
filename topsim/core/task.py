@@ -13,11 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from enum import Enum
-from topsim.core.delay import DelayModel
+
 import simpy
 import logging
 import copy
+import math
+import numpy as np
+from enum import Enum
 
 logger = logging.getLogger(__name__)
 
@@ -104,7 +106,7 @@ class Task(object):
 
         duration = self._calc_task_delay()
         if duration < 1:
-            duration = 2
+            duration = 1
             # raise ValueError(f'Duration is {duration} which is not a valid '
             #                  f'time. Please check configuration.')
         yield env.timeout(duration - 1)

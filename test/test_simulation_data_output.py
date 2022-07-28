@@ -19,12 +19,13 @@ import simpy
 
 import pandas as pd
 
+from pathlib import Path
 from topsim.core.simulation import Simulation
 from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
 from topsim.user.telescope import Telescope
 from topsim.user.plan.static_planning import SHADOWPlanning
 
-CONFIG = "test/data/config/heft_single_observation_simulation.json"
+CONFIG = Path("test/data/config/heft_single_observation_simulation.json")
 # SIM_TIMESTAMP = f'test/simulation_pickles/{0}'
 cwd = os.getcwd()
 
@@ -50,7 +51,7 @@ class TestMonitorPandasPickle(unittest.TestCase):
             delay=None,
             timestamp='unittest',
             to_file=True,
-            hdf5_path='test/simulation_data/test_hdf5.h5',
+            hdf5_path=Path('test/simulation_data/test_hdf5.h5'),
             delimiters=f'test/'
         )
 

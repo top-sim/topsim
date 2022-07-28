@@ -247,10 +247,11 @@ class Buffer:
             # time_left = data_transfer_time - 1
 
             if data_left_to_transfer <= 0:
+                LOGGER.info(
+                    "Removing observation from buffer at time %s",self.env.now
+                )
                 break
 
-            # LOGGER.debug("Removing observation from buffer at time %s",
-            #              self.env.now)
 
             check = self.cold[b].receive_observation(
                 current_obs,
@@ -483,7 +484,7 @@ class ColdBuffer:
         Deletes the specified observation from observations['stored'] list
     """
 
-    def __init__(self, capacity, max_data_rate):
+    def __init__(self, capacity, max_data_rate, env=None):
         """
         The ColdBuffer takes data from the hot buffer for use in workflow
         processing
@@ -496,6 +497,7 @@ class ColdBuffer:
             'stored': [],
             'transfer': None
         }
+        self.env = env
 
     def has_capacity(self, observation_size):
         """
@@ -562,6 +564,7 @@ class ColdBuffer:
         if residual_data == 0:
             self.observations['transfer'] = None
             self.observations['stored'].append(observation)
+
         return residual_data
 
     def has_stored_observations(self):

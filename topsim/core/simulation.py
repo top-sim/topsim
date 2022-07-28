@@ -32,7 +32,7 @@ class Simulation:
         simulation maintains state across the different actors,
         and interfaces with the simpy processes.
 
-    config : str
+    config : Path
         Path to the simulation JSOn configuration file
 
     instrument : :py:obj:`~topsim.core.instrument.Instrument`
@@ -371,7 +371,7 @@ class Simulation:
 
         workflows = self._create_config_table(self._cfg_path)
 
-        sanitised_path = self._cfg_path.replace(".json", '').split('/')[-1]
+        sanitised_path = self._cfg_path.name.replace(".json", '').split('/')[-1]
         final_key = f'{ts}/{self._delimiters}/{sanitised_path}'
         self._hdf5_store.put(key=f"{final_key}/sim", value=global_df)
         self._hdf5_store.put(key=f'{final_key}/tasks',
