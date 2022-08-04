@@ -76,23 +76,24 @@ class BatchProcessing(Algorithm):
             max_allocations_iteration = len(temporary_resources)
             for task in task_pool:
                 # If we have exhausted all possible allocations for this
-                # timestep, there no need to iterate
+                # timest ep, there no need to iterat
                 if len(allocations) >= max_allocations_iteration:
                     break
                 if len(temporary_resources) > 0 and task not in allocations:
                     if task.task_status is TaskStatus.UNSCHEDULED:
+                        # id = int(task.id.split('_')[-1])
                         # Pick the next available machine
                         m = temporary_resources[0]
                         # If there are no predecessors, we can schedule
                         # without issue
                         if not list(workflow_plan.graph.predecessors(task)):
+                            # if not task.pred:
+                            tduration = int(task.flops / m.cpu)
                             allocations[task] = m
                             temporary_resources.remove(m)
                             removed.add(task)
                             added.update(workflow_plan.graph.successors(task))
                         else:
-                            # Need to go through the predecessors and ensure
-                            # they've completed
                             pred = list(workflow_plan.graph.predecessors(task))
                             count = 0
                             for p in pred:
@@ -100,6 +101,15 @@ class BatchProcessing(Algorithm):
                                     count += 1
                             if count < len(list(pred)):
                                 continue
+                            #
+                            # pred = set(task.pred)
+                            # finished = set(
+                            #     t.id for t in cluster.get_finished_tasks()
+                            # )
+                            # # Check if there isn't an overlap between sets
+                            # if not pred.issubset(finished):
+                            #     # one of the predecessors is still running
+                            #     continue
                             else:
                                 allocations[task] = m
                                 temporary_resources.remove(m)

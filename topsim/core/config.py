@@ -100,7 +100,7 @@ class Config:
         machine_list = []
         timestep_multiplier = 1
         if self.timestep_unit == 'minutes':
-            timestep_multiplier = 5
+            timestep_multiplier = 60
         if self.timestep_unit == 'hours':
             timestep_multiplier = 3600
         for machine in machines:
@@ -117,7 +117,7 @@ class Config:
     def parse_instrument_config(self, instrument_name):
         timestep_multiplier = 1
         if self.timestep_unit == 'minutes':
-            timestep_multiplier = 5
+            timestep_multiplier = 60
         if self.timestep_unit == 'hours':
             timestep_multiplier = 3600
         cfg = self.instrument
@@ -152,7 +152,7 @@ class Config:
         config = self.buffer
         timestep_multiplier = 1
         if self.timestep_unit == 'minutes':
-            timestep_multiplier = 5
+            timestep_multiplier = 60
         if self.timestep_unit == 'hours':
             timestep_multiplier = 3600
         hot = HotBuffer(capacity=config['hot']['capacity'],
