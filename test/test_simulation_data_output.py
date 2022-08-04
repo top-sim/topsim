@@ -152,7 +152,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
         )
         print("Debug this one")
         simdf, taskdf = simulation.start()
-        self.assertEqual(128, len(simdf))
+        self.assertEqual(134, len(simdf))
 
 
     def testResultsAgreeWithExpectations(self):
