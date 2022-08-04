@@ -6,11 +6,11 @@
 			"pipelines": {
 				"emu":
 				{
-					"workflow": "test/data/config/workflow_config_heft_sim.json",
+					"workflow": "integration/workflow_config_heft_sim.json",
 					"ingest_demand": 5
 				},
 				"dingo": {
-					"workflow": "test/data/config/workflow_config_heft_sim.json",
+					"workflow": "integration/workflow_config_heft_sim.json",
 					"ingest_demand": 10
 				}
 			},

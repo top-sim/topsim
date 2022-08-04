@@ -13,11 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from enum import Enum
-from topsim.core.delay import DelayModel
+
 import simpy
 import logging
 import copy
+import math
+import numpy as np
+from enum import Enum
 
 logger = logging.getLogger(__name__)
 
@@ -31,20 +33,21 @@ class TaskStatus(Enum):
 
 class Task(object):
     """
-    Tasks have priorities inheritted from the workflows from which they are arrived; once
-    they arrive on the cluster queue, they are workflow agnositc, and are processed according to
+    Tasks have priorities inheritted from the workflows from which they are
+    arrived; once
+    they arrive on the cluster queue, they are workflow agnositc, and are
+    processed according to
     their priority.
     """
 
     # NB I don't want tasks to have null defaults; should we improve on this
     # by initialising everything in a task at once?
-    def __init__(
-            self, tid, est, eft, machine, predecessors,
-            flops=0, memory=0, io=None, delay=None
-    ):
+    def __init__(self, tid, est, eft, machine, predecessors, flops=0, memory=0,
+            io=None, delay=None,gid=None):
         """
         :param tid: ID of the Task object
-        :param env: Simulation environment to which the task will be added, and where it will run as a process
+        :param env: Simulation environment to which the task will be added,
+        and where it will run as a process
         """
 
         self.id = tid
@@ -53,14 +56,15 @@ class Task(object):
         self.ast = -1
         self.aft = -1
         self.machine = machine
-        self.duration = eft-est
-        self.est_duration = eft-est
+        self.duration = eft - est
+        self.est_duration = eft - est
         self.delay_flag = False
         self.task_status = TaskStatus.UNSCHEDULED
         self.pred = predecessors
         self.delay = delay
         self.delay_offset = 0
         self.workflow_offset = 0
+        self.graph_id = gid
 
         # Machine information that is less important
         # currently (will update this in future versions)
@@ -93,8 +97,7 @@ class Task(object):
         """
         if predecessor_allocations:
             yield env.timeout(
-                self._wait_for_transfer(env, machine, predecessor_allocations)
-            )
+                self._wait_for_transfer(env, machine, predecessor_allocations))
         self.task_status = TaskStatus.RUNNING
         self.ast = env.now
 
@@ -102,18 +105,21 @@ class Task(object):
         # Process potential updates to duration:
 
         duration = self._calc_task_delay()
-
-        yield env.timeout(duration-1)
+        if duration < 1:
+            duration = 1
+            # raise ValueError(f'Duration is {duration} which is not a valid '
+            #                  f'time. Please check configuration.')
+        yield env.timeout(duration - 1)
         if self.duration < duration:
             self.delay_flag = True
             self.delay_offset += (duration - self.duration)
 
-        self.aft = env.now+1
+        self.aft = env.now + 1
         if self.aft > self.eft:
             self.delay_flag = True
         # self.task_status = TaskStatus.FINISHED
-        logger.debug('%s finished at %s', self.id, self.aft)
-        # return TaskStatus.FINISHED
+        logger.debug('%s finished at %s', self.id,
+                     self.aft)  # return TaskStatus.FINISHED
 
     def update_allocation(self, machine):
         """
@@ -139,7 +145,7 @@ class Task(object):
         -------
 
         """
-        duration = int(self.flops/machine.cpu)
+        duration = int(self.flops / machine.cpu)
         if duration > self.duration:
             self.delay_flag = True
             self.delay_offset = (duration - self.duration)
@@ -159,7 +165,7 @@ class Task(object):
         # predecessor and the current time.
         for task in predecessor_allocations:
             transfer_time = self.io[task.id] / machine.bandwidth
-            if task.aft+transfer_time - env.now > mx :
+            if task.aft + transfer_time - env.now > mx:
                 mx = task.aft + transfer_time - env.now
         return mx
 
@@ -174,3 +180,13 @@ class Task(object):
             return self.delay.generate_delay(self.duration)
         else:
             return self.duration
+
+    def _determine_bottleneck(self):
+        """
+        Stub : will eventually check for which is slower, the FLOPS or the
+        memory bandwidth.
+        Returns
+        -------
+
+        """
+        return None

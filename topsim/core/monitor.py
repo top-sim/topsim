@@ -28,10 +28,12 @@ class Monitor(object):
 
     def run(self):
         while True:
-            logger.debug('SimTime=%s', self.env.now)
+            if self.env.now % 1000 == 0:
+                logger.debug('SimTime=%s', self.env.now)
             # time.sleep(0.5)
-            self.df = self.df.append(
-                self.collate_actor_dataframes(), ignore_index=True
+            self.df = pd.concat(
+                [self.df, self.collate_actor_dataframes()],
+                ignore_index=True
             )
             yield self.env.timeout(1)
 

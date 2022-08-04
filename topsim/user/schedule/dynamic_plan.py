@@ -35,7 +35,7 @@ class DynamicAlgorithmFromPlan(Algorithm):
     def __repr__(self):
         return "DynamicAlgorithmFromPlan"
 
-    def run(self, cluster, clock, workflow_plan, existing_schedule):
+    def run(self, cluster, clock, workflow_plan, existing_schedule,task_pool):
         """
         Iterate through immediate predecessors and check that they are finished
         Schedule as we go check if there is an overlap between the two sets

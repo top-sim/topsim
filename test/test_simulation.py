@@ -4,6 +4,7 @@ import logging
 import os
 import datetime
 import pandas as pd
+from pathlib import Path
 
 from topsim.core.simulation import Simulation
 from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
@@ -16,7 +17,7 @@ logging.basicConfig(level='WARNING')
 logger = logging.getLogger(__name__)
 
 cwd = os.getcwd()
-CONFIG = f'{cwd}/test/data/config/standard_simulation.json'
+CONFIG = Path(f'{cwd}/test/data/config/standard_simulation.json')
 
 
 class TestSimulationConfig(unittest.TestCase):
@@ -48,10 +49,10 @@ class TestSimulationFileOptions(unittest.TestCase):
 
     def setUp(self) -> None:
         self.env = simpy.Environment()
-        self.output = f'{cwd}/test/data/output/hdf5.h5'
+        self.output = f'test/data/output/hdf5.h5'
 
     def tearDown(self):
-        output = f'{cwd}/test/data/output/hdf5.h5'
+        output = f'test/data/output/hdf5.h5'
         # os.remove(f'{output}')
         # os.remove(f'{output}-tasks.pkl')
 

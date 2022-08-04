@@ -30,7 +30,11 @@ moved and from where post-processing pipelines access workflow data.
 
 import logging
 import json
+from time import sleep
+
 import pandas as pd
+
+from tqdm import tqdm
 
 from topsim.common.globals import TIMESTEP
 from topsim.core.instrument import RunStatus
@@ -89,11 +93,13 @@ class Buffer:
         A simpy.env.timeout() of duration topsim.common.globals.TIMESTEP
         """
         while True:
-            LOGGER.debug(
-                "HotBuffer: %s \nColdBuffer: %s",
-                [self.hot[b].current_capacity for b in self.hot],
-                [self.cold[b].current_capacity for b in self.cold]
-            )
+            if self.env.now % 1000 == 0:
+                LOGGER.debug(
+                    "\nHotBuffer: %s \nColdBuffer: %s @ %d",
+                    [self.hot[b].current_capacity for b in self.hot],
+                    [self.cold[b].current_capacity for b in self.cold],
+                    self.env.now
+                )
             for b in self.hot:
                 if self.hot[b].has_waiting_observations():
                     if self.cold[b].has_capacity(
@@ -226,6 +232,11 @@ class Buffer:
         current_obs = self.hot[b].observation_for_transfer()
         # current_obs = self.hot.observations['transfer']
         data_left_to_transfer = current_obs.total_data_size
+        _total_data = current_obs.total_data_size
+        _tqdm = False
+        pbar = None
+        if _tqdm:
+            pbar = tqdm(total=_total_data,desc=f'Buffer: {current_obs.name}')
         if not self.cold[b].has_capacity(data_left_to_transfer):
             # We cannot actually transfer the observation due to size
             # constraints
@@ -239,10 +250,11 @@ class Buffer:
             # time_left = data_transfer_time - 1
 
             if data_left_to_transfer <= 0:
+                LOGGER.info(
+                    "Removing observation from buffer at time %s",self.env.now
+                )
                 break
 
-            LOGGER.debug("Removing observation from buffer at time %s",
-                         self.env.now)
 
             check = self.cold[b].receive_observation(
                 current_obs,
@@ -252,12 +264,15 @@ class Buffer:
             data_left_to_transfer = self.hot[b].transfer_observation(
                 current_obs, self.cold[b].max_data_rate, data_left_to_transfer
             )
-
             if check != data_left_to_transfer:
                 raise RuntimeError(
                     "Hot and Cold Buffer receiving data at a differen rate"
                 )
+            if pbar:
+                pbar.update(n=self.cold[b].max_data_rate)
             yield self.env.timeout(TIMESTEP)
+        if pbar:
+            pbar.close()
         return True
 
 
@@ -415,8 +430,8 @@ class HotBuffer:
             )
 
         self.current_capacity -= incoming_datarate
-        LOGGER.debug("Current HotBuffer capacity is %s @ %s",
-                     self.current_capacity, time)
+        # LOGGER.debug("Current HotBuffer capacity is %s @ %s",
+        #              self.current_capacity, time)
 
         return self.current_capacity
 
@@ -434,12 +449,17 @@ class HotBuffer:
             self.observations['transfer'] = observation
         # We are doing a 'real-time' simulation, which means we treat the hot
         # and cold buffers as one buffer.
+
         if transfer_rate < 0:
             self.current_capacity += observation.total_data_size
             residual_data -= observation.total_data_size
+        elif residual_data < transfer_rate:
+            self.current_capacity += residual_data
+            residual_data = 0
         else:
             self.current_capacity += transfer_rate
             residual_data -= transfer_rate
+
         if residual_data == 0:
             self.observations['transfer'] = None
         return residual_data
@@ -469,7 +489,7 @@ class ColdBuffer:
         Deletes the specified observation from observations['stored'] list
     """
 
-    def __init__(self, capacity, max_data_rate):
+    def __init__(self, capacity, max_data_rate, env=None):
         """
         The ColdBuffer takes data from the hot buffer for use in workflow
         processing
@@ -482,6 +502,7 @@ class ColdBuffer:
             'stored': [],
             'transfer': None
         }
+        self.env = env
 
     def has_capacity(self, observation_size):
         """
@@ -532,16 +553,23 @@ class ColdBuffer:
         """
 
         self.observations['transfer'] = observation
+
         if self.max_data_rate > 0:
-            self.current_capacity -= self.max_data_rate
-            residual_data -= self.max_data_rate
-        elif self.max_data_rate < 0:
+            if residual_data < self.max_data_rate:
+                self.current_capacity -= residual_data
+                residual_data = 0
+            else:
+                self.current_capacity -= self.max_data_rate
+                residual_data -= self.max_data_rate
+
+        else:
             self.current_capacity -= observation.total_data_size
             residual_data -= observation.total_data_size
 
         if residual_data == 0:
             self.observations['transfer'] = None
             self.observations['stored'].append(observation)
+
         return residual_data
 
     def has_stored_observations(self):

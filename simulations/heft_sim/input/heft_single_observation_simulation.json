@@ -2,83 +2,40 @@
 	"instrument": {
 		"telescope": {
 			"total_arrays": 36,
-			"max_ingest_resources": 5,
+			"max_ingest_resources": 1,
 			"pipelines": {
-				"continuum": {
-					"demand": 5
-				},
-				"spectral": {
-					"demand": 10
-				},
-				"pulsar": {
-					"demand": 5
+				"emu": {
+					"workflow": "workflows/workflow_config_minutes_longtask.json",
+					"ingest_demand": 1
 				}
 			},
 			"observations": [
 				{
 					"name": "emu",
-					"start": 1,
-					"duration": 10,
-					"demand": 36,
-					"workflow": "simulations/heft_sim/input/workflow_config_heft_sim.json",
-					"type": "continuum",
-					"data_product_rate": 2
+					"start": 0,
+					"duration": 600,
+					"instrument_demand": 36,
+					"data_product_rate": 0.03333333333333333
 				}
 			]
 		}
 	},
 	"cluster": {
 		"header": {
-			"time": "false",
-			"gen_specs": {
-				"file": "recipes/routput/basic_spec-10.json",
-				"seed": 20,
-				"range": "[(50, 100)]",
-				"heterogeneity": 1.0,
-				"multiplier": 1
-			}
 		},
 		"system": {
 			"resources": {
 				"cat0_m0": {
-					"flops": 84,
-					"rates": 10
+					"flops": 7000.0,
+					"rates": 1.0
 				},
-				"cat0_m1": {
-					"flops": 84,
-					"rates": 10
+				"cat1_m1": {
+					"flops": 6000.0,
+					"rates": 1.0
 				},
-				"cat0_m2": {
-					"flops": 84,
-					"rates": 10
-				},
-				"cat0_m3": {
-					"flops": 84,
-					"rates": 10
-				},
-				"cat0_m4": {
-					"flops": 84,
-					"rates": 10
-				},
-				"cat0_m5": {
-					"flops": 84,
-					"rates": 10
-				},
-				"cat0_m6": {
-					"flops": 84,
-					"rates": 10
-				},
-				"cat0_m7": {
-					"flops": 84,
-					"rates": 10
-				},
-				"cat0_m8": {
-					"flops": 84,
-					"rates": 10
-				},
-				"cat0_m9": {
-					"flops": 84,
-					"rates": 10
+				"cat2_m2": {
+					"flops": 11000.0,
+					"rates": 1.0
 				}
 			},
 			"bandwidth": 1.0
@@ -87,13 +44,14 @@
 	"buffer": {
 		"hot": {
 			"capacity": 500,
-			"max_ingest_rate": 5
+			"max_ingest_rate": 0.08333333333333333
 		},
 		"cold": {
 			"capacity": 250,
-			"max_data_rate": 2
+			"max_data_rate": 0.03333333333333333
 		}
 	},
 	"planning": "heft",
-	"scheduling": "fifo"
+	"scheduling": "fifo",
+	"timestep": "minutes"
 }

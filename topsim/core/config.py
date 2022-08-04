@@ -15,6 +15,7 @@
 
 
 import json
+from pathlib import Path
 from topsim.core.instrument import Observation
 from topsim.core.machine import Machine
 from topsim.core.buffer import HotBuffer, ColdBuffer
@@ -53,7 +54,8 @@ class Config:
     json.JSONDecodeError
         This is raised if the JSON file is in the wrong format
     KeyError
-        Raised if one of the attribute-keys is not found in the provided JSON file.
+        Raised if one of the attribute-keys is not found in the provided JSON
+        file.
     """
 
     def __init__(self, config):
@@ -66,6 +68,7 @@ class Config:
         except json.JSONDecodeError:
             raise
 
+        self.path = Path(config)
         if 'instrument' in cfg and cfg['instrument'] is not None:
             self.instrument = cfg['instrument']
         else:
@@ -85,13 +88,12 @@ class Config:
 
     def parse_cluster_config(self):
         try:
-            (self.cluster['system'] and self.cluster['system']['resources']
-             and self.cluster['system']['bandwidth'])
+            (self.cluster['system'] and self.cluster['system']['resources'] and
+             self.cluster['system']['bandwidth'])
         except KeyError:
             LOGGER.warning(
                 "'system' is not in %s, check your JSON is correctly formatted",
-                self.cluster
-            )
+                self.cluster)
             raise
 
         machines = self.cluster['system']['resources']
@@ -104,14 +106,10 @@ class Config:
         for machine in machines:
             cpu = machines[machine]['flops'] * timestep_multiplier
             machine_list.append(
-                Machine(
-                    id=machine,
-                    cpu=cpu,
-                    memory=1,  # * timestep_multiplier,
-                    disk=1,  # * timestep_multiplier,
-                    bandwidth=machines[machine]['rates'] * timestep_multiplier
-                )
-            )
+                Machine(id=machine, cpu=cpu, memory=1,  # * timestep_multiplier,
+                        disk=1,  # * timestep_multiplier,
+                        bandwidth=machines[machine][
+                                      'rates'] * timestep_multiplier))
 
         bandwidth = self.cluster['system']['bandwidth'] * timestep_multiplier
         return machine_list, bandwidth
@@ -131,18 +129,22 @@ class Config:
                 name = observation['name']
                 workflow_path = pipelines[name]['workflow']
                 ingest_demand = pipelines[name]['ingest_demand']
-                o = Observation(
-                    name=name,
-                    start=observation['start'],
-                    duration=observation['duration'],
-                    demand=observation['instrument_demand'],
-                    workflow=workflow_path,
-                    data_rate=observation[
-                                  'data_product_rate'] * timestep_multiplier
-                )
+                o = Observation(name=name, start=observation[
+                                                     'start'] /
+                                                 timestep_multiplier,
+                                duration=observation[
+                                             'duration'] / timestep_multiplier,
+                                demand=observation['instrument_demand'],
+                                workflow=((
+                                                  self.path.parent /
+                                                  workflow_path).as_posix()),
+                                data_rate=(observation[
+                                               'data_product_rate'] *
+                                           timestep_multiplier))
                 observations.append(o)
             except KeyError:
                 raise
+
         max_ingest_resources = cfg[instrument_name]['max_ingest_resources']
         return total_arrays, pipelines, observations, max_ingest_resources
 
@@ -153,15 +155,13 @@ class Config:
             timestep_multiplier = 60
         if self.timestep_unit == 'hours':
             timestep_multiplier = 3600
-        hot = HotBuffer(
-            capacity=config['hot']['capacity'],
-            max_ingest_data_rate=config['hot'][
-                                     'max_ingest_rate'] * timestep_multiplier
-        )
-        cold = ColdBuffer(
-            capacity=config['cold']['capacity'],
-            max_data_rate=config['cold']['max_data_rate'] * timestep_multiplier
-        )
+        hot = HotBuffer(capacity=config['hot']['capacity'],
+                        max_ingest_data_rate=config['hot'][
+                                                 'max_ingest_rate'] *
+                                             timestep_multiplier)
+        cold = ColdBuffer(capacity=config['cold']['capacity'],
+                          max_data_rate=config['cold'][
+                                            'max_data_rate'] *
+                                        timestep_multiplier)
 
         return {0: hot}, {0: cold}
-

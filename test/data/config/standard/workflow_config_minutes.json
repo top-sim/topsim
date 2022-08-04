@@ -1,0 +1,134 @@
+{
+	"header": {
+		"time": false,
+		"units": "flops_per_minute"
+	},
+	"graph": {
+		"directed": true,
+		"multigraph": false,
+		"calc": true,
+		"graph": {
+			"node_default": {},
+			"edge_default": {}
+		},
+		"nodes": [
+			{
+				"comp": 71400,
+				"id": 0
+			},
+			{
+				"comp": 55200,
+				"id": 1
+			},
+			{
+				"comp": 57000,
+				"id": 2
+			},
+			{
+				"comp": 65400,
+				"id": 3
+			},
+			{
+				"comp": 64200,
+				"id": 4
+			},
+			{
+				"comp": 101400,
+				"id": 5
+			},
+			{
+				"comp": 66000,
+				"id": 6
+			},
+			{
+				"comp": 88200,
+				"id": 7
+			},
+			{
+				"comp": 87600,
+				"id": 8
+			},
+			{
+				"comp": 60600,
+				"id": 9
+			}
+		],
+		"links": [
+			{
+				"data_size": 1080,
+				"source": 0,
+				"target": 1
+			},
+			{
+				"data_size": 720,
+				"source": 0,
+				"target": 2
+			},
+			{
+				"data_size": 540,
+				"source": 0,
+				"target": 3
+			},
+			{
+				"data_size": 660,
+				"source": 0,
+				"target": 4
+			},
+			{
+				"data_size": 840,
+				"source": 0,
+				"target": 5
+			},
+			{
+				"data_size": 960,
+				"source": 1,
+				"target": 8
+			},
+			{
+				"data_size": 1140,
+				"source": 1,
+				"target": 7
+			},
+			{
+				"data_size": 1380,
+				"source": 2,
+				"target": 6
+			},
+			{
+				"data_size": 1380,
+				"source": 3,
+				"target": 8
+			},
+			{
+				"data_size": 1620,
+				"source": 3,
+				"target": 7
+			},
+			{
+				"data_size": 780,
+				"source": 4,
+				"target": 8
+			},
+			{
+				"data_size": 900,
+				"source": 5,
+				"target": 7
+			},
+			{
+				"data_size": 1020,
+				"source": 6,
+				"target": 9
+			},
+			{
+				"data_size": 660,
+				"source": 7,
+				"target": 9
+			},
+			{
+				"data_size": 780,
+				"source": 8,
+				"target": 9
+			}
+		]
+	}
+}

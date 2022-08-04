@@ -41,7 +41,7 @@ PLAN_ALGORITHM = 'heft'
 CONFIG = "test/data/config/standard_simulation_longtask.json"
 HEFT_CONFIG = "test/data/config/heft_single_observation_simulation.json"
 MACHINE_CONFIG = None
-OBS_WORKFLOW = "test/data/config/workflow_config_minutes_longtask.json"
+OBS_WORKFLOW = "test/data/config/longtask/workflow_config_minutes_longtask.json"
 
 
 class TestPlannerConfig(unittest.TestCase):

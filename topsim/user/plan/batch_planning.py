@@ -50,7 +50,8 @@ class BatchPlanning(Planning):
         if self.algorithm is 'batch':
             graph = self._workflow_to_nx(observation.workflow)
             est = self._calc_workflow_est(observation, buffer)
-
+            # new_graph = nx.DiGraph()
+            mapping = {}
             tasks = []
             exec_order = list(nx.algorithms.topological_sort(graph))
             for task in exec_order:
@@ -60,6 +61,12 @@ class BatchPlanning(Planning):
                 dm = copy.copy(self.delay_model)
                 pred = list(graph.predecessors(task))
                 predecessors = [
+                    self._create_observation_task_id(
+                        x, observation, clock
+                    ) for x in pred
+                ]
+                succ = list(graph.successors(task))
+                successors = [
                     self._create_observation_task_id(
                         x, observation, clock
                     ) for x in pred
@@ -76,15 +83,16 @@ class BatchPlanning(Planning):
                 taskobj = Task(
                     tid, 0, 0, None, predecessors, graph.nodes[task][
                         'comp'], 0,
-                    edge_costs, dm
+                    edge_costs, dm, gid=task
                 )
+                mapping[task] = taskobj
                 tasks.append(taskobj)
+            new_graph = nx.relabel_nodes(graph, mapping)
             # exec_order = list(nx.algorithms.topological_sort(graph))
             return WorkflowPlan(
                 observation.name, est, -1, tasks, exec_order,
-                WorkflowStatus.SCHEDULED, max_ingest
+                WorkflowStatus.SCHEDULED, max_ingest, new_graph
             )
-
 
         else:
             raise RuntimeError(

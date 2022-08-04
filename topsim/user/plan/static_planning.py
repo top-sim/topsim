@@ -164,6 +164,7 @@ class SHADOWPlanning(Planning):
                 self.algorithm, solution.makespan
             )
         )
+        print(f"Execution order {solution.execution_order}")
         return solution
 
     def _cluster_to_shadow_format(self, cluster):

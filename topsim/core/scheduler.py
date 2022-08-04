@@ -17,6 +17,7 @@ import logging
 import pandas as pd
 
 from enum import Enum
+from tqdm import tqdm
 
 from topsim.common.globals import TIMESTEP
 from topsim.core.instrument import RunStatus
@@ -93,13 +94,14 @@ class Scheduler:
         -------
         Timeout of common.config.TIMESTEP.
         """
-
         if self.status is not SchedulerStatus.RUNNING:
             raise RuntimeError("Scheduler has not been initialised! Call init")
         LOGGER.debug("Scheduler starting up...")
 
         while self.status is SchedulerStatus.RUNNING:
-            LOGGER.debug('Time on Scheduler: {0}'.format(self.env.now))
+            if self.env.now % 1000 == 0:
+                LOGGER.debug('Time on Scheduler: {0}'.format(self.env.now))
+                LOGGER.debug("Scheduler Status: %s", self.status)
             if self.buffer.has_observations_ready_for_processing():
                 obs = self.buffer.next_observation_for_processing()
                 if obs not in self.observation_queue:
@@ -113,7 +115,6 @@ class Scheduler:
             # for obs in self.observation_queue:
             #     if obs.workflow_plan.status == WorkflowStatus.FINISHED:
             #         self.cluster.release_batch_resources(obs)
-            LOGGER.debug("Scheduler Status: %s", self.status)
             yield self.env.timeout(TIMESTEP)
 
     def is_idle(self):
@@ -176,6 +177,8 @@ class Scheduler:
                     observation.name
                 )
             else:
+                LOGGER.debug('pipeline demand %s + provision_ingest %s',
+                             pipeline_demand,self.provision_ingest)
                 LOGGER.debug('Cluster is unable to process ingest as two'
                              'observations are scheduled at the same time')
 
@@ -285,11 +288,27 @@ class Scheduler:
 
         schedule = {}
         allocation_pairs = {}
+        task_pool = set()
+        _total_tasks = len(current_plan.tasks)
+        _curr_tasks = len(current_plan.tasks)
+        _tqdm = False
+        pbar = None
+        if _tqdm:
+            pbar = tqdm(total=_total_tasks,desc=f'Scheduler: {observation.name}',
+                    unit="Tasks",leave=True)#,position=)
         while True:
             current_plan.tasks = self._update_current_plan(current_plan)
             current_plan, schedule, finished = self._generate_current_schedule(
-                observation, current_plan, schedule
+                observation, current_plan, schedule, task_pool
             )
+            # prev_tasks = _curr_tasks
+            # _curr_tasks = len(current_plan.tasks)
+            tmp = _curr_tasks
+            _curr_tasks = len(current_plan.tasks)
+            _nupdate = tmp - _curr_tasks
+            if pbar:
+                pbar.update(_nupdate)
+
             if finished:
                 # We have finished this observation
                 LOGGER.info(f'{observation.name} Removed from Queue @'
@@ -298,18 +317,20 @@ class Scheduler:
                 break
             # If there are no allocations made this timestep
             elif not schedule:
+                LOGGER.debug('No new schedule at time %s', self.env.now)
                 yield self.env.timeout(TIMESTEP)
             else:
                 # This is where allocations are made to the cluster
                 schedule, allocation_pairs = self._process_current_schedule(
                     schedule, allocation_pairs, current_plan.id
                 )
-
                 yield self.env.timeout(TIMESTEP)
-
+        if pbar:
+            pbar.close()
         yield self.env.timeout(TIMESTEP)
 
-    def _generate_current_schedule(self, observation, current_plan, schedule):
+    def _generate_current_schedule(self, observation, current_plan, schedule,
+                                   task_pool):
         """
         Each timestep, we want to generate a schedule based on the observation
         plan and an existing schedule.
@@ -330,7 +351,8 @@ class Scheduler:
             cluster=self.cluster,
             clock=self.env.now,
             workflow_plan=current_plan,
-            existing_schedule=schedule
+            existing_schedule=schedule,
+            task_pool=task_pool
         )
         self.algtime[nm] = (time.time() - self.algtime[nm])
 

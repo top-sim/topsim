@@ -31,7 +31,7 @@ from topsim.user.plan.static_planning import SHADOWPlanning
 OBS_START_TME = 0
 OBS_DURATION = 10
 OBS_DEMAND = 15
-OBS_WORKFLOW = 'test/data/config/workflow_config.json'
+OBS_WORKFLOW = 'test/data/config/workflow_config_minutes_longtask.json'
 PLAN_ALGORITHM = 'heft'
 
 CONFIG = "test/data/config/standard_simulation_longtask.json"
@@ -349,6 +349,14 @@ class TestBufferRequests(unittest.TestCase):
         )
         self.assertEqual(None,
                          self.buffer.cold[BUFFER_ID].observations['transfer'])
+
+    def testColdBufferReceiveOverlap(self):
+
+        res = self.buffer.cold[BUFFER_ID].receive_observation(
+            self.observation,1
+        )
+        self.assertEqual(0,res)
+
 
     # @unittest.skip("Functionality has changed")
     def testWorkflowAddedToQueue(self):
