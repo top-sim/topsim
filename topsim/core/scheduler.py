@@ -291,7 +291,10 @@ class Scheduler:
         task_pool = set()
         _total_tasks = len(current_plan.tasks)
         _curr_tasks = len(current_plan.tasks)
-        pbar = tqdm(total=_total_tasks,desc=f'Scheduler: {observation.name}',
+        _tqdm = False
+        pbar = None
+        if _tqdm:
+            pbar = tqdm(total=_total_tasks,desc=f'Scheduler: {observation.name}',
                     unit="Tasks",leave=True)#,position=)
         while True:
             current_plan.tasks = self._update_current_plan(current_plan)
@@ -303,7 +306,8 @@ class Scheduler:
             tmp = _curr_tasks
             _curr_tasks = len(current_plan.tasks)
             _nupdate = tmp - _curr_tasks
-            pbar.update(_nupdate)
+            if pbar:
+                pbar.update(_nupdate)
 
             if finished:
                 # We have finished this observation
@@ -321,7 +325,8 @@ class Scheduler:
                     schedule, allocation_pairs, current_plan.id
                 )
                 yield self.env.timeout(TIMESTEP)
-        pbar.close()
+        if pbar:
+            pbar.close()
         yield self.env.timeout(TIMESTEP)
 
     def _generate_current_schedule(self, observation, current_plan, schedule,

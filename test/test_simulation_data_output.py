@@ -150,6 +150,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
             timestamp=None,
             # delimiters=f'test/{algorithm}'
         )
+        print("Debug this one")
         simdf, taskdf = simulation.start()
         self.assertEqual(128, len(simdf))
 

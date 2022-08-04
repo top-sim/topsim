@@ -233,7 +233,10 @@ class Buffer:
         # current_obs = self.hot.observations['transfer']
         data_left_to_transfer = current_obs.total_data_size
         _total_data = current_obs.total_data_size
-        pbar = tqdm(total=_total_data,desc=f'Buffer: {current_obs.name}')
+        _tqdm = False
+        pbar = None
+        if _tqdm:
+            pbar = tqdm(total=_total_data,desc=f'Buffer: {current_obs.name}')
         if not self.cold[b].has_capacity(data_left_to_transfer):
             # We cannot actually transfer the observation due to size
             # constraints
@@ -265,9 +268,11 @@ class Buffer:
                 raise RuntimeError(
                     "Hot and Cold Buffer receiving data at a differen rate"
                 )
-            pbar.update(n=self.cold[b].max_data_rate)
+            if pbar:
+                pbar.update(n=self.cold[b].max_data_rate)
             yield self.env.timeout(TIMESTEP)
-        pbar.close()
+        if pbar:
+            pbar.close()
         return True
 
 
