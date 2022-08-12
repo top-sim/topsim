@@ -78,6 +78,21 @@ class TestActorConfigurationReturnsCorrectDictionary(unittest.TestCase):
 class TestConfigTimeStep(unittest.TestCase):
 
     def setUp(self) -> None:
+        """
+        This tests the different configuration options and their requisite
+        calculations for per-timestep values.
+
+        Alternative timesteps were a retroactively applied feature,
+        so to reduce complications and avoid re-generating a bunch of
+        workflows and config files, the approach taken was to keep the total
+        data products produced per-config the same (and therefore have less
+        data produced/second for our "minutes" config) to make it easier to
+        integrate existing values used in tests.
+
+        Returns
+        -------
+
+        """
         self.standard_config = "test/data/config/integration_simulation.json"
         self.minutes_config = "test/data/config/standard_simulation.json"
         self.custom_config = (
