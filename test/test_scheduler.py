@@ -138,12 +138,12 @@ class TestSchedulerIngest(unittest.TestCase):
         self.env.run(until=1)
         self.assertEqual(5, len(self.cluster._resources['available']))
         # After 1 timestep, data in the HotBuffer should be 2
-        self.assertEqual(496, self.buffer.hot[0].current_capacity)
+        self.assertEqual(496e9, self.buffer.hot[0].current_capacity)
         self.env.run(until=30)
         self.assertEqual(10, len(self.cluster._resources['available']))
         self.assertEqual(5, len(self.cluster._tasks['finished']))
-        self.assertEqual(500, self.buffer.hot[0].current_capacity)
-        self.assertEqual(210, self.buffer.cold[0].current_capacity)
+        self.assertEqual(500e9, self.buffer.hot[0].current_capacity)
+        self.assertEqual(210e9, self.buffer.cold[0].current_capacity)
 
 
 class TestSchedulerAllocations(unittest.TestCase):
@@ -375,11 +375,11 @@ class TestSchedulerIntegration(unittest.TestCase):
         # This takes timestep, data in the HotBuffer should be 4
         self.env.run(until=2)
         self.assertEqual(5, len(self.cluster._resources['available']))
-        self.assertEqual(496, self.buffer.hot[0].current_capacity)
+        self.assertEqual(496e9, self.buffer.hot[0].current_capacity)
         self.env.run(until=31)
         self.assertEqual(5, len(self.cluster._tasks['finished']))
         # self.assertEqual(500, self.buffer.hot[0].current_capacity)
-        self.assertEqual(210, self.buffer.cold[0].current_capacity)
+        self.assertEqual(210e9, self.buffer.cold[0].current_capacity)
         self.env.run(until=32)
         # Ensure the time
         self.assertEqual(ScheduleStatus.ONTIME, self.scheduler.schedule_status)
@@ -388,7 +388,7 @@ class TestSchedulerIntegration(unittest.TestCase):
         self.env.run(until=124)
         # As we have been processing the current observation, we are also
         # ingestting the next one.
-        self.assertEqual(250, self.buffer.cold[0].current_capacity)
+        self.assertEqual(250e9, self.buffer.cold[0].current_capacity)
 
 
 class TestSchedulerDelayHelpers(unittest.TestCase):

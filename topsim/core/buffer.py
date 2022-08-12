@@ -144,7 +144,8 @@ class Buffer:
         size = observation.ingest_data_rate * observation.duration
         if self.hot[b].total_capacity < size:
             raise RuntimeError(
-                "Observation data size exceeds total Buffer capacity"
+                f"Observation data size exceeds total Buffer capacity "
+                f"{observation.name}, {size} vs {self.hot[b].total_capacity}"
             )
         elif self.hot[b].current_capacity - size <= 0 \
                 or not self.cold[b].has_capacity(size):
@@ -229,6 +230,14 @@ class Buffer:
             raise RuntimeError(
                 "No observations in Hot Buffer"
             )
+
+        # Iterate through current observations for transfer
+        # Each of them will have a data size
+        # The total data rate is just total divided by the number of
+        # observations in the 'transfer' dictionary.
+        # Each timestep we check the length - if something has been removed
+        # from transfer, we update the data rate
+
         current_obs = self.hot[b].observation_for_transfer()
         # current_obs = self.hot.observations['transfer']
         data_left_to_transfer = current_obs.total_data_size
@@ -254,7 +263,6 @@ class Buffer:
                     "Removing observation from buffer at time %s",self.env.now
                 )
                 break
-
 
             check = self.cold[b].receive_observation(
                 current_obs,
@@ -423,7 +431,7 @@ class HotBuffer:
         -----------
         True if the data can be processed - false if it cannot
         """
-        if incoming_datarate > self.max_ingest_data_rate:
+        if int(incoming_datarate) > self.max_ingest_data_rate:
             raise ValueError(
                 'Incoming data rate {0} exceeds maximum.'.format(
                     incoming_datarate)

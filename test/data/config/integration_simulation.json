@@ -20,14 +20,14 @@
 				"start": 1,
 				"duration": 10,
 				"instrument_demand": 36,
-				"data_product_rate": 4
+				"data_product_rate": 4000000000.0
 			},
 			{
 				"name": "dingo",
 				"start": 15,
 				"duration": 20,
 				"instrument_demand": 18,
-				"data_product_rate": 5
+				"data_product_rate": 5000000000.0
 			}
 		]
 		}
@@ -91,12 +91,12 @@
 	},
 	"buffer": {
 		"hot": {
-			"capacity": 500,
-			"max_ingest_rate": 5
+			"capacity": 500000000000.0,
+			"max_ingest_rate": 5000000000.0
 		},
 		"cold": {
-			"capacity": 250,
-			"max_data_rate": 2
+			"capacity": 250000000000.0,
+			"max_data_rate": 2000000000.0
 		}
 	},
 	"planning": "heft",

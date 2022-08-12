@@ -118,10 +118,10 @@ class TestDelaysInActors(unittest.TestCase):
         self.env.run(until=2)
 
         # After 1 timestep, data in the HotBuffer should be 4
-        self.assertEqual(496, self.buffer.hot[0].current_capacity)
+        self.assertEqual(496e9, self.buffer.hot[0].current_capacity)
         self.env.run(until=31)
         self.assertEqual(5, len(self.cluster._tasks['finished']))
-        self.assertEqual(500, self.buffer.hot[0].current_capacity)
+        self.assertEqual(500e9, self.buffer.hot[0].current_capacity)
         self.env.run(until=44)
         # We know that the schedule has been delayed - however, we don't
         # report this to the telescope until we know how long we are delayed
@@ -152,10 +152,10 @@ class TestDelaysInActors(unittest.TestCase):
         self.env.run(until=2)
 
         # After 1 timestep, data in the HotBuffer should be 4
-        self.assertEqual(496, self.buffer.hot[0].current_capacity)
+        self.assertEqual(496e9, self.buffer.hot[0].current_capacity)
         self.env.run(until=31)
         self.assertEqual(5, len(self.cluster._tasks['finished']))
-        self.assertEqual(500, self.buffer.hot[0].current_capacity)
+        self.assertEqual(500e9, self.buffer.hot[0].current_capacity)
         self.env.run(until=32)
         # Ensure the time
         self.assertEqual(ScheduleStatus.ONTIME, self.scheduler.schedule_status)

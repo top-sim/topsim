@@ -80,11 +80,14 @@ class TestConfigTimeStep(unittest.TestCase):
     def setUp(self) -> None:
         self.standard_config = "test/data/config/integration_simulation.json"
         self.minutes_config = "test/data/config/standard_simulation.json"
-        self.custom_config = "test/data/config/standard_simulation_custom.json"
+        self.custom_config = (
+            "test/data/config/standard_simulation_custom_timestep.json"
+        )
         self.observation_duration_in_timesteps = 20
-        self.observation_data_product_rate_per_timestep = 5  # bytes/sec
-        self.hot_buffer_ingest_rate_per_timestep = 5
-        self.cold_buffer_data_rate_per_timestep = 2
+        self.observation_data_product_rate_per_timestep = 5000000000.0  #
+        # bytes/sec
+        self.hot_buffer_ingest_rate_per_timestep = 5000000000.0
+        self.cold_buffer_data_rate_per_timestep = 2000000000.0
 
     def testConfigDefaultTimestep(self):
         """
@@ -98,22 +101,22 @@ class TestConfigTimeStep(unittest.TestCase):
         config = Config(self.standard_config)
         (total_arrays, pipelines, observations,
          max_ingest_resources) = config.parse_instrument_config("telescope")
-        self.assertEqual(
+        self.assertAlmostEqual(
             self.observation_duration_in_timesteps, observations[1].duration
         )
-        self.assertEqual(
+        self.assertAlmostEqual(
             self.observation_data_product_rate_per_timestep,
-            observations[1].ingest_data_rate
+            observations[1].ingest_data_rate, places=5
         )
         hot, cold = config.parse_buffer_config()
 
-        self.assertEqual(
+        self.assertAlmostEqual(
             self.hot_buffer_ingest_rate_per_timestep,
-            hot[0].max_ingest_data_rate
+            hot[0].max_ingest_data_rate, places=5
         )
-        self.assertEqual(
+        self.assertAlmostEqual(
             self.cold_buffer_data_rate_per_timestep,
-            cold[0].max_data_rate
+            cold[0].max_data_rate,places=5
         )
 
     def testConfigMinutesTimestep(self):
@@ -123,39 +126,39 @@ class TestConfigTimeStep(unittest.TestCase):
         self.assertEqual(
             self.observation_duration_in_timesteps, observations[1].duration
         )
-        self.assertEqual(
+        self.assertAlmostEqual(
             self.observation_data_product_rate_per_timestep,
-            observations[1].ingest_data_rate
+            observations[1].ingest_data_rate,places=5
         )
         hot, cold = config.parse_buffer_config()
 
-        self.assertEqual(
+        self.assertAlmostEqual(
             self.hot_buffer_ingest_rate_per_timestep,
-            hot[0].max_ingest_data_rate
+            hot[0].max_ingest_data_rate, places=5
         )
-        self.assertEqual(
+        self.assertAlmostEqual(
             self.cold_buffer_data_rate_per_timestep,
-            cold[0].max_data_rate
+            cold[0].max_data_rate, places=5
         )
 
     def testConfigCustomTimestep(self):
-        config = Config(self.minutes_config)
+        config = Config(self.custom_config)
         (total_arrays, pipelines, observations,
          max_ingest_resources) = config.parse_instrument_config("telescope")
         self.assertEqual(
             self.observation_duration_in_timesteps, observations[1].duration
         )
-        self.assertEqual(
+        self.assertAlmostEqual(
             self.observation_data_product_rate_per_timestep,
             observations[1].ingest_data_rate
         )
         hot, cold = config.parse_buffer_config()
 
-        self.assertEqual(
+        self.assertAlmostEqual(
             self.hot_buffer_ingest_rate_per_timestep,
             hot[0].max_ingest_data_rate
         )
-        self.assertEqual(
+        self.assertAlmostEqual(
             self.cold_buffer_data_rate_per_timestep,
             cold[0].max_data_rate
         )

@@ -14,12 +14,20 @@
 				}
 			},
 			"observations": [
+								{
+					"name": "emu",
+					"start": 1,
+					"duration":50,
+					"instrument_demand": 36,
+					"data_product_rate":800000000.0
+				},
+
 				{
 					"name": "dingo",
 					"start": 75,
 					"duration": 100,
 					"instrument_demand": 18,
-					"data_product_rate": 1.0
+					"data_product_rate": 1000000000.0
 				}
 			]
 		}
@@ -79,11 +87,11 @@
 	"buffer": {
 		"hot": {
 			"capacity": 500,
-			"max_ingest_rate": 1.0
+			"max_ingest_rate": 1000000000.0
 		},
 		"cold": {
 			"capacity": 250,
-			"max_data_rate": 0.4
+			"max_data_rate": 400000000.0
 		}
 	},
 	"planning": "heft",

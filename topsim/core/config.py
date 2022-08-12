@@ -103,6 +103,12 @@ class Config:
             timestep_multiplier = 60
         if self.timestep_unit == 'hours':
             timestep_multiplier = 3600
+        elif isinstance(self.timestep_unit, int):
+            # This is a custom unit
+            timestep_multiplier = self.timestep_unit
+        else:  # Seconds
+            timestep_multiplier = timestep_multiplier
+
         for machine in machines:
             cpu = machines[machine]['flops'] * timestep_multiplier
             machine_list.append(
@@ -118,8 +124,14 @@ class Config:
         timestep_multiplier = 1
         if self.timestep_unit == 'minutes':
             timestep_multiplier = 60
-        if self.timestep_unit == 'hours':
+        elif self.timestep_unit == 'hours':
             timestep_multiplier = 3600
+        elif isinstance(self.timestep_unit, int):
+            # This is a custom unit
+            timestep_multiplier = self.timestep_unit
+        else:  # Seconds
+            timestep_multiplier = timestep_multiplier
+
         cfg = self.instrument
         total_arrays = cfg[instrument_name]['total_arrays']
         pipelines = cfg[instrument_name]['pipelines']
@@ -129,18 +141,16 @@ class Config:
                 name = observation['name']
                 workflow_path = pipelines[name]['workflow']
                 ingest_demand = pipelines[name]['ingest_demand']
-                o = Observation(name=name, start=observation[
-                                                     'start'] /
-                                                 timestep_multiplier,
-                                duration=observation[
-                                             'duration'] / timestep_multiplier,
-                                demand=observation['instrument_demand'],
-                                workflow=((
-                                                  self.path.parent /
-                                                  workflow_path).as_posix()),
-                                data_rate=(observation[
-                                               'data_product_rate'] *
-                                           timestep_multiplier))
+                o = Observation(name=name,
+                    start=observation['start'] / timestep_multiplier,
+                    duration=observation['duration'] / timestep_multiplier,
+                    demand=observation['instrument_demand'],
+                    workflow=((self.path.parent / workflow_path).as_posix()),
+                    data_rate=(
+                            round(observation['data_product_rate']
+                            * timestep_multiplier)
+                    ),
+                    timestep=self.timestep_unit)
                 observations.append(o)
             except KeyError:
                 raise
@@ -155,6 +165,12 @@ class Config:
             timestep_multiplier = 60
         if self.timestep_unit == 'hours':
             timestep_multiplier = 3600
+        elif isinstance(self.timestep_unit, int):
+            # This is a custom unit
+            timestep_multiplier = self.timestep_unit
+        else:  # Seconds
+            timestep_multiplier = timestep_multiplier
+
         hot = HotBuffer(capacity=config['hot']['capacity'],
                         max_ingest_data_rate=config['hot'][
                                                  'max_ingest_rate'] *
