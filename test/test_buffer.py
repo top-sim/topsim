@@ -230,7 +230,7 @@ class TestBufferRequests(unittest.TestCase):
         the movement from one buffer to the other.
 
         Using the current situation, we should have the observation finished by
-        timestep [TBC], and then the observation moved across by timestep [TBC]
+        timestep 10, and then the observation moved across by timestep 22
 
         Returns
         -------
@@ -244,7 +244,7 @@ class TestBufferRequests(unittest.TestCase):
         # Moving data from one to the other
         self.assertEqual(250, self.buffer.cold[BUFFER_ID].current_capacity)
         self.assertTrue(self.observation in
-                        self.buffer.hot[BUFFER_ID].observations["stored"])
+                        self .buffer.hot[BUFFER_ID].observations["stored"])
         self.env.process(self.buffer.move_hot_to_cold(0))
         self.env.run(until=15)
         self.assertEqual(240, self.buffer.cold[BUFFER_ID].current_capacity)
@@ -357,8 +357,6 @@ class TestBufferRequests(unittest.TestCase):
         )
         self.assertEqual(0,res)
 
-
-    # @unittest.skip("Functionality has changed")
     def testWorkflowAddedToQueue(self):
         """
         We only add a workflow to the queue once an observation has finished
@@ -374,6 +372,3 @@ class TestBufferRequests(unittest.TestCase):
                                                  self.buffer, None)
         self.assertTrue(self.observation.plan is not None)
         # Buffer observation queue should be empty
-#
-# # Get the observation and check we have applied the buffer offset
-# self.assertTrue(self.observation.start > OBS_START_TME + OBS_DURATION)

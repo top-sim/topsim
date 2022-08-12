@@ -94,15 +94,12 @@ class TestBatchSchedulerAllocation(unittest.TestCase):
         self.assertEqual(5, len(self.cluster.get_available_resources()))
         self.assertEqual(5, self.algorithm._max_resource_provision(
             self.cluster))
-        # TODO The algorithm must provision resources if they are not already
-        #  provisioned.
         plan = self.planner.run(obs, self.buffer, self.telescope.max_ingest)
         self.algorithm._provision_resources(self.cluster, plan)
         self.assertEqual(5, len(self.cluster.get_idle_resources(obs.name)))
         self.assertEqual(
                 0, self.algorithm._max_resource_provision(self.cluster)
         )
-        # self.planner.run(obs, )
 
     def test_algorithm_allocation(self):
         obs = self.telescope.observations[0]
