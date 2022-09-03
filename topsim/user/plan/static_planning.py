@@ -47,7 +47,7 @@ class SHADOWPlanning(Planning):
     def generate_plan(self, clock, cluster, buffer, observation, max_ingest):
         """
         For this StaticPlanning example, we are using the SHADOW static
-        scheduling library to produce static plans. There are a couple of
+        scheduling library to produce static plans.
 
         Parameters
         ----------
