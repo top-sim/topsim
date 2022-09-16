@@ -47,7 +47,7 @@ class TestMonitorPandasPickle(unittest.TestCase):
             instrument=self.instrument,
             planning_algorithm='heft',
             planning_model=SHADOWPlanning('heft'),
-            scheduling=DynamicAlgorithmFromPlan,
+            scheduling=DynamicAlgorithmFromPlan(),
             delay=None,
             timestamp='unittest',
             to_file=True,
@@ -88,7 +88,7 @@ class TestMonitorPandasPickle(unittest.TestCase):
                 self.instrument,
                 planning_algorithm=algorithm,
                 planning_model=SHADOWPlanning(algorithm),
-                scheduling=DynamicAlgorithmFromPlan,
+                scheduling=DynamicAlgorithmFromPlan(),
                 delay=None,
                 timestamp='unittest',
                 hdf5_path='test/simulation_data/test_hdf5.h5',
@@ -104,7 +104,7 @@ class TestMonitorPandasPickle(unittest.TestCase):
         heft_sim = pd.read_hdf(
             'test/simulation_data/test_hdf5.h5', key=heft_key
         )
-        self.assertEqual(120, len(heft_sim))
+        self.assertEqual(119, len(heft_sim))
         self.assertEqual(3, heft_sim.iloc[-1]['available_resources'])
 
 
@@ -128,12 +128,12 @@ class TestMonitorNoFileOption(unittest.TestCase):
             self.instrument,
             planning_algorithm='heft',
             planning_model=SHADOWPlanning('heft'),
-            scheduling=DynamicAlgorithmFromPlan,
+            scheduling=DynamicAlgorithmFromPlan(),
             delay=None,
             timestamp=None,
         )
         simdf, taskdf = simulation.start()
-        self.assertEqual(120, len(simdf))
+        self.assertEqual(119, len(simdf))
         self.env = simpy.Environment()
         simulation = Simulation(
             self.env,
@@ -141,14 +141,13 @@ class TestMonitorNoFileOption(unittest.TestCase):
             self.instrument,
             planning_algorithm='fcfs',
             planning_model=SHADOWPlanning('fcfs'),
-            scheduling=DynamicAlgorithmFromPlan,
+            scheduling=DynamicAlgorithmFromPlan(),
             delay=None,
             timestamp=None,
             # delimiters=f'test/{algorithm}'
         )
-        print("Debug this one")
         simdf, taskdf = simulation.start()
-        self.assertEqual(134, len(simdf))
+        self.assertEqual(133, len(simdf))
 
 
     def testResultsAgreeWithExpectations(self):

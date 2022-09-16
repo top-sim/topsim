@@ -104,7 +104,11 @@ class TestTaskDelayDetection(unittest.TestCase):
 class TestObservationConfig(unittest.TestCase):
 
     def setUp(self):
-        self.env = simpy.Environment()
+        config = Config(CONFIG)
+        (
+            total_arrays, pipelines, self.observations, max_ingest
+        ) = config.parse_instrument_config('telescope')
+
 
     def testObservationConfigJSON(self):
         """
@@ -112,6 +116,7 @@ class TestObservationConfig(unittest.TestCase):
 
         :return:
         """
+       # self.observations
 
 
 class TestTelescope(unittest.TestCase):

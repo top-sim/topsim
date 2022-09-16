@@ -150,7 +150,7 @@ class Observation(object):
     """
 
     def __init__(self, name, start, duration, demand, workflow,
-                 data_rate, timestep='seconds'):
+                 data_rate, timestep='seconds',min_resources=-1,max_resources=-1):
 
         # TODO change to self.id
         self.name = name
@@ -166,6 +166,8 @@ class Observation(object):
         self.ingest_data_rate = data_rate
         self.timestep = timestep
         self.status = RunStatus.WAITING
+        self.min_resources = min_resources
+        self.min_resources = max_resources
 
         self.plan = None
 

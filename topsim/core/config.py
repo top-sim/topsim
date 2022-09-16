@@ -141,6 +141,15 @@ class Config:
                 name = observation['name']
                 workflow_path = pipelines[name]['workflow']
                 ingest_demand = pipelines[name]['ingest_demand']
+                if 'min_workflow_resources' in observation:
+                    min_resources = observation['min_workflow_resources']
+                else:
+                    min_resources = -1  # No minimum requirement
+
+                if 'max_workflow_resources' in observation:
+                    max_resources = observation['max_workflow_resources']
+                else:
+                    max_resources = -1  # No maximum resources
                 o = Observation(name=name,
                     start=observation['start'] / timestep_multiplier,
                     duration=observation['duration'] / timestep_multiplier,

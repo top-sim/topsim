@@ -1,0 +1,57 @@
+{
+	"instrument": {
+		"telescope": {
+			"total_arrays": 36,
+			"max_ingest_resources": 1,
+			"pipelines": {
+				"emu": {
+					"workflow": "workflows/workflow_config_heft_sim.json",
+					"ingest_demand": 1
+				}
+			},
+			"observations": [
+				{
+					"name": "emu",
+					"start": 0,
+					"duration": 1,
+					"instrument_demand": 36,
+					"data_product_rate": 1
+				}
+			]
+		}
+	},
+	"cluster": {
+		"header": {
+		},
+		"system": {
+			"resources": {
+				"cat0_m0": {
+					"flops": 70.0,
+					"rates": 1.0
+				},
+				"cat1_m1": {
+					"flops": 60.0,
+					"rates": 1.0
+				},
+				"cat2_m2": {
+					"flops": 110.0,
+					"rates": 1.0
+				}
+			},
+			"bandwidth": 1.0
+		}
+	},
+	"buffer": {
+		"hot": {
+			"capacity": 2,
+			"max_ingest_rate": 1
+		},
+		"cold": {
+			"capacity": 2,
+			"max_data_rate": 1
+		}
+	},
+	"planning": "heft",
+	"scheduling": "fifo",
+	"timestep": "seconds"
+}

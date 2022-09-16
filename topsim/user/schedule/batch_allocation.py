@@ -31,20 +31,29 @@ class BatchProcessing(Algorithm):
 
     Attributes
     ----------
-    max_resources_split : int
+    max_resource_partitions : int
         The number of provisions that can be made on the cluster.
         By default, this is 2 - that is, only two workflows may run on the
         cluster at any given point in time, provided they also do not overlap
         with the number of ingest pipelines, too.
 
     min_resources_per_workflow: int
+        The
+
+    resource_split: dict
 
     """
 
-    def __init__(self, max_resources_split=1, min_resources_per_workflow=3):
+    def __init__(
+        self,
+        max_resource_partitions=1,
+        min_resources_per_workflow=3,
+        resource_split=None
+    ):
         super().__init__()
-        self.max_resources_split = max_resources_split
+        self.max_resources_split = max_resource_partitions
         self.min_resource_per_workflow = min_resources_per_workflow
+        self.resource_split = resource_split
 
     def __repr__(self):
         return "BatchProcessing"
@@ -127,10 +136,16 @@ class BatchProcessing(Algorithm):
     def to_df(self):
         pass
 
-    def _max_resource_provision(self, cluster):
+    def _max_resource_provision(self, cluster, workflow_plan=None):
         """
 
         Calculate the appropriate number of resources to provision accordingly
+
+        Two approaches here based on differing requirements:
+
+        Resources Split
+
+        Max Resources Split
 
         Parameters
         ----------
@@ -155,13 +170,25 @@ class BatchProcessing(Algorithm):
 
         #  TODO do We need to make sure there's enough left for ingest to
         #   occur?
-        max_allowed = int(len(cluster) / self.max_resources_split)
-        if available == 0:
-            return 0
-        if available < max_allowed:
-            return available
+        if self.resource_split:
+            min_resource_limit, max_resource_limit = self.resource_split[workflow_plan.id]
+            if min_resource_limit > len(cluster):
+                raise RuntimeError("Minimum resource demand is not supported by cluster")
+            elif available == 0:
+                return 0
+            elif available < min_resource_limit:
+                return 0
+            else:
+                return min(available, max_resource_limit)
+
         else:
-            return max_allowed
+            max_allowed = int(len(cluster) / self.max_resources_split)
+            if available == 0:
+                return 0
+            if available < max_allowed:
+                return available
+            else:
+                return max_allowed
 
     def _provision_resources(self, cluster, workflow_plan):
         """
@@ -182,7 +209,7 @@ class BatchProcessing(Algorithm):
             return True
         else:
             if cluster.num_provisioned_obs < self.max_resources_split:
-                provision = self._max_resource_provision(cluster)
+                provision = self._max_resource_provision(cluster, workflow_plan)
                 if provision < self.min_resource_per_workflow:
                     return False
                 else:

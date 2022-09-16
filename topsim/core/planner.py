@@ -98,6 +98,8 @@ class WorkflowPlan:
         self.status = status
         self.max_ingest = max_ingest
         self.graph = graph
+        self.min_resources = None
+        self.max_resources = None
         self.priority = None
 
     def __lt__(self, other):

@@ -157,7 +157,7 @@ class Simulation:
         self.cluster = Cluster(env, self._cfg)
         #: :py:obj:`~topsim.core.buffer.Buffer` instance
         self.buffer = Buffer(env, self.cluster, self._cfg)
-        planning_algorithm = planning_algorithm
+        planning_algorithm = None
         planning_model = planning_model
 
         if not delay:
@@ -167,7 +167,7 @@ class Simulation:
         self.planner = Planner(
             env, planning_algorithm, self.cluster, planning_model, delay
         )
-        scheduling_algorithm = scheduling()
+        scheduling_algorithm = scheduling
         #: :py:obj:`~topsim.core.scheduler.Scheduler` instance
         self.scheduler = Scheduler(
             env, self.buffer, self.cluster, scheduling_algorithm
@@ -263,7 +263,7 @@ class Simulation:
         else:
             while not self.is_finished():
                 self.env.run(self.env.now + 1)
-            self.env.run(self.env.now + 1)
+            # self.env.run(self.env.now + 1)
         LOGGER.info("Simulation Finished @ %s", self.env.now)
 
         if self.to_file and self._hdf5_store is not None:
