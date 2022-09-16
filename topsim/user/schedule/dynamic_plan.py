@@ -75,7 +75,7 @@ class DynamicAlgorithmFromPlan(Algorithm):
                         machine = cluster.get_machine_from_id(task.machine)
                         workflow_plan.status = WorkflowStatus.SCHEDULED
                         # We do not update the allocations
-                        allocations[task] = machine
+                        allocations[task] = machine  
                         self.accurate += 1
 
                     # The task has predecessors

@@ -114,21 +114,10 @@ class TestWorkflowPlan(unittest.TestCase):
         """
 
         time = self.env.now
-        # self.assertRaises(
-        #     RuntimeError,
-        #     next, self.planner.run(self.observation, self.buffer)
-        # )
         self.observation.ast = self.env.now
         plan = self.planner.run(self.observation, self.buffer,
                                 TEL_MAX_INGEST
                                 )
-        # plan = self.planner.plan(
-        #     self.observation,
-        #     self.observation.workflow,
-        #     'heft',
-        #     self.buffer
-        # )
-
         expected_exec_order = [0, 5, 3, 4, 2, 1, 6, 8, 7, 9]
         self.assertEqual(len(plan.tasks), len(expected_exec_order))
         for x in range(len(plan.tasks)):
@@ -174,14 +163,11 @@ class TestPlannerDelay(unittest.TestCase):
         and thus run the rest of the code in run()  next(val)
         """
 
-        # self.assertRaises(
-        #     RuntimeError,
-        #     next,
-        #     self.planner.run(self.observation, self.buffer)
-        # )
         self.observation.ast = self.env.now
-        self.observation.plan = self.planner.run(self.observation,
-                                                 self.buffer, TEL_MAX_INGEST)
+        self.observation.plan = self.planner.run(
+            self.observation,
+            self.buffer, TEL_MAX_INGEST
+        )
         self.assertTrue(self.observation.plan is not None)
         self.assertTrue(0.1, self.observation.plan.tasks[0].delay.prob)
 

@@ -106,10 +106,6 @@ class TestMonitorPandasPickle(unittest.TestCase):
         )
         self.assertEqual(120, len(heft_sim))
         self.assertEqual(3, heft_sim.iloc[-1]['available_resources'])
-        # length of both simulations is 248
-        # self.assertEqual(248, len(global_sim_df))
-
-
 
 
 class TestMonitorNoFileOption(unittest.TestCase):
