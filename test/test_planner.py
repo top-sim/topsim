@@ -56,7 +56,6 @@ class TestPlannerConfig(unittest.TestCase):
     def testPlannerBasicConfig(self):
         planner = Planner(
             env=self.env,
-            algorithm=PLAN_ALGORITHM,
             cluster=self.cluster,
             model=self.model
         )
@@ -79,7 +78,7 @@ class TestWorkflowPlan(unittest.TestCase):
         self.cluster = Cluster(self.env, config=config)
         self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
         self.planner = Planner(
-            self.env, PLAN_ALGORITHM, self.cluster, self.model,
+            self.env, self.cluster, self.model,
         )
         self.observation = Observation(
             'planner_observation',
@@ -142,7 +141,7 @@ class TestPlannerDelay(unittest.TestCase):
         self.model = SHADOWPlanning('heft', dm)
         self.cluster = Cluster(self.env, config=config)
         self.buffer = Buffer(self.env, self.cluster, config)
-        self.planner = Planner(self.env, PLAN_ALGORITHM, self.cluster,
+        self.planner = Planner(self.env, self.cluster,
                                self.model, delay_model=dm)
         self.observation = Observation(
             'planner_observation',
@@ -196,7 +195,7 @@ class TestBatchProcessingPlan(unittest.TestCase):
         self.cluster = Cluster(self.env, config=config)
         self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
         self.planner = Planner(
-            self.env, PLAN_ALGORITHM, self.cluster, self.model,
+            self.env, self.cluster, self.model,
         )
         self.telescope = Telescope(
             self.env, config, planner=None, scheduler=None

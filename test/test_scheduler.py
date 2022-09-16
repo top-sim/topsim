@@ -75,7 +75,7 @@ class TestSchedulerIngest(unittest.TestCase):
         self.scheduler = Scheduler(
             self.env, self.buffer, self.cluster, DynamicAlgorithmFromPlan
         )
-        self.planner = Planner(self.env, PLANNING_ALGORITHM,
+        self.planner = Planner(self.env,
                                self.cluster, SHADOWPlanning('heft'))
         # planner = None
         self.telescope = Telescope(self.env, config, self.planner,
@@ -158,7 +158,7 @@ class TestSchedulerDynamicPlanAllocation(unittest.TestCase):
         sched_algorithm = DynamicAlgorithmFromPlan()
         config = Config(HEFT_CONFIG)
         self.cluster = Cluster(self.env, config)
-        self.planner = Planner(self.env, PLANNING_ALGORITHM,
+        self.planner = Planner(self.env,
                                self.cluster, SHADOWPlanning('heft'))
         self.buffer = Buffer(self.env, self.cluster, config)
         self.scheduler = Scheduler(self.env, self.buffer,
@@ -281,8 +281,8 @@ class TestSchedulerLongWorkflow(unittest.TestCase):
         sched_algorithm = DynamicAlgorithmFromPlan()
         config = Config(LONG_CONFIG)
         self.cluster = Cluster(self.env, config)
-        planning_model = SHADOWPlanning(algorithm=PLANNING_ALGORITHM)
-        self.planner = Planner(self.env, PLANNING_ALGORITHM,
+        planning_model = SHADOWPlanning(algorithm='heft')
+        self.planner = Planner(self.env,
                                self.cluster, planning_model)
         self.buffer = Buffer(self.env, self.cluster, config)
         self.scheduler = Scheduler(self.env, self.buffer,
@@ -312,7 +312,7 @@ class TestSchedulerDynamicReAllocation(unittest.TestCase):
         sched_algorithm = GreedyAlgorithmFromPlan()
         config = Config(LONG_CONFIG)
         self.cluster = Cluster(self.env, config)
-        self.planner = Planner(self.env, PLANNING_ALGORITHM,
+        self.planner = Planner(self.env,
                                self.cluster, SHADOWPlanning('heft'))
         self.buffer = Buffer(self.env, self.cluster, config)
         self.scheduler = Scheduler(self.env, self.buffer,
@@ -341,7 +341,7 @@ class TestSchedulerIntegration(unittest.TestCase):
         config = Config(INTEGRATION)
         self.cluster = Cluster(self.env, config)
         self.buffer = Buffer(self.env, self.cluster, config)
-        self.planner = Planner(self.env, PLANNING_ALGORITHM,
+        self.planner = Planner(self.env,
                                self.cluster, SHADOWPlanning('heft'))
 
         self.scheduler = Scheduler(
@@ -399,7 +399,7 @@ class TestSchedulerDelayHelpers(unittest.TestCase):
         self.cluster = Cluster(self.env, config)
         self.buffer = Buffer(self.env, self.cluster, config)
         self.planner = Planner(
-            self.env, PLANNING_ALGORITHM,
+            self.env,
             self.cluster, SHADOWPlanning('heft'),
             delay_model=DelayModel(0.3, "normal")
         )

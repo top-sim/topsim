@@ -28,27 +28,26 @@ class Planning(ABC):
 
     Parameters
     ----------
-    observation : topsim.core.instrument.Observation
+    observation : ~topsim.core.instrument.Observation
         Contains workflow associated with the observation processing.
     algorithm : str
          Name of the algorithm used in the model; some models allow for
          multiple algorithms in addition to the model
-    buffer : topsim.core.buffer.Cluster
-        The simulation Cluster object - used to retrieve current cluster
-        information to inform the static schedule.
+
+    delay_model:
 
     Attributes
     ----------
 
     """
 
-    def __init__(self, algorithm, delay_model=None):
+    def __init__(self, algorithm: str, delay_model=None):
         # self.observation = observation
         self.algorithm = algorithm
         self.delay_model = delay_model
 
     @abstractmethod
-    def generate_plan(self, clock, cluser, buffer, observation,max_ingest):
+    def generate_plan(self, clock, cluser, buffer, observation, max_ingest):
         """
         Build a WorkflowPlan object storing
         Returns

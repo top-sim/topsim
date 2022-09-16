@@ -65,7 +65,7 @@ class TestBatchSchedulerAllocation(unittest.TestCase):
         self.algorithm = BatchProcessing()
         self.model = BatchPlanning('batch')
         self.planner = Planner(
-            self.env, 'heft', self.cluster, self.model,
+            self.env, self.cluster, self.model,
         )
 
         self.telescope = Telescope(

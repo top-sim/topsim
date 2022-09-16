@@ -88,7 +88,7 @@ class TestDelaysInActors(unittest.TestCase):
         dm = DelayModel(0.9, "normal",
                    DelayModel.DelayDegree.HIGH)
         self.planner = Planner(
-            self.env, PLANNING_ALGORITHM,
+            self.env,
             self.cluster, SHADOWPlanning('heft',delay_model=dm), delay_model=dm
         )
 
