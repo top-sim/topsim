@@ -141,11 +141,19 @@ class Buffer:
 
         """
         b = observation.buffer_id
-        size = observation.ingest_data_rate * observation.duration
-        if self.hot[b].total_capacity < size:
+        if observation.duration < 1:
             raise RuntimeError(
-                f"Observation data size exceeds total Buffer capacity "
-                f"{observation.name}, {size} vs {self.hot[b].total_capacity}"
+                f"Observation duration has become less than 1 second.\n"
+                f"Please check the observation plan, "
+                f"or ensure that the conversion between observation duration "
+                f"and simulation units do not cause a fractional timestep."
+            )
+        size = observation.ingest_data_rate * observation.duration
+        if self.hot[b].total_capacity <= size:
+            raise RuntimeError(
+                f"Observation data size is equal or greater than HotBuffer capacity."
+                f"Consider expanding capacity size."
+                f"{observation.name}, Observation: {size} vs Hot Buffer: {self.hot[b].total_capacity:.1f}"
             )
         elif self.hot[b].current_capacity - size <= 0 \
                 or not self.cold[b].has_capacity(size):
@@ -260,7 +268,7 @@ class Buffer:
 
             if data_left_to_transfer <= 0:
                 LOGGER.info(
-                    "Removing observation from buffer at time %s",self.env.now
+                    "Buffer transfer completed at time %s", self.env.now
                 )
                 break
 

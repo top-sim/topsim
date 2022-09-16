@@ -47,7 +47,7 @@ class TestMonitorPandasPickle(unittest.TestCase):
             instrument=self.instrument,
             planning_algorithm='heft',
             planning_model=SHADOWPlanning('heft'),
-            scheduling=DynamicAlgorithmFromPlan,
+            scheduling=DynamicAlgorithmFromPlan(),
             delay=None,
             timestamp='unittest',
             to_file=True,
@@ -88,7 +88,7 @@ class TestMonitorPandasPickle(unittest.TestCase):
                 self.instrument,
                 planning_algorithm=algorithm,
                 planning_model=SHADOWPlanning(algorithm),
-                scheduling=DynamicAlgorithmFromPlan,
+                scheduling=DynamicAlgorithmFromPlan(),
                 delay=None,
                 timestamp='unittest',
                 hdf5_path='test/simulation_data/test_hdf5.h5',
@@ -128,7 +128,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
             self.instrument,
             planning_algorithm='heft',
             planning_model=SHADOWPlanning('heft'),
-            scheduling=DynamicAlgorithmFromPlan,
+            scheduling=DynamicAlgorithmFromPlan(),
             delay=None,
             timestamp=None,
         )
@@ -141,12 +141,11 @@ class TestMonitorNoFileOption(unittest.TestCase):
             self.instrument,
             planning_algorithm='fcfs',
             planning_model=SHADOWPlanning('fcfs'),
-            scheduling=DynamicAlgorithmFromPlan,
+            scheduling=DynamicAlgorithmFromPlan(),
             delay=None,
             timestamp=None,
             # delimiters=f'test/{algorithm}'
         )
-        print("Debug this one")
         simdf, taskdf = simulation.start()
         self.assertEqual(134, len(simdf))
 

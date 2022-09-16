@@ -311,8 +311,8 @@ class Scheduler:
 
             if finished:
                 # We have finished this observation
-                LOGGER.info(f'{observation.name} Removed from Queue @'
-                            f'{self.env.now}')
+                # LOGGER.info(f'{observation.name} Removed from Queue @'
+                #             f'{self.env.now}')
                 # self.cluster.release_batch_resources(observation)
                 break
             # If there are no allocations made this timestep
@@ -365,9 +365,10 @@ class Scheduler:
         if not schedule and status is WorkflowStatus.FINISHED:
             if self.buffer.mark_observation_finished(observation):
                 self.cluster.release_batch_resources(observation.name)
-                LOGGER.info(f'{observation.name} resources released')
+                LOGGER.debug(f'{observation.name} resources released')
                 self.observation_queue.remove(observation)
                 finished = True
+                LOGGER.info(f"{observation.name} finished @ {self.env.now}")
 
         return current_plan, schedule, finished
 

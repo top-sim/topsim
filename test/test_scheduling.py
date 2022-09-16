@@ -112,6 +112,17 @@ class TestBatchSchedulerAllocation(unittest.TestCase):
         )
         self.assertTrue(obs.plan.tasks[0] in existing_schedule)
 
+    def test_algorithm_provisioning(self):
+        obs = self.telescope.observations[0]
+        resource_split = {'dingo': (1,1), 'emu':(1,1)}
+        plan = self.planner.run(obs, self.buffer, self.telescope.max_ingest)
+        algorithm = BatchProcessing(
+            min_resources_per_workflow=1,
+            resource_split=resource_split
+        )
+        algorithm._provision_resources(self.cluster, plan)
+        self.assertEqual(1, len(self.cluster.get_idle_resources(obs.name)))
+
     def test_observation_queue(self):
         """
         Observation queue will static once the resources are exausted
