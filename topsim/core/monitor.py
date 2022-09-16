@@ -58,7 +58,7 @@ class Monitor(object):
         )
         algs = pd.DataFrame(
             {
-                'planning': [self.simulation.planner.algorithm],
+                'planning': [self.simulation.planner.model.algorithm],
                 'scheduling': [repr(self.simulation.scheduler.algorithm)]
             },
         )

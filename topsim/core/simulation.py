@@ -165,7 +165,7 @@ class Simulation:
             #  model outside the simulation.
             delay = DelayModel(0.0, "normal", DelayModel.DelayDegree.NONE)
         self.planner = Planner(
-            env, planning_algorithm, self.cluster, planning_model, delay
+            env, self.cluster, planning_model, delay
         )
         scheduling_algorithm = scheduling
         #: :py:obj:`~topsim.core.scheduler.Scheduler` instance
@@ -343,7 +343,7 @@ class Simulation:
         df = self.cluster.finished_task_time_data()
         df = df.T
         size = len(df)
-        df['scheduling'] = [self.planner.algorithm for x in range(size)]
+        df['scheduling'] = [self.planner.model.algorithm for x in range(size)]
         df['planning'] = [
             repr(self.scheduler.algorithm) for x in range(size)
         ]

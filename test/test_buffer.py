@@ -210,7 +210,7 @@ class TestBufferRequests(unittest.TestCase):
             env=self.env, cluster=self.cluster, config=self.config
         )
         self.planner = Planner(
-            self.env, PLAN_ALGORITHM, self.cluster, SHADOWPlanning('heft')
+            self.env, self.cluster, SHADOWPlanning('heft')
         )
         self.observation = Observation(
             'scheduler_observation',

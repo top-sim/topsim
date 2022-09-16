@@ -34,25 +34,23 @@ class Planner:
     env : simpy.Environment
         Simulation environment object
 
-    cluster : topsim.core.cluster.Cluster
+    cluster : :py:object:~topsim.core.cluster.Cluster
         The cluster of the simulation; necessary to pass to static scheduling
         algorithms
 
-    algorithm : str
-        The intended algorithm used for scheduling
+    model : topsim.algorithm.planner.Planner
+        The implemented planning model that is run by this actor
 
     delay_model: topsim.core.delay.DelayModel
         The delaymodel object, to assign to each Workflow Plan task.
 
-
     """
 
-    def __init__(self, env, algorithm, cluster, model, delay_model=None):
-        self.env = env  #: :py:object:~`simpy.Environment object for the
-        # simulation`
+    def __init__(self, env, cluster, model, delay_model=None):
+        self.env = env  #: :py:object:~`simpy.Environment` object for the
+        # simulation
         self.cluster = cluster
         # self.envconfig = envconfig
-        self.algorithm = algorithm
         self.model = model  # algorithm, cluster, delay_model)
         self.delay_model = delay_model
 
