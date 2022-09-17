@@ -18,12 +18,7 @@ observation plan for a (radio) telescope. A simulation contains various
 'Actors'; some are initialised and start at the beginning of the simulation;
 others are activated by other Actors throughout the duration of the
 simulation. The different Actors, their roles, and how they may be invoked,
-are discussed in more detail in the :ref:`actors` section. 
-
-Actors will often store and exchange information between each other through
-Resources; Resources may be part of an Actor (as is the case with the
-Telescope); or they may be independent of any Actor (as is the case with the
-Cluster). More information can be found in :ref:`resources`. 
+are discussed in more detail in the section.
 
 The primary motivation of TopSim is to test new models of scheduling and
 planning for Radio Astronomy post-processing. As a result, the focus of
@@ -39,10 +34,9 @@ sections.
 Installation
 -------------
 .. toctree::
-	:maxdepth: 3
+    :maxdepth: 3
 
-	requirements
-	model_overview
-	simulation
-
-	reference/index
+    getting_started/index
+    configuration/index
+    algorithms/index
+    reference/index

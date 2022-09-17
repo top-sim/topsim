@@ -1,7 +1,17 @@
+
+Planning and Scheduling
+=======================
+
+.. toctree::
+    :maxdepth: 2
+    :hidden:
+
+    planning
+    scheduling
+
+
 User-defined operations in TOpSim
-====================================
-
-
+----------------------------------
 
 TopSims development is motivated by the evaluation of the workflow scheduling
 procedures that are proposed for the Square Kilometre Array Science Data

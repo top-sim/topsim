@@ -1,14 +1,15 @@
+============================
 The anatomy of a simulation
-===========================
+============================
 
 .. currentmodule:: topsim.core
 
-.. image:: figures/topsim_sim_config.svg
+.. image:: ../figures/topsim_sim_config.svg
 
 Simulations are started from a :py:class:`simulation.Simulation` object. All
 actors that operate within a simulation are instantiated within the
 
-`:py:class:`simulation.Simulation` constructor, and include:
+:py:class:`simulation.Simulation` constructor, and include:
 
 * :py:class:`~instrument.Instrument`
 * :py:class:`~scheduler.Scheduler`

@@ -1,6 +1,6 @@
 .. _configuration:
 
-Simulations
+Configuring a Simulation
 =========================
 
 Observations
