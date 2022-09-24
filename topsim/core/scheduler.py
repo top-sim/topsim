@@ -59,10 +59,9 @@ class Scheduler:
         self.provision_ingest = 0
         self.observation_queue = []
         self.schedule_status = ScheduleStatus.ONTIME
+        self.events = []
         self.algtime = {}
         self.delay_offset = 0
-        self._finished_observations = 0
-
 
     def start(self):
         """
@@ -99,6 +98,7 @@ class Scheduler:
         LOGGER.debug("Scheduler starting up...")
 
         while self.status is SchedulerStatus.RUNNING:
+            self.events = []
             if self.env.now % 1000 == 0:
                 LOGGER.debug('Time on Scheduler: {0}'.format(self.env.now))
                 LOGGER.debug("Scheduler Status: %s", self.status)
@@ -107,9 +107,10 @@ class Scheduler:
                 if obs not in self.observation_queue:
                     self.observation_queue.append(obs)
                     ret = self.env.process(self.allocate_tasks(obs))
-
-            if len(self.observation_queue) == 0 \
-                    and self.status == SchedulerStatus.SHUTDOWN:
+                    self._add_event(obs, "queue", "added")
+            if (
+                    not self.observation_queue and self.status ==
+                    SchedulerStatus.SHUTDOWN):
                 LOGGER.debug("No more waiting workflows")
                 break
             # for obs in self.observation_queue:
@@ -174,18 +175,17 @@ class Scheduler:
                 self.provision_ingest += pipeline_demand
                 LOGGER.debug(
                     "Cluster is able to process ingest for observation %s",
-                    observation.name
-                )
+                    observation.name)
             else:
                 LOGGER.debug('pipeline demand %s + provision_ingest %s',
-                             pipeline_demand,self.provision_ingest)
+                             pipeline_demand, self.provision_ingest)
                 LOGGER.debug('Cluster is unable to process ingest as two'
                              'observations are scheduled at the same time')
 
         return buffer_capacity and cluster_capacity
 
-    def allocate_ingest(self, observation, pipelines, planner,
-                        max_ingest=None, c='default'):
+    def allocate_ingest(self, observation, pipelines, planner, max_ingest=None,
+                        c='default'):
         """
         Ingest is 'streaming' data to the buffer during the observation
         How we calculate how long it takes remains to be seen
@@ -221,16 +221,10 @@ class Scheduler:
         while ingest_observation.status is not RunStatus.FINISHED:
             if ingest_observation.status is RunStatus.WAITING:
                 cluster_ingest = self.env.process(
-                    self.cluster.provision_ingest_resources(
-                        pipeline_demand,
-                        observation
-                    )
-                )
+                    self.cluster.provision_ingest_resources(pipeline_demand,
+                        observation))
                 ret = self.env.process(
-                    self.buffer.ingest_data_stream(
-                        observation,
-                    )
-                )
+                    self.buffer.ingest_data_stream(observation, ))
                 ingest_observation.status = RunStatus.RUNNING
 
             elif ingest_observation.status is RunStatus.RUNNING:
@@ -276,8 +270,7 @@ class Scheduler:
         if current_plan is None:
             raise RuntimeError(
                 "Observation should have pre-plan; Planner actor has "
-                "failed at runtime."
-            )
+                "failed at runtime.")
         current_plan.ast = self.env.now
         for task in current_plan.tasks:
             task.workflow_offset = self.env.now
@@ -294,13 +287,14 @@ class Scheduler:
         _tqdm = False
         pbar = None
         if _tqdm:
-            pbar = tqdm(total=_total_tasks,desc=f'Scheduler: {observation.name}',
-                    unit="Tasks",leave=True)#,position=)
+            pbar = tqdm(total=_total_tasks,
+                        desc=f'Scheduler: {observation.name}', unit="Tasks",
+                        leave=True)  # ,position=)
+        self._add_event(observation, "allocation", "started")
         while True:
             current_plan.tasks = self._update_current_plan(current_plan)
             current_plan, schedule, finished = self._generate_current_schedule(
-                observation, current_plan, schedule, task_pool
-            )
+                observation, current_plan, schedule, task_pool)
             # prev_tasks = _curr_tasks
             # _curr_tasks = len(current_plan.tasks)
             tmp = _curr_tasks
@@ -322,8 +316,7 @@ class Scheduler:
             else:
                 # This is where allocations are made to the cluster
                 schedule, allocation_pairs = self._process_current_schedule(
-                    schedule, allocation_pairs, current_plan.id
-                )
+                    schedule, allocation_pairs, current_plan.id)
                 yield self.env.timeout(TIMESTEP)
         if pbar:
             pbar.close()
@@ -347,26 +340,25 @@ class Scheduler:
         finished = False
         nm = f'{observation.name}-algtime'
         self.algtime[nm] = time.time()
-        schedule, status = self.algorithm.run(
-            cluster=self.cluster,
-            clock=self.env.now,
-            workflow_plan=current_plan,
-            existing_schedule=schedule,
-            task_pool=task_pool
-        )
+        schedule, status = self.algorithm.run(cluster=self.cluster,
+            clock=self.env.now, workflow_plan=current_plan,
+            existing_schedule=schedule, task_pool=task_pool)
         self.algtime[nm] = (time.time() - self.algtime[nm])
 
         current_plan.status = status
-        if (current_plan.status is WorkflowStatus.DELAYED and
+        if (
+                current_plan.status is WorkflowStatus.DELAYED and
                 self.schedule_status is not WorkflowStatus.DELAYED):
             self.schedule_status = ScheduleStatus.DELAYED
 
         # If the workflow is finished
         if not schedule and status is WorkflowStatus.FINISHED:
+            self._add_event(observation, "allocation", "stopped")
             if self.buffer.mark_observation_finished(observation):
                 self.cluster.release_batch_resources(observation.name)
                 LOGGER.debug(f'{observation.name} resources released')
                 self.observation_queue.remove(observation)
+                self._add_event(observation, "queue", "removed")
                 finished = True
                 LOGGER.info(f"{observation.name} finished @ {self.env.now}")
 
@@ -389,9 +381,7 @@ class Scheduler:
         -------
 
         """
-        sorted_tasks = sorted(
-            schedule.keys(), key=lambda t: t.est
-        )
+        sorted_tasks = sorted(schedule.keys(), key=lambda t: t.est)
         curr_allocs = []
         # Allocate tasks
         for task in sorted_tasks:
@@ -401,21 +391,17 @@ class Scheduler:
             # Schedule
             if machine in curr_allocs or self.cluster.is_occupied(machine):
                 LOGGER.debug(
-                    "Allocation not made to cluster due to double-allocation"
-                )
+                    "Allocation not made to cluster due to double-allocation")
             else:
                 allocation_pairs[task.id] = (task, machine)
-                pred_allocations = self._find_pred_allocations(
-                    task, machine, allocation_pairs
-                )
+                pred_allocations = self._find_pred_allocations(task, machine,
+                    allocation_pairs)
                 if task.task_status != TaskStatus.UNSCHEDULED:
                     raise RuntimeError("Producing schedule with Scheduled "
                                        "Tasks")
                 self.env.process(
-                    self.cluster.allocate_task_to_cluster(
-                        task, machine,  pred_allocations, workflow_id
-                    )
-                )
+                    self.cluster.allocate_task_to_cluster(task, machine,
+                        pred_allocations, workflow_id))
 
                 LOGGER.debug(f"Allocation {task}-{machine} made to cluster")
                 task.task_status = TaskStatus.SCHEDULED
@@ -494,24 +480,36 @@ class Scheduler:
 
         """
         df = pd.DataFrame()
-        queuestr = f''
-        for obs in self.observation_queue:
-            queuestr += f'{obs.name}'
-        df['scheduler_observation_queue'] = [len(self.observation_queue)]
-        # df['observations_waiting'] = [0]
-        df['finished_observations'] = [self._finished_observations]
-        df['observation_queue'] = queuestr
-        df['schedule_status'] = pd.Series(
-            [self.schedule_status.value]
-        )
-        df['delay_offset'] = pd.Series([self.delay_offset])
+        df['scheduler_observation_queue'] = [int(len(self.observation_queue))]
+        df['schedule_status'] = [str(self.schedule_status.value)]
+        df['delay_offset'] = [self.delay_offset]
         tmp = f'alg'
         if self.algtime:
             for key, value in self.algtime.items():
                 df[key] = value
-        else:
-            df['algtime'] = tmp
         return df
+
+    def to_summary(self):
+        """
+        Generate summary information when a key event occurs during the
+        current timestep
+
+        The scheduler has the following key events that can happen each timestep
+
+        *
+
+        Returns
+        -------
+        summary : dict
+            list of key-value pairs with the 'event': 'event_name'
+        """
+
+        return self.events
+
+    def _add_event(self, observation, resource, event):
+        self.events.append({"time": int(self.env.now), "actor": "scheduler",
+                            "observation": observation.name, "event": event,
+                            "resource": resource})
 
 
 class SchedulerStatus(Enum):
@@ -526,6 +524,7 @@ class SchedulerStatus(Enum):
     RUNNING = 'RUNNING'
     SHUTDOWN = 'SHUTDOWN'
 
+
 # TODO Update to WorkflowStatus to avoid SchedulerStatus single-letter typos
 class ScheduleStatus(Enum):
     """
@@ -534,3 +533,10 @@ class ScheduleStatus(Enum):
     ONTIME = 'ONTIME'
     DELAYED = 'DELAYED'
     FAILURE = 'FAILURE'
+
+
+class SchedulerEvent(Enum):
+    """
+    When an event occurs, send information to the monitor with the event
+    information
+    """

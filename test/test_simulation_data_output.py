@@ -49,7 +49,7 @@ class TestMonitorPandasPickle(unittest.TestCase):
             planning_model=SHADOWPlanning('heft'),
             scheduling=DynamicAlgorithmFromPlan(),
             delay=None,
-            timestamp='unittest',
+            timestamp=0,
             to_file=True,
             hdf5_path=Path('test/simulation_data/test_hdf5.h5'),
             delimiters=f'test/'
@@ -90,7 +90,7 @@ class TestMonitorPandasPickle(unittest.TestCase):
                 planning_model=SHADOWPlanning(algorithm),
                 scheduling=DynamicAlgorithmFromPlan(),
                 delay=None,
-                timestamp='unittest',
+                timestamp=0,
                 hdf5_path='test/simulation_data/test_hdf5.h5',
                 to_file=True,
                 delimiters=f'{algorithm}'
@@ -99,8 +99,8 @@ class TestMonitorPandasPickle(unittest.TestCase):
         self.assertTrue(
             os.path.exists('test/simulation_data/test_hdf5.h5')
         )
-        heft_key = '/dunittest/heft/heft_single_observation_simulation/sim/'
-        fcfs_key = '/dunittest/fcfs/heft_single_observation_simulation/sim/'
+        heft_key = '/Thu700101080000/heft/heft_single_observation_simulation/sim/'
+        fcfs_key = '/Thu700101080000/fcfs/heft_single_observation_simulation/sim/'
         heft_sim = pd.read_hdf(
             'test/simulation_data/test_hdf5.h5', key=heft_key
         )

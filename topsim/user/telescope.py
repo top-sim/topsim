@@ -58,18 +58,12 @@ class Telescope(Instrument):
 
     name = 'telescope'
 
-    def __init__(
-            self, env, config, planner, scheduler
-    ):
+    def __init__(self, env, config, planner, scheduler):
         super().__init__(env, config, planner, scheduler)
         self.env = env
         try:
-            (
-                total_arrays,
-                pipelines,
-                observations,
-                max_ingest
-            ) = config.parse_instrument_config(Telescope.name)
+            (total_arrays, pipelines, observations,
+             max_ingest) = config.parse_instrument_config(Telescope.name)
         except OSError:
             raise
         #: int: Total number of arrays used to observe
@@ -84,6 +78,7 @@ class Telescope(Instrument):
         #: :py:obj:`~topsim.core.olanner.Planner` object of Simulation
         self.planner = planner
         self.observation_types = None
+        self.events = []
         self.telescope_status = False
         self.telescope_use = 0
         self.delayed = False
@@ -126,10 +121,11 @@ class Telescope(Instrument):
         self.env.timeout(1)
             A single simulation timestep
         """
-
         while self.has_observations_to_process():
             # Check if scheduler is delayed
-            if (self.scheduler.schedule_status is ScheduleStatus.DELAYED
+            self.events = []
+            if (
+                    self.scheduler.schedule_status is ScheduleStatus.DELAYED
                     and not self.delayed):
                 self.delayed = True
 
@@ -137,44 +133,35 @@ class Telescope(Instrument):
                 capacity = self.total_arrays - self.telescope_use
                 # IF there is an observation ready for start
                 if observation.is_ready(self.env.now, capacity):
-                    LOGGER.info(
-                        'Observation %s scheduled for %s',
-                        observation.name,
-                        self.env.now
-                    )
+                    LOGGER.info('Observation %s scheduled for %s',
+                                observation.name, self.env.now)
                     # Observation is ready - is the Buffer/Cluster?
-                    if self.scheduler.check_ingest_capacity(
-                            observation,
-                            self.pipelines,
-                            self.max_ingest
-                    ):
+                    if self.scheduler.check_ingest_capacity(observation,
+                                                            self.pipelines,
+                                                            self.max_ingest):
                         ret = self.begin_observation(observation)
                         observation.ast = self.env.now
-                        # self.env.process(
-                        #     self.planner.run(observation,self.buffer)
-                        # )
-                        # yield plan_trigger
-                        LOGGER.info(
-                            'telescope is now using %s arrays',
-                            self.telescope_use
-                        )
-                        process = self.env.process(
-                            self.scheduler.allocate_ingest(
-                                observation, self.pipelines, self.planner
-                            ))
 
-                elif observation.is_finished(
-                        self.env.now,
-                        self.telescope_status
-                ):
+                        LOGGER.info('telescope is now using %s arrays',
+                                    self.telescope_use)
+                        process = self.env.process(
+                            self.scheduler.allocate_ingest(observation,
+                                                           self.pipelines,
+                                                           self.planner))
+                        self._add_event(observation, "telescope", "started")
+
+                elif observation.is_finished(self.env.now,
+                                             self.telescope_status):
                     observation.status = self.finish_observation(observation)
-                    LOGGER.info(
-                        'Telescope is now using %s arrays', self.telescope_use
-                    )
+                    self._add_event(observation, "telescope", "finished")
+                    LOGGER.info('Telescope is now using %s arrays',
+                                self.telescope_use)
                 else:
                     continue
 
             yield self.env.timeout(1)
+
+        self.events = []
 
     def begin_observation(self, observation):
         """
@@ -217,7 +204,7 @@ class Telescope(Instrument):
 
         self.telescope_use -= observation.demand
 
-        if self.telescope_use is 0:
+        if self.telescope_use == 0:
             self.telescope_status = False
         return RunStatus.FINISHED
 
@@ -262,7 +249,8 @@ class Telescope(Instrument):
         Global DAG model - we reschedule based on current awareness of the
         cluster and the delays (with a buffer).
             This means we update our global plan, with the workflows
-            potentially being interleaved more effectively as a result of the delay.
+            potentially being interleaved more effectively as a result of the
+            delay.
 
         Then, based on this re-planning, we determine the delay %; if it's still
         over, we follow the greedy approach
@@ -273,25 +261,30 @@ class Telescope(Instrument):
         """
 
     def observations_waiting(self):
-        return sum(
-            [1 if x.status == RunStatus.WAITING
-             else 0
-             for x in self.observations]
-        )
+        """
+        Calculate the number of observations that are waiting for telescope time
+        Returns
+        -------
+
+        """
+        return sum([1 if x.status == RunStatus.WAITING else 0 for x in
+                    self.observations])
 
     def observations_finished(self):
-        return sum(
-            [1 if x.status == RunStatus.FINISHED
-             else 0
-             for x in self.observations]
-        )
+        """
+        Calculates the number of observations that are finished observing
+
+        Returns
+        -------
+        Integer number of finished observations
+        """
+        return sum([1 if x.status == RunStatus.FINISHED else 0 for x in
+                    self.observations])
 
     def print_state(self):
-        return {
-            'telescope_in_use': self.telescope_status,
-            'telescope_arrays_used': self.telescope_use,
-            'observations_waiting': self.observations_waiting()
-        }
+        return {'telescope_in_use': self.telescope_status,
+                'telescope_arrays_used': self.telescope_use,
+                'observations_waiting': self.observations_waiting()}
 
     def is_idle(self):
         """
@@ -304,10 +297,7 @@ class Telescope(Instrument):
         for observation in self.observations:
             if observation.status != RunStatus.FINISHED:
                 return False
-        if (
-                (not self.telescope_status)
-                and self.telescope_use == 0
-        ):
+        if ((not self.telescope_status) and self.telescope_use == 0):
             return True
         return False
 
@@ -316,15 +306,21 @@ class Telescope(Instrument):
         df['observations_waiting'] = [self.observations_waiting()]
         df['observations_finished'] = [self.observations_finished()]
         df['observations_delayed'] = [self._calc_observation_delay()]
-        df['telescope_status'] = [self.telescope_status]
-        df['delay_status'] = [self.delayed]
         return df
 
     def _calc_observation_delay(self):
         cum_delay = 0
         for observation in self.observations:
-            if self.env.now >= observation.est and (
-                    observation.status == RunStatus.WAITING
-            ):
+            if self.env.now > observation.est and (
+                    observation.status == RunStatus.WAITING):
                 cum_delay += self.env.now - observation.est
         return cum_delay
+
+    def _add_event(self, observation, resource, event):
+        self.events.append(
+            {
+                "time": int(self.env.now), "actor": "instrument",
+                "observation": observation.name, "event": event,
+                "resource": resource
+            }
+        )

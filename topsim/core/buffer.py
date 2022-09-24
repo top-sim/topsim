@@ -78,6 +78,7 @@ class Buffer:
         self.hot_count = len(self.hot)
         self.cold_count = len(self.cold)
         self.waiting_observation_list = []
+        self.events = []
 
     def run(self):
         """
@@ -93,6 +94,7 @@ class Buffer:
         A simpy.env.timeout() of duration topsim.common.globals.TIMESTEP
         """
         while True:
+            self.events = []
             if self.env.now % 1000 == 0:
                 LOGGER.debug(
                     "\nHotBuffer: %s \nColdBuffer: %s @ %d",
@@ -212,6 +214,7 @@ class Buffer:
         is not.
         """
         b = observation.buffer_id
+        self._add_event(observation, "buffer", "removed")
         return self.cold[b].remove(observation)
 
     def move_hot_to_cold(self, b):
@@ -261,6 +264,7 @@ class Buffer:
             self.hot[b].observations['stored'].append(current_obs)
             self.hot[b].observations['transfer'] = None
             return False
+        self._add_event(current_obs, "transfer", "started")
         while True:
             # data_transfer_time = observation_size / self.cold.max_data_rate
             #
@@ -270,6 +274,7 @@ class Buffer:
                 LOGGER.info(
                     "Buffer transfer completed at time %s", self.env.now
                 )
+                self._add_event(current_obs, "transfer", "stopped")
                 break
 
             check = self.cold[b].receive_observation(
@@ -311,6 +316,7 @@ class Buffer:
             raise RuntimeError(
                 "Observation must be marked RUNNING before ingest begins!"
             )
+        self._add_event(observation, "buffer", "added")
         while observation.status == RunStatus.RUNNING:
 
             self.hot[b].process_incoming_data_stream(
@@ -343,7 +349,7 @@ class Buffer:
             Dictionary comprising hot and cold buffer storage information
 
         """
-        if self.hot_count is 1 and self.cold_count is 1:
+        if self.hot_count == 1 and self.cold_count == 1:
             return {
                 'hotbuffer': {
                     'capacity': self.hot[0].current_capacity,
@@ -389,6 +395,15 @@ class Buffer:
         current_state = pd.DataFrame()
 
         return current_state
+
+    def _add_event(self, observation, resource, event):
+        self.events.append(
+            {
+                "time": int(self.env.now), "actor": "buffer",
+                "observation": str(observation.name), "event": str(event),
+                "resource": str(resource)
+            }
+        )
 
 
 class HotBuffer:
@@ -632,3 +647,4 @@ class ColdBuffer:
             self.observations['stored'].remove(observation)
             return True
         return False
+

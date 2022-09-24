@@ -34,7 +34,7 @@ class Planner:
     env : simpy.Environment
         Simulation environment object
 
-    cluster : :py:object:~topsim.core.cluster.Cluster
+    cluster : ~topsim.core.cluster.Cluster
         The cluster of the simulation; necessary to pass to static scheduling
         algorithms
 
@@ -86,8 +86,8 @@ class WorkflowPlan:
 
     """
 
-    def __init__(self,
-                 id, est, eft, tasks, exec_order,status, max_ingest,graph=None):
+    def __init__(self, id, est, eft, tasks, exec_order, status, max_ingest,
+                 graph=None):
         self.id = id
         self.est = est
         self.eft = eft
@@ -130,7 +130,6 @@ class WorkflowPlan:
 
         """
         return self.status == WorkflowStatus.FINISHED
-
 
     def get_task_successors(self, task_id):
         return self.graph.successors(task_id)

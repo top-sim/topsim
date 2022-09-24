@@ -29,7 +29,7 @@ class TestSimulationConfig(unittest.TestCase):
         # tel = Telescope(env, buffer_obj, config, planner)
         self.env = simpy.Environment()
         self.instrument = Telescope
-        self.timestamp = f'{cwd}/test/data/output/{0}'
+        self.timestamp = 0
 
     def testBasicConfig(self):
         simulation = Simulation(
@@ -57,7 +57,6 @@ class TestSimulationFileOptions(unittest.TestCase):
         # os.remove(f'{output}-tasks.pkl')
 
     def test_simulation_produces_file(self):
-        ts = f'{datetime.datetime(2021,1,1).strftime("%y_%m_%d_%H_%M_%S")}'
         simulation = Simulation(
             self.env,
             CONFIG,
@@ -66,7 +65,7 @@ class TestSimulationFileOptions(unittest.TestCase):
             planning_algorithm='heft',
             scheduling=DynamicAlgorithmFromPlan(),
             delay=None,
-            timestamp=ts,
+            timestamp=0,
             to_file=True,
             hdf5_path=self.output
         )
@@ -76,7 +75,7 @@ class TestSimulationFileOptions(unittest.TestCase):
 
         store = pd.HDFStore(self.output)
 
-        store[f'd{ts}/standard_simulation/sim']
+        # store[f'{s}/standard_simulation/sim']
 
     # def
 
@@ -94,7 +93,7 @@ class TestSimulationBatchProcessing(unittest.TestCase):
             planning_algorithm='batch',
             scheduling=BatchProcessing(),
             delay=None,
-            timestamp=f'{cwd}/test/data/output/{0}'
+            timestamp=0
         )
         sim, task = simulation.start()
         self.assertGreater(len(sim), 0)

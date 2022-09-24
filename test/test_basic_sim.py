@@ -48,7 +48,7 @@ class TestBasicIngest(unittest.TestCase):
             planning_model=SHADOWPlanning('heft'),
             scheduling=DynamicAlgorithmFromPlan(),
             delay=None,
-            timestamp=SIM_TIMESTAMP
+            timestamp=0
         )
 
     # def tearDown(self):

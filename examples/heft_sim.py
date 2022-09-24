@@ -45,12 +45,13 @@ simulation = Simulation(
     env=env,
     config=CONFIG,
     instrument=instrument,
-    planning_algorithm='fcfs',
-    planning_model=SHADOWPlanning('fcfs'),
+    planning_algorithm='heft',
+    planning_model=SHADOWPlanning('heft'),
     scheduling=DynamicAlgorithmFromPlan(),
     delay=None,
-    timestamp='heft_sim',
-    to_file=False
+    timestamp=None,
+    to_file=True,
+    hdf5_path='heft_results.hdf5'
 )
 
 simulation.start()

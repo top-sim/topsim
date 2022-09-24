@@ -6,6 +6,7 @@ import json
 
 import pandas as pd
 
+from pathlib import Path
 from topsim.core.config import Config
 from topsim.core.monitor import Monitor
 from topsim.core.scheduler import Scheduler
@@ -51,7 +52,7 @@ class Simulation:
     delay: :py:obj:`~topsim.core.delay.DelayModel`,  optional
          for the simulation.
 
-    timestamp: str, optional
+    timestamp: float, optional
         Optional Simulation start-time; this is useful for testing, to ensure we
         name the file and the tests match up. Also useful if you do not want to
         use the time of the simulation as the name.
@@ -109,13 +110,13 @@ class Simulation:
 
     Running a simulation to completion:
 
-    >>> df = simulation.run()
+    >>> simulation.run()
 
     Running a simulation for a specific time period, then resuming:
 
-    >>> df = simulation.run(runtime=100)
+    >>> simulation.run(runtime=100)
     >>> ### Check current status of simulatiion
-    >>> df = simulation.resume(until=150)
+    >>> simulation.resume(until=150)
 
     Raises
     ------
@@ -139,17 +140,23 @@ class Simulation:
         #: :py:obj:`simpy.Environment` object
         self.env = env
 
-        if timestamp:
-            #: :py:obj:`~topsim.core.monitor.Monitor` instance
+        # if timestamp:
+        #     #: :py:obj:`~topsim.core.monitor.Monitor` instance
+        #     self.monitor = Monitor(self, timestamp)
+        #     self._timestamp = timestamp
+        # else:
+        #     sim_start_time = f'{time.time()}'.split('.')[0]
+        #     self._timestamp = sim_start_time
+        #     self.monitor = Monitor(self, sim_start_time)
+        if timestamp is not None:
             self.monitor = Monitor(self, timestamp)
-            self._timestamp = timestamp
+            self._timestamp = datetime.datetime.fromtimestamp(timestamp)
         else:
-            sim_start_time = f'{time.time()}'.split('.')[0]
-            self._timestamp = sim_start_time
-            self.monitor = Monitor(self, sim_start_time)
+            self._timestamp = datetime.datetime.now()
+            self.monitor = Monitor(self, self._timestamp)
         # Process necessary config files
 
-        self._cfg_path = config  #: Configuration path
+        self._cfg_path = Path(config) #: Configuration path
 
         # Initiaise Actor and Resource objects
         self._cfg = Config(config)
@@ -196,7 +203,7 @@ class Simulation:
                     'Check pandas.HDFStore documentation for valid file path'
             ):
                 raise
-        elif self.to_file and not hdf5_path:
+        elif self.to_file and hdf5_path is None:
             raise ValueError(
                 'Attempted to initialise Simulation object that outputs'
                 'to file without providing file path'
@@ -264,13 +271,15 @@ class Simulation:
             while not self.is_finished():
                 self.env.run(self.env.now + 1)
             # self.env.run(self.env.now + 1)
-        LOGGER.info("Simulation Finished @ %s", self.env.now)
 
+        LOGGER.info("Simulation Finished @ %s", self.env.now)
+        self.monitor.collate_events()
         if self.to_file and self._hdf5_store is not None:
             global_df = self.monitor.df
+            summary_df = self.monitor.events
             task_df = self._generate_final_task_data()
             self._hdf5_store.open()
-            self._compose_hdf5_output(global_df, task_df)
+            self._compose_hdf5_output(global_df, task_df, summary_df)
             self._hdf5_store.close()
 
         else:
@@ -328,6 +337,21 @@ class Simulation:
             return True
         return False
 
+    def summary(self):
+        """
+        Produce a formatted summary of events that occured during simulation
+
+        Returns
+        -------
+        df
+        """
+
+        events = self.monitor.events
+        finish = max(events['timestep'],0)
+
+
+
+
     @staticmethod
     def _split_monolithic_config(self, json):
         return json
@@ -343,14 +367,14 @@ class Simulation:
         df = self.cluster.finished_task_time_data()
         df = df.T
         size = len(df)
-        df['scheduling'] = [self.planner.model.algorithm for x in range(size)]
+        df['scheduling'] = [str(self.planner.model.algorithm) for x in range(size)]
         df['planning'] = [
-            repr(self.scheduler.algorithm) for x in range(size)
+            str(self.scheduler.algorithm) for x in range(size)
         ]
-        df['config'] = [self._cfg_path for x in range(size)]
-        return df
+        df['config'] = [str(self._cfg_path) for x in range(size)]
+        return df.infer_objects()
 
-    def _compose_hdf5_output(self, global_df, tasks_df):
+    def _compose_hdf5_output(self, global_df, tasks_df, summary_df):
         """
         Given a :py:obj:`pandas.HDFStore()` object, put global simulation,
         task specific, and configuration data into HDF5 storage files.
@@ -365,19 +389,20 @@ class Simulation:
 
         """
         if self._timestamp:
-            ts = f'd{self._timestamp}'
+            ts = f'{self._timestamp}'
         else:
-            ts = f'd{datetime.datetime.today().strftime("%y_%m_%d_%H_%M_%S")}'
+            ts = f'{datetime.datetime.today().strftime("%y_%m_%d_%H_%M_%S")}'
 
-        workflows = self._create_config_table(self._cfg_path)
+        ts = self._timestamp.strftime("%a%y%m%d%H%M%S")
 
         sanitised_path = self._cfg_path.name.replace(".json", '').split('/')[-1]
         final_key = f'{ts}/{self._delimiters}/{sanitised_path}'
+        global_df = global_df.fillna(0)
         self._hdf5_store.put(key=f"{final_key}/sim", value=global_df)
         self._hdf5_store.put(key=f'{final_key}/tasks',
                              value=tasks_df)
-        self._hdf5_store.put(key=f'{final_key}/config',
-                             value=workflows)
+        self._hdf5_store.put(key=f'{final_key}/summary',
+                             value=summary_df)
 
         return self._hdf5_store
 
@@ -411,30 +436,3 @@ class Simulation:
         jstr = json.dumps(jdict)  # , indent=2)
         return jstr
 
-    def _create_config_table(self, path):
-        """
-        From the simulation config files, find the paths for each observation
-        workflow and produce a table of this information
-
-        Parameters
-        ----------
-        path
-
-        Returns
-        -------
-
-        """
-
-        cfg_str = self._stringify_json_data(path, relative=False)
-        jdict = json.loads(cfg_str)
-        pipelines = jdict['instrument']['telescope']['pipelines']
-        ds = [['simulation_config', path, cfg_str]]
-        for observation in pipelines:
-            p = pipelines[observation]['workflow']
-            p = p.replace('publications', 'archived_results')
-            wf_str = self._stringify_json_data(p)
-            tpl = [f'{observation}', p, wf_str]
-            ds.append(tpl)
-
-        df = pd.DataFrame(ds, columns=['entity', 'config_path', 'config_json'])
-        return df
