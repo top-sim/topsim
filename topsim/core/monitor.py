@@ -79,13 +79,14 @@ class Monitor(object):
 
         """
         if self.simulation.instrument.events:
-            self.events = self.events.append(self.simulation.instrument.events,
-                                         ignore_index=True)
+            self.events = pd.concat([self.events,
+                                    pd.DataFrame(self.simulation.instrument.events)])
+
         if self.simulation.scheduler.events:
-            self.events = self.events.append(self.simulation.scheduler.events,
-                                         ignore_index=True)
+            self.events = pd.concat([self.events,
+                                    pd.DataFrame(self.simulation.scheduler.events)])
         if self.simulation.buffer.events:
-            self.events = self.events.append(self.simulation.buffer.events,
-                                         ignore_index=True)
+            self.events = pd.concat([self.events,
+                                    pd.DataFrame(self.simulation.buffer.events)])
 
         self.events = self.events.infer_objects()

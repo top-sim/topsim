@@ -53,6 +53,7 @@ class TestSimulationFileOptions(unittest.TestCase):
 
     def tearDown(self):
         output = f'test/data/output/hdf5.h5'
+        os.remove(output)
         # os.remove(f'{output}')
         # os.remove(f'{output}-tasks.pkl')
 
@@ -74,6 +75,7 @@ class TestSimulationFileOptions(unittest.TestCase):
         self.assertTrue(os.path.exists(self.output))
 
         store = pd.HDFStore(self.output)
+        store.close()
 
         # store[f'{s}/standard_simulation/sim']
 
