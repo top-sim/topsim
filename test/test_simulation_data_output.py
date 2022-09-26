@@ -17,6 +17,7 @@ import os
 import unittest
 import simpy
 import h5py
+import datetime
 import pandas as pd
 
 from pathlib import Path
@@ -99,8 +100,10 @@ class TestMonitorPandasPickle(unittest.TestCase):
         self.assertTrue(
             os.path.exists('test/simulation_data/test_hdf5.h5')
         )
-        heft_key = '/Thu700101080000/heft/heft_single_observation_simulation/sim/'
-        fcfs_key = '/Thu700101080000/fcfs/heft_single_observation_simulation/sim/'
+        # Necessary to get local datetime, so it passes tests everywhere
+        timestamp = datetime.datetime.fromtimestamp(0).strftime('%a%y%m%d%H%M%S')
+        heft_key = f'/{timestamp}/heft/heft_single_observation_simulation/sim/'
+        fcfs_key = f'/{timestamp}/fcfs/heft_single_observation_simulation/sim/'
         f = h5py.File('test/simulation_data/test_hdf5.h5')
         def printname(name):
             print(name)
