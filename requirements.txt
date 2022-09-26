@@ -11,3 +11,4 @@ bokeh>=1.4
 nbserverproxy
 tables >= 3.7
 tqdm
+h5py
