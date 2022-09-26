@@ -16,7 +16,7 @@
 import os
 import unittest
 import simpy
-
+import h5py
 import pandas as pd
 
 from pathlib import Path
@@ -101,6 +101,10 @@ class TestMonitorPandasPickle(unittest.TestCase):
         )
         heft_key = '/Thu700101080000/heft/heft_single_observation_simulation/sim/'
         fcfs_key = '/Thu700101080000/fcfs/heft_single_observation_simulation/sim/'
+        f = h5py.File('test/simulation_data/test_hdf5.h5')
+        def printname(name):
+            print(name)
+        f.visit(printname)
         heft_sim = pd.read_hdf(
             'test/simulation_data/test_hdf5.h5', key=heft_key
         )
