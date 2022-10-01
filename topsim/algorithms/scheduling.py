@@ -6,7 +6,7 @@ Algorithm presents the abstract base class for any Scheduling algorithm.
 from abc import ABC, abstractmethod
 
 
-class Algorithm(ABC):
+class Scheduling(ABC):
     """
     Abstract base class for all Scheduling Algorithms (used in the dynamic
     allocation by the 'scheduler').

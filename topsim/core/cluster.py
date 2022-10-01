@@ -194,12 +194,15 @@ class Cluster:
         for i, machine in enumerate(temp_ingest_resources):
             pairs.append((machine, tasks[i]))
 
+        # TODO UPDATE HOW WE ALLOCATE TASKS TO RESOURCES HERE SO WE DON'T GENERATE SAME PAIRS
         self._clusters[c]['ingest']['status'] = True
         self._clusters[c]['ingest']['demand'] = demand
         id = observation.name
         while True:
             for pair in pairs:
                 (machine, task) = pair
+                self._clusters[c]['resources']['ingest'].append(machine)
+                self._clusters[c]['resources']['available'].remove(machine)
                 ret = self.env.process(
                     self.allocate_task_to_cluster(task, machine, observation=id,
                                                   ingest=True))
@@ -259,12 +262,13 @@ class Cluster:
 
         while True:
             if task not in self._clusters[c]['tasks']['running']:
+                # THIS CHECK DOESN"T WORK FIX IT SOMEHOW
                 if (machine not in self._clusters[c]['resources'][
-                    'available'] and machine not in
+                    'available'] and (machine not in
                         self._clusters[c]['resources'][
                             'ingest'] and machine not in
                         self.get_idle_resources(
-                            observation)):
+                            observation))):
                     raise RuntimeError
                 if ingest:
                     # Ingest resources allocated separately from scheduler
@@ -272,8 +276,8 @@ class Cluster:
                     # self._set_machine_occupied(ingest=True)
                     self._clusters[c]['tasks']['running'].append(task)
                     self._clusters[c]['tasks']['finished'][task] = False
-                    self._clusters[c]['resources']['ingest'].append(machine)
-                    self._clusters[c]['resources']['available'].remove(machine)
+                    # self._clusters[c]['resources']['ingest'].append(machine)
+                    # self._clusters[c]['resources']['available'].remove(machine)
                     self._clusters[c]['usage_data']['available'] -= 1
                     self._clusters[c]['usage_data']['running_tasks'] += 1
                     self._clusters[c]['usage_data']['ingest'] += 1

@@ -25,7 +25,7 @@ namely, the original HEFT workflow from Topcuoglu 2000.
 import simpy
 import logging
 
-from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicSchedulingFromPlan
 from topsim.user.plan.static_planning import SHADOWPlanning
 from topsim.user.telescope import Telescope
 from topsim.core.simulation import Simulation
@@ -37,7 +37,7 @@ LOGGER = logging.getLogger(__name__)
 CONFIG = 'examples/heft_single_observation_simulation.json'
 env = simpy.Environment()
 planning_algorithm = 'heft'
-scheduling_algorithm = DynamicAlgorithmFromPlan
+scheduling_algorithm = DynamicSchedulingFromPlan
 instrument = Telescope
 dm = DelayModel(0.5, 'normal', DelayModel.DelayDegree.LOW)
 
@@ -47,7 +47,7 @@ simulation = Simulation(
     instrument=instrument,
     planning_algorithm='heft',
     planning_model=SHADOWPlanning('heft'),
-    scheduling=DynamicAlgorithmFromPlan(),
+    scheduling=DynamicSchedulingFromPlan(),
     delay=None,
     timestamp=None,
     to_file=True,

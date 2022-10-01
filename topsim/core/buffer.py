@@ -104,11 +104,12 @@ class Buffer:
                 )
             for b in self.hot:
                 if self.hot[b].has_waiting_observations():
-                    if self.cold[b].has_capacity(
-                            self.hot[b].observations['stored'][
-                                0].total_data_size
-                    ):
-                        self.env.process(self.move_hot_to_cold(b))
+                    for o in self.hot[b].observations['stored']:
+                        if self.cold[b].has_capacity(
+                                self.hot[b].observations['stored'][
+                                    0].total_data_size
+                        ):
+                            self.env.process(self.move_hot_to_cold(b))
             yield self.env.timeout(TIMESTEP)
 
     def check_buffer_capacity(self, observation):

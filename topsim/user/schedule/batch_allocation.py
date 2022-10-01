@@ -19,12 +19,12 @@ import networkx as nx
 
 from topsim.core.task import TaskStatus
 from topsim.core.planner import WorkflowStatus
-from topsim.algorithms.scheduling import Algorithm
+from topsim.algorithms.scheduling import Scheduling
 
 logger = logging.getLogger(__name__)
 
 
-class BatchProcessing(Algorithm):
+class BatchProcessing(Scheduling):
     """
     Dynamic schedule for a workflowplan that is using a batch-processing
     resource reservation approach without generating a static schedule.

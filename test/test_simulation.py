@@ -7,7 +7,7 @@ import pandas as pd
 from pathlib import Path
 
 from topsim.core.simulation import Simulation
-from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicSchedulingFromPlan
 from topsim.user.schedule.batch_allocation import BatchProcessing
 from topsim.user.plan.static_planning import SHADOWPlanning
 from topsim.user.plan.batch_planning import BatchPlanning
@@ -38,7 +38,7 @@ class TestSimulationConfig(unittest.TestCase):
             self.instrument,
             planning_model=SHADOWPlanning('heft'),
             planning_algorithm='heft',
-            scheduling=DynamicAlgorithmFromPlan(),
+            scheduling=DynamicSchedulingFromPlan(),
             timestamp=self.timestamp
         )
         self.assertTrue(36, simulation.instrument.total_arrays)
@@ -64,7 +64,7 @@ class TestSimulationFileOptions(unittest.TestCase):
             Telescope,
             planning_model=SHADOWPlanning('heft'),
             planning_algorithm='heft',
-            scheduling=DynamicAlgorithmFromPlan(),
+            scheduling=DynamicSchedulingFromPlan(),
             delay=None,
             timestamp=0,
             to_file=True,

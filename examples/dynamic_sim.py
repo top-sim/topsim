@@ -37,30 +37,18 @@ scheduling_algorithm = BatchProcessing
 instrument = Telescope
 dm = DelayModel(0.5, 'normal', DelayModel.DelayDegree.LOW)
 
-simulation = Simulation(
-    env=env,
-    config=CONFIG,
-    instrument=instrument,
+simulation = Simulation(env=env, config=CONFIG, instrument=instrument,
     planning_algorithm=planning_algorithm,
     planning_model=BatchPlanning('batch'),
-    scheduling=BatchProcessing(min_resources_per_workflow=1,resource_split={'emu':(1,3)}),
-    delay=None,
-    timestamp='heft_sim',
-    to_file=False
-)
+    scheduling=BatchProcessing(min_resources_per_workflow=1,
+        resource_split={'emu': (1, 3)}), delay=None, timestamp=None,
+    to_file=False)
 
 simulation.start()
 
 env = simpy.Environment()
-simulation = Simulation(
-    env=env,
-    config=CONFIG,
-    instrument=instrument,
+simulation = Simulation(env=env, config=CONFIG, instrument=instrument,
     planning_algorithm=planning_algorithm,
-    planning_model=BatchPlanning('batch'),
-    scheduling=BatchProcessing(),
-    delay=None,
-    timestamp='heft_sim',
-    to_file=False
-)
+    planning_model=BatchPlanning('batch'), scheduling=BatchProcessing(),
+    delay=None, timestamp='heft_sim', to_file=False)
 simulation.start()

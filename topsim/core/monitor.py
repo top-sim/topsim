@@ -38,6 +38,8 @@ class Monitor(object):
             self.collate_events()
             yield self.env.timeout(1)
 
+    import h5py
+
     def collate_actor_dataframes(self):
         """
         Take information on a per-timestep basis from each Actor and collate
