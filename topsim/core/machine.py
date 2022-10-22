@@ -24,13 +24,13 @@ class Machine(object):
         self.transfer_flag = False
         self.current_task = None
 
-    def run(self, task, env):
+    def run(self, task, env, predecessor_allocations):
         # return True
         while True:
             if task.task_status is TaskStatus.SCHEDULED:
                 self.run_task(task)
                 ret = None
-                ret = yield env.process(task.do_work(env))
+                ret = env.process(task.do_work(env,self,predecessor_allocations))
                 self.stop_task(task)
                 return ret
 

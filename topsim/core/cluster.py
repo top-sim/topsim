@@ -282,8 +282,9 @@ class Cluster:
                     self._clusters[c]['usage_data']['running_tasks'] += 1
                     self._clusters[c]['usage_data']['ingest'] += 1
                     task.task_status = TaskStatus.SCHEDULED
-                    ret = self.env.process(task.do_work(self.env, machine,
-                                                        predecessor_allocations))
+                    # ret = self.env.process(task.do_work(self.env, machine,
+                    #                                     predecessor_allocations))
+                    ret = machine.run(task, self.env, predecessor_allocations)
                 else:
                     # self.clusters[c]['resources']['available'].remove(machine)
                     # self.clusters[c]['resources']['occupied'].append(machine)

@@ -447,10 +447,10 @@ class Scheduler:
         Return a list of machines that the current tasks' predecessors were
         allocated to.
 
-        The purpose of this is to provide this to the task when calculating
-        its duration; communication time of data from tasks on other
-        machines will be non-negligible and this must be completed in full
-        before the task can begin executing.
+        This is necessary for the Task when determining its duration;
+        communication time of data from tasks on other machines will
+        be non-negligible and this must be completed in full
+        before the task can start.
 
         Parameters
         ----------
