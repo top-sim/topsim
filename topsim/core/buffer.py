@@ -394,6 +394,12 @@ class Buffer:
             A DataFrame (1xn) table of the current state of the Buffers.
         """
         current_state = pd.DataFrame()
+        current_state['hot_buffer'] = [self.hot[0].current_capacity]
+        current_state['cold_buffer'] = [self.cold[0].current_capacity]
+        current_state['stored'] = [
+            len(self.cold[0].observations['stored'])
+            + len(self.hot[0].observations['stored'])
+        ]
 
         return current_state
 
