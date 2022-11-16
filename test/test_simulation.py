@@ -7,7 +7,7 @@ import pandas as pd
 from pathlib import Path
 
 from topsim.core.simulation import Simulation
-from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicSchedulingFromPlan
 from topsim.user.schedule.batch_allocation import BatchProcessing
 from topsim.user.plan.static_planning import SHADOWPlanning
 from topsim.user.plan.batch_planning import BatchPlanning
@@ -29,7 +29,7 @@ class TestSimulationConfig(unittest.TestCase):
         # tel = Telescope(env, buffer_obj, config, planner)
         self.env = simpy.Environment()
         self.instrument = Telescope
-        self.timestamp = f'{cwd}/test/data/output/{0}'
+        self.timestamp = 0
 
     def testBasicConfig(self):
         simulation = Simulation(
@@ -38,7 +38,7 @@ class TestSimulationConfig(unittest.TestCase):
             self.instrument,
             planning_model=SHADOWPlanning('heft'),
             planning_algorithm='heft',
-            scheduling=DynamicAlgorithmFromPlan(),
+            scheduling=DynamicSchedulingFromPlan(),
             timestamp=self.timestamp
         )
         self.assertTrue(36, simulation.instrument.total_arrays)
@@ -53,20 +53,20 @@ class TestSimulationFileOptions(unittest.TestCase):
 
     def tearDown(self):
         output = f'test/data/output/hdf5.h5'
+        os.remove(output)
         # os.remove(f'{output}')
         # os.remove(f'{output}-tasks.pkl')
 
     def test_simulation_produces_file(self):
-        ts = f'{datetime.datetime(2021,1,1).strftime("%y_%m_%d_%H_%M_%S")}'
         simulation = Simulation(
             self.env,
             CONFIG,
             Telescope,
             planning_model=SHADOWPlanning('heft'),
             planning_algorithm='heft',
-            scheduling=DynamicAlgorithmFromPlan(),
+            scheduling=DynamicSchedulingFromPlan(),
             delay=None,
-            timestamp=ts,
+            timestamp=0,
             to_file=True,
             hdf5_path=self.output
         )
@@ -75,8 +75,9 @@ class TestSimulationFileOptions(unittest.TestCase):
         self.assertTrue(os.path.exists(self.output))
 
         store = pd.HDFStore(self.output)
+        store.close()
 
-        store[f'd{ts}/standard_simulation/sim']
+        # store[f'{s}/standard_simulation/sim']
 
     # def
 
@@ -94,7 +95,7 @@ class TestSimulationBatchProcessing(unittest.TestCase):
             planning_algorithm='batch',
             scheduling=BatchProcessing(),
             delay=None,
-            timestamp=f'{cwd}/test/data/output/{0}'
+            timestamp=0
         )
         sim, task = simulation.start()
         self.assertGreater(len(sim), 0)

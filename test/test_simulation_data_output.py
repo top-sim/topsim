@@ -16,12 +16,12 @@
 import os
 import unittest
 import simpy
-
+import datetime
 import pandas as pd
 
 from pathlib import Path
 from topsim.core.simulation import Simulation
-from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicSchedulingFromPlan
 from topsim.user.telescope import Telescope
 from topsim.user.plan.static_planning import SHADOWPlanning
 
@@ -47,9 +47,9 @@ class TestMonitorPandasPickle(unittest.TestCase):
             instrument=self.instrument,
             planning_algorithm='heft',
             planning_model=SHADOWPlanning('heft'),
-            scheduling=DynamicAlgorithmFromPlan(),
+            scheduling=DynamicSchedulingFromPlan(),
             delay=None,
-            timestamp='unittest',
+            timestamp=0,
             to_file=True,
             hdf5_path=Path('test/simulation_data/test_hdf5.h5'),
             delimiters=f'test/'
@@ -88,9 +88,9 @@ class TestMonitorPandasPickle(unittest.TestCase):
                 self.instrument,
                 planning_algorithm=algorithm,
                 planning_model=SHADOWPlanning(algorithm),
-                scheduling=DynamicAlgorithmFromPlan(),
+                scheduling=DynamicSchedulingFromPlan(),
                 delay=None,
-                timestamp='unittest',
+                timestamp=0,
                 hdf5_path='test/simulation_data/test_hdf5.h5',
                 to_file=True,
                 delimiters=f'{algorithm}'
@@ -99,8 +99,10 @@ class TestMonitorPandasPickle(unittest.TestCase):
         self.assertTrue(
             os.path.exists('test/simulation_data/test_hdf5.h5')
         )
-        heft_key = '/dunittest/heft/heft_single_observation_simulation/sim/'
-        fcfs_key = '/dunittest/fcfs/heft_single_observation_simulation/sim/'
+        # Necessary to get local datetime, so it passes tests everywhere
+        timestamp = datetime.datetime.fromtimestamp(0).strftime('%a%y%m%d%H%M%S')
+        heft_key = f'/{timestamp}/heft/heft_single_observation_simulation/sim/'
+        fcfs_key = f'/{timestamp}/fcfs/heft_single_observation_simulation/sim/'
         heft_sim = pd.read_hdf(
             'test/simulation_data/test_hdf5.h5', key=heft_key
         )
@@ -128,7 +130,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
             self.instrument,
             planning_algorithm='heft',
             planning_model=SHADOWPlanning('heft'),
-            scheduling=DynamicAlgorithmFromPlan(),
+            scheduling=DynamicSchedulingFromPlan(),
             delay=None,
             timestamp=None,
         )
@@ -141,7 +143,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
             self.instrument,
             planning_algorithm='fcfs',
             planning_model=SHADOWPlanning('fcfs'),
-            scheduling=DynamicAlgorithmFromPlan(),
+            scheduling=DynamicSchedulingFromPlan(),
             delay=None,
             timestamp=None,
             # delimiters=f'test/{algorithm}'

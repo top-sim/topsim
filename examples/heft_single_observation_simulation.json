@@ -13,7 +13,7 @@
 				{
 					"name": "emu",
 					"start": 0,
-					"duration": 1,
+					"duration": 20,
 					"instrument_demand": 36,
 					"data_product_rate": 1
 				}
@@ -43,11 +43,11 @@
 	},
 	"buffer": {
 		"hot": {
-			"capacity": 2,
+			"capacity": 30,
 			"max_ingest_rate": 1
 		},
 		"cold": {
-			"capacity": 2,
+			"capacity": 30,
 			"max_data_rate": 1
 		}
 	},

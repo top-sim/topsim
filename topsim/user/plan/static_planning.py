@@ -149,11 +149,11 @@ class SHADOWPlanning(Planning):
             additional information.
         """
 
-        if self.algorithm is 'heft':
+        if self.algorithm == 'heft':
             solution = heft(workflow)
-        elif self.algorithm is 'pheft':
+        elif self.algorithm == 'pheft':
             solution = pheft(workflow)
-        elif self.algorithm is 'fcfs':
+        elif self.algorithm == 'fcfs':
             solution = fcfs(workflow)
         else:
             raise RuntimeError(

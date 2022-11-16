@@ -16,14 +16,14 @@ import copy
 import logging
 import pandas as pd
 
-from topsim.algorithms.scheduling import Algorithm
+from topsim.algorithms.scheduling import Scheduling
 from topsim.core.planner import WorkflowStatus
 from topsim.core.task import TaskStatus
 
 logger = logging.getLogger(__name__)
 
 
-class DynamicAlgorithmFromPlan(Algorithm):
+class DynamicSchedulingFromPlan(Scheduling):
     """
     This plan
     """
@@ -118,7 +118,7 @@ class DynamicAlgorithmFromPlan(Algorithm):
         return self.cluster.is_occupied(machine)
 
 
-class GlobalDagDelayHeuristic(Algorithm):
+class GlobalDagDelayHeuristic(Scheduling):
     """
     Implementation of the bespoke Delay heuristic I have been working on
     """

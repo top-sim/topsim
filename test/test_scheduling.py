@@ -29,7 +29,7 @@ from topsim.user.telescope import Telescope
 from topsim.user.plan.batch_planning import BatchPlanning
 from topsim.user.schedule.batch_allocation import BatchProcessing
 
-from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicSchedulingFromPlan
 
 CONFIG = "test/data/config/standard_simulation.json"
 
@@ -37,7 +37,7 @@ CONFIG = "test/data/config/standard_simulation.json"
 class TestFifoAlgorithm(unittest.TestCase):
 
     def setUp(self):
-        self.algorithm = DynamicAlgorithmFromPlan()
+        self.algorithm = DynamicSchedulingFromPlan()
         # TODO setup a workflow
         self.workflow = None
 
@@ -60,7 +60,7 @@ class TestBatchSchedulerAllocation(unittest.TestCase):
         self.cluster = Cluster(self.env, config=config)
         self.buffer = Buffer(self.env, self.cluster, config)
         self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, DynamicAlgorithmFromPlan()
+            self.env, self.buffer, self.cluster, DynamicSchedulingFromPlan()
         )
         self.algorithm = BatchProcessing()
         self.model = BatchPlanning('batch')

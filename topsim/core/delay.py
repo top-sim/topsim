@@ -129,9 +129,9 @@ class DelayModel:
         mu = runtime
         sigma = self.degree.value * mu
 
-        if self.dist is "normal":
+        if self.dist == "normal":
             s = default_rng(self.seed).normal(mu, sigma, n)
-        elif self.dist is "poisson":
+        elif self.dist == "poisson":
             s = default_rng().poisson(mu, int(runtime / self.degree))
         else:
             s = default_rng().uniform()

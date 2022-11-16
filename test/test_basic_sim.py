@@ -23,7 +23,7 @@ import simpy
 from topsim.core.simulation import Simulation
 from topsim.core.instrument import RunStatus
 
-from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicSchedulingFromPlan
 from topsim.user.telescope import Telescope
 from topsim.user.plan.static_planning import SHADOWPlanning
 
@@ -46,9 +46,9 @@ class TestBasicIngest(unittest.TestCase):
             Telescope,
             planning_algorithm='heft',
             planning_model=SHADOWPlanning('heft'),
-            scheduling=DynamicAlgorithmFromPlan(),
+            scheduling=DynamicSchedulingFromPlan(),
             delay=None,
-            timestamp=SIM_TIMESTAMP
+            timestamp=0
         )
 
     # def tearDown(self):

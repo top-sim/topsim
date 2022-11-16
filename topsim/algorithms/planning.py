@@ -52,7 +52,7 @@ class Planning(ABC):
         Build a WorkflowPlan object storing
         Returns
         -------
-        plan : core.topsim.planner.WorkflowPlan
+            plan : core.topsim.planner.WorksplatflowPlan
             WorkflowPlan object
         """
         pass

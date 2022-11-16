@@ -42,8 +42,8 @@ from topsim.core.delay import DelayModel
 from topsim.core.task import Task
 
 from topsim.user.telescope import Telescope
-from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
-from topsim.user.schedule.greedy import GreedyAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicSchedulingFromPlan
+from topsim.user.schedule.greedy import GreedySchedulingFromPlan
 from topsim.user.plan.static_planning import SHADOWPlanning
 
 logging.basicConfig(level="WARNING")
@@ -73,7 +73,7 @@ class TestSchedulerIngest(unittest.TestCase):
         self.cluster = Cluster(self.env, config)
         self.buffer = Buffer(self.env, self.cluster, config)
         self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, DynamicAlgorithmFromPlan
+            self.env, self.buffer, self.cluster, DynamicSchedulingFromPlan
         )
         self.planner = Planner(self.env,
                                self.cluster, SHADOWPlanning('heft'))
@@ -155,7 +155,7 @@ class TestSchedulerDynamicPlanAllocation(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
-        sched_algorithm = DynamicAlgorithmFromPlan()
+        sched_algorithm = DynamicSchedulingFromPlan()
         config = Config(HEFT_CONFIG)
         self.cluster = Cluster(self.env, config)
         self.planner = Planner(self.env,
@@ -240,7 +240,7 @@ class TestSchedulerEdgeCases(unittest.TestCase):
         """
         self.env = simpy.Environment()
         config = Config(CONFIG)
-        sched_algorithm = DynamicAlgorithmFromPlan()
+        sched_algorithm = DynamicSchedulingFromPlan()
 
         self.cluster = Cluster(env=self.env, config=config)
         self.telescope = Telescope(
@@ -278,7 +278,7 @@ class TestSchedulerLongWorkflow(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
-        sched_algorithm = DynamicAlgorithmFromPlan()
+        sched_algorithm = DynamicSchedulingFromPlan()
         config = Config(LONG_CONFIG)
         self.cluster = Cluster(self.env, config)
         planning_model = SHADOWPlanning(algorithm='heft')
@@ -309,7 +309,7 @@ class TestSchedulerDynamicReAllocation(unittest.TestCase):
 
     def setUp(self) -> None:
         self.env = simpy.Environment()
-        sched_algorithm = GreedyAlgorithmFromPlan()
+        sched_algorithm = GreedySchedulingFromPlan()
         config = Config(LONG_CONFIG)
         self.cluster = Cluster(self.env, config)
         self.planner = Planner(self.env,
@@ -345,7 +345,7 @@ class TestSchedulerIntegration(unittest.TestCase):
                                self.cluster, SHADOWPlanning('heft'))
 
         self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, DynamicAlgorithmFromPlan()
+            self.env, self.buffer, self.cluster, DynamicSchedulingFromPlan()
         )
         self.telescope = Telescope(
             self.env, config, self.planner, self.scheduler
@@ -405,7 +405,7 @@ class TestSchedulerDelayHelpers(unittest.TestCase):
         )
 
         self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, DynamicAlgorithmFromPlan()
+            self.env, self.buffer, self.cluster, DynamicSchedulingFromPlan()
         )
         self.telescope = Telescope(
             self.env, config, self.planner, self.scheduler

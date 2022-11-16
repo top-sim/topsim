@@ -23,7 +23,7 @@ from topsim.core.buffer import Buffer
 from topsim.core.instrument import Observation
 from topsim.core.delay import DelayModel
 from topsim.user.telescope import Telescope
-from topsim.user.schedule.dynamic_plan import DynamicAlgorithmFromPlan
+from topsim.user.schedule.dynamic_plan import DynamicSchedulingFromPlan
 from topsim.user.plan.static_planning import SHADOWPlanning
 from topsim.user.plan.batch_planning import BatchPlanning
 
@@ -135,7 +135,7 @@ class TestPlannerDelay(unittest.TestCase):
 
     def setUp(self):
         self.env = simpy.Environment()
-        sched_algorithm = DynamicAlgorithmFromPlan()
+        sched_algorithm = DynamicSchedulingFromPlan()
         config = Config(HEFT_CONFIG)
         dm = DelayModel(0.1, "normal")
         self.model = SHADOWPlanning('heft', dm)

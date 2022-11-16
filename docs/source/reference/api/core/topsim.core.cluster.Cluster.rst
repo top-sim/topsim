@@ -38,6 +38,7 @@
       ~Cluster.is_idle
       ~Cluster.is_observation_provisioned
       ~Cluster.is_occupied
+      ~Cluster.is_task_finished
       ~Cluster.provision_batch_resources
       ~Cluster.provision_ingest_resources
       ~Cluster.release_batch_resources

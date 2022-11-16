@@ -23,8 +23,8 @@ class Monitor(object):
         self.simulation = simulation
         self.env = simulation.env
         self.sim_timestamp = start_time
-        self.events = []
         self.df = pd.DataFrame()
+        self.events = pd.DataFrame()
 
     def run(self):
         while True:
@@ -35,7 +35,10 @@ class Monitor(object):
                 [self.df, self.collate_actor_dataframes()],
                 ignore_index=True
             )
+            self.collate_events()
             yield self.env.timeout(1)
+
+    import h5py
 
     def collate_actor_dataframes(self):
         """
@@ -58,13 +61,34 @@ class Monitor(object):
         )
         algs = pd.DataFrame(
             {
-                'planning': [self.simulation.planner.model.algorithm],
-                'scheduling': [repr(self.simulation.scheduler.algorithm)]
+                'planning': [str(self.simulation.planner.model.algorithm)],
+                'scheduling': [str(self.simulation.scheduler.algorithm)]
             },
         )
-        cf = pd.DataFrame({'config': [self.simulation._cfg_path]})
+        cf = pd.DataFrame({'config': [str(self.simulation._cfg_path)]})
         df = df.join(
             [cluster, buffer, instrument, scheduler, algs, cf, delay],
             how='outer'
         )
         return df
+
+    def collate_events(self):
+        """
+        Update events attribute with this timestep's events
+
+        Returns
+        -------
+
+        """
+        if self.simulation.instrument.events:
+            self.events = pd.concat([self.events,
+                                    pd.DataFrame(self.simulation.instrument.events)])
+
+        if self.simulation.scheduler.events:
+            self.events = pd.concat([self.events,
+                                    pd.DataFrame(self.simulation.scheduler.events)])
+        if self.simulation.buffer.events:
+            self.events = pd.concat([self.events,
+                                    pd.DataFrame(self.simulation.buffer.events)])
+
+        self.events = self.events.infer_objects()
