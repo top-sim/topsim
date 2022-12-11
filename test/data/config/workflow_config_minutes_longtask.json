@@ -55,77 +55,77 @@
 		],
 		"links": [
 			{
-				"data_size": 1080,
+				"transfer_data": 1080,
 				"source": 0,
 				"target": 1
 			},
 			{
-				"data_size": 720,
+				"transfer_data": 720,
 				"source": 0,
 				"target": 2
 			},
 			{
-				"data_size": 540,
+				"transfer_data": 540,
 				"source": 0,
 				"target": 3
 			},
 			{
-				"data_size": 660,
+				"transfer_data": 660,
 				"source": 0,
 				"target": 4
 			},
 			{
-				"data_size": 840,
+				"transfer_data": 840,
 				"source": 0,
 				"target": 5
 			},
 			{
-				"data_size": 960,
+				"transfer_data": 960,
 				"source": 1,
 				"target": 8
 			},
 			{
-				"data_size": 1140,
+				"transfer_data": 1140,
 				"source": 1,
 				"target": 7
 			},
 			{
-				"data_size": 1380,
+				"transfer_data": 1380,
 				"source": 2,
 				"target": 6
 			},
 			{
-				"data_size": 1380,
+				"transfer_data": 1380,
 				"source": 3,
 				"target": 8
 			},
 			{
-				"data_size": 1620,
+				"transfer_data": 1620,
 				"source": 3,
 				"target": 7
 			},
 			{
-				"data_size": 780,
+				"transfer_data": 780,
 				"source": 4,
 				"target": 8
 			},
 			{
-				"data_size": 900,
+				"transfer_data": 900,
 				"source": 5,
 				"target": 7
 			},
 			{
-				"data_size": 1020,
+				"transfer_data": 1020,
 				"source": 6,
 				"target": 9
 			},
 			{
-				"data_size": 660,
+				"transfer_data": 660,
 				"source": 7,
 				"target": 9
 			},
 			{
-				"data_size": 780,
+				"transfer_data": 780,
 				"source": 8,
 				"target": 9
 			}

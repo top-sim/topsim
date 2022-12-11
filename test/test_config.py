@@ -25,8 +25,8 @@ from topsim.user.telescope import Telescope
 
 CONFIG = "test/data/config/standard_simulation_longtask.json"
 NOFILE = "test/data/config/cluster_config.json"  # Does not exist
-INCORRECT_JSON = "test/data/config/sneaky.json"
-NOT_JSON = "test/data/config/oops.txt"
+INCORRECT_JSON = "test/data/config/IncorrectJSONTest.json"
+NOT_JSON = "test/data/config/NotJSONFileTest.txt"
 MISSING_KEYS = "test/data/config/config_missing_keys.json"
 CONFIG_CUSTOM_TIMESTEP = "test/data/config/custom_timestep.json"
 

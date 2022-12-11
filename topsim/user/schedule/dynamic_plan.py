@@ -71,8 +71,11 @@ class DynamicSchedulingFromPlan(Scheduling):
                     if workflow_plan.ast > workflow_plan.est:
                         workflow_plan.status = WorkflowStatus.DELAYED
                     if not task.pred:
-                        # machine = cluster.dmachine[task.machine]
-                        machine = cluster.get_machine_from_id(task.machine)
+                        # TODO Reconsider using this method in the scheduling
+                        # We should just use it in the Scheduler
+                        machine = cluster.get_machine_from_id(
+                            task.allocated_machine_id
+                        )
                         workflow_plan.status = WorkflowStatus.SCHEDULED
                         # We do not update the allocations
                         allocations[task] = machine  
@@ -83,9 +86,9 @@ class DynamicSchedulingFromPlan(Scheduling):
                         # If the set of finished tasks does not contain all
                         # of the previous tasks, we cannot start yet.
                         pred = set(task.pred)
-                        # machine = cluster.dmachine[task.machine]
-                        machine = cluster.get_machine_from_id(task.machine)
-                        # finished = set(t.id for t in cluster.tasks['finished'])
+                        machine = cluster.get_machine_from_id(
+                            task.allocated_machine_id
+                        )
                         finished = set(t.id for t in cluster.finished_tasks)
                         # Check if there is an overlap between the two sets
                         if not pred.issubset(finished):

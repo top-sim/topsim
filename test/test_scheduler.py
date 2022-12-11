@@ -52,6 +52,7 @@ logger = logging.getLogger(__name__)
 CONFIG = "test/data/config/standard_simulation_longtask.json"
 INTEGRATION = "test/data/config/integration_simulation.json"
 HEFT_CONFIG = "test/data/config/heft_single_observation_simulation.json"
+HEFT_CONFIG_IO = "test/data/config/heft_single_observation_simulation_IO.json"
 LONG_CONFIG = "test/data/config/mos_sw10_long.json"
 PLANNING_ALGORITHM = 'heft'
 
@@ -223,6 +224,58 @@ class TestSchedulerDynamicPlanAllocation(unittest.TestCase):
         self.assertEqual(10, len(self.cluster._tasks['finished']))
         self.assertEqual(0, len(self.cluster._tasks['running']))
         self.assertEqual(0, len(self.scheduler.observation_queue))
+
+
+class TestSchedulerDynamicPlanWithIO(unittest.TestCase):
+
+    def setUp(self):
+        self.env = simpy.Environment()
+        sched_algorithm = DynamicSchedulingFromPlan()
+        config = Config(HEFT_CONFIG_IO)
+        self.cluster = Cluster(self.env, config)
+        self.planner = Planner(self.env,
+                               self.cluster, SHADOWPlanning('heft'))
+        self.buffer = Buffer(self.env, self.cluster, config)
+        self.scheduler = Scheduler(self.env, self.buffer,
+                                   self.cluster, sched_algorithm)
+        self.telescope = Telescope(
+            self.env, config, self.planner, self.scheduler
+        )
+
+    def tearDown(self) -> None:
+        pass
+
+    def testAllocationWithIODuration(self):
+        """
+        Use
+        Returns
+        -------
+
+        """
+        curr_obs = self.telescope.observations[0]
+        gen = self.scheduler.allocate_tasks(curr_obs)
+        self.assertRaises(RuntimeError, next, gen)
+        l = [0, 3, 2, 4, 1, 5, 6, 8, 7, 9]
+        exec_ord = [
+            curr_obs.name + '_' + str(self.env.now) + '_' + str(tid) for tid
+            in l
+        ]
+        self.scheduler.observation_queue.append(curr_obs)
+        curr_obs.ast = self.env.now
+        curr_obs.plan = self.planner.run(
+            curr_obs, self.buffer, self.telescope.max_ingest)
+        self.env.process(self.scheduler.allocate_tasks(curr_obs))
+        self.env.run(1)
+        self.assertListEqual(
+            l,
+            [a.task.tid for a in curr_obs.plan.exec_order]
+        )
+        self.buffer.cold[0].observations['stored'].append(curr_obs)
+        self.env.run(until=99)
+        self.assertEqual(10, len(self.cluster._tasks['finished']))
+        self.assertEqual(0, len(self.cluster._tasks['running']))
+        self.assertEqual(0, len(self.scheduler.observation_queue))
+
 
 
 class TestSchedulerEdgeCases(unittest.TestCase):

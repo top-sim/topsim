@@ -34,22 +34,22 @@
 		],
 		"links": [
 			{
-				"data_size": 1,
+				"transfer_data": 1,
 				"source": 0,
 				"target": 1
 			},
 			{
-				"data_size": 1,
+				"transfer_data": 1,
 				"source": 1,
 				"target": 2
 			},
 			{
-				"data_size": 1,
+				"transfer_data": 1,
 				"source": 2,
 				"target": 3
 			},
 			{
-				"data_size": 1,
+				"transfer_data": 1,
 				"source": 3,
 				"target": 4
 			}

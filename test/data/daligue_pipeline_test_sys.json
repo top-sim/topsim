@@ -1541,7 +1541,7 @@
 				"flops": 1086.0
 			}
 		},
-		"rates": {
+		"compute_bandwidth": {
 			"cat0": 4.0,
 			"cat1": 5.0
 		}

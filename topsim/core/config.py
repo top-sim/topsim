@@ -89,7 +89,7 @@ class Config:
     def parse_cluster_config(self):
         try:
             (self.cluster['system'] and self.cluster['system']['resources'] and
-             self.cluster['system']['bandwidth'])
+             self.cluster['system']["system_bandwidth"])
         except KeyError:
             LOGGER.warning(
                 "'system' is not in %s, check your JSON is correctly formatted",
@@ -115,9 +115,9 @@ class Config:
                 Machine(id=machine, cpu=cpu, memory=1,  # * timestep_multiplier,
                         disk=1,  # * timestep_multiplier,
                         bandwidth=machines[machine][
-                                      'rates'] * timestep_multiplier))
+                                      "compute_bandwidth"] * timestep_multiplier))
 
-        bandwidth = self.cluster['system']['bandwidth'] * timestep_multiplier
+        bandwidth = self.cluster['system']["system_bandwidth"] * timestep_multiplier
         return machine_list, bandwidth
 
     def parse_instrument_config(self, instrument_name):

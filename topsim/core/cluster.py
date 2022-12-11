@@ -194,7 +194,7 @@ class Cluster:
         for i, machine in enumerate(temp_ingest_resources):
             pairs.append((machine, tasks[i]))
 
-        # TODO UPDATE HOW WE ALLOCATE TASKS TO RESOURCES HERE SO WE DON'T GENERATE SAME PAIRS
+        # TODO update how we allocate tasks to resources here so we don't generate same pairs
         self._clusters[c]['ingest']['status'] = True
         self._clusters[c]['ingest']['demand'] = demand
         id = observation.name
