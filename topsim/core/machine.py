@@ -36,7 +36,7 @@ class Machine(object):
 
     def run_task(self, task_instance):
         self.cpu -= task_instance.flops
-        self.memory -= task_instance.memory
+        self.memory -= task_instance.task_data
         self.disk -= task_instance.io
         self.current_task = task_instance
         # self.task_instances.append(task_instance)
@@ -44,7 +44,7 @@ class Machine(object):
 
     def stop_task(self, task_instance):
         self.cpu += task_instance.flops
-        self.memory += task_instance.memory
+        self.memory += task_instance.task_data
         self.disk += task_instance.io
         self.status = Status.IDLE
         self.current_task = None

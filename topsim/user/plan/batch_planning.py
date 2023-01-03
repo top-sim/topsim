@@ -78,7 +78,7 @@ class BatchPlanning(Planning):
                     nm = self._create_observation_task_id(
                         element, observation, clock
                     )
-                    val = data[element]['data_size']
+                    val = data[element]["transfer_data"]
                     edge_costs[nm] = val
                 taskobj = Task(
                     tid, 0, 0, None, predecessors, graph.nodes[task][

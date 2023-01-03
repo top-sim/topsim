@@ -77,7 +77,7 @@ class GreedySchedulingFromPlan(Scheduling):
                     workflow_plan.status = WorkflowStatus.DELAYED
                 if not task.pred:
                     # machine = cluster.dmachine[task.machine]
-                    machine = cluster.get_machine_from_id(task.machine)
+                    machine = cluster.get_machine_from_id(task.allocated_machine_id)
                     workflow_plan.status = WorkflowStatus.SCHEDULED
                     allocations, temporary_resources = (
                         self._attempt_machine_allocation(
@@ -93,7 +93,7 @@ class GreedySchedulingFromPlan(Scheduling):
                     # finished = set(t.id for t in cluster.tasks['finished'])
                     finished = set(t.id for t in cluster.finished_tasks)
                     # machine = cluster.dmachine[task.machine]
-                    machine = cluster.get_machine_from_id(task.machine)
+                    machine = cluster.get_machine_from_id(task.allocated_machine_id)
                     # Check if there is an overlap between the two sets
                     if not pred.issubset(finished):
                         # One of the predecessors of 't' is still running

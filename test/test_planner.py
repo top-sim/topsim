@@ -62,7 +62,7 @@ class TestPlannerConfig(unittest.TestCase):
         available_resources = planner.model._cluster_to_shadow_format(
             self.cluster)
         # Bandwidth set at 1gb/s = 60gb/min.
-        self.assertEqual(60.0, available_resources['system']['bandwidth'])
+        self.assertEqual(60.0, available_resources['system']["system_bandwidth"])
         machine = available_resources['system']['resources']['cat0_m0']
         self.assertEqual(
             5040, available_resources['system']['resources']['cat0_m0']['flops']

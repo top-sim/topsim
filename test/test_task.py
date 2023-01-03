@@ -28,7 +28,7 @@ class TaskInit(unittest.TestCase):
         self.dm = None
         self.est = 0
         self.eft = 11
-        self.machine = 'x1'
+        self.allocated_machine_id = 'x1'
         self.flops = 10000
         self.pred = []
         
@@ -37,9 +37,9 @@ class TaskInit(unittest.TestCase):
             tid=self.task_id,
             est=self.est,
             eft=self.eft,
-            machine=self.machine,
+            machine_id=self.allocated_machine_id,
             predecessors=None,
-            flops=0, memory=0, io=0,
+            flops=0, task_data=0, io=0,
             delay=self.dm)
 
 
@@ -53,7 +53,7 @@ class TestTaskDelay(unittest.TestCase):
         self.dm_delay = DelayModel(0.3, "normal")
         self.assertEqual(20, self.dm_nodelay.seed)
 
-        self.machine = 'x1'
+        self.allocated_machine_id = 'x1'
         self.flops = 10000
         self.pred = []
 
@@ -65,9 +65,9 @@ class TestTaskDelay(unittest.TestCase):
             self.task_id,
             est=0,
             eft=11,
-            machine=None,
+            machine_id=None,
             predecessors=None,
-            flops=0, memory=0, io=0,
+            flops=0, task_data=0, io=0,
             delay=dm)
         # t.est = 0
         # t.eft = 11
@@ -82,9 +82,9 @@ class TestTaskDelay(unittest.TestCase):
             self.task_id,
             est=0,
             eft=11,
-            machine=None,
+            machine_id=None,
             predecessors=None,
-            flops=0, memory=0, io=0,
+            flops=0, task_data=0, io=0,
             delay=dm)
 
         # t.est = 0
@@ -100,9 +100,9 @@ class TestTaskDelay(unittest.TestCase):
             self.task_id,
             est=0,
             eft=11,
-            machine=None,
+            machine_id=None,
             predecessors=None,
-            flops=0, memory=0, io=0,
+            flops=0, task_data=0, io=0,
             delay=dm)
         # t.ast = 0
         t.duration = t.eft - t.est
@@ -117,9 +117,9 @@ class TestTaskDelay(unittest.TestCase):
             self.task_id,
             est=0,
             eft=11,
-            machine=None,
+            machine_id = None,
             predecessors=None,
-            flops=0, memory=0, io=0,
+            flops=0, task_data=0, io=0,
             delay=dm)
         self.env.process(t.do_work(self.env, None))
         self.env.run()

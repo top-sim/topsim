@@ -114,7 +114,7 @@ class Scheduler:
                 LOGGER.debug("No more waiting workflows")
                 break
             # for obs in self.observation_queue:
-            #     if obs.workflow_plan.status == WorkflowStatus.FINISHED:
+            #     if obs.workflow_plan.status =f= WorkflowStatus.FINISHED:
             #         self.cluster.release_batch_resources(obs)
             yield self.env.timeout(TIMESTEP)
 
@@ -386,7 +386,7 @@ class Scheduler:
         # Allocate tasks
         for task in sorted_tasks:
             machine = schedule[task]
-            if machine.id != task.machine:
+            if machine.id != task.allocated_machine_id:
                 task.update_allocation(machine)
             # Schedule
             if machine in curr_allocs or self.cluster.is_occupied(machine):

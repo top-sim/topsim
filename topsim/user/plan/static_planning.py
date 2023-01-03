@@ -89,7 +89,7 @@ class SHADOWPlanning(Planning):
                 nm = self._create_observation_task_id(
                     element.tid, observation, clock
                 )
-                val = data[element]['data_size']
+                val = data[element]["transfer_data"]
                 edge_costs[nm] = val
 
             taskobj = Task(
@@ -98,7 +98,7 @@ class SHADOWPlanning(Planning):
                 allocation.aft,
                 allocation.machine.id,
                 predecessors,
-                task.flops_demand, 0, edge_costs,
+                task.flops_demand, task.io_demand, edge_costs,
                 dm
             )
             tasks.append(taskobj)
@@ -183,14 +183,14 @@ class SHADOWPlanning(Planning):
         dictionary = {
             "system": {
                 "resources": None,
-                "bandwidth": cluster.system_bandwidth
+                "system_bandwidth": cluster.system_bandwidth
             }
         }
         resources = {}
         for m in available_resources:
             resources[m.id] = {
                 "flops": m.cpu,
-                "rates": m.bandwidth,
+                "compute_bandwidth": m.bandwidth,
                 "io": m.disk,
                 "memory": m.memory
             }

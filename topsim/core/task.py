@@ -42,8 +42,8 @@ class Task(object):
 
     # NB I don't want tasks to have null defaults; should we improve on this
     # by initialising everything in a task at once?
-    def __init__(self, tid, est, eft, machine, predecessors, flops=0, memory=0,
-            io=None, delay=None,gid=None):
+    def __init__(self, tid, est, eft, machine_id, predecessors, flops=0, task_data=0,
+                 io=None, delay=None, gid=None):
         """
         :param tid: ID of the Task object
         :param env: Simulation environment to which the task will be added,
@@ -55,8 +55,8 @@ class Task(object):
         self.eft = eft
         self.ast = -1
         self.aft = -1
-        self.machine = machine
-        self.duration = eft - est
+        self.allocated_machine_id = machine_id
+        self.duration = eft - est # TODO investigate making this a class property
         self.est_duration = eft - est
         self.delay_flag = False
         self.task_status = TaskStatus.UNSCHEDULED
@@ -69,7 +69,7 @@ class Task(object):
         # Machine information that is less important
         # currently (will update this in future versions)
         self.flops = flops
-        self.memory = memory
+        self.task_data = task_data
         self.io = io
 
     def __repr__(self):
@@ -103,16 +103,16 @@ class Task(object):
 
         # self.eft = self.duration+self.ast
         # Process potential updates to duration:
+        if (self.flops > 0) or (self.task_data > 0):
+            self.duration = self.calculate_runtime(machine)
+        total_duration = self._calc_task_delay()
+        if total_duration < 1:
+            total_duration = 1
 
-        duration = self._calc_task_delay()
-        if duration < 1:
-            duration = 1
-            # raise ValueError(f'Duration is {duration} which is not a valid '
-            #                  f'time. Please check configuration.')
-        yield env.timeout(duration - 1)
-        if self.duration < duration:
+        yield env.timeout(total_duration - 1)
+        if self.duration < total_duration:
             self.delay_flag = True
-            self.delay_offset += (duration - self.duration)
+            self.delay_offset += (total_duration - self.duration)
 
         self.aft = env.now + 1
         if self.aft > self.eft:
@@ -120,6 +120,23 @@ class Task(object):
         # self.task_status = TaskStatus.FINISHED
         logger.debug('%s finished at %s', self.id,
                      self.aft)  # return TaskStatus.FINISHED
+
+    def calculate_runtime(self, machine):
+        """
+        Calculate the runtime of the task
+        Task duration is a function of either compute-time (FLOPs) or data-time (bandwidth)
+
+        Parameters
+        ----------
+        machine: The machine we are allocated to (passed in during do_work())
+
+        Returns
+        -------
+        Maximum integer of either compute- or data-time
+        """
+        compute_time = int(self.flops / machine.cpu)
+        data_time = int(self.task_data / machine.bandwidth)
+        return  max(compute_time, data_time)
 
     def update_allocation(self, machine):
         """
@@ -145,7 +162,10 @@ class Task(object):
         -------
 
         """
-        duration = int(self.flops / machine.cpu)
+        self.allocated_machine_id = machine
+        compute_time = int(self.flops / machine.cpu)
+        data_time = int(self.task_data / machine.bandwidth)
+        duration = max(compute_time, data_time)
         if duration > self.duration:
             self.delay_flag = True
             self.delay_offset = (duration - self.duration)
