@@ -95,7 +95,7 @@ class Simulation:
     Standard simulation with data frame output
 
     >>> env = simpy.environment()
-    >>> config = Config('path/to/config')
+    >>> config = Path('path/to/config')
     >>> instrument = CustomInstrument()
     >>> plan = PlanningModel()
     >>> sched = SchedulingModel()

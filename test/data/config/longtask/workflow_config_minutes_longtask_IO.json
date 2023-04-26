@@ -1,0 +1,143 @@
+{
+  "header": {
+    "time": false
+  },
+  "graph": {
+    "directed": true,
+    "multigraph": false,
+    "calc": true,
+    "graph": {
+      "node_default": {},
+      "edge_default": {}
+    },
+    "nodes": [
+      {
+        "comp": 0,
+        "id": 0,
+        "task_data": 7140000
+      },
+      {
+        "comp": 0,
+        "id": 1,
+        "task_data": 5520000
+      },
+      {
+        "comp": 0,
+        "id": 2,
+        "task_data": 5700000
+      },
+      {
+        "comp": 0,
+        "id": 3,
+        "task_data": 6540000
+      },
+      {
+        "comp": 0,
+        "id": 4,
+        "task_data": 6420000
+      },
+      {
+        "comp": 0,
+        "id": 5,
+        "task_data": 10140000
+      },
+      {
+        "comp": 0,
+        "id": 6,
+        "task_data": 6600000
+      },
+      {
+        "comp": 0,
+        "id": 7,
+        "task_data": 8820000
+      },
+      {
+        "comp": 0,
+        "id": 8,
+        "task_data": 8760000
+      },
+      {
+        "comp": 0,
+        "id": 9,
+        "task_data": 6060000
+      }
+    ],
+    "links": [
+      {
+        "transfer_data": 1080,
+        "source": 0,
+        "target": 1
+      },
+      {
+        "transfer_data": 720,
+        "source": 0,
+        "target": 2
+      },
+      {
+        "transfer_data": 540,
+        "source": 0,
+        "target": 3
+      },
+      {
+        "transfer_data": 660,
+        "source": 0,
+        "target": 4
+      },
+      {
+        "transfer_data": 840,
+        "source": 0,
+        "target": 5
+      },
+      {
+        "transfer_data": 960,
+        "source": 1,
+        "target": 8
+      },
+      {
+        "transfer_data": 1140,
+        "source": 1,
+        "target": 7
+      },
+      {
+        "transfer_data": 1380,
+        "source": 2,
+        "target": 6
+      },
+      {
+        "transfer_data": 1380,
+        "source": 3,
+        "target": 8
+      },
+      {
+        "transfer_data": 1620,
+        "source": 3,
+        "target": 7
+      },
+      {
+        "transfer_data": 780,
+        "source": 4,
+        "target": 8
+      },
+      {
+        "transfer_data": 900,
+        "source": 5,
+        "target": 7
+      },
+      {
+        "transfer_data": 1020,
+        "source": 6,
+        "target": 9
+      },
+      {
+        "transfer_data": 660,
+        "source": 7,
+        "target": 9
+      },
+      {
+        "transfer_data": 780,
+        "source": 8,
+        "target": 9
+      }
+    ]
+  }
+}
