@@ -61,48 +61,71 @@ class DynamicSchedulingFromPlan(Scheduling):
         replace = False
         allocations = copy.copy(existing_schedule)
         # allocations = copy.copy(existing_schedule)
+        if not task_pool:
+            for task in workflow_plan.tasks:
+                if not list(workflow_plan.graph.predecessors(task)):
+                    task_pool.add(task)
+        removed = set()
+        added = set()
         self.accurate = 0
         self.alternate = 0
-        for task in tasks:
-            if task not in allocations:
-                if (task.task_status is TaskStatus.UNSCHEDULED and
-                        task not in allocations):
-                    # Are we workflow - delayed?
-                    if workflow_plan.ast > workflow_plan.est:
-                        workflow_plan.status = WorkflowStatus.DELAYED
-                    if not task.pred:
-                        # TODO Reconsider using this method in the scheduling
-                        # We should just use it in the Scheduler
-                        machine = cluster.get_machine_from_id(
-                            task.allocated_machine_id
-                        )
-                        workflow_plan.status = WorkflowStatus.SCHEDULED
-                        # We do not update the allocations
-                        allocations[task] = machine  
+        temporary_resources = cluster.get_available_resources()
+        max_allocations_iteration = len(temporary_resources)
+        for task in sorted(task_pool, key=lambda x:x.est):
+            if len(allocations) >= max_allocations_iteration:
+                break
+            if (task.task_status is TaskStatus.UNSCHEDULED and
+                    task not in allocations and len(temporary_resources) > 0):
+                # Are we workflow - delayed?
+                if workflow_plan.ast > workflow_plan.est:
+                    workflow_plan.status = WorkflowStatus.DELAYED
+                # Task has no predecssors
+                machine = cluster.get_machine_from_id(task.allocated_machine_id)
+                if machine not in temporary_resources:
+                    continue
+                if not list(workflow_plan.graph.predecessors(task)): # if not task.pred:
+                    # TODO Reconsider using this method in the scheduling
+                    # We should just use it in the Scheduler
+                    workflow_plan.status = WorkflowStatus.SCHEDULED
+                    # We do not update the allocations
+                    allocations[task] = machine
+                    self.accurate += 1
+                    temporary_resources.remove(machine)
+                    removed.add(task)
+                    added.update(workflow_plan.graph.successors(task))
+                # The task has predecessors
+                else:
+                    # If the set of finished tasks does not contain all
+                    # of the previous tasks, we cannot start yet.
+                    pred = list(workflow_plan.graph.predecessors(task)) # set(task.pred)
+                    count = 0
+                    for p in pred:
+                        if cluster.is_task_finished(p):
+                            count += 1
+                    if count < len(pred):
+                        # One of the predecessors of 't' is still running
+                        continue
+                    # machine = cluster.get_machine_from_id(
+                    #     task.allocated_machine_id
+                    # )
+                    # finished = set(t.id for t in cluster.finished_tasks)
+                    # # Check if there is an overlap between the two sets
+                    # if not pred.issubset(finished):
+                    #     # One of the predecessors of 't' is still running
+                    #     continue
+                    else:
+                        allocations[task] = machine
+                        temporary_resources.remove(machine)
+                        removed.add(task)
+                        added.update((workflow_plan.graph.successors(task)))
                         self.accurate += 1
 
-                    # The task has predecessors
-                    else:
-                        # If the set of finished tasks does not contain all
-                        # of the previous tasks, we cannot start yet.
-                        pred = set(task.pred)
-                        machine = cluster.get_machine_from_id(
-                            task.allocated_machine_id
-                        )
-                        finished = set(t.id for t in cluster.finished_tasks)
-                        # Check if there is an overlap between the two sets
-                        if not pred.issubset(finished):
-                            # One of the predecessors of 't' is still running
-                            continue
-                        else:
-                            allocations[task] = machine
-                            self.accurate += 1
-
+        task_pool -= removed
+        task_pool.update(added)
         if len(workflow_plan.tasks) == 0:
             workflow_plan.status = WorkflowStatus.FINISHED
             logger.debug("is finished %s", workflow_id)
-
-        return allocations, workflow_plan.status
+        return allocations, workflow_plan.status, task_pool
 
     def to_df(self):
         df = pd.DataFrame()

@@ -71,8 +71,9 @@ class BatchPlanning(Planning):
                         x, observation, clock
                     ) for x in pred
                 ]
-                edge_costs = {}
+
                 # Get the data transfer costs
+                edge_costs = {}
                 data = dict(graph.pred[task])
                 for element in data:
                     nm = self._create_observation_task_id(
@@ -80,10 +81,17 @@ class BatchPlanning(Planning):
                     )
                     val = data[element]["transfer_data"]
                     edge_costs[nm] = val
+
+                est, eft = 0, 0
+                machine_id = None
+                task_compute =  graph.nodes[task]['comp']
+                task_data = 0
+                if 'task_data' in  graph.nodes[task]:
+                    task_data = graph.nodes[task]['task_data']
+
                 taskobj = Task(
-                    tid, 0, 0, None, predecessors, graph.nodes[task][
-                        'comp'], 0,
-                    edge_costs, dm, gid=task
+                    tid, est, eft, machine_id, predecessors, task_compute,
+                    task_data, edge_costs, dm, gid=task
                 )
                 mapping[task] = taskobj
                 tasks.append(taskobj)

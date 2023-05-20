@@ -216,8 +216,8 @@ class TestSchedulerDynamicPlanAllocation(unittest.TestCase):
         self.env.process(self.scheduler.allocate_tasks(curr_obs))
         self.env.run(1)
         self.assertListEqual(
-            l,
-            [a.task.tid for a in curr_obs.plan.exec_order]
+            exec_ord,
+            curr_obs.plan.exec_order
         )
         self.buffer.cold[0].observations['stored'].append(curr_obs)
         self.env.run(until=99)
@@ -267,8 +267,8 @@ class TestSchedulerDynamicPlanWithIO(unittest.TestCase):
         self.env.process(self.scheduler.allocate_tasks(curr_obs))
         self.env.run(1)
         self.assertListEqual(
-            l,
-            [a.task.tid for a in curr_obs.plan.exec_order]
+            exec_ord,
+            curr_obs.plan.exec_order
         )
         self.buffer.cold[0].observations['stored'].append(curr_obs)
         self.env.run(until=99)

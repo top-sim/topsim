@@ -131,7 +131,7 @@ class BatchProcessing(Scheduling):
             workflow_plan.status = WorkflowStatus.FINISHED
             logger.debug(f'{workflow_plan.id} is finished.')
             cluster.release_batch_resources(workflow_plan.id)
-        return allocations, workflow_plan.status
+        return allocations, workflow_plan.status, task_pool
 
     def to_df(self):
         pass
