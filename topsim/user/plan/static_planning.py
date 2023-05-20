@@ -15,6 +15,7 @@
 
 import logging
 import copy
+import networkx as nx
 
 from topsim.algorithms.planning import Planning
 from topsim.core.planner import WorkflowPlan, WorkflowStatus
@@ -70,11 +71,14 @@ class SHADOWPlanning(Planning):
 
         est = self._calc_workflow_est(observation, buffer)
         eft = solution.makespan
+        mapping = {}
         tasks = []
+        exec_order_mapping = {}
 
         for task in solution.task_allocations:
             allocation = solution.task_allocations.get(task)
             tid = self._create_observation_task_id(task.tid, observation, clock)
+            exec_order_mapping[tid] = task.tid
             dm = copy.copy(self.delay_model)
             pred = list(workflow.graph.predecessors(task))
             predecessors = [
@@ -101,13 +105,18 @@ class SHADOWPlanning(Planning):
                 task.flops_demand, task.io_demand, edge_costs,
                 dm
             )
+            mapping[task] = taskobj
             tasks.append(taskobj)
+        new_graph = nx.relabel_nodes(workflow.graph, mapping)
         tasks.sort(key=lambda x: x.est)
-        exec_order = solution.execution_order
+        exec_order = [
+            self._create_observation_task_id(x, observation, clock)
+            for x in solution.execution_order
+        ]
 
         return WorkflowPlan(
             observation.name, est, eft, tasks, exec_order,
-            WorkflowStatus.SCHEDULED, max_ingest
+            WorkflowStatus.SCHEDULED, max_ingest, new_graph
         )
 
     def to_df(self):

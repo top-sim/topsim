@@ -394,7 +394,7 @@ class Cluster:
         if size > tmp > 0:
             size = tmp
         for m in range(0, size):
-            self._add_idle_resource(name, available_resources[0])
+            self._add_idle_resource(name, available_resources[m])
 
         self.num_provisioned_obs += 1
         return True
@@ -449,7 +449,8 @@ class Cluster:
             self._clusters[c]['resources']['available'].append(m)
 
     def get_available_resources(self, c='default'):
-        return self._clusters[c]['resources']['available']
+        # TODO Figure out why this breaks in one but not the other
+        return [x for x in self._clusters[c]['resources']['available']]
 
     def is_observation_provisioned(self, observation, c='default'):
         return observation in self._clusters[c]['resources']['idle']

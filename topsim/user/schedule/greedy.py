@@ -112,7 +112,7 @@ class GreedySchedulingFromPlan(Scheduling):
             workflow_plan.status = WorkflowStatus.FINISHED
             LOGGER.debug("is finished %s", workflow_id)
 
-        return allocations, workflow_plan.status
+        return allocations, workflow_plan.status, task_pool
 
     def to_df(self):
         """

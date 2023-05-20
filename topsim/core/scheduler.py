@@ -293,7 +293,7 @@ class Scheduler:
         self._add_event(observation, "allocation", "started")
         while True:
             current_plan.tasks = self._update_current_plan(current_plan)
-            current_plan, schedule, finished = self._generate_current_schedule(
+            current_plan, schedule, task_pool, finished = self._generate_current_schedule(
                 observation, current_plan, schedule, task_pool)
             # prev_tasks = _curr_tasks
             # _curr_tasks = len(current_plan.tasks)
@@ -340,7 +340,7 @@ class Scheduler:
         finished = False
         nm = f'{observation.name}-algtime'
         self.algtime[nm] = time.time()
-        schedule, status = self.algorithm.run(cluster=self.cluster,
+        schedule, status, task_pool = self.algorithm.run(cluster=self.cluster,
             clock=self.env.now, workflow_plan=current_plan,
             existing_schedule=schedule, task_pool=task_pool)
         self.algtime[nm] = (time.time() - self.algtime[nm])
@@ -362,7 +362,7 @@ class Scheduler:
                 finished = True
                 LOGGER.info(f"{observation.name} finished @ {self.env.now}")
 
-        return current_plan, schedule, finished
+        return current_plan, schedule, task_pool, finished
 
     def _process_current_schedule(self, schedule, allocation_pairs,
                                   workflow_id):
