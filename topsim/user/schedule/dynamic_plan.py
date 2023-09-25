@@ -27,6 +27,7 @@ class DynamicSchedulingFromPlan(Scheduling):
     """
     This plan
     """
+
     def __init__(self):
         super().__init__()
         self.accurate = 0
@@ -35,7 +36,7 @@ class DynamicSchedulingFromPlan(Scheduling):
     def __repr__(self):
         return "DynamicAlgorithmFromPlan"
 
-    def run(self, cluster, clock, workflow_plan, existing_schedule,task_pool):
+    def run(self, cluster, clock, workflow_plan, existing_schedule, task_pool):
         """
         Iterate through immediate predecessors and check that they are finished
         Schedule as we go check if there is an overlap between the two sets
@@ -60,7 +61,6 @@ class DynamicSchedulingFromPlan(Scheduling):
         tasks = workflow_plan.tasks
         replace = False
         allocations = copy.copy(existing_schedule)
-        # allocations = copy.copy(existing_schedule)
         if not task_pool:
             for task in workflow_plan.tasks:
                 if not list(workflow_plan.graph.predecessors(task)):
@@ -71,11 +71,14 @@ class DynamicSchedulingFromPlan(Scheduling):
         self.alternate = 0
         temporary_resources = cluster.get_available_resources()
         max_allocations_iteration = len(temporary_resources)
-        for task in sorted(task_pool, key=lambda x:x.est):
+        for task in sorted(task_pool, key=lambda x: x.est):
             if len(allocations) >= max_allocations_iteration:
                 break
-            if (task.task_status is TaskStatus.UNSCHEDULED and
-                    task not in allocations and len(temporary_resources) > 0):
+            if (
+                task.task_status is TaskStatus.UNSCHEDULED
+                and task not in allocations
+                and len(temporary_resources) > 0
+            ):
                 # Are we workflow - delayed?
                 if workflow_plan.ast > workflow_plan.est:
                     workflow_plan.status = WorkflowStatus.DELAYED
@@ -83,9 +86,7 @@ class DynamicSchedulingFromPlan(Scheduling):
                 machine = cluster.get_machine_from_id(task.allocated_machine_id)
                 if machine not in temporary_resources:
                     continue
-                if not list(workflow_plan.graph.predecessors(task)): # if not task.pred:
-                    # TODO Reconsider using this method in the scheduling
-                    # We should just use it in the Scheduler
+                if not list(workflow_plan.graph.predecessors(task)):
                     workflow_plan.status = WorkflowStatus.SCHEDULED
                     # We do not update the allocations
                     allocations[task] = machine
@@ -97,7 +98,9 @@ class DynamicSchedulingFromPlan(Scheduling):
                 else:
                     # If the set of finished tasks does not contain all
                     # of the previous tasks, we cannot start yet.
-                    pred = list(workflow_plan.graph.predecessors(task)) # set(task.pred)
+                    pred = list(
+                        workflow_plan.graph.predecessors(task)
+                    )  # set(task.pred)
                     count = 0
                     for p in pred:
                         if cluster.is_task_finished(p):
@@ -129,8 +132,8 @@ class DynamicSchedulingFromPlan(Scheduling):
 
     def to_df(self):
         df = pd.DataFrame()
-        df['alternate'] = [self.alternate]
-        df['accurate'] = [self.accurate]
+        df["alternate"] = [self.alternate]
+        df["accurate"] = [self.accurate]
         return df
 
     def is_machine_occupied(self, machine):
