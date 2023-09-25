@@ -284,7 +284,7 @@ class Scheduler:
         task_pool = set()
         _total_tasks = len(current_plan.tasks)
         _curr_tasks = len(current_plan.tasks)
-        _tqdm = False
+        _tqdm = True
         pbar = None
         if _tqdm:
             pbar = tqdm(total=_total_tasks,
