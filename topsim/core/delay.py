@@ -56,7 +56,7 @@ class DelayModel:
         NONE = 0
 
 
-    def __init__(self, prob, dist, degree=DelayDegree.LOW, seed=20):
+    def __init__(self, prob, dist, degree=DelayDegree.LOW, seed=0):
         """
 
         Parameters
@@ -132,11 +132,11 @@ class DelayModel:
         if self.dist == "normal":
             s = default_rng(self.seed).normal(mu, sigma, n)
         elif self.dist == "poisson":
-            s = default_rng().poisson(mu, int(runtime / self.degree))
+            s = default_rng().poisson(sigma, n)
         else:
-            s = default_rng().uniform()
+            s = default_rng().uniform(runtime-sigma, runtime+sigma, n)
 
-        var = s[s > mu]
+        var = sorted([s > mu])
         rand_var = var[int(len(var)/2)]
         return rand_var
 
