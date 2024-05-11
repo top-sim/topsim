@@ -61,17 +61,6 @@ class TestBasicIngest(unittest.TestCase):
         The basic ingest represents the edge cases for timing and scheduling
         within the simulation, as demonstrated in this test.
 
-        There are a couple of edge cases that occur here, especially when we
-        consider that we have only 2 resources; one of these will be taken by
-        ingest, meaning that we cannot start an observation until 1 timestep
-        AFTER an ingest has finished, because the telescope will check before
-        that task is successfully removed from the cluster.
-
-        This is why we run for 6 seconds and only process 2 observations.
-
-        After we've observed 2 observations, we reach capacity on the
-        cold-buffer so we are unable to observe any more.
-
         Returns
         -------
 
@@ -79,7 +68,7 @@ class TestBasicIngest(unittest.TestCase):
         self.assertEqual(0, self.env.now)
         self.simulation.start(runtime=7)
         self.assertEqual(
-            2, self.simulation.cluster._ingest['completed']
+            3, self.simulation.cluster._ingest['completed']
         )
 
         self.assertEqual(
@@ -95,28 +84,34 @@ class TestBasicIngest(unittest.TestCase):
         )
         self.simulation.resume(until=2)
         self.assertEqual(
-            10, self.simulation.buffer.hot[0].current_capacity
+            5, self.simulation.buffer.hot[0].current_capacity
         )
         self.assertEqual(
-            5, self.simulation.buffer.cold[0].current_capacity
+            10, self.simulation.buffer.cold[0].current_capacity
         )
+        self.assertEqual(
+            1,
+            len(self.simulation.buffer.hot[0].observations["scheduled"])
+        )
+        self.simulation.resume(until=4)
+        self.assertEqual(5, self.simulation.buffer.hot[0].current_capacity)
+        self.assertEqual(5, self.simulation.buffer.cold[0].current_capacity)
         self.assertEqual(
             1,
             len(self.simulation.buffer.cold[0].observations["stored"])
         )
-        self.simulation.resume(until=4)
-        self.assertEqual(10, self.simulation.buffer.hot[0].current_capacity)
-        self.assertEqual(0, self.simulation.buffer.cold[0].current_capacity)
-        self.assertEqual(
-            2,
-            len(self.simulation.buffer.cold[0].observations["stored"])
-        )
+        self.simulation.resume(until=5)
+        self.assertEqual(0, self.simulation.buffer.hot[0].current_capacity)
+        self.assertEqual(5, self.simulation.buffer.cold[0].current_capacity)
 
     def testSchedulerRunTime(self):
         self.assertEqual(0, self.simulation.env.now)
         self.simulation.start(runtime=2)
         self.assertEqual(
-            1, len(self.simulation.buffer.cold[0].observations['stored'])
+            1, len(self.simulation.buffer.hot[0].observations['scheduled'])
+        )
+        self.assertEqual(
+            0, len(self.simulation.buffer.cold[0].observations['stored'])
         )
         self.simulation.resume(until=8)
         self.simulation.resume(until=11)
@@ -125,6 +120,6 @@ class TestBasicIngest(unittest.TestCase):
         # We've finished processing one of the workflows so one observation
         # is finished.
         self.assertEqual(
-        2, len(self.simulation.buffer.cold[0].observations['stored'])
+        1, len(self.simulation.buffer.hot[0].observations['finished'])
         )
 

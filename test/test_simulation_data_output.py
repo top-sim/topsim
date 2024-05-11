@@ -106,7 +106,7 @@ class TestMonitorPandasPickle(unittest.TestCase):
         heft_sim = pd.read_hdf(
             'test/simulation_data/test_hdf5.h5', key=heft_key
         )
-        self.assertEqual(118, len(heft_sim))
+        self.assertEqual(108, len(heft_sim))
         self.assertEqual(3, heft_sim.iloc[-1]['available_resources'])
 
 
@@ -135,7 +135,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
             timestamp=None,
         )
         simdf, taskdf = simulation.start()
-        self.assertEqual(118, len(simdf))
+        self.assertEqual(108, len(simdf))
         self.env = simpy.Environment()
         simulation = Simulation(
             self.env,
@@ -149,7 +149,7 @@ class TestMonitorNoFileOption(unittest.TestCase):
             # delimiters=f'test/{algorithm}'
         )
         simdf, taskdf = simulation.start()
-        self.assertEqual(132, len(simdf))
+        self.assertEqual(122, len(simdf))
 
 
     def testResultsAgreeWithExpectations(self):

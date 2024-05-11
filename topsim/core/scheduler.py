@@ -237,12 +237,6 @@ class Scheduler:
         if RunStatus.FINISHED:
             self.provision_ingest -= pipeline_demand
             self.cluster.clean_up_ingest()
-            # TODO Fix this implicit object change, as whilst this is the
-            #  same as the object in the buffer, it is from the buffer we
-            #  get the observation. It is probably worth storing plans
-            #  separately and then 'giving' them to the observation once it
-            #  arrives at the scheduler.
-            observation.plan = planner.run(observation, self.buffer, max_ingest)
 
     def print_state(self):
         # Change this to 'workflows scheduled/workflows unscheduled'
@@ -276,7 +270,7 @@ class Scheduler:
             task.workflow_offset = self.env.now
 
         # Do we have a runtime delay?
-        if current_plan.est > self.env.now:
+        if current_plan.est >= self.env.now + TIMESTEP: # Give us leeway on if we are one timestep out
             self.schedule_status.DELAYED
 
         schedule = {}
@@ -289,7 +283,7 @@ class Scheduler:
         if _tqdm:
             pbar = tqdm(total=_total_tasks,
                         desc=f'Scheduler: {observation.name}', unit="Tasks",
-                        leave=True)  # ,position=)
+                        leave=True,position=1)
         self._add_event(observation, "allocation", "started")
         while True:
             current_plan.tasks = self._update_current_plan(current_plan)

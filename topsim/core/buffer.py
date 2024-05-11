@@ -56,7 +56,7 @@ class Buffer:
     -------
     """
 
-    def __init__(self, env, cluster, config):
+    def __init__(self, env, cluster, planner, config):
         """
         Parameters
         ----------
@@ -75,10 +75,14 @@ class Buffer:
         except OSError:
             print("Error processing Buffer config file")
             raise
+        self.planner = planner
         self.hot_count = len(self.hot)
         self.cold_count = len(self.cold)
+        self._data_left_to_transfer = 0
         self.waiting_observation_list = []
         self.events = []
+        self.threshold = 0.6
+        self.stored_times = []
 
     def run(self):
         """
@@ -103,14 +107,37 @@ class Buffer:
                     self.env.now
                 )
             for b in self.hot:
-                if self.hot[b].has_waiting_observations():
-                    for o in self.hot[b].observations['stored']:
-                        if self.cold[b].has_capacity(
-                                self.hot[b].observations['stored'][
-                                    0].total_data_size
+                if self.check_buffer_over_data_threshold(b):
+                    if self.env.now in self.stored_times:
+                        continue
+                    if self.cold[b].has_capacity_for(
+                        self.hot[b].observations['stored'][
+                                    -1].total_data_size
                         ):
                             self.env.process(self.move_hot_to_cold(b))
+                #         else: Something quite wrong has gone? When we accept ingest we should make sure
+                #         that all buffers have capacity below a particular threshold
+
+                if ((self.hot[b].current_capacity + self._data_left_to_transfer)
+                      / self.hot[b].total_capacity < self.threshold):
+                    if self.cold[b].observations['stored']:
+                        if self.project_buffer_capacity(self.cold[b].observations['stored'][-1], b):
+                            self.env.process(self.move_cold_to_hot(b))
+                    else:
+                        continue
+                else:
+                    continue
+
             yield self.env.timeout(TIMESTEP)
+
+    def check_buffer_over_data_threshold(self,b):
+        return  ((self.hot[b].total_capacity - self.hot[b].current_capacity)
+                / self.hot[b].total_capacity) > self.threshold
+
+    def project_buffer_capacity(self, obs, b):
+        numerator = self.hot[b].total_capacity - (self.hot[b].current_capacity)
+        numerator += obs.total_data_size
+        return numerator / self.hot[b].total_capacity < self.threshold
 
     def check_buffer_capacity(self, observation):
         """
@@ -158,8 +185,9 @@ class Buffer:
                 f"Consider expanding capacity size."
                 f"{observation.name}, Observation: {size} vs Hot Buffer: {self.hot[b].total_capacity:.1f}"
             )
-        elif self.hot[b].current_capacity - size <= 0 \
-                or not self.cold[b].has_capacity(size):
+
+        elif self.hot[b].current_capacity - size < 0 \
+                or not self.cold[b].has_capacity_for(size):
             return False
 
         return True
@@ -176,8 +204,8 @@ class Buffer:
         -------
         True if has observations; False if not.
         """
-        for b in self.cold:
-            if self.cold[b].has_stored_observations():
+        for b in self.hot:
+            if self.hot[b].has_stored_observations() and not self.check_buffer_over_data_threshold(b):
                 return True
         return False
         # return self.cold.has_stored_observations()
@@ -192,8 +220,12 @@ class Buffer:
         observation : topsim.core.telescope.Observation()
             next observation for processing
         """
-        for b in self.cold:
-            return self.cold[b].next_observation_for_processing()
+        # Next observation for processing must come from the hot buffer.
+        # This should triger
+        for b in self.hot:
+            obs = self.hot[b].next_observation_for_processing()
+            obs.plan = self.planner.run(obs, self, None)
+            return obs
 
     def mark_observation_finished(self, observation):
         """
@@ -216,7 +248,7 @@ class Buffer:
         """
         b = observation.buffer_id
         self._add_event(observation, "buffer", "removed")
-        return self.cold[b].remove(observation)
+        return self.hot[b].remove(observation)
 
     def move_hot_to_cold(self, b):
         """
@@ -252,13 +284,14 @@ class Buffer:
 
         current_obs = self.hot[b].observation_for_transfer()
         # current_obs = self.hot.observations['transfer']
+        self._data_left_to_transfer = current_obs.total_data_size
         data_left_to_transfer = current_obs.total_data_size
         _total_data = current_obs.total_data_size
         _tqdm = False
         pbar = None
         if _tqdm:
-            pbar = tqdm(total=_total_data,desc=f'Buffer: {current_obs.name}')
-        if not self.cold[b].has_capacity(data_left_to_transfer):
+            pbar = tqdm(total=_total_data, desc=f'Buffer: {current_obs.name}')
+        if not self.cold[b].has_capacity_for(data_left_to_transfer):
             # We cannot actually transfer the observation due to size
             # constraints
             # TODO create an object method to update the hot buffer
@@ -292,11 +325,89 @@ class Buffer:
                 )
             if pbar:
                 pbar.update(n=self.cold[b].max_data_rate)
+            self._data_left_to_transfer = data_left_to_transfer
             yield self.env.timeout(TIMESTEP)
         if pbar:
             pbar.close()
         return True
 
+    def move_cold_to_hot(self, b):
+        """
+
+        Called from within the buffer, when we hae capacity in the HotBuffer to
+        process an existing observation.
+
+        This method 'moves' the observation data from the ColdBuffer to the
+        HotBuffer, at a rate of  ColdBuffer.max_data_rate.
+
+        ----------
+        observation : core.telescope.Observation object
+
+            The observation that is stored in the HotBuffer, to be moved
+
+        Returns
+        -------
+
+        """
+
+        # TODO Support multiple observation transfers
+
+        if not self.cold[b].observations["stored"]:
+            raise RuntimeError(
+                "No observations in Hot Buffer"
+            )
+
+        # Iterate through current observations for transfer
+        # Each of them will have a data size
+        # The total data rate is just total divided by the number of
+        # observations in the 'transfer' dictionary.
+        # Each timestep we check the length - if something has been removed
+        # from transfer, we update the data rate
+
+        current_obs = self.cold[b].observation_for_transfer()
+        # current_obs = self.hot.observations['transfer']
+        data_left_to_transfer = current_obs.total_data_size
+        _total_data = current_obs.total_data_size
+        _tqdm = False
+        pbar = None
+        if _tqdm:
+            pbar = tqdm(total=_total_data, desc=f'Buffer: {current_obs.name}')
+        if not self.hot[b].has_capacity_for(data_left_to_transfer):
+            # We cannot actually transfer the observation due to size
+            # constraints
+            # TODO create an object method to update the hot buffer
+            self.cold[b].observations['stored'].append(current_obs)
+            self.cold[b].observations['transfer'] = None
+            return False
+        self._add_event(current_obs, "transfer", "started")
+        while True:
+            if data_left_to_transfer <= 0:
+                LOGGER.info(
+                    "Buffer transfer completed at time %s", self.env.now
+                )
+                self._add_event(current_obs, "transfer", "stopped")
+                break
+
+            check = self.hot[b].receive_observation(
+                current_obs,
+                data_left_to_transfer,
+                # Pick the slowest rate to transfer
+                min(self.hot[b].max_ingest_data_rate, self.cold[b].max_data_rate)
+            )
+
+            data_left_to_transfer = self.cold[b].transfer_observation(
+                current_obs, self.cold[b].max_data_rate, data_left_to_transfer
+            )
+            if check != data_left_to_transfer:
+                raise RuntimeError(
+                    "Hot and Cold Buffer receiving data at a differen rate"
+                )
+            if pbar:
+                pbar.update(n=self.cold[b].max_data_rate)
+            yield self.env.timeout(TIMESTEP)
+        if pbar:
+            pbar.close()
+        return True
 
     def ingest_data_stream(self, observation):
         """
@@ -331,6 +442,7 @@ class Buffer:
                 # observation.status = RunStatus.FINISHED
                 self.waiting_observation_list.append(observation)
                 self.hot[b].observations["stored"].append(observation)
+                self.stored_times.append(self.env.now)
                 break
 
             yield self.env.timeout(TIMESTEP)
@@ -431,8 +543,41 @@ class HotBuffer:
         self.stored_observations = []
         self.observations = {
             "stored": [],
-            "transfer": None
+            "transfer": None,
+            "scheduled": [],
+            "finished": []
         }
+
+    def has_capacity_for(self, observation_size):
+        """
+        Check if the HotBuffer has capacity (checks self.current_capacity).
+
+        Preferred approach over accessing self.current_capacity
+
+        We also need to check that the combined observation size of the capacity
+
+        Parameters
+        ----------
+        observation_size : int
+            The size of the observation
+
+        Returns
+        -------
+        True
+            If there is capacity
+        False
+            Otherwise.
+
+        """
+        size = observation_size
+        if self.observations['transfer']:
+            size = observation_size + self.observations[
+                'transfer'].total_data_size
+
+
+        return (
+                self.current_capacity - size >= 0
+        )
 
     def has_waiting_observations(self):
         """
@@ -485,12 +630,13 @@ class HotBuffer:
 
         if self.observations['transfer'] is None:
             self.observations['transfer'] = observation
+
         # We are doing a 'real-time' simulation, which means we treat the hot
         # and cold buffers as one buffer.
-
-        if transfer_rate < 0:
+        if transfer_rate < 0:  # 'Real Time': CB is an extension of HB
             self.current_capacity += observation.total_data_size
             residual_data -= observation.total_data_size
+
         elif residual_data < transfer_rate:
             self.current_capacity += residual_data
             residual_data = 0
@@ -502,9 +648,91 @@ class HotBuffer:
             self.observations['transfer'] = None
         return residual_data
 
+    def receive_observation(self, observation, residual_data, data_rate):
+        """
+        For an observation that needs to be moved to ColdBuffer storage,
+        we must 'receive' it.
+
+        Parameters
+        ----------
+        observation : topsim.core.telescope.Observation
+            The observation to be stored
+
+        residual_data : int
+            How much data is left to transfer
+        Returns
+        -------
+        residual_data
+            Decremented value of residual_data by the data_rate of ColdBuffer
+        """
+
+        self.observations['transfer'] = observation
+
+        if data_rate > 0:
+            if residual_data < data_rate:
+                self.current_capacity -= residual_data
+                residual_data = 0
+            else:
+                self.current_capacity -= data_rate
+                residual_data -= data_rate
+
+        else:
+            self.current_capacity -= observation.total_data_size
+            residual_data -= observation.total_data_size
+
+        if residual_data == 0:
+            self.observations['transfer'] = None
+            print('Added to hotbuffer')
+            self.observations['stored'].append(observation)
+
+        return residual_data
+
     def observation_for_transfer(self):
         self.observations['transfer'] = self.observations["stored"].pop()
         return self.observations['transfer']
+
+    def has_stored_observations(self):
+        """
+
+        Hides the dictionary nature of observations stored in the Buffer.
+        Returns
+        -------
+        True if there are observations in self.observations['stored']
+        """
+        return len(self.observations['stored']) > 0
+
+    def next_observation_for_processing(self):
+        """
+        Produces the next observation without removal
+
+        Returns
+        -------
+        topsim.core.telescope.Observation object
+        """
+        if len(self.observations['stored']) > 0:
+            self.observations['scheduled'].append(self.observations['stored'].pop())
+            return self.observations['scheduled'][-1]
+
+    def remove(self, observation):
+        """
+        Removes an observation from the cold buffer and updates the capacity
+        accordingly
+
+        Parameters
+        ----------
+        observation : topsim.core.telescope.Observation
+            The observation that is to be removed
+        Returns
+        -------
+        True if observation is stored and remove successfully
+        False otherwise
+        """
+        if observation in self.observations['scheduled']:
+            self.current_capacity += observation.total_data_size
+            self.observations['finished'].append(observation)
+            self.observations['scheduled'].remove(observation)
+            return True
+        return False
 
 
 class ColdBuffer:
@@ -538,11 +766,11 @@ class ColdBuffer:
         self.next_obs = 0
         self.observations = {
             'stored': [],
-            'transfer': None
+            'transfer': None,
         }
         self.env = env
 
-    def has_capacity(self, observation_size):
+    def has_capacity_for(self, observation_size):
         """
         Check if the ColdBuffer has capacity (checks self.current_capacity).
 
@@ -571,6 +799,36 @@ class ColdBuffer:
         return (
                 self.current_capacity - size >= 0
         )
+
+    def transfer_observation(self, observation, transfer_rate, residual_data):
+        """
+        Parameters
+        ----------
+        Returns
+        -------
+        residual_data : int
+            The amount of data left to transfer
+        """
+
+        if self.observations['transfer'] is None:
+            self.observations['transfer'] = observation
+
+        # We are doing a 'real-time' simulation, which means we treat the hot
+        # and cold buffers as one buffer.
+        if transfer_rate < 0:  # 'Real Time': CB is an extension of HB
+            self.current_capacity += observation.total_data_size
+            residual_data -= observation.total_data_size
+
+        elif residual_data < transfer_rate:
+            self.current_capacity += residual_data
+            residual_data = 0
+        else:
+            self.current_capacity += transfer_rate
+            residual_data -= transfer_rate
+
+        if residual_data == 0:
+            self.observations['transfer'] = None
+        return residual_data
 
     def receive_observation(self, observation, residual_data):
         """
@@ -620,6 +878,10 @@ class ColdBuffer:
         """
         return len(self.observations['stored']) > 0
 
+    def observation_for_transfer(self):
+        self.observations['transfer'] = self.observations["stored"].pop()
+        return self.observations['transfer']
+
     def next_observation_for_processing(self):
         """
         Produces the next observation without removal
@@ -654,4 +916,3 @@ class ColdBuffer:
             self.observations['stored'].remove(observation)
             return True
         return False
-

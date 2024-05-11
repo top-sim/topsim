@@ -58,15 +58,15 @@ class TestBatchSchedulerAllocation(unittest.TestCase):
         self.env = simpy.Environment()
         config = Config(CONFIG)
         self.cluster = Cluster(self.env, config=config)
-        self.buffer = Buffer(self.env, self.cluster, config)
-        self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, DynamicSchedulingFromPlan()
-        )
-        self.algorithm = BatchProcessing()
         self.model = BatchPlanning('batch')
         self.planner = Planner(
             self.env, self.cluster, self.model,
         )
+        self.buffer = Buffer(self.env, self.cluster, self.planner, config)
+        self.scheduler = Scheduler(
+            self.env, self.buffer, self.cluster, DynamicSchedulingFromPlan()
+        )
+        self.algorithm = BatchProcessing()
 
         self.telescope = Telescope(
             self.env, config, self.planner, self.scheduler

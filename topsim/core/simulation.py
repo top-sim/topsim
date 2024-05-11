@@ -163,7 +163,6 @@ class Simulation:
         #: :py:obj:`~topsim.core.cluster.Cluster` instance
         self.cluster = Cluster(env, self._cfg)
         #: :py:obj:`~topsim.core.buffer.Buffer` instance
-        self.buffer = Buffer(env, self.cluster, self._cfg)
         planning_algorithm = None
         planning_model = planning_model
 
@@ -174,6 +173,7 @@ class Simulation:
         self.planner = Planner(
             env, self.cluster, planning_model, delay
         )
+        self.buffer = Buffer(env, self.cluster, self.planner, self._cfg)
         scheduling_algorithm = scheduling
         #: :py:obj:`~topsim.core.scheduler.Scheduler` instance
         self.scheduler = Scheduler(
