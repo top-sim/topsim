@@ -133,8 +133,10 @@ class Telescope(Instrument):
                 capacity = self.total_arrays - self.telescope_use
                 # IF there is an observation ready for start
                 if observation.is_ready(self.env.now, capacity):
-                    LOGGER.info('Observation %s scheduled for %s',
-                                observation.name, self.env.now)
+                    # TODO update this with a counter so we know when
+                    # this occurs but it doesn't spam the terminal
+                    # LOGGER.info('Observation %s scheduled for %s',
+                    #             observation.name, self.env.now)
                     # Observation is ready - is the Buffer/Cluster?
                     if self.scheduler.check_ingest_capacity(observation,
                                                             self.pipelines,
