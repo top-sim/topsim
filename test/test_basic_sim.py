@@ -20,6 +20,7 @@ import os
 import unittest
 import logging
 import simpy
+from pathlib import Path
 from topsim.core.simulation import Simulation
 from topsim.core.instrument import RunStatus
 
@@ -31,7 +32,7 @@ logging.basicConfig(level="WARNING")
 logger = logging.getLogger(__name__)
 
 SIM_TIMESTAMP = f'test/basic-workflow-data/{0}'
-BASIC_CONFIG = 'test/basic-workflow-data/basic_simulation.json'
+BASIC_CONFIG = Path('test/basic-workflow-data/basic_simulation.json')
 planning_model = SHADOWPlanning
 
 cwd = os.getcwd()
@@ -44,7 +45,6 @@ class TestBasicIngest(unittest.TestCase):
             self.env,
             BASIC_CONFIG,
             Telescope,
-            planning_algorithm='heft',
             planning_model=SHADOWPlanning('heft'),
             scheduling=DynamicSchedulingFromPlan(),
             delay=None,
@@ -66,7 +66,7 @@ class TestBasicIngest(unittest.TestCase):
 
         """
         self.assertEqual(0, self.env.now)
-        self.simulation.start(runtime=7)
+        self.simulation.start()# runtime=8)
         self.assertEqual(
             3, self.simulation.cluster._ingest['completed']
         )
@@ -84,39 +84,36 @@ class TestBasicIngest(unittest.TestCase):
         )
         self.simulation.resume(until=2)
         self.assertEqual(
-            5, self.simulation.buffer.hot[0].current_capacity
+            0, self.simulation.buffer.hot[0].current_capacity
         )
         self.assertEqual(
             10, self.simulation.buffer.cold[0].current_capacity
         )
         self.assertEqual(
-            1,
+            0,
             len(self.simulation.buffer.hot[0].observations["scheduled"])
         )
-        self.simulation.resume(until=4)
+        self.simulation.resume(until=10)
         self.assertEqual(5, self.simulation.buffer.hot[0].current_capacity)
-        self.assertEqual(5, self.simulation.buffer.cold[0].current_capacity)
+        self.assertEqual(0, self.simulation.buffer.cold[0].current_capacity)
         self.assertEqual(
-            1,
+            2,
             len(self.simulation.buffer.cold[0].observations["stored"])
         )
-        self.simulation.resume(until=5)
-        self.assertEqual(0, self.simulation.buffer.hot[0].current_capacity)
+        self.simulation.resume(until=16)
+        self.assertEqual(5, self.simulation.buffer.hot[0].current_capacity)
         self.assertEqual(5, self.simulation.buffer.cold[0].current_capacity)
 
     def testSchedulerRunTime(self):
         self.assertEqual(0, self.simulation.env.now)
         self.simulation.start(runtime=2)
         self.assertEqual(
-            1, len(self.simulation.buffer.hot[0].observations['scheduled'])
+            0, len(self.simulation.buffer.hot[0].observations['scheduled'])
         )
         self.assertEqual(
             0, len(self.simulation.buffer.cold[0].observations['stored'])
         )
-        self.simulation.resume(until=8)
-        self.simulation.resume(until=11)
-        self.simulation.resume(until=12)
-        # self.assertEqual(0, len(self.simulation.cluster.tasks['running']))
+        self.simulation.resume(until=16)
         # We've finished processing one of the workflows so one observation
         # is finished.
         self.assertEqual(

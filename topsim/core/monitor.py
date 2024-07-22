@@ -61,8 +61,8 @@ class Monitor(object):
         )
         algs = pd.DataFrame(
             {
-                'planning': [str(self.simulation.planner.model.algorithm)],
-                'scheduling': [str(self.simulation.scheduler.algorithm)]
+                'planning': [self.simulation.planner.model.to_string()],
+                'scheduling': [self.simulation.scheduler.algorithm.to_string()]
             },
         )
         cf = pd.DataFrame({'config': [str(self.simulation._cfg_path)]})

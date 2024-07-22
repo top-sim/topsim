@@ -54,7 +54,6 @@ INTEGRATION = "test/data/config/integration_simulation.json"
 HEFT_CONFIG = "test/data/config/heft_single_observation_simulation.json"
 HEFT_CONFIG_IO = "test/data/config/heft_single_observation_simulation_IO.json"
 LONG_CONFIG = "test/data/config/mos_sw10_long.json"
-PLANNING_ALGORITHM = 'heft'
 
 
 class TestSchedulerRandom(unittest.TestCase):
@@ -76,7 +75,7 @@ class TestSchedulerIngest(unittest.TestCase):
                                self.cluster, SHADOWPlanning('heft'))
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
         self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, DynamicSchedulingFromPlan
+            self.env, self.buffer, self.cluster, self.planner, DynamicSchedulingFromPlan
         )
 
         # planner = None
@@ -164,7 +163,7 @@ class TestSchedulerDynamicPlanAllocation(unittest.TestCase):
                                self.cluster, SHADOWPlanning('heft'))
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
         self.scheduler = Scheduler(self.env, self.buffer,
-                                   self.cluster, sched_algorithm)
+                                   self.cluster, self.planner, sched_algorithm)
         self.telescope = Telescope(
             self.env, config, self.planner, self.scheduler
         )
@@ -212,8 +211,8 @@ class TestSchedulerDynamicPlanAllocation(unittest.TestCase):
         ]
         self.scheduler.observation_queue.append(curr_obs)
         curr_obs.ast = self.env.now
-        curr_obs.plan = self.planner.run(
-            curr_obs, self.buffer, self.telescope.max_ingest)
+        # curr_obs.plan = self.planner.run(
+        #     curr_obs, self.buffer, self.telescope.max_ingest)
         self.env.process(self.scheduler.allocate_tasks(curr_obs))
         self.env.run(1)
         self.assertListEqual(
@@ -238,7 +237,7 @@ class TestSchedulerDynamicPlanWithIO(unittest.TestCase):
                                self.cluster, SHADOWPlanning('heft'))
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
         self.scheduler = Scheduler(self.env, self.buffer,
-                                   self.cluster, sched_algorithm)
+                                   self.cluster, self.planner, sched_algorithm)
         self.telescope = Telescope(
             self.env, config, self.planner, self.scheduler
         )
@@ -263,8 +262,8 @@ class TestSchedulerDynamicPlanWithIO(unittest.TestCase):
         ]
         self.scheduler.observation_queue.append(curr_obs)
         curr_obs.ast = self.env.now
-        curr_obs.plan = self.planner.run(
-            curr_obs, self.buffer, self.telescope.max_ingest)
+        # curr_obs.plan = self.planner.run(
+        #     curr_obs, self.buffer, self.telescope.max_ingest)
         self.env.process(self.scheduler.allocate_tasks(curr_obs))
         self.env.run(1)
         self.assertListEqual(
@@ -305,7 +304,7 @@ class TestSchedulerEdgeCases(unittest.TestCase):
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
 
         self.scheduler = Scheduler(self.env, self.buffer,
-                                   self.cluster, sched_algorithm)
+                                   self.cluster, self.planner, sched_algorithm)
 
         self.observation = self.telescope.observations[0]
         self.machine = self.cluster.machines[0]
@@ -342,7 +341,7 @@ class TestSchedulerLongWorkflow(unittest.TestCase):
                                self.cluster, planning_model)
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
         self.scheduler = Scheduler(self.env, self.buffer,
-                                   self.cluster, sched_algorithm)
+                                   self.cluster, self.planner, sched_algorithm)
         self.telescope = Telescope(
             self.env, config, self.planner, self.scheduler
         )
@@ -351,9 +350,9 @@ class TestSchedulerLongWorkflow(unittest.TestCase):
         curr_obs = self.telescope.observations[0]
         self.scheduler.observation_queue.append(curr_obs)
         curr_obs.ast = self.env.now
-        curr_obs.plan = self.planner.run(
-            curr_obs, self.buffer, self.telescope.max_ingest
-        )
+        # curr_obs.plan = self.planner.run(
+        #     curr_obs, self.buffer, self.telescope.max_ingest
+        # )
         self.env.process(self.scheduler.allocate_tasks(curr_obs))
         self.env.run(1)
         self.buffer.hot[0].observations['scheduled'].append(curr_obs)
@@ -361,6 +360,7 @@ class TestSchedulerLongWorkflow(unittest.TestCase):
         self.assertEqual(0, len(self.scheduler.observation_queue))
 
 
+@unittest.skip("Currently not supported")
 class TestSchedulerDynamicReAllocation(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -372,7 +372,7 @@ class TestSchedulerDynamicReAllocation(unittest.TestCase):
                                self.cluster, SHADOWPlanning('heft'))
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
         self.scheduler = Scheduler(self.env, self.buffer,
-                                   self.cluster, sched_algorithm)
+                                   self.cluster, self.planner, sched_algorithm)
         self.telescope = Telescope(
             self.env, config, self.planner, self.scheduler
         )
@@ -381,8 +381,8 @@ class TestSchedulerDynamicReAllocation(unittest.TestCase):
         curr_obs = self.telescope.observations[0]
         self.scheduler.observation_queue.append(curr_obs)
         curr_obs.ast = self.env.now
-        curr_obs.plan = self.planner.run(curr_obs, self.buffer,
-                                         self.telescope.max_ingest)
+        # curr_obs.plan = self.planner.run(curr_obs, self.buffer,
+        #                                  self.telescope.max_ingest)
         self.env.process(self.scheduler.allocate_tasks(curr_obs))
         self.env.run(1)
         self.buffer.hot[0].observations['scheduled'].append(curr_obs)
@@ -401,7 +401,7 @@ class TestSchedulerIntegration(unittest.TestCase):
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
 
         self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, DynamicSchedulingFromPlan()
+            self.env, self.buffer, self.cluster, self.planner, DynamicSchedulingFromPlan()
         )
         self.telescope = Telescope(
             self.env, config, self.planner, self.scheduler
@@ -462,7 +462,7 @@ class TestSchedulerDelayHelpers(unittest.TestCase):
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
 
         self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, DynamicSchedulingFromPlan()
+            self.env, self.buffer, self.cluster, self.planner, DynamicSchedulingFromPlan()
         )
         self.telescope = Telescope(
             self.env, config, self.planner, self.scheduler

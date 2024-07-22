@@ -2,8 +2,10 @@
 Algorithm presents the abstract base class for any Scheduling algorithm.
 """
 
-
 from abc import ABC, abstractmethod
+
+from topsim.core.cluster import Cluster
+from topsim.core.planner import Planner, WorkflowPlan
 
 
 class Scheduling(ABC):
@@ -29,14 +31,27 @@ class Scheduling(ABC):
 
     It is also important for the algorithm to take into account 
 
-
     """
 
     def __init__(self):
         self.name = "AbstractAlgorithm"
+        self.ingest_requirements = 0
 
     @abstractmethod
-    def run(self, cluster, clock, plan, schedule, task_pool):
+    def to_string(self):
+        """
+        Return the string name of the implemenation of this class
+        """
+        pass
+
+    @abstractmethod
+    def run(self,
+            cluster: Cluster,
+            planner: Planner,
+            clock, plan: WorkflowPlan,
+            schedule,
+            task_pool,
+            **kwargs):
         """
 
         Parameters

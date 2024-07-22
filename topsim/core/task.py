@@ -119,6 +119,8 @@ class Task(object):
         if self.aft > self.eft:
             self.delay_flag = True
         # self.task_status = TaskStatus.FINISHED
+        # print(total_duration, self.aft-self.ast)
+
         logger.debug('%s finished at %s', self.id,
                      self.aft)  # return TaskStatus.FINISHED
 

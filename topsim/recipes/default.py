@@ -35,8 +35,6 @@ CLUSTER_CONFIG = 'test/data/config/basic_spec-10.json'
 BUFFER_CONFIG = 'test/data/config/buffer.json'
 EVENT_FILE = 'recipes/output/sim.trace'
 
-# Planning Algorithm - needs to be in our external library
-planning_algorithm = 'heft'
 
 # Scheduling Algorithm - these are implemented in a specific format to work
 # in conjunction with the Scheduler Actor
@@ -50,7 +48,6 @@ simulation = Simulation(
     TELESCOPE_CONFIG,
     CLUSTER_CONFIG,
     BUFFER_CONFIG,
-    planning_algorithm,
     scheduling_algorithm,
     EVENT_FILE,
     visualisation=False

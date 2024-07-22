@@ -32,7 +32,6 @@ from topsim.user.schedule.dynamic_plan import DynamicSchedulingFromPlan
 from topsim.user.plan.static_planning import SHADOWPlanning
 
 INTEGRATION = "test/data/config/integration_simulation.json"
-PLANNING_ALGORITHM = 'heft'
 
 
 class TestDelayCreation(unittest.TestCase):
@@ -93,7 +92,7 @@ class TestDelaysInActors(unittest.TestCase):
         self.buffer = Buffer(self.env, self.cluster, self.planner,config)
 
         self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, DynamicSchedulingFromPlan()
+            self.env, self.buffer, self.cluster, self.planner, DynamicSchedulingFromPlan()
         )
         self.telescope = Telescope(
             self.env, config, self.planner, self.scheduler

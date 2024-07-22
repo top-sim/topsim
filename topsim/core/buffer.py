@@ -110,7 +110,11 @@ class Buffer:
                 if self.check_buffer_over_data_threshold(b):
                     if self.env.now in self.stored_times:
                         continue
-                    if self.cold[b].has_capacity_for(
+                    if self.has_observations_stored(b) and self.cold[b].has_capacity_for(
+                        # TODO Fix the issue here of us being over threshold whilst
+                        # we are still ingesting, so nothing is in "stored"
+                        # SHould be simple as checking if store size is not None
+                        # Only want to move if the size > 1
                         self.hot[b].observations['stored'][
                                     -1].total_data_size
                         ):
@@ -118,8 +122,7 @@ class Buffer:
                 #         else: Something quite wrong has gone? When we accept ingest we should make sure
                 #         that all buffers have capacity below a particular threshold
 
-                if ((self.hot[b].current_capacity + self._data_left_to_transfer)
-                      / self.hot[b].total_capacity < self.threshold):
+                if (1-(self.hot[b].current_capacity + self._data_left_to_transfer) / self.hot[b].total_capacity) < self.threshold:
                     if self.cold[b].observations['stored']:
                         if self.project_buffer_capacity(self.cold[b].observations['stored'][-1], b):
                             self.env.process(self.move_cold_to_hot(b))
@@ -133,6 +136,10 @@ class Buffer:
     def check_buffer_over_data_threshold(self,b):
         return  ((self.hot[b].total_capacity - self.hot[b].current_capacity)
                 / self.hot[b].total_capacity) > self.threshold
+
+    def has_observations_stored(self, b):
+        return len(self.hot[b].observations['stored']) > 1
+
 
     def project_buffer_capacity(self, obs, b):
         numerator = self.hot[b].total_capacity - (self.hot[b].current_capacity)
@@ -224,7 +231,6 @@ class Buffer:
         # This should triger
         for b in self.hot:
             obs = self.hot[b].next_observation_for_processing()
-            obs.plan = self.planner.run(obs, self, None)
             return obs
 
     def mark_observation_finished(self, observation):
@@ -396,7 +402,8 @@ class Buffer:
             )
 
             data_left_to_transfer = self.cold[b].transfer_observation(
-                current_obs, self.cold[b].max_data_rate, data_left_to_transfer
+                current_obs, min(self.hot[b].max_ingest_data_rate, self.cold[b].max_data_rate),
+                data_left_to_transfer
             )
             if check != data_left_to_transfer:
                 raise RuntimeError(
@@ -442,7 +449,8 @@ class Buffer:
                 # observation.status = RunStatus.FINISHED
                 self.waiting_observation_list.append(observation)
                 self.hot[b].observations["stored"].append(observation)
-                self.stored_times.append(self.env.now)
+                curr_time = int(self.env.now)
+                self.stored_times.append(curr_time)
                 break
 
             yield self.env.timeout(TIMESTEP)
@@ -768,7 +776,7 @@ class ColdBuffer:
             'stored': [],
             'transfer': None,
         }
-        self.env = env
+        # self.env = env
 
     def has_capacity_for(self, observation_size):
         """

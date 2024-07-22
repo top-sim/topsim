@@ -286,8 +286,8 @@ class Cluster:
                     #                                     predecessor_allocations))
                     ret = machine.run(task, self.env, predecessor_allocations)
                 else:
-                    # self.clusters[c]['resources']['available'].remove(machine)
-                    # self.clusters[c]['resources']['occupied'].append(machine)
+                    # self._clusters[c]['resources']['available'].remove(machine)
+                    # self._clusters[c]['resources']['occupied'].append(machine)
                     self._set_machine_occupied(machine, observation)
                     self._clusters[c]['tasks']['running'].append(task)
                     self._clusters[c]['usage_data']['available'] -= 1
@@ -309,7 +309,8 @@ class Cluster:
                     self._clusters[c]['resources']['available'].append(machine)
                     self._clusters[c]['usage_data']['ingest'] -= 1
                 else:
-                    # self.clusters[c]['resources']['occupied'].remove(machine)
+                    # self._clusters[c]['resources']['occupied'].remove(machine)
+                    # self._clusters[c]['resources']['available'].append(machine)
                     self._set_machine_available(machine, observation)
                 self._clusters[c]['usage_data']['available'] += 1
                 task.task_status = TaskStatus.FINISHED
@@ -396,6 +397,7 @@ class Cluster:
         for m in range(0, size):
             self._add_idle_resource(name, available_resources[m])
 
+        logger.info(f"{size} machines provisioned for {name}")
         self.num_provisioned_obs += 1
         return True
 
@@ -546,7 +548,7 @@ class Cluster:
             self._clusters[c]['resources'][pool].append(machine)
             return True
         else:
-            return False
+            raise RuntimeError("Incorrect allocation")
 
     def _set_machine_available(self, machine, observation, ingest=False, c='default'):
         """
