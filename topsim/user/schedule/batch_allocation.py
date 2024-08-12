@@ -15,6 +15,7 @@
 
 import copy
 import logging
+import json
 import networkx as nx
 
 from topsim.core.task import TaskStatus
@@ -47,13 +48,17 @@ class BatchProcessing(Scheduling):
     def __init__(
         self,
         max_resource_partitions=1,
-        min_resources_per_workflow=3,
+        min_resources_per_workflow=2,
         resource_split=None,
+        ignore_ingest=False,
+        use_workflow_dop=False
     ):
         super().__init__()
         self.max_resources_split = max_resource_partitions
         self.min_resource_per_workflow = min_resources_per_workflow
         self.resource_split = resource_split
+        self.ignore_ingest = ignore_ingest
+        self.use_workflow_dop = use_workflow_dop
 
     def __str__(self):
         return "BatchProcessing"
@@ -197,7 +202,25 @@ class BatchProcessing(Scheduling):
                 return min(available, max_resource_limit)
 
         else:
-            max_allowed = int(len(cluster) / self.max_resources_split) - self.ingest_requirements
+            if self.ignore_ingest:
+                self.ingest_requirements = 0
+
+            if self.use_workflow_dop:
+                with open(observation.workflow, 'r') as infile:
+                    wfconfig = json.load(infile)
+                graph = nx.readwrite.json_graph.node_link_graph(wfconfig['graph'])
+
+                graph_dop = (max(graph.out_degree(list(graph.nodes)),
+                             key=lambda x: x[1]))[1] / 2
+
+                min_resources = int(graph_dop)
+                if min_resources == len(cluster):
+                    min_resources = int(graph_dop/2)
+                if available >= min_resources:
+                    return min_resources
+
+            max_allowed = int(
+                len(cluster) / self.max_resources_split) - self.ingest_requirements
             if available == 0:
                 return 0
             if available < max_allowed:

@@ -14,7 +14,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import copy
 import logging
+import json
 import pandas as pd
+import networkx as nx
 
 from topsim.algorithms.scheduling import Scheduling
 from topsim.core.planner import WorkflowStatus
@@ -32,7 +34,8 @@ class DynamicSchedulingFromPlan(Scheduling):
                  max_resource_partitions=1,
                  min_resources_per_workflow=2,
                  resource_split=None,
-                 ignore_ingest=False
+                 ignore_ingest=False,
+                 use_workflow_dop=False
                  ):
         super().__init__()
         self.accurate = 0
@@ -42,6 +45,7 @@ class DynamicSchedulingFromPlan(Scheduling):
         self.min_resource_per_workflow = min_resources_per_workflow
         self.ignore_ingest = ignore_ingest
         self.resource_split = resource_split
+        self.use_workflow_dop = use_workflow_dop
 
     def __str__(self):
         return "DynamicAllocationFromFixedStaticPlan"
@@ -70,22 +74,21 @@ class DynamicSchedulingFromPlan(Scheduling):
         allocations, WorkflowStatus, false
         """
         observation = kwargs['observation']
-        provision = self._provision_resources(cluster, observation.name)
+
+        provision = self._provision_resources(cluster, observation)
         if clock % 100 == 0 and not provision:
             logger.info(f"{observation.name} attempted to provision @ {clock}.")
+
 
         allocations = copy.copy(existing_schedule)
         if not provision:
            return allocations, workflow_plan, task_pool #allocations, workflow_plan.status, task_pool
         if not workflow_plan and provision:
+            # for m in cluster.get_idle_resources(observation.name):
+            #     logger.info("Provisioning: %s", m)
             workflow_plan = planner.run(observation, None, None)
 
-        cluster = cluster
-        machines = cluster.machines
-        # workflow_id = workflow_plan.id
-        # tasks = workflow_plan.tasks
         replace = False
-
         if not task_pool:
             for task in workflow_plan.tasks:
                 if not list(workflow_plan.graph.predecessors(task)):
@@ -97,12 +100,12 @@ class DynamicSchedulingFromPlan(Scheduling):
             self.alternate = 0
             temporary_resources = cluster.get_idle_resources(observation.name)
             if self._report:
-                logger.info("%s available resoureces", len(temporary_resources))
+                logger.info("%s available resources", len(temporary_resources))
                 self._report = False
-
             max_allocations_iteration = len(temporary_resources)
             for task in sorted(task_pool, key=lambda x: x.est):
-                # print(f"{clock=}, {len(temporary_resources)=}")
+                # If we have exhausted all possible allocations for this
+                # timestep, there no need to iterat
                 if len(allocations) >= max_allocations_iteration:
                     break
                 if (
@@ -139,14 +142,6 @@ class DynamicSchedulingFromPlan(Scheduling):
                         if count < len(pred):
                             # One of the predecessors of 't' is still running
                             continue
-                        # machine = cluster.get_machine_from_id(
-                        #     task.allocated_machine_id
-                        # )
-                        # finished = set(t.id for t in cluster.finished_tasks)
-                        # # Check if there is an overlap between the two sets
-                        # if not pred.issubset(finished):
-                        #     # One of the predecessors of 't' is still running
-                        #     continue
                         else:
                             allocations[task] = machine
                             temporary_resources.remove(machine)
@@ -178,7 +173,7 @@ class DynamicSchedulingFromPlan(Scheduling):
         """
         return self.cluster.is_occupied(machine)
 
-    def _max_resource_provision(self, cluster, workflow_plan=None):
+    def _max_resource_provision(self, cluster, observation=None):
         """
 
         Calculate the appropriate number of resources to provision accordingly
@@ -209,14 +204,14 @@ class DynamicSchedulingFromPlan(Scheduling):
         # TODO consider making the cluster initialised with the max ingest resources for the simulation
         # This can be used to ensure we never dig into ingest resources?
         available = len(cluster.get_available_resources())
-        logger.info("Available resources are: %s", available)
+        # logger.info("Available resources are: %s", available)
         # Ensure we don't provision more than is acceptable for a single
         # workflow
 
         #  TODO do We need to make sure there's enough left for ingest to
         #   occur?
         if self.resource_split:
-            min_resource_limit, max_resource_limit = self.resource_split[workflow_plan.id]
+            min_resource_limit, max_resource_limit = self.resource_split[observation.workflow_plan.id]
             if min_resource_limit > len(cluster):
                 raise RuntimeError("Minimum resource demand is not supported by cluster")
             elif available == 0:
@@ -229,17 +224,35 @@ class DynamicSchedulingFromPlan(Scheduling):
         else:
             if self.ignore_ingest:
                 self.ingest_requirements = 0
+
             max_allowed = int(
                 len(cluster) / self.max_resources_split) - self.ingest_requirements
-            if max_allowed == 0 and self.ingest_requirements == len(cluster):
-                # We will never be allowed to ingest anything unless we allow resources!
-                max_allowed = len(cluster)
-            if available == 0:
-                return 0
-            if available < max_allowed:
-                return available
+
+            if self.use_workflow_dop:
+                with open(observation.workflow, 'r') as infile:
+                    wfconfig = json.load(infile)
+                graph = nx.readwrite.json_graph.node_link_graph(wfconfig['graph'])
+
+                graph_dop = (max(graph.out_degree(list(graph.nodes)),
+                             key=lambda x: x[1]))[1] / 2
+
+                min_resources = int(graph_dop)
+                if min_resources == len(cluster):
+                    min_resources = int(graph_dop/2)
+                if available >= min_resources:
+                    return min_resources
+
             else:
-                return max_allowed
+                if max_allowed == 0 and self.ingest_requirements == len(cluster):
+                    # We will never be allowed to ingest anything unless we allow resources!
+                    max_allowed = len(cluster)
+                if available == 0:
+                    return 0
+
+                if available < max_allowed:
+                    return available
+                else:
+                    return max_allowed
 
     def _provision_resources(self, cluster, observation):
         """
@@ -255,7 +268,7 @@ class DynamicSchedulingFromPlan(Scheduling):
         -------
 
         """
-        if cluster.is_observation_provisioned(observation):
+        if cluster.is_observation_provisioned(observation.name):
             # logger.info(f"{workflow_plan.id} already provisioned.")
             return True
         else:
@@ -264,9 +277,9 @@ class DynamicSchedulingFromPlan(Scheduling):
                 if provision < self.min_resource_per_workflow:
                     return False
                 else:
-                    # logger.info(f"{provision} machines provisioned for {workflow_plan.id}")
+                    logger.info(f"{provision} machines provisioned for {observation.name}")
                     return cluster.provision_batch_resources(provision,
-                                                             observation)
+                                                             observation.name)
             else:
                 return False
 

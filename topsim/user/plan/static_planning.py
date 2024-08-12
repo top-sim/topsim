@@ -119,7 +119,7 @@ class SHADOWPlanning(Planning):
             self._create_observation_task_id(x, observation, clock)
             for x in solution.execution_order
         ]
-        print(f"Final workflow runtime estimate: {tasks[-1].est}")
+        # print(f"Final workflow runtime estimate: {tasks[-1].est}")
 
         return WorkflowPlan(
             observation.name, est, eft, tasks, exec_order,
@@ -211,9 +211,9 @@ class SHADOWPlanning(Planning):
         #  improve this moving forward?
         # TODO entire machines
         available_resources  = cluster.get_idle_resources(observation.name)
-        # available_resources = cluster.get_available_resources()
         logging.info("%d resources available for planning.",
                      len(available_resources))
+
         dictionary = {
             "system": {
                 "resources": None,

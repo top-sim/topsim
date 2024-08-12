@@ -283,11 +283,8 @@ class Scheduler:
         _total_tasks = 0 # len(current_plan.tasks)
         _curr_tasks = 0 # len(current_plan.tasks)
         _tqdm = True
+        pbar_setup = False
         pbar = None
-        if _tqdm:
-            pbar = tqdm(total=_total_tasks,
-                        desc=f'Scheduler: {observation.name}', unit="Tasks",
-                        leave=True,position=1)
         self._add_event(observation, "allocation", "started")
         while True:
             if current_plan:
@@ -303,6 +300,13 @@ class Scheduler:
             if not current_plan:
                 yield self.env.timeout(TIMESTEP)
                 continue
+            if _tqdm and not pbar_setup:
+                _total_tasks = len(current_plan.tasks)
+                _curr_tasks = len(current_plan.tasks)
+                pbar = tqdm(total=_total_tasks,
+                            desc=f'Scheduler: {observation.name}', unit="Tasks",
+                            leave=True, position=1)
+                pbar_setup = True
             # prev_tasks = _curr_tasks
             # _curr_tasks = len(current_plan.tasks)
             tmp = _curr_tasks

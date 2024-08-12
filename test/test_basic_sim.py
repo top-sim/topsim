@@ -37,6 +37,7 @@ planning_model = SHADOWPlanning
 
 cwd = os.getcwd()
 
+
 class TestBasicIngest(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -46,7 +47,8 @@ class TestBasicIngest(unittest.TestCase):
             BASIC_CONFIG,
             Telescope,
             planning_model=SHADOWPlanning('heft'),
-            scheduling=DynamicSchedulingFromPlan(),
+            scheduling=DynamicSchedulingFromPlan(min_resources_per_workflow=1,
+                                                 ignore_ingest=True),
             delay=None,
             timestamp=0
         )
@@ -66,7 +68,7 @@ class TestBasicIngest(unittest.TestCase):
 
         """
         self.assertEqual(0, self.env.now)
-        self.simulation.start()# runtime=8)
+        self.simulation.start()  # runtime=8)
         self.assertEqual(
             3, self.simulation.cluster._ingest['completed']
         )
@@ -117,6 +119,5 @@ class TestBasicIngest(unittest.TestCase):
         # We've finished processing one of the workflows so one observation
         # is finished.
         self.assertEqual(
-        1, len(self.simulation.buffer.hot[0].observations['finished'])
+            1, len(self.simulation.buffer.hot[0].observations['finished'])
         )
-

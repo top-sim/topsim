@@ -107,7 +107,7 @@ class Task(object):
             self.duration = self.calculate_runtime(machine)
         total_duration = self._calc_task_delay()
         if total_duration < 1:
-            yield env.timeout(1)
+            yield env.timeout(0)
         else:
             yield env.timeout(total_duration - 1)
 
