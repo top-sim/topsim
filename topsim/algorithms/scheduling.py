@@ -31,7 +31,15 @@ class Scheduling(ABC):
 
     It is also important for the algorithm to take into account 
 
+
     """
+
+    # The below constants have been derived from the SDP parametric model.
+    LOW_REALTIME_RESOURCES = 164
+    MID_REALTIME_RESOURCES = 281
+
+    LOW_MAX_RESOURCES = 896
+    MID_MAX_RESOURCES = 786
 
     def __init__(self):
         self.name = "AbstractAlgorithm"

@@ -53,13 +53,19 @@ class Experiment:
     to avoid significantly large script files.
     """
 
-    def __init__(self, configuration: list() = None, alloc_combinations: list(tuple()) = None,
-                 output=None, delay: bool = False):
+    def __init__(
+            self,
+            configuration: list() = None,
+            alloc_combinations: list(tuple()) = None,
+            output=None,
+            delay: bool = False,
+            **kwargs):
         self._configuration = configuration
         self._combinations = alloc_combinations
         self._delay = delay
         self._output = Path(output)
         self._sims = []
+        self.sched_args = kwargs['sched_args']
 
     def _build_simulations(self):
         if not self._output.exists():
@@ -78,11 +84,9 @@ class Experiment:
                     raise RuntimeError("Planning '%s' is not supported", plan)
 
                 if sched == "dynamic_plan":
-                    sched = DynamicSchedulingFromPlan(ignore_ingest=False,
-                                                      use_workflow_dop=True)
+                    sched = DynamicSchedulingFromPlan(**self.sched_args)
                 else:
-                    sched = BatchProcessing(ignore_ingest=False,
-                                            use_workflow_dop=True)
+                    sched = BatchProcessing(**self.sched_args)
                 env = simpy.Environment()
                 instrument = Telescope
                 yield Simulation(env=env, config=c, instrument=instrument,
@@ -122,7 +126,8 @@ class Experiment:
             st = time.time()
             try:
                 s.start()
-            except ValueError:
+            except ValueError as exp:
+                print(exp)
                 print(f"Simulation {i+1} did not run due to non-useable simulation "
                       f"parameters")
             # self._sims.remove(s)

@@ -76,8 +76,8 @@ class DynamicSchedulingFromPlan(Scheduling):
         observation = kwargs['observation']
 
         provision = self._provision_resources(cluster, observation)
-        if clock % 100 == 0 and not provision:
-            logger.info(f"{observation.name} attempted to provision @ {clock}.")
+        # if clock % 100 == 0 and not provision:
+            # logger.info(f"{observation.name} attempted to provision @ {clock}.")
 
 
         allocations = copy.copy(existing_schedule)
@@ -225,9 +225,9 @@ class DynamicSchedulingFromPlan(Scheduling):
             if self.ignore_ingest:
                 self.ingest_requirements = 0
 
-            max_allowed = int(
-                len(cluster) / self.max_resources_split) - self.ingest_requirements
-
+            if len(cluster) == self.LOW_MAX_RESOURCES:
+                self.ingest_requirements = self.LOW_REALTIME_RESOURCES
+            
             if self.use_workflow_dop:
                 with open(observation.workflow, 'r') as infile:
                     wfconfig = json.load(infile)
@@ -243,12 +243,14 @@ class DynamicSchedulingFromPlan(Scheduling):
                     return min_resources
 
             else:
+                max_allowed = int(
+                    len(cluster) / self.max_resources_split) - self.ingest_requirements
+
                 if max_allowed == 0 and self.ingest_requirements == len(cluster):
                     # We will never be allowed to ingest anything unless we allow resources!
                     max_allowed = len(cluster)
                 if available == 0:
                     return 0
-
                 if available < max_allowed:
                     return available
                 else:

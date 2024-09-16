@@ -76,8 +76,8 @@ class BatchProcessing(Scheduling):
         allocations = copy.copy(existing_schedule)
         observation = kwargs['observation']
         provision = self._provision_resources(cluster, observation)
-        if clock % 100 == 0 and not provision:
-            logger.info(f"{observation.name} attempted to provision @ {clock}.")
+        # if clock % 100 == 0 and not provision:
+        #     logger.info(f"{observation.name} attempted to provision @ {clock}.")
             # logger.info(f"{cluster.num_provisioned_obs} existing provs.")
         # tasks = workflow_plan.tasks
         allocations = copy.copy(existing_schedule)
@@ -205,6 +205,11 @@ class BatchProcessing(Scheduling):
             if self.ignore_ingest:
                 self.ingest_requirements = 0
 
+            # If the number of resources are the maximal resources, we use the pre-calc'd
+            # maximum resources
+            if len(cluster) == self.LOW_MAX_RESOURCES:
+                self.ingest_requirements = self.LOW_REALTIME_RESOURCES
+                
             if self.use_workflow_dop:
                 with open(observation.workflow, 'r') as infile:
                     wfconfig = json.load(infile)
@@ -218,15 +223,23 @@ class BatchProcessing(Scheduling):
                     min_resources = int(graph_dop/2)
                 if available >= min_resources:
                     return min_resources
-
-            max_allowed = int(
-                len(cluster) / self.max_resources_split) - self.ingest_requirements
-            if available == 0:
-                return 0
-            if available < max_allowed:
-                return available
             else:
-                return max_allowed
+                # TODO consider removing the concept of the max_resources_split
+                max_allowed = int(
+                    len(cluster) / self.max_resources_split) - self.ingest_requirements
+                
+                if max_allowed == 0 and self.ingest_requirements == len(cluster):
+                    # We will never be allowed to ingest anything unless we allow resources!
+                    max_allowed = len(cluster)
+                if available == 0:
+                    return 0
+                if available < max_allowed:
+                    return available
+                else:
+                    return max_allowed
+
+    # TODO move this and the _max_resource_provision into AbstractBaseClass as we are
+    # just duplicating the information.
 
     def _provision_resources(self, cluster, observation):
         """
