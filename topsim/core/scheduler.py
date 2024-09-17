@@ -260,20 +260,10 @@ class Scheduler:
         if observation is None:
             return False
 
-        # TODO consider running the planner here to run the plan
-        #  against the current resources available
+        # TODO determine how to calculate runtime delay with planner being triggered
+        # in a new place
 
-        # elif current_plan is None:
-        #     current_plan = observation.plan
-        # if current_plan is None:
-        #     raise RuntimeError(
-        #         "Observation should have pre-plan; Planner actor has "
-        #         "failed at runtime.")
-        # current_plan.ast = self.env.now
-        # for task in current_plan.tasks:
-        #     task.workflow_offset = self.env.now
-
-        # Do we have a runtime delay?
+        # Answers the question: Do we have a runtime delay?
         # if current_plan.est >= self.env.now + TIMESTEP: # Give us leeway on if we are one timestep out
         #     self.schedule_status.DELAYED
 

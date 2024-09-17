@@ -124,30 +124,30 @@ class TestMonitorNoFileOption(unittest.TestCase):
         # self.ts = f'{cwd}/test/simulation_pickles/{0}'
 
     def test_simulation_nofile_option(self):
-        # simulation = Simulation(
-        #     self.env,
-        #     CONFIG,
-        #     self.instrument,
-        #     planning_model=SHADOWPlanning('heft'),
-        #     scheduling=DynamicSchedulingFromPlan(),
-        #     delay=None,
-        #     timestamp=None,
-        # )
-        # simdf, taskdf = simulation.start()
-        # self.assertEqual(108, len(simdf))
-        # self.env = simpy.Environment()
-        # simulation = Simulation(
-        #     self.env,
-        #     CONFIG,
-        #     self.instrument,
-        #     planning_model=SHADOWPlanning('fcfs'),
-        #     scheduling=DynamicSchedulingFromPlan(),
-        #     delay=None,
-        #     timestamp=None,
-        #     # delimiters=f'test/{algorithm}'
-        # )
-        # simdf, taskdf = simulation.start()
-        # self.assertEqual(122, len(simdf))
+        simulation = Simulation(
+            self.env,
+            CONFIG,
+            self.instrument,
+            planning_model=SHADOWPlanning('heft'),
+            scheduling=DynamicSchedulingFromPlan(),
+            delay=None,
+            timestamp=None,
+        )
+        simdf, taskdf = simulation.start()
+        self.assertEqual(105, len(simdf))
+        self.env = simpy.Environment()
+        simulation = Simulation(
+            self.env,
+            CONFIG,
+            self.instrument,
+            planning_model=SHADOWPlanning('fcfs'),
+            scheduling=DynamicSchedulingFromPlan(),
+            delay=None,
+            timestamp=None,
+            # delimiters=f'test/{algorithm}'
+        )
+        simdf, taskdf = simulation.start()
+        self.assertEqual(135, len(simdf))
         self.env = simpy.Environment()
         simulation = Simulation(
             self.env,

@@ -103,7 +103,6 @@ class TestBatchSchedulerAllocation(unittest.TestCase):
 
     def test_algorithm_allocation(self):
         obs = self.telescope.observations[0]
-        # obs.plan = self.planner.run(obs, self.buffer, self.telescope.max_ingest)
         # Replicate the Scheduler allocate_task() methods
         existing_schedule = {}
         task_pool = set()

@@ -286,16 +286,6 @@ class DynamicSchedulingFromPlan(Scheduling):
                 return False
 
 
-"""
-
-        graph_dop = (max(workflow.graph.out_degree(list(workflow.graph.nodes)), key=lambda x: x[1]))[1]/2
-        logging.info("Graph parallelism is %d, updating resources from %d", graph_dop,
-                 len(available_resources))
-
-        available_resources = available_resources[:int(graph_dop)]
-"""
-
-
 class GlobalDagDelayHeuristic(Scheduling):
     """
     Implementation of the bespoke Delay heuristic I have been working on

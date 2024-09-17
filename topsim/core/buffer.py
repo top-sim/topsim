@@ -111,18 +111,14 @@ class Buffer:
                     if self.env.now in self.stored_times:
                         continue
                     if self.has_observations_stored(b) and self.cold[b].has_capacity_for(
-                        # TODO Fix the issue here of us being over threshold whilst
-                        # we are still ingesting, so nothing is in "stored"
-                        # SHould be simple as checking if store size is not None
-                        # Only want to move if the size > 1
-                        self.hot[b].observations['stored'][
-                                    -1].total_data_size
-                        ):
+                        self.hot[b].observations['stored'][-1].total_data_size):
                             self.env.process(self.move_hot_to_cold(b))
-                #         else: Something quite wrong has gone? When we accept ingest we should make sure
-                #         that all buffers have capacity below a particular threshold
 
-                if (1-(self.hot[b].current_capacity + self._data_left_to_transfer) / self.hot[b].total_capacity) < self.threshold:
+                # If the capacity leftover after this observation has completed
+                # is less than the threshold we have set, then we check to see if we can
+                # move an observation
+                if ((1-(self.hot[b].current_capacity + self._data_left_to_transfer)
+                     / self.hot[b].total_capacity) < self.threshold):
                     if self.cold[b].observations['stored']:
                         if self.project_buffer_capacity(self.cold[b].observations['stored'][-1], b):
                             self.env.process(self.move_cold_to_hot(b))
@@ -763,7 +759,7 @@ class ColdBuffer:
         Deletes the specified observation from observations['stored'] list
     """
 
-    def __init__(self, capacity, max_data_rate, env=None):
+    def __init__(self, capacity, max_data_rate):
         """
         The ColdBuffer takes data from the hot buffer for use in workflow
         processing
@@ -776,7 +772,6 @@ class ColdBuffer:
             'stored': [],
             'transfer': None,
         }
-        # self.env = env
 
     def has_capacity_for(self, observation_size):
         """

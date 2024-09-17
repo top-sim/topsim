@@ -350,9 +350,6 @@ class TestSchedulerLongWorkflow(unittest.TestCase):
         curr_obs = self.telescope.observations[0]
         self.scheduler.observation_queue.append(curr_obs)
         curr_obs.ast = self.env.now
-        # curr_obs.plan = self.planner.run(
-        #     curr_obs, self.buffer, self.telescope.max_ingest
-        # )
         self.env.process(self.scheduler.allocate_tasks(curr_obs))
         self.env.run(1)
         self.buffer.hot[0].observations['scheduled'].append(curr_obs)
@@ -381,8 +378,6 @@ class TestSchedulerDynamicReAllocation(unittest.TestCase):
         curr_obs = self.telescope.observations[0]
         self.scheduler.observation_queue.append(curr_obs)
         curr_obs.ast = self.env.now
-        # curr_obs.plan = self.planner.run(curr_obs, self.buffer,
-        #                                  self.telescope.max_ingest)
         self.env.process(self.scheduler.allocate_tasks(curr_obs))
         self.env.run(1)
         self.buffer.hot[0].observations['scheduled'].append(curr_obs)

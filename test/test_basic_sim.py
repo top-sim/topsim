@@ -53,10 +53,6 @@ class TestBasicIngest(unittest.TestCase):
             timestamp=0
         )
 
-    # def tearDown(self):
-    #     output = 'test/basic-workflow-data/output/{0}'
-    #     os.remove(f'{output}-sim.pkl')
-    #     os.remove(f'{output}-tasks.pkl')
 
     def testClusterIngest(self):
         """
@@ -68,7 +64,7 @@ class TestBasicIngest(unittest.TestCase):
 
         """
         self.assertEqual(0, self.env.now)
-        self.simulation.start()  # runtime=8)
+        self.simulation.start()
         self.assertEqual(
             3, self.simulation.cluster._ingest['completed']
         )

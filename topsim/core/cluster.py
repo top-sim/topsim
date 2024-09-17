@@ -272,22 +272,14 @@ class Cluster:
                     raise RuntimeError
                 if ingest:
                     # Ingest resources allocated separately from scheduler
-                    # self._set_task_running()
-                    # self._set_machine_occupied(ingest=True)
                     self._clusters[c]['tasks']['running'].append(task)
                     self._clusters[c]['tasks']['finished'][task] = False
-                    # self._clusters[c]['resources']['ingest'].append(machine)
-                    # self._clusters[c]['resources']['available'].remove(machine)
                     self._clusters[c]['usage_data']['available'] -= 1
                     self._clusters[c]['usage_data']['running_tasks'] += 1
                     self._clusters[c]['usage_data']['ingest'] += 1
                     task.task_status = TaskStatus.SCHEDULED
-                    # ret = self.env.process(task.do_work(self.env, machine,
-                    #                                     predecessor_allocations))
                     ret = machine.run(task, self.env, predecessor_allocations)
                 else:
-                    # self._clusters[c]['resources']['available'].remove(machine)
-                    # self._clusters[c]['resources']['occupied'].append(machine)
                     self._set_machine_occupied(machine, observation)
                     self._clusters[c]['tasks']['running'].append(task)
                     self._clusters[c]['usage_data']['available'] -= 1
@@ -301,7 +293,6 @@ class Cluster:
                 # machine.stop_task(task)
                 self._clusters[c]['tasks']['running'].remove(task)
                 self._clusters[c]['usage_data']['running_tasks'] -= 1
-                # self._clusters[c]['tasks']['finished'].append(task)
                 self._clusters[c]['tasks']['finished'][task] = True
                 self._clusters[c]['usage_data']['finished_tasks'] += 1
                 if ingest:
@@ -309,8 +300,6 @@ class Cluster:
                     self._clusters[c]['resources']['available'].append(machine)
                     self._clusters[c]['usage_data']['ingest'] -= 1
                 else:
-                    # self._clusters[c]['resources']['occupied'].remove(machine)
-                    # self._clusters[c]['resources']['available'].append(machine)
                     self._set_machine_available(machine, observation)
                 self._clusters[c]['usage_data']['available'] += 1
                 task.task_status = TaskStatus.FINISHED
