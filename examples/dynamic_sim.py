@@ -32,13 +32,11 @@ LOGGER = logging.getLogger(__name__)
 
 CONFIG = 'examples/heft_single_observation_simulation.json'
 env = simpy.Environment()
-planning_algorithm = 'batch'
 scheduling_algorithm = BatchProcessing
 instrument = Telescope
 dm = DelayModel(0.5, 'normal', DelayModel.DelayDegree.LOW)
 
 simulation = Simulation(env=env, config=CONFIG, instrument=instrument,
-    planning_algorithm=planning_algorithm,
     planning_model=BatchPlanning('batch'),
     scheduling=BatchProcessing(min_resources_per_workflow=1,
         resource_split={'emu': (1, 3)}), delay=None, timestamp=None,
@@ -48,7 +46,6 @@ simulation.start()
 
 env = simpy.Environment()
 simulation = Simulation(env=env, config=CONFIG, instrument=instrument,
-    planning_algorithm=planning_algorithm,
     planning_model=BatchPlanning('batch'), scheduling=BatchProcessing(),
     delay=None, timestamp='heft_sim', to_file=False)
 simulation.start()

@@ -36,7 +36,6 @@ LOGGER = logging.getLogger(__name__)
 
 CONFIG = 'examples/heft_single_observation_simulation.json'
 env = simpy.Environment()
-planning_algorithm = 'heft'
 scheduling_algorithm = DynamicSchedulingFromPlan
 instrument = Telescope
 dm = DelayModel(0.5, 'normal', DelayModel.DelayDegree.LOW)
@@ -45,7 +44,6 @@ simulation = Simulation(
     env=env,
     config=CONFIG,
     instrument=instrument,
-    planning_algorithm='heft',
     planning_model=SHADOWPlanning('heft'),
     scheduling=DynamicSchedulingFromPlan(),
     delay=None,

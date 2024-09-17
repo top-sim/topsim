@@ -46,13 +46,22 @@ class Planning(ABC):
         self.algorithm = algorithm
         self.delay_model = delay_model
 
+
+
+    @abstractmethod
+    def to_string(self):
+        """
+        Return the string name of the implemenation of this class
+        """
+        pass
+
     @abstractmethod
     def generate_plan(self, clock, cluser, buffer, observation, max_ingest):
         """
         Build a WorkflowPlan object storing
         Returns
         -------
-            plan : core.topsim.planner.WorksplatflowPlan
+            plan : core.topsim.planner.WorkflowPlan
             WorkflowPlan object
         """
         pass
@@ -70,7 +79,7 @@ class Planning(ABC):
         
         pass
 
-    def _calc_workflow_est(self,observation, buffer):
+    def _calc_workflow_est(self, observation, buffer):
         """
         Calculate the estimated start time of the workflow based on data
         transfer delays post-observation

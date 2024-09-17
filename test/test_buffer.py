@@ -450,6 +450,7 @@ class TestBufferRequests(unittest.TestCase):
         # calling next() runs the iterator immediately after generator is
         # called
         self.observation.ast = 0
+        self.cluster.provision_batch_resources(10, self.observation.name)
         self.observation.plan = self.planner.run(self.observation,
                                                  self.buffer, None)
         self.assertTrue(self.observation.plan is not None)

@@ -64,7 +64,7 @@ class TestBatchSchedulerAllocation(unittest.TestCase):
         )
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
         self.scheduler = Scheduler(
-            self.env, self.buffer, self.cluster, DynamicSchedulingFromPlan()
+            self.env, self.buffer, self.cluster, self.planner, DynamicSchedulingFromPlan()
         )
         self.algorithm = BatchProcessing()
 
@@ -95,7 +95,7 @@ class TestBatchSchedulerAllocation(unittest.TestCase):
         self.assertEqual(5, self.algorithm._max_resource_provision(
             self.cluster))
         plan = self.planner.run(obs, self.buffer, self.telescope.max_ingest)
-        self.algorithm._provision_resources(self.cluster, plan)
+        self.algorithm._provision_resources(self.cluster, obs)
         self.assertEqual(5, len(self.cluster.get_idle_resources(obs.name)))
         self.assertEqual(
                 0, self.algorithm._max_resource_provision(self.cluster)
@@ -103,24 +103,25 @@ class TestBatchSchedulerAllocation(unittest.TestCase):
 
     def test_algorithm_allocation(self):
         obs = self.telescope.observations[0]
-        obs.plan = self.planner.run(obs, self.buffer, self.telescope.max_ingest)
         # Replicate the Scheduler allocate_task() methods
         existing_schedule = {}
         task_pool = set()
-        existing_schedule, status, task_pool = self.algorithm.run(
-            self.cluster, self.env.now, obs.plan, existing_schedule,task_pool
+        existing_schedule, workflow_plan, task_pool = self.algorithm.run(
+            self.cluster, self.planner, self.env.now, obs.plan, existing_schedule, task_pool, observation=obs
         )
+        obs.plan = workflow_plan
+        #
         self.assertTrue(obs.plan.tasks[0] in existing_schedule)
 
     def test_algorithm_provisioning(self):
         obs = self.telescope.observations[0]
         resource_split = {'dingo': (1,1), 'emu':(1,1)}
-        plan = self.planner.run(obs, self.buffer, self.telescope.max_ingest)
+        # plan = self.planner.run(obs, self.buffer, self.telescope.max_ingest)
         algorithm = BatchProcessing(
             min_resources_per_workflow=1,
             resource_split=resource_split
         )
-        algorithm._provision_resources(self.cluster, plan)
+        algorithm._provision_resources(self.cluster, obs)
         self.assertEqual(1, len(self.cluster.get_idle_resources(obs.name)))
 
     def test_observation_queue(self):
