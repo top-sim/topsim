@@ -51,7 +51,7 @@ class TestPlannerConfig(unittest.TestCase):
         config = Config(CONFIG)
         self.model = SHADOWPlanning('heft')
         self.cluster = Cluster(env=self.env, config=config)
-        self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
+        # self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
 
     def testPlannerBasicConfig(self):
         planner = Planner(
@@ -76,10 +76,10 @@ class TestWorkflowPlan(unittest.TestCase):
         config = Config(CONFIG)
         self.model = SHADOWPlanning('heft')
         self.cluster = Cluster(self.env, config=config)
-        self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
         self.planner = Planner(
             self.env, self.cluster, self.model,
         )
+        self.buffer = Buffer(env=self.env, cluster=self.cluster, planner=self.planner, config=config)
         self.observation = Observation(
             'planner_observation',
             OBS_START_TME,
@@ -140,9 +140,9 @@ class TestPlannerDelay(unittest.TestCase):
         dm = DelayModel(0.1, "normal")
         self.model = SHADOWPlanning('heft', dm)
         self.cluster = Cluster(self.env, config=config)
-        self.buffer = Buffer(self.env, self.cluster, config)
         self.planner = Planner(self.env, self.cluster,
                                self.model, delay_model=dm)
+        self.buffer = Buffer(self.env, self.cluster, self.planner, config)
         self.observation = Observation(
             'planner_observation',
             OBS_START_TME,
@@ -193,10 +193,10 @@ class TestBatchProcessingPlan(unittest.TestCase):
         self.model = BatchPlanning('batch')
 
         self.cluster = Cluster(self.env, config=config)
-        self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
         self.planner = Planner(
             self.env, self.cluster, self.model,
         )
+        self.buffer = Buffer(env=self.env, cluster=self.cluster, planner=self.planner, config=config)
         self.telescope = Telescope(
             self.env, config, planner=None, scheduler=None
         )

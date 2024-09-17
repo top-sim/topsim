@@ -84,7 +84,7 @@ class Planning(ABC):
         storage = buffer.buffer_storage_summary()
         size = observation.duration * observation.ingest_data_rate
         hot_to_cold_time = int(size/storage['coldbuffer']['data_rate'])
-        est = observation.duration + hot_to_cold_time
+        est = observation.duration # + hot_to_cold_time
         return est
 
     def _create_observation_task_id(self, tid, observation, clock):

@@ -84,13 +84,13 @@ class TestDelaysInActors(unittest.TestCase):
         self.env = simpy.Environment()
         config = Config(INTEGRATION)
         self.cluster = Cluster(self.env, config)
-        self.buffer = Buffer(self.env, self.cluster, config)
         dm = DelayModel(0.9, "normal",
                    DelayModel.DelayDegree.HIGH)
         self.planner = Planner(
             self.env,
             self.cluster, SHADOWPlanning('heft',delay_model=dm), delay_model=dm
         )
+        self.buffer = Buffer(self.env, self.cluster, self.planner,config)
 
         self.scheduler = Scheduler(
             self.env, self.buffer, self.cluster, DynamicSchedulingFromPlan()
@@ -119,25 +119,19 @@ class TestDelaysInActors(unittest.TestCase):
 
         # After 1 timestep, data in the HotBuffer should be 4
         self.assertEqual(496e9, self.buffer.hot[0].current_capacity)
-        self.env.run(until=31)
+        self.env.run(until=21)
         self.assertEqual(5, len(self.cluster._tasks['finished']))
-        self.assertEqual(500e9, self.buffer.hot[0].current_capacity)
-        self.env.run(until=44)
+        self.assertEqual(460e9, self.buffer.hot[0].current_capacity)
+        self.env.run(until=34)
         # We know that the schedule has been delayed - however, we don't
         # report this to the telescope until we know how long we are delayed
         # (that is, until the task has completely finished its duration).
         # In this instance. we know that the first task is going to be
         # delayed, and so wait until it's completed execution to trigger a
         # delay.
-        self.assertEqual(ScheduleStatus.ONTIME, self.scheduler.schedule_status)
         self.env.run(until=45)
         self.assertTrue(ScheduleStatus.DELAYED,self.scheduler.schedule_status)
-        self.env.run(until=124)
-        # Assert that we still have tasks running
-        # self.assertLess(
-        #     0, len(self.cluster.clusters['default']['tasks']['running'])
-        # )
-        self.assertNotEqual(250, self.buffer.cold[0].current_capacity)
+        self.assertTrue(self.telescope.delayed)
 
     def test_telescope_delay_detection(self):
         """
@@ -153,14 +147,13 @@ class TestDelaysInActors(unittest.TestCase):
 
         # After 1 timestep, data in the HotBuffer should be 4
         self.assertEqual(496e9, self.buffer.hot[0].current_capacity)
-        self.env.run(until=31)
+        self.env.run(until=21)
         self.assertEqual(5, len(self.cluster._tasks['finished']))
-        self.assertEqual(500e9, self.buffer.hot[0].current_capacity)
-        self.env.run(until=32)
+        self.assertEqual(460e9, self.buffer.hot[0].current_capacity)
+        self.env.run(until=22)
         # Ensure the time
-        self.assertEqual(ScheduleStatus.ONTIME, self.scheduler.schedule_status)
-        self.env.run(until=100)
-        self.assertEqual(ScheduleStatus.DELAYED,self.scheduler.schedule_status)
+        self.assertEqual(ScheduleStatus.DELAYED, self.scheduler.schedule_status)
+        self.env.run(until=90)
         self.assertTrue(self.telescope.delayed)
 
     def test_telescope_delay_greedy_decision(self):

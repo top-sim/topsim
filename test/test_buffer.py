@@ -45,13 +45,16 @@ class TestBufferConfig(unittest.TestCase):
         self.env = simpy.Environment()
         self.config = Config(CONFIG)
         self.cluster = Cluster(env=self.env, config=self.config)
+        self.planner = Planner(
+            self.env, self.cluster, SHADOWPlanning('heft')
+        )
 
     def testHotBufferConfig(self):
         """
         Process the Hot Buffer section of the config file
         """
         buffer = Buffer(
-            env=self.env, cluster=self.cluster, config=self.config
+            env=self.env, cluster=self.cluster, planner=self.planner, config=self.config
         )
         self.assertEqual(500e9, buffer.hot[BUFFER_ID].total_capacity)
         self.assertEqual(500e9, buffer.hot[BUFFER_ID].current_capacity)
@@ -63,7 +66,7 @@ class TestBufferConfig(unittest.TestCase):
         :return:
         """
         buffer = Buffer(
-            env=self.env, cluster=self.cluster, config=self.config
+            env=self.env, cluster=self.cluster, planner=self.planner,  config=self.config
         )
         self.assertEqual(250e9, buffer.cold[BUFFER_ID].total_capacity)
         self.assertEqual(250e9, buffer.cold[BUFFER_ID].current_capacity)
@@ -86,7 +89,10 @@ class TestBufferIngestDataStream(unittest.TestCase):
         self.env = simpy.Environment()
         self.config = Config(CONFIG)
         self.cluster = Cluster(env=self.env, config=self.config)
-        self.buffer = Buffer(self.env, self.cluster, self.config)
+        self.planner = Planner(
+            self.env, self.cluster, SHADOWPlanning('heft')
+        )
+        self.buffer = Buffer(self.env, self.cluster, self.planner, self.config)
         self.observation = Observation(
             name='test_observation',
             start=OBS_START_TME,
@@ -205,12 +211,11 @@ class TestBufferRequests(unittest.TestCase):
         self.env = simpy.Environment()
         self.config = Config(CONFIG)
         self.cluster = Cluster(env=self.env, config=self.config)
-
-        self.buffer = Buffer(
-            env=self.env, cluster=self.cluster, config=self.config
-        )
         self.planner = Planner(
             self.env, self.cluster, SHADOWPlanning('heft')
+        )
+        self.buffer = Buffer(
+            env=self.env, cluster=self.cluster, planner=self.planner, config=self.config
         )
         self.observation = Observation(
             'scheduler_observation',
@@ -259,6 +264,36 @@ class TestBufferRequests(unittest.TestCase):
             self.buffer.cold[BUFFER_ID].observations['stored']
         )
 
+    def test_buffer_cold_to_hot(self):
+        self.observation.status = RunStatus.RUNNING
+        self.env.process(self.buffer.ingest_data_stream(self.observation))
+        self.env.run(until=10)
+        self.assertEqual(480e9, self.buffer.hot[BUFFER_ID].current_capacity)
+        # Moving data from one to the other
+        self.assertEqual(250e9, self.buffer.cold[BUFFER_ID].current_capacity)
+        self.assertTrue(self.observation in
+                        self.buffer.hot[BUFFER_ID].observations["stored"])
+        self.env.process(self.buffer.move_hot_to_cold(0))
+        self.env.run(until=15)
+        self.assertEqual(240e9, self.buffer.cold[BUFFER_ID].current_capacity)
+        self.assertEqual(490e9, self.buffer.hot[BUFFER_ID].current_capacity)
+        self.env.run(until=20)
+        self.assertEqual(230e9, self.buffer.cold[BUFFER_ID].current_capacity)
+        self.env.run(until=22)
+        self.assertEqual(500e9, self.buffer.hot[BUFFER_ID].current_capacity)
+        self.assertEqual(230e9, self.buffer.cold[BUFFER_ID].current_capacity)
+        self.assertListEqual(
+            [self.observation],
+            self.buffer.cold[BUFFER_ID].observations['stored']
+        )
+        self.env.process(self.buffer.move_cold_to_hot(0))
+        self.env.run(until=32)
+        self.assertEqual(480e9, self.buffer.hot[BUFFER_ID].current_capacity)
+        self.assertEqual(250e9, self.buffer.cold[BUFFER_ID].current_capacity)
+        self.assertListEqual(
+            [self.observation],
+            self.buffer.hot[BUFFER_ID].observations['stored']
+        )
     def test_hot_transfer_observation(self):
         """
         When passed an observation, over a period of time ensure that the
@@ -349,6 +384,53 @@ class TestBufferRequests(unittest.TestCase):
         )
         self.assertEqual(None,
                          self.buffer.cold[BUFFER_ID].observations['transfer'])
+
+    def test_hot_receive_data(self):
+        """
+        When passed an observation, over a period of time ensure that the
+        complete data set is added to the Cold Buffer.
+
+        Only when all data has finished being transferred do we add the
+        observation to ColdBuffer.observations.
+
+        Observation duration is 10; ingest rate is 5.
+
+        Observation.total_data_size => 50
+
+        ColdBuffer.max_data_rate => 2; therefore
+
+        Time until Observation is moved => 25.
+
+        Returns
+        -------
+        """
+
+        self.observation.total_data_size = 50e9
+        data_left_to_transfer = self.observation.total_data_size
+        data_left_to_transfer = self.buffer.hot[BUFFER_ID].receive_observation(
+            self.observation,
+            data_left_to_transfer,
+            self.buffer.cold[BUFFER_ID].max_data_rate
+        )
+        self.assertEqual(48e9, data_left_to_transfer)
+        self.assertFalse(
+            self.observation in self.buffer.hot[BUFFER_ID].observations[
+                'stored']
+        )
+
+        while data_left_to_transfer > 0:
+            data_left_to_transfer = self.buffer.hot[
+                BUFFER_ID].receive_observation(
+                self.observation,
+                data_left_to_transfer,
+                self.buffer.cold[BUFFER_ID].max_data_rate
+            )
+        self.assertTrue(
+            self.observation in self.buffer.hot[BUFFER_ID].observations[
+                'stored']
+        )
+        self.assertEqual(None,
+                         self.buffer.hot[BUFFER_ID].observations['transfer'])
 
     def testColdBufferReceiveOverlap(self):
 
