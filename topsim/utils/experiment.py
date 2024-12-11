@@ -50,22 +50,28 @@ from topsim.user.schedule.dynamic_plan import DynamicSchedulingFromPlan
 class Experiment:
     """
     Experiment wraps the constructions of initialisation a series of one or more related simulations together,
-    to avoid significantly large script files.
+    to avoid significantly larger script files.
+
+    Experiment has two different modes:
+    - Serial
+    - Batch
+
     """
 
     def __init__(
             self,
-            configuration: list() = None,
-            alloc_combinations: list(tuple()) = None,
+            configuration: list = None,
+            alloc_combinations: list[tuple] = None,
             output=None,
             delay: bool = False,
             **kwargs):
-        self._configuration = configuration
+        self._configurations = configuration
         self._combinations = alloc_combinations
         self._delay = delay
         self._output = Path(output)
         self._sims = []
         self.sched_args = kwargs['sched_args']
+        self._batch = kwargs['slurm'] if 'batch' in kwargs else False
 
     def _build_simulations(self):
         if not self._output.exists():
@@ -73,7 +79,7 @@ class Experiment:
                 self._output.mkdir(parents=True)
             except OSError as e:
                 LOGGER.critical("Failed to make output directory: %s", e)
-        for c in self._configuration:
+        for c in self._configurations:
            for ac in self._combinations:
                 plan, sched = ac
                 if plan == "batch":
@@ -93,6 +99,31 @@ class Experiment:
                                         planning_model=plan, scheduling=sched, delay=self._delay, timestamp=None,
                                         to_file=True,
                                         hdf5_path=f"{self._output}/results_f{date.today().isoformat()}.h5")
+
+    def _run_batch(self):
+        """
+        Batch experiments are single-run experiments, which means we don't run combinations
+        """ 
+        c= self._configurations[0]
+        plan, sched = self._combinations[0]
+        if plan == "batch":
+            plan = BatchPlanning("batch")
+        elif plan == "static":
+            plan = SHADOWPlanning("heft")
+        else:
+            raise RuntimeError("Planning '%s' is not supported", plan)
+
+        if sched == "dynamic_plan":
+            sched = DynamicSchedulingFromPlan(**self.sched_args)
+        else:
+            sched = BatchProcessing(**self.sched_args)
+        env = simpy.Environment()
+        instrument = Telescope
+
+        yield Simulation(env=env, config=c, instrument=instrument,
+                            planning_model=plan, scheduling=sched, delay=self._delay, timestamp=None,
+                            to_file=True,
+                            hdf5_path=f"{self._output}/results_f{date.today().isoformat()}.h5")
 
 
 
@@ -116,23 +147,36 @@ class Experiment:
         if not self._output:
             LOGGER.warning("No output file set, experiments will not be run.")
             return exit(1)
-        i = 0
-        for s in self._build_simulations():
-            LOGGER.info("Simulation %s/%s running...",
-                        i+1, len(self._combinations) * len(self._configuration))
-            LOGGER.info("Simulation is using %s to plan and %s to schedule",
-                        s.planner.model.algorithm, s.scheduler.algorithm)
-            print(s.planner.model.algorithm, s.scheduler.algorithm)
+        if self._batch:
+            s = self._run_batch()
             st = time.time()
+            LOGGER.info("Simulation is using %s to plan and %s to schedule",
+                            s.planner.model.algorithm, s.scheduler.algorithm)
             try:
-                s.start()
+                    s.start()
             except ValueError as exp:
-                print(exp)
-                print(f"Simulation {i+1} did not run due to non-useable simulation "
-                      f"parameters")
-            # self._sims.remove(s)
-            ft = time.time()
-            i += 1
+                LOGGER.warning("Simulation  did not run due to non-useable simulation "
+                        "parameters")
+                ft = time.time()
             LOGGER.info("Runtime: %s.", ft - st)
+        else:
+            i = 0
+            for s in self._build_simulations():
+                LOGGER.info("Simulation %s/%s running...",
+                            i+1, len(self._combinations) * len(self._configurations))
+                LOGGER.info("Simulation is using %s to plan and %s to schedule",
+                            s.planner.model.algorithm, s.scheduler.algorithm)
+                print(s.planner.model.algorithm, s.scheduler.algorithm)
+                st = time.time()
+                try:
+                    s.start()
+                except ValueError as exp:
+                    print(exp)
+                    print(f"Simulation {i+1} did not run due to non-useable simulation "
+                        f"parameters")
+                # self._sims.remove(s)
+                ft = time.time()
+                i += 1
+                LOGGER.info("Runtime: %s.", ft - st)
         LOGGER.info("Experiment complete.")
 

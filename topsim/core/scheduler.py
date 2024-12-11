@@ -295,7 +295,7 @@ class Scheduler:
                 _curr_tasks = len(current_plan.tasks)
                 pbar = tqdm(total=_total_tasks,
                             desc=f'Scheduler: {observation.name}', unit="Tasks",
-                            leave=True, position=1)
+                            leave=True, ncols=0)
                 pbar_setup = True
             # prev_tasks = _curr_tasks
             # _curr_tasks = len(current_plan.tasks)
