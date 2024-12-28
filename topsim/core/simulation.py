@@ -196,10 +196,8 @@ class Simulation:
                     )
                 self._hdf5_store = pd.HDFStore(hdf5_path)
                 self._hdf5_store.close()
-            except ValueError(
-                    'Check pandas.HDFStore documentation for valid file path'
-            ):
-                raise
+            except Exception as e:
+                LOGGER.error('%s', e)
         elif self.to_file and hdf5_path is None:
             raise ValueError(
                 'Attempted to initialise Simulation object that outputs'
