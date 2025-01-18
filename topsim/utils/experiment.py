@@ -95,10 +95,11 @@ class Experiment:
                     sched = BatchProcessing(**self.sched_args)
                 env = simpy.Environment()
                 instrument = Telescope
+                result_path_hash = _generate_truncated_hash(c, hash_length=6)
                 yield Simulation(env=env, config=c, instrument=instrument,
                                         planning_model=plan, scheduling=sched, delay=self._delay, timestamp=None,
                                         to_file=True,
-                                        hdf5_path=f"{self._output}/results_f{date.today().isoformat()}.h5")
+                                        hdf5_path=f"{self._output}/results_f{date.today().isoformat()}_{result_path_hash}.h5")
 
     def _run_batch(self):
         """
@@ -119,11 +120,11 @@ class Experiment:
             sched = BatchProcessing(**self.sched_args)
         env = simpy.Environment()
         instrument = Telescope
-
+        result_path_hash = _generate_truncated_hash(c, hash_length=6)
         yield Simulation(env=env, config=c, instrument=instrument,
                             planning_model=plan, scheduling=sched, delay=self._delay, timestamp=None,
                             to_file=True,
-                            hdf5_path=f"{self._output}/results_f{date.today().isoformat()}.h5")
+                            hdf5_path=f"{self._output}/results_f{date.today().isoformat()}_{path_hash}.h5")
 
 
 
@@ -180,3 +181,22 @@ class Experiment:
                 LOGGER.info("Runtime: %s.", ft - st)
         LOGGER.info("Experiment complete.")
 
+def _generate_truncated_hash(path: Path, hash_length: int ) -> str:
+    """
+    Generate a truncated string hash of the pathname. This is to balance 
+    result file pathname uniqueness and readability. 
+    
+    This is _not_ a secure hash and will definitely increase the chance of 
+    conflicts. However, we are not expecting to produce large numbers of result
+    files over the course a given experiment so it is unlikely to produce 
+    collisions (e.g. ~150 different output files). 
+
+    Parameters: 
+        path: name of the path we are hashing
+        hash_length: The length of the truncated hash
+
+    Returns:
+        Truncated result of the absolute value of hash(path). 
+    """
+
+    return str(abs(hash(path)))[:hash_length]
