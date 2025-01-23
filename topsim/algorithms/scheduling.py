@@ -2,8 +2,10 @@
 Algorithm presents the abstract base class for any Scheduling algorithm.
 """
 
-
 from abc import ABC, abstractmethod
+
+from topsim.core.cluster import Cluster
+from topsim.core.planner import Planner, WorkflowPlan
 
 
 class Scheduling(ABC):
@@ -32,11 +34,32 @@ class Scheduling(ABC):
 
     """
 
+    # The below constants have been derived from the SDP parametric model.
+    LOW_REALTIME_RESOURCES = 164
+    MID_REALTIME_RESOURCES = 281
+
+    LOW_MAX_RESOURCES = 896
+    MID_MAX_RESOURCES = 786
+
     def __init__(self):
         self.name = "AbstractAlgorithm"
+        self.ingest_requirements = 0
 
     @abstractmethod
-    def run(self, cluster, clock, plan, schedule, task_pool):
+    def to_string(self):
+        """
+        Return the string name of the implemenation of this class
+        """
+        pass
+
+    @abstractmethod
+    def run(self,
+            cluster: Cluster,
+            planner: Planner,
+            clock, plan: WorkflowPlan,
+            schedule,
+            task_pool,
+            **kwargs):
         """
 
         Parameters

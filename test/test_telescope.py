@@ -36,7 +36,7 @@ class TestTelescopeConfig(unittest.TestCase):
         planner = Planner(self.env, cluster, SHADOWPlanning('heft'))
         buffer = Buffer(env=self.env, cluster=cluster, planner=planner, config=self.config)
         self.scheduler = Scheduler(
-            env=self.env, buffer=buffer, cluster=cluster, algorithm=None
+            env=self.env, buffer=buffer, cluster=cluster, planner=planner, algorithm=None
         )
 
     def testTelescopeBasicConfig(self):
@@ -62,7 +62,7 @@ class TestTelescopeIngest(unittest.TestCase):
         self.buffer = Buffer(env=self.env, cluster=self.cluster, planner=self.planner,
                              config=self.config)
         self.scheduler = Scheduler(
-            env=self.env, buffer=self.buffer, cluster=self.cluster,
+            env=self.env, buffer=self.buffer, cluster=self.cluster, planner=self.planner,
             algorithm=None
         )
 

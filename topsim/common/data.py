@@ -24,7 +24,6 @@ telescope_config = 'test/data/observations.csv'
 machine_config = 'test/data/system_config.json'
 workflow_config = 'test/data/workflow_config.json'
 event_file = 'sim.trace'
-planning_algorithm = 'heft'
 
 test_scheduler_workflow = 'test/data/workflow_config.json'
 test_buffer_workflow = 'test/data/workflow_config.json'

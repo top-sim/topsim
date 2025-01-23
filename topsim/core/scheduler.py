@@ -34,7 +34,7 @@ class Scheduler:
     ----------
     """
 
-    def __init__(self, env, buffer, cluster, algorithm):
+    def __init__(self, env, buffer, cluster, planner, algorithm):
         """
         Parameters
         ----------
@@ -54,6 +54,7 @@ class Scheduler:
         self.algorithm = algorithm
         self.cluster = cluster
         self.buffer = buffer
+        self.planner = planner
         self.status = SchedulerStatus.SLEEP
         self.ingest_observation = None
         self.provision_ingest = 0
@@ -258,37 +259,44 @@ class Scheduler:
         current_plan = None
         if observation is None:
             return False
-        elif current_plan is None:
-            current_plan = observation.plan
 
-        if current_plan is None:
-            raise RuntimeError(
-                "Observation should have pre-plan; Planner actor has "
-                "failed at runtime.")
-        current_plan.ast = self.env.now
-        for task in current_plan.tasks:
-            task.workflow_offset = self.env.now
+        # TODO determine how to calculate runtime delay with planner being triggered
+        # in a new place
 
-        # Do we have a runtime delay?
-        if current_plan.est >= self.env.now + TIMESTEP: # Give us leeway on if we are one timestep out
-            self.schedule_status.DELAYED
+        # Answers the question: Do we have a runtime delay?
+        # if current_plan.est >= self.env.now + TIMESTEP: # Give us leeway on if we are one timestep out
+        #     self.schedule_status.DELAYED
 
         schedule = {}
         allocation_pairs = {}
         task_pool = set()
-        _total_tasks = len(current_plan.tasks)
-        _curr_tasks = len(current_plan.tasks)
+        _total_tasks = 0 # len(current_plan.tasks)
+        _curr_tasks = 0 # len(current_plan.tasks)
         _tqdm = True
+        pbar_setup = False
         pbar = None
-        if _tqdm:
-            pbar = tqdm(total=_total_tasks,
-                        desc=f'Scheduler: {observation.name}', unit="Tasks",
-                        leave=True,position=1)
         self._add_event(observation, "allocation", "started")
         while True:
-            current_plan.tasks = self._update_current_plan(current_plan)
-            current_plan, schedule, task_pool, finished = self._generate_current_schedule(
-                observation, current_plan, schedule, task_pool)
+            if current_plan:
+                current_plan.tasks = self._update_current_plan(current_plan)
+            (current_plan,
+             schedule,
+             task_pool,
+             finished) = self._generate_current_schedule(observation,
+                                                         current_plan,
+                                                         schedule,
+                                                         task_pool)
+            observation.plan = current_plan
+            if not current_plan:
+                yield self.env.timeout(TIMESTEP)
+                continue
+            if _tqdm and not pbar_setup:
+                _total_tasks = len(current_plan.tasks)
+                _curr_tasks = len(current_plan.tasks)
+                pbar = tqdm(total=_total_tasks,
+                            desc=f'Scheduler: {observation.name}', unit="Tasks",
+                            leave=True, ncols=0)
+                pbar_setup = True
             # prev_tasks = _curr_tasks
             # _curr_tasks = len(current_plan.tasks)
             tmp = _curr_tasks
@@ -334,19 +342,29 @@ class Scheduler:
         finished = False
         nm = f'{observation.name}-algtime'
         self.algtime[nm] = time.time()
-        schedule, status, task_pool = self.algorithm.run(cluster=self.cluster,
-            clock=self.env.now, workflow_plan=current_plan,
-            existing_schedule=schedule, task_pool=task_pool)
+        schedule, workflow_plan, task_pool = self.algorithm.run(
+            cluster=self.cluster,
+            planner=self.planner,
+            clock=self.env.now,
+            workflow_plan=current_plan,
+            existing_schedule=schedule,
+            task_pool=task_pool,
+            observation=observation)
         self.algtime[nm] = (time.time() - self.algtime[nm])
 
-        current_plan.status = status
+        if not workflow_plan:
+            return current_plan, schedule, task_pool, finished
+        else:
+            current_plan = workflow_plan
+
+        current_plan.status = workflow_plan.status
         if (
                 current_plan.status is WorkflowStatus.DELAYED and
                 self.schedule_status is not WorkflowStatus.DELAYED):
             self.schedule_status = ScheduleStatus.DELAYED
 
         # If the workflow is finished
-        if not schedule and status is WorkflowStatus.FINISHED:
+        if not schedule and workflow_plan.status is WorkflowStatus.FINISHED:
             self._add_event(observation, "allocation", "stopped")
             if self.buffer.mark_observation_finished(observation):
                 self.cluster.release_batch_resources(observation.name)
@@ -427,6 +445,8 @@ class Scheduler:
         """
 
         remaining_tasks = []
+        # if not current_plan:
+        #     return remaining_tasks
         for t in current_plan.tasks:
             if t.task_status is not TaskStatus.FINISHED:
                 remaining_tasks.append(t)

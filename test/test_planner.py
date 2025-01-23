@@ -52,6 +52,14 @@ class TestPlannerConfig(unittest.TestCase):
         self.model = SHADOWPlanning('heft')
         self.cluster = Cluster(env=self.env, config=config)
         # self.buffer = Buffer(env=self.env, cluster=self.cluster, config=config)
+        self.observation = Observation(
+            'planner_observation',
+            OBS_START_TME,
+            OBS_DURATION,
+            OBS_DEMAND,
+            OBS_WORKFLOW,
+            data_rate=OBS_DATA_RATE
+        )
 
     def testPlannerBasicConfig(self):
         planner = Planner(
@@ -59,8 +67,9 @@ class TestPlannerConfig(unittest.TestCase):
             cluster=self.cluster,
             model=self.model
         )
+        self.cluster.provision_batch_resources(10, self.observation.name)
         available_resources = planner.model._cluster_to_shadow_format(
-            self.cluster)
+            self.cluster, self.observation)
         # Bandwidth set at 1gb/s = 60gb/min.
         self.assertEqual(60.0, available_resources['system']["system_bandwidth"])
         machine = available_resources['system']['resources']['cat0_m0']
@@ -114,6 +123,7 @@ class TestWorkflowPlan(unittest.TestCase):
 
         time = self.env.now
         self.observation.ast = self.env.now
+        self.cluster.provision_batch_resources(10, self.observation.name)
         plan = self.planner.run(self.observation, self.buffer,
                                 TEL_MAX_INGEST
                                 )
@@ -163,6 +173,7 @@ class TestPlannerDelay(unittest.TestCase):
         """
 
         self.observation.ast = self.env.now
+        self.cluster.provision_batch_resources(10, self.observation.name)
         self.observation.plan = self.planner.run(
             self.observation,
             self.buffer, TEL_MAX_INGEST
@@ -213,6 +224,7 @@ class TestBatchProcessingPlan(unittest.TestCase):
             WorkflowPlan object for the observation
         """
         obs = self.telescope.observations[0]
+        self.cluster.provision_batch_resources(10, obs.name)
         plan = self.planner.run(obs, self.buffer, TEL_MAX_INGEST)
         order = [0, 1, 2, 3, 4, 5, 6, 8, 7, 9]
         self.assertIsNotNone(plan)

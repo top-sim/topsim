@@ -190,3 +190,7 @@ class Config:
                                         timestep_multiplier)
 
         return {0: hot}, {0: cold}
+
+    def get_max_ingest(self, instrument_name):
+
+        return self.instrument[instrument_name]['max_ingest_resources']

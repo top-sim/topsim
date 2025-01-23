@@ -107,7 +107,7 @@ class Task(object):
             self.duration = self.calculate_runtime(machine)
         total_duration = self._calc_task_delay()
         if total_duration < 1:
-            yield env.timeout(1)
+            yield env.timeout(0)
         else:
             yield env.timeout(total_duration - 1)
 
@@ -119,6 +119,8 @@ class Task(object):
         if self.aft > self.eft:
             self.delay_flag = True
         # self.task_status = TaskStatus.FINISHED
+        # print(total_duration, self.aft-self.ast)
+
         logger.debug('%s finished at %s', self.id,
                      self.aft)  # return TaskStatus.FINISHED
 

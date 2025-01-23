@@ -36,6 +36,9 @@ class BatchPlanning(Planning):
     def __str__(self):
         return 'BatchPlanning'
 
+    def to_string(self):
+        return self.__str__()
+
     def generate_plan(self, clock, cluster, buffer, observation, max_ingest):
         """
 
@@ -49,7 +52,7 @@ class BatchPlanning(Planning):
         plan = None
         if self.algorithm is 'batch':
             graph = self._workflow_to_nx(observation.workflow)
-            est = self._calc_workflow_est(observation, buffer)
+            est = clock # self._calc_workflow_est(observation, buffer)
             # new_graph = nx.DiGraph()
             mapping = {}
             tasks = []

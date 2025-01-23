@@ -37,7 +37,6 @@ class TestSimulationConfig(unittest.TestCase):
             CONFIG,
             self.instrument,
             planning_model=SHADOWPlanning('heft'),
-            planning_algorithm='heft',
             scheduling=DynamicSchedulingFromPlan(),
             timestamp=self.timestamp
         )
@@ -63,7 +62,6 @@ class TestSimulationFileOptions(unittest.TestCase):
             CONFIG,
             Telescope,
             planning_model=SHADOWPlanning('heft'),
-            planning_algorithm='heft',
             scheduling=DynamicSchedulingFromPlan(),
             delay=None,
             timestamp=0,
@@ -92,7 +90,6 @@ class TestSimulationBatchProcessing(unittest.TestCase):
             CONFIG,
             Telescope,
             planning_model=BatchPlanning('batch'),
-            planning_algorithm='batch',
             scheduling=BatchProcessing(),
             delay=None,
             timestamp=0
