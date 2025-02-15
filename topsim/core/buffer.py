@@ -110,19 +110,20 @@ class Buffer:
                 if self.check_buffer_over_data_threshold(b):
                     if self.env.now in self.stored_times:
                         continue
-                    if self.cold[b].has_capacity_for(
-                        self.hot[b].observations['stored'][
-                                    -1].total_data_size
-                        ):
-                            self.env.process(self.move_hot_to_cold(b))
-                #         else: Something quite wrong has gone? When we accept ingest we should make sure
-                #         that all buffers have capacity below a particular threshold
+                    if self.has_observations_stored(b) and self.cold[b].has_capacity_for(
+                        self.hot[b].observations['stored'][-1].total_data_size):
+                            if not self.transfer_in_progress(b):
+                                self.env.process(self.move_hot_to_cold(b))
 
-                if ((self.hot[b].current_capacity + self._data_left_to_transfer)
-                      / self.hot[b].total_capacity < self.threshold):
+                # If the capacity leftover after this observation has completed
+                # is less than the threshold we have set, then we check to see if we can
+                # move an observation
+                if ((1-(self.hot[b].current_capacity + self._data_left_to_transfer)
+                     / self.hot[b].total_capacity) < self.threshold):
                     if self.cold[b].observations['stored']:
-                        if self.project_buffer_capacity(self.cold[b].observations['stored'][-1], b):
-                            self.env.process(self.move_cold_to_hot(b))
+                        if self.project_buffer_capacity(self.cold[b].observations['stored'][0], b):
+                            if not self.transfer_in_progress(b):
+                                self.env.process(self.move_cold_to_hot(b))
                     else:
                         continue
                 else:
@@ -130,9 +131,16 @@ class Buffer:
 
             yield self.env.timeout(TIMESTEP)
 
+    def transfer_in_progress(self, b):
+        return self.hot[b].observations['transfer'] or self.cold[b].observations['transfer']
+
     def check_buffer_over_data_threshold(self,b):
         return  ((self.hot[b].total_capacity - self.hot[b].current_capacity)
                 / self.hot[b].total_capacity) > self.threshold
+
+    def has_observations_stored(self, b):
+        return len(self.hot[b].observations['stored']) > 1
+
 
     def project_buffer_capacity(self, obs, b):
         numerator = self.hot[b].total_capacity - (self.hot[b].current_capacity)
@@ -224,7 +232,6 @@ class Buffer:
         # This should triger
         for b in self.hot:
             obs = self.hot[b].next_observation_for_processing()
-            obs.plan = self.planner.run(obs, self, None)
             return obs
 
     def mark_observation_finished(self, observation):
@@ -296,8 +303,9 @@ class Buffer:
             # constraints
             # TODO create an object method to update the hot buffer
             self.hot[b].observations['stored'].append(current_obs)
-            self.hot[b].observations['transfer'] = None
+            self.hot[b].observations['transfer'].remove(current_obs)
             return False
+        # TODO UPDATE EVENT INFORMATION ON WHICH TRANSFER DIRECTION
         self._add_event(current_obs, "transfer", "started")
         while True:
             # data_transfer_time = observation_size / self.cold.max_data_rate
@@ -379,13 +387,13 @@ class Buffer:
             self.cold[b].observations['stored'].append(current_obs)
             self.cold[b].observations['transfer'] = None
             return False
-        self._add_event(current_obs, "transfer", "started")
+        self._add_event(current_obs, "transfer-to-hot", "started")
         while True:
             if data_left_to_transfer <= 0:
                 LOGGER.info(
                     "Buffer transfer completed at time %s", self.env.now
                 )
-                self._add_event(current_obs, "transfer", "stopped")
+                self._add_event(current_obs, "transfer-to-hot", "stopped")
                 break
 
             check = self.hot[b].receive_observation(
@@ -396,7 +404,8 @@ class Buffer:
             )
 
             data_left_to_transfer = self.cold[b].transfer_observation(
-                current_obs, self.cold[b].max_data_rate, data_left_to_transfer
+                current_obs, min(self.hot[b].max_ingest_data_rate, self.cold[b].max_data_rate),
+                data_left_to_transfer
             )
             if check != data_left_to_transfer:
                 raise RuntimeError(
@@ -442,7 +451,8 @@ class Buffer:
                 # observation.status = RunStatus.FINISHED
                 self.waiting_observation_list.append(observation)
                 self.hot[b].observations["stored"].append(observation)
-                self.stored_times.append(self.env.now)
+                curr_time = int(self.env.now)
+                self.stored_times.append(curr_time)
                 break
 
             yield self.env.timeout(TIMESTEP)
@@ -755,7 +765,7 @@ class ColdBuffer:
         Deletes the specified observation from observations['stored'] list
     """
 
-    def __init__(self, capacity, max_data_rate, env=None):
+    def __init__(self, capacity, max_data_rate):
         """
         The ColdBuffer takes data from the hot buffer for use in workflow
         processing
@@ -766,9 +776,8 @@ class ColdBuffer:
         self.next_obs = 0
         self.observations = {
             'stored': [],
-            'transfer': None,
+            'transfer': None
         }
-        self.env = env
 
     def has_capacity_for(self, observation_size):
         """
@@ -793,8 +802,9 @@ class ColdBuffer:
         """
         size = observation_size
         if self.observations['transfer']:
-            size = observation_size + self.observations[
-                'transfer'].total_data_size
+            size = observation_size + self.observations['transfer'].total_data_size
+                    # + sum([o.total_data_size for o in self.observations['transfer']])
+                    # )
 
         return (
                 self.current_capacity - size >= 0
@@ -810,7 +820,7 @@ class ColdBuffer:
             The amount of data left to transfer
         """
 
-        if self.observations['transfer'] is None:
+        if not self.observations['transfer']:
             self.observations['transfer'] = observation
 
         # We are doing a 'real-time' simulation, which means we treat the hot

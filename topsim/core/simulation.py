@@ -42,9 +42,6 @@ class Simulation:
     planning_model : :py:obj:`~topsim.algorithms.planning.Planning` object
         User-defined implementation of the planning algorithm class
 
-    planning_algorithm: str
-        Reference to the specific algorithm implementated in `planning_model`
-
     scheduling: :py:obj:`~topsim.algorithms.scheduling.Algorithm`
         User-defined implementation of the scheduling algorithm
         :py:obj:`abc.ABC`.
@@ -128,7 +125,6 @@ class Simulation:
             config,
             instrument,
             planning_model,
-            planning_algorithm,
             scheduling,
             delay=None,
             timestamp=None,
@@ -163,8 +159,8 @@ class Simulation:
         #: :py:obj:`~topsim.core.cluster.Cluster` instance
         self.cluster = Cluster(env, self._cfg)
         #: :py:obj:`~topsim.core.buffer.Buffer` instance
-        planning_algorithm = None
         planning_model = planning_model
+        # planning_model.ingest_requirements = self._cfg.get_max_ingest(instrument.name)
 
         if not delay:
             # TODO Have this approach replicated so we don't specify the
@@ -175,9 +171,10 @@ class Simulation:
         )
         self.buffer = Buffer(env, self.cluster, self.planner, self._cfg)
         scheduling_algorithm = scheduling
+        scheduling_algorithm.ingest_requirements = self._cfg.get_max_ingest(instrument.name)
         #: :py:obj:`~topsim.core.scheduler.Scheduler` instance
         self.scheduler = Scheduler(
-            env, self.buffer, self.cluster, scheduling_algorithm
+            env, self.buffer, self.cluster, self.planner, scheduling_algorithm
         )
         #: User-defined :py:obj:`~topsim.core.instrument.Instrument` instance
         self.instrument = instrument(
@@ -199,10 +196,8 @@ class Simulation:
                     )
                 self._hdf5_store = pd.HDFStore(hdf5_path)
                 self._hdf5_store.close()
-            except ValueError(
-                    'Check pandas.HDFStore documentation for valid file path'
-            ):
-                raise
+            except Exception as e:
+                LOGGER.error('%s', e)
         elif self.to_file and hdf5_path is None:
             raise ValueError(
                 'Attempted to initialise Simulation object that outputs'
@@ -284,6 +279,9 @@ class Simulation:
 
         else:
             return self.monitor.df, self._generate_final_task_data()
+
+
+
 
     def resume(self, until):
         """

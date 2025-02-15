@@ -45,6 +45,12 @@ class SHADOWPlanning(Planning):
         # self.buffer = buffer
         # self.delay_model = delay_model
 
+    def __str__(self):
+        return 'SHADOWPlanning'
+
+    def to_string(self):
+        return self.__str__()
+
     def generate_plan(self, clock, cluster, buffer, observation, max_ingest):
         """
         For this StaticPlanning example, we are using the SHADOW static
@@ -69,7 +75,7 @@ class SHADOWPlanning(Planning):
         workflow = self._initialise_shadow_workflows(observation,cluster)
         solution = self._run_scheduling(workflow)
 
-        est = self._calc_workflow_est(observation, buffer)
+        est = clock #self._calc_workflow_est(observation, buffer)
         eft = solution.makespan
         mapping = {}
         tasks = []
@@ -113,6 +119,7 @@ class SHADOWPlanning(Planning):
             self._create_observation_task_id(x, observation, clock)
             for x in solution.execution_order
         ]
+        # print(f"Final workflow runtime estimate: {tasks[-1].est}")
 
         return WorkflowPlan(
             observation.name, est, eft, tasks, exec_order,
@@ -141,10 +148,25 @@ class SHADOWPlanning(Planning):
 
         """
         workflow = Workflow(observation.workflow)
-        available_resources = self._cluster_to_shadow_format(cluster)
+        available_resources = self._cluster_to_shadow_format(cluster, observation)
         workflow_env = Environment(available_resources, dictionary=True)
         workflow.add_environment(workflow_env)
         return workflow
+
+    def _load_cached_workflow(self, workflow, available_resources):
+        """
+        Review cached workflows and load the workflow, in the event that we have
+        scheduled for the current parameters
+
+        Parameters
+        ----------
+        workflow
+        available_resources
+
+        Returns
+        -------
+
+        """
 
     def _run_scheduling(self, workflow):
         """
@@ -175,7 +197,7 @@ class SHADOWPlanning(Planning):
         )
         return solution
 
-    def _cluster_to_shadow_format(self, cluster):
+    def _cluster_to_shadow_format(self, cluster, observation):
         """
         Given the cluster, select from the available resources to allocate
         and create a dictionary in the format required for shadow.
@@ -188,7 +210,10 @@ class SHADOWPlanning(Planning):
         # TODO we have reverted to the entire list of machines; can we
         #  improve this moving forward?
         # TODO entire machines
-        available_resources = cluster.machines
+        available_resources  = cluster.get_idle_resources(observation.name)
+        logging.info("%d resources available for planning.",
+                     len(available_resources))
+
         dictionary = {
             "system": {
                 "resources": None,

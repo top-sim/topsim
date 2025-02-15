@@ -24,6 +24,8 @@ from topsim.core.simulation import Simulation
 from topsim.user.schedule.dynamic_plan import DynamicSchedulingFromPlan
 from topsim.user.telescope import Telescope
 from topsim.user.plan.static_planning import SHADOWPlanning
+from topsim.user.schedule.batch_allocation import BatchProcessing
+from topsim.user.plan.batch_planning import BatchPlanning  # Planning
 
 CONFIG = Path("test/data/config/heft_single_observation_simulation.json")
 # SIM_TIMESTAMP = f'test/simulation_pickles/{0}'
@@ -45,7 +47,6 @@ class TestMonitorPandasPickle(unittest.TestCase):
             env=env,
             config=CONFIG,
             instrument=self.instrument,
-            planning_algorithm='heft',
             planning_model=SHADOWPlanning('heft'),
             scheduling=DynamicSchedulingFromPlan(),
             delay=None,
@@ -86,9 +87,8 @@ class TestMonitorPandasPickle(unittest.TestCase):
                 env,
                 CONFIG,
                 self.instrument,
-                planning_algorithm=algorithm,
                 planning_model=SHADOWPlanning(algorithm),
-                scheduling=DynamicSchedulingFromPlan(),
+                scheduling=DynamicSchedulingFromPlan(ignore_ingest=True),
                 delay=None,
                 timestamp=0,
                 hdf5_path='test/simulation_data/test_hdf5.h5',
@@ -128,20 +128,18 @@ class TestMonitorNoFileOption(unittest.TestCase):
             self.env,
             CONFIG,
             self.instrument,
-            planning_algorithm='heft',
             planning_model=SHADOWPlanning('heft'),
             scheduling=DynamicSchedulingFromPlan(),
             delay=None,
             timestamp=None,
         )
         simdf, taskdf = simulation.start()
-        self.assertEqual(108, len(simdf))
+        self.assertEqual(105, len(simdf))
         self.env = simpy.Environment()
         simulation = Simulation(
             self.env,
             CONFIG,
             self.instrument,
-            planning_algorithm='fcfs',
             planning_model=SHADOWPlanning('fcfs'),
             scheduling=DynamicSchedulingFromPlan(),
             delay=None,
@@ -149,8 +147,21 @@ class TestMonitorNoFileOption(unittest.TestCase):
             # delimiters=f'test/{algorithm}'
         )
         simdf, taskdf = simulation.start()
-        self.assertEqual(122, len(simdf))
-
+        self.assertEqual(135, len(simdf))
+        self.env = simpy.Environment()
+        simulation = Simulation(
+            self.env,
+            CONFIG,
+            self.instrument,
+            planning_model=BatchPlanning('batch'),
+            scheduling=BatchProcessing(min_resources_per_workflow=1, resource_split={},
+                                       max_resource_partitions=1),
+            delay=None,
+            timestamp=None,
+            # delimiters=f'test/{algorithm}'
+        )
+        simdf, taskdf = simulation.start()
+        print(len(simdf))
 
     def testResultsAgreeWithExpectations(self):
         pass

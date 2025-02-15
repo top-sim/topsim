@@ -2,7 +2,7 @@
 	"instrument": {
 		"telescope": {
 			"total_arrays": 36,
-			"max_ingest_resources": 1,
+			"max_ingest_resources": 2,
 			"pipelines": {
 				"first": {
 					"workflow": "workflows/basic_workflow_config.json",

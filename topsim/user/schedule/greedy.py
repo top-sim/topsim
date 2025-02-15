@@ -43,10 +43,13 @@ class GreedySchedulingFromPlan(Scheduling):
         """
         pass
 
-    def __repr__(self):
+    def __str__(self):
         return "GreedyAlgorithmFromPlan"
 
-    def run(self, cluster, clock, workflow_plan, existing_schedule,task_pool):
+    def to_string(self):
+        return self.__str__()
+
+    def run(self, cluster, planner, clock, workflow_plan, existing_schedule, task_pool, **kwargs):
         """
         cluster,
         clock

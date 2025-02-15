@@ -15,6 +15,7 @@
 
 import copy
 import logging
+import json
 import networkx as nx
 
 from topsim.core.task import TaskStatus
@@ -47,18 +48,25 @@ class BatchProcessing(Scheduling):
     def __init__(
         self,
         max_resource_partitions=1,
-        min_resources_per_workflow=3,
-        resource_split=None
+        min_resources_per_workflow=2,
+        resource_split=None,
+        ignore_ingest=False,
+        use_workflow_dop=False
     ):
         super().__init__()
         self.max_resources_split = max_resource_partitions
         self.min_resource_per_workflow = min_resources_per_workflow
         self.resource_split = resource_split
+        self.ignore_ingest = ignore_ingest
+        self.use_workflow_dop = use_workflow_dop
 
-    def __repr__(self):
+    def __str__(self):
         return "BatchProcessing"
 
-    def run(self, cluster, clock, workflow_plan, existing_schedule, task_pool):
+    def to_string(self):
+        return self.__str__()
+
+    def run(self, cluster, planner, clock, workflow_plan, existing_schedule, task_pool, **kwargs):
         """
         Generate a list of allocations for the current timestep using the
         existing schedule as a basis.
@@ -66,12 +74,20 @@ class BatchProcessing(Scheduling):
 
         provision = False
         allocations = copy.copy(existing_schedule)
-        provision = self._provision_resources(cluster, workflow_plan)
-        if clock % 100 == 0 and not provision:
-            logger.info(f"{workflow_plan.id} attempted to provision @ {clock}.")
-            logger.info(f"{cluster.num_provisioned_obs} existing provs.")
+        observation = kwargs['observation']
+        provision = self._provision_resources(cluster, observation)
+        # if clock % 100 == 0 and not provision:
+        #     logger.info(f"{observation.name} attempted to provision @ {clock}.")
+            # logger.info(f"{cluster.num_provisioned_obs} existing provs.")
         # tasks = workflow_plan.tasks
-        if not task_pool:
+        allocations = copy.copy(existing_schedule)
+        if not provision:
+            return allocations, workflow_plan, task_pool
+            # return None, None, task_pool
+        if not workflow_plan and provision:
+            workflow_plan = planner.run(observation, None, None)
+
+        if not task_pool and provision:
             for task in workflow_plan.tasks:
                 # id = int(task.id.split('_')[-1])
                 if not list(workflow_plan.graph.predecessors(task)):
@@ -82,6 +98,7 @@ class BatchProcessing(Scheduling):
             temporary_resources = cluster.get_idle_resources(workflow_plan.id)
             # The starting number of temporary resources is the maximum
             # number of (greedy) allocations we can make
+            # print(f"{clock}, {len(temporary_resources)=}")
             max_allocations_iteration = len(temporary_resources)
             for task in task_pool:
                 # If we have exhausted all possible allocations for this
@@ -131,12 +148,12 @@ class BatchProcessing(Scheduling):
             workflow_plan.status = WorkflowStatus.FINISHED
             logger.debug(f'{workflow_plan.id} is finished.')
             cluster.release_batch_resources(workflow_plan.id)
-        return allocations, workflow_plan.status, task_pool
+        return allocations, workflow_plan, task_pool
 
     def to_df(self):
         pass
 
-    def _max_resource_provision(self, cluster, workflow_plan=None):
+    def _max_resource_provision(self, cluster, observation=None):
         """
 
         Calculate the appropriate number of resources to provision accordingly
@@ -164,14 +181,17 @@ class BatchProcessing(Scheduling):
         prov_resources : int
             Number of resources to provision based on our provisioning heuristic
         """
+        # TODO consider making the cluster initialised with the max ingest resources for the simulation
+        # This can be used to ensure we never dig into ingest resources?
         available = len(cluster.get_available_resources())
+        logger.info("Available resources are: %s", available)
         # Ensure we don't provision more than is acceptable for a single
         # workflow
 
         #  TODO do We need to make sure there's enough left for ingest to
         #   occur?
         if self.resource_split:
-            min_resource_limit, max_resource_limit = self.resource_split[workflow_plan.id]
+            min_resource_limit, max_resource_limit = self.resource_split[observation.name]
             if min_resource_limit > len(cluster):
                 raise RuntimeError("Minimum resource demand is not supported by cluster")
             elif available == 0:
@@ -182,15 +202,46 @@ class BatchProcessing(Scheduling):
                 return min(available, max_resource_limit)
 
         else:
-            max_allowed = int(len(cluster) / self.max_resources_split)
-            if available == 0:
-                return 0
-            if available < max_allowed:
-                return available
-            else:
-                return max_allowed
+            if self.ignore_ingest:
+                self.ingest_requirements = 0
 
-    def _provision_resources(self, cluster, workflow_plan):
+            # If the number of resources are the maximal resources, we use the pre-calc'd
+            # maximum resources
+            if len(cluster) == self.LOW_MAX_RESOURCES:
+                self.ingest_requirements = self.LOW_REALTIME_RESOURCES
+                
+            if self.use_workflow_dop:
+                with open(observation.workflow, 'r') as infile:
+                    wfconfig = json.load(infile)
+                graph = nx.readwrite.json_graph.node_link_graph(wfconfig['graph'])
+
+                graph_dop = (max(graph.out_degree(list(graph.nodes)),
+                             key=lambda x: x[1]))[1] / 2
+
+                min_resources = int(graph_dop)
+                if min_resources == len(cluster):
+                    min_resources = int(graph_dop/2)
+                if available >= min_resources:
+                    return min_resources
+            else:
+                # TODO consider removing the concept of the max_resources_split
+                max_allowed = int(
+                    len(cluster) / self.max_resources_split) - self.ingest_requirements
+                
+                if max_allowed == 0 and self.ingest_requirements == len(cluster):
+                    # We will never be allowed to ingest anything unless we allow resources!
+                    max_allowed = len(cluster)
+                if available == 0:
+                    return 0
+                if available < max_allowed:
+                    return available
+                else:
+                    return max_allowed
+
+    # TODO move this and the _max_resource_provision into AbstractBaseClass as we are
+    # just duplicating the information.
+
+    def _provision_resources(self, cluster, observation):
         """
         Given the defined max_resources_split, provision resources
 
@@ -204,18 +255,17 @@ class BatchProcessing(Scheduling):
         -------
 
         """
-        if cluster.is_observation_provisioned(workflow_plan.id):
+        if cluster.is_observation_provisioned(observation.name):
             # logger.info(f"{workflow_plan.id} already provisioned.")
             return True
         else:
             if cluster.num_provisioned_obs < self.max_resources_split:
-                provision = self._max_resource_provision(cluster, workflow_plan)
+                provision = self._max_resource_provision(cluster, observation)
                 if provision < self.min_resource_per_workflow:
                     return False
                 else:
-                    logger.info(f"{provision} machines for {workflow_plan.id}")
-                    logger.info(f"{cluster.num_provisioned_obs} provisioned")
+                    # logger.info(f"{provision} machines provisioned for {workflow_plan.id}")
                     return cluster.provision_batch_resources(provision,
-                        workflow_plan.id)
+                        observation.name)
             else:
                 return False
