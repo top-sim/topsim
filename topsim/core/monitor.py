@@ -61,11 +61,11 @@ class Monitor(object):
         )
         algs = pd.DataFrame(
             {
-                'planning': [self.simulation.planner.model.to_string()],
-                'scheduling': [self.simulation.scheduler.algorithm.to_string()]
+                'planning': [str(self.simulation.planner.model.algorithm)],
+                'scheduling': [str(self.simulation.scheduler.algorithm)]
             },
         )
-        cf = pd.DataFrame({'config': [str(self.simulation._cfg_path)]})
+        cf = pd.DataFrame({'config': [str(self.simulation._cfg_path.name)]})
         df = df.join(
             [cluster, buffer, instrument, scheduler, algs, cf, delay],
             how='outer'
