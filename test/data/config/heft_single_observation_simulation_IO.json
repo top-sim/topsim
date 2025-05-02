@@ -1,57 +1,59 @@
 {
-	"instrument": {
-		"telescope": {
-			"total_arrays": 36,
-			"max_ingest_resources": 1,
-			"pipelines": {
-				"emu": {
-					"workflow": "longtask/workflow_config_minutes_longtask_IO.json",
-					"ingest_demand": 1
-				}
-			},
-			"observations": [
-				{
-					"name": "emu",
-					"start": 0,
-					"duration": 600,
-					"instrument_demand": 36,
-					"data_product_rate": 0.03333333333333333
-				}
-			]
-		}
-	},
-	"cluster": {
-		"header": {
-		},
-		"system": {
-			"resources": {
-				"cat0_m0": {
-					"flops": 1.0,
-					"compute_bandwidth": 7000.0
-				},
-				"cat1_m1": {
-					"flops": 1.0,
-					"compute_bandwidth": 6000.0
-				},
-				"cat2_m2": {
-					"flops": 1.0,
-					"compute_bandwidth": 11000.0
-				}
-			},
-			"system_bandwidth": 1.0
-		}
-	},
-	"buffer": {
-		"hot": {
-			"capacity": 500,
-			"max_ingest_rate": 0.08333333333333333
-		},
-		"cold": {
-			"capacity": 250,
-			"max_data_rate": 0.03333333333333333
-		}
-	},
-	"planning": "heft",
-	"scheduling": "fifo",
-	"timestep": "minutes"
+  "instrument": {
+    "telescope": {
+      "total_arrays": 36,
+      "max_ingest_resources": 1,
+      "pipelines": {
+        "emu": {
+          "workflow": "longtask/workflow_config_minutes_longtask_IO.json",
+          "ingest_demand": 1
+        }
+      },
+      "observations": [
+        {
+          "name": "emu",
+          "start": 0,
+          "duration": 600,
+          "instrument_demand": 36,
+          "data_product_rate": 0.03333333333333333
+        }
+      ]
+    }
+  },
+  "cluster": {
+    "header": {},
+    "system": {
+      "resources": {
+        "cat0": {
+          "compute_bandwidth": 7000.0,
+          "flops": 1.0,
+          "count": 1
+        },
+        "cat1": {
+          "compute_bandwidth": 6000.0,
+          "flops": 1.0,
+          "count": 1
+        },
+        "cat2": {
+          "compute_bandwidth": 11000.0,
+          "flops": 1.0,
+          "count": 1
+        }
+      },
+      "system_bandwidth": 1.0
+    }
+  },
+  "buffer": {
+    "hot": {
+      "capacity": 500,
+      "max_ingest_rate": 0.08333333333333333
+    },
+    "cold": {
+      "capacity": 250,
+      "max_data_rate": 0.03333333333333333
+    }
+  },
+  "planning": "heft",
+  "scheduling": "fifo",
+  "timestep": "minutes"
 }

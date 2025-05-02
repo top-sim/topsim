@@ -1,78 +1,79 @@
 {
-	"instrument": {
-		"telescope": {
-			"total_arrays": 36,
-			"max_ingest_resources": 2,
-			"pipelines": {
-				"first": {
-					"workflow": "workflows/basic_workflow_config.json",
-					"ingest_demand": 1
-				},
-				"second": {
-					"workflow": "workflows/basic_workflow_config.json",
-					"ingest_demand": 1
-				},
-				"third": {
-					"workflow": "workflows/basic_workflow_config.json",
-					"ingest_demand": 1
-				}
-			},
-			"observations": [
-				{
-					"name": "first",
-					"start": 0,
-					"duration": 1,
-					"instrument_demand": 36,
-					"data_product_rate": 5
-				},
-				{
-					"name": "second",
-					"start": 1,
-					"duration": 1,
-					"instrument_demand": 36,
-					"data_product_rate": 5
-				},
-				{
-					"name": "third",
-					"start": 2,
-					"duration": 1,
-					"instrument_demand": 36,
-					"data_product_rate": 5
-				}
-			]
-		}
-	},
-	"cluster": {
-		"header": {
-			"time": "false",
-			"gen_specs": {
-			}
-		},
-		"system": {
-			"resources": {
-				"cat0_m0": {
-					"flops": 1.0,
-					"compute_bandwidth": 1.0
-				},
-				"cat1_m1": {
-					"flops": 2.0,
-					"compute_bandwidth": 1.0
-				}
-			},
-			"system_bandwidth": 1.0
-		}
-	},
-	"buffer": {
-		"hot": {
-			"capacity": 10,
-			"max_ingest_rate": 5
-		},
-		"cold": {
-			"capacity": 10,
-			"max_data_rate": 5
-		}
-	},
-	"planning": "heft",
-	"scheduling": "fifo",
-	"timestep": "seconds"
+  "instrument": {
+    "telescope": {
+      "total_arrays": 36,
+      "max_ingest_resources": 2,
+      "pipelines": {
+        "first": {
+          "workflow": "workflows/basic_workflow_config.json",
+          "ingest_demand": 1
+        },
+        "second": {
+          "workflow": "workflows/basic_workflow_config.json",
+          "ingest_demand": 1
+        },
+        "third": {
+          "workflow": "workflows/basic_workflow_config.json",
+          "ingest_demand": 1
+        }
+      },
+      "observations": [
+        {
+          "name": "first",
+          "start": 0,
+          "duration": 1,
+          "instrument_demand": 36,
+          "data_product_rate": 5
+        },
+        {
+          "name": "second",
+          "start": 1,
+          "duration": 1,
+          "instrument_demand": 36,
+          "data_product_rate": 5
+        },
+        {
+          "name": "third",
+          "start": 2,
+          "duration": 1,
+          "instrument_demand": 36,
+          "data_product_rate": 5
+        }
+      ]
+    }
+  },
+  "cluster": {
+    "header": {
+      "time": "false",
+      "gen_specs": {}
+    },
+    "system": {
+      "resources": {
+        "cat0": {
+          "compute_bandwidth": 1.0,
+          "flops": 1.0,
+          "count": 1
+        },
+        "cat1": {
+          "compute_bandwidth": 1.0,
+          "flops": 2.0,
+          "count": 1
+        }
+      },
+      "system_bandwidth": 1.0
+    }
+  },
+  "buffer": {
+    "hot": {
+      "capacity": 10,
+      "max_ingest_rate": 5
+    },
+    "cold": {
+      "capacity": 10,
+      "max_data_rate": 5
+    }
+  },
+  "planning": "heft",
+  "scheduling": "fifo",
+  "timestep": "seconds"
 }

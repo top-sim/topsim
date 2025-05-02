@@ -1,99 +1,63 @@
 {
-	"instrument": {
-		"telescope": {
-			"total_arrays": 36,
-			"max_ingest_resources": 5,
-			"pipelines": {
-				"emu": {
-					"workflow": "longtask/workflow_config_minutes_longtask.json",
-					"ingest_demand": 5
-				},
-				"dingo": {
-					"workflow": "longtask/workflow_config_minutes_longtask.json",
-					"ingest_demand": 5
-				}
-			},
-			"observations": [
-				{
-					"name": "emu",
-					"start": 0,
-					"duration": 600,
-					"instrument_demand": 36,
-					"data_product_rate": 66666666.66666666
-				},
-				{
-					"name": "dingo",
-					"start": 900,
-					"duration": 1200,
-					"instrument_demand": 18,
-					"data_product_rate": 83333333.33333
-				}
-			]
-		}
-	},
-	"cluster": {
-		"header": {
-			"time": "false",
-			"gen_specs": {
-			}
-		},
-		"system": {
-			"resources": {
-				"cat0_m0": {
-					"flops": 84,
-					"compute_bandwidth": 10
-				},
-				"cat0_m1": {
-					"flops": 84,
-					"compute_bandwidth": 10
-				},
-				"cat0_m2": {
-					"flops": 84,
-					"compute_bandwidth": 10
-				},
-				"cat0_m3": {
-					"flops": 84,
-					"compute_bandwidth": 10
-				},
-				"cat0_m4": {
-					"flops": 84,
-					"compute_bandwidth": 10
-				},
-				"cat0_m5": {
-					"flops": 84,
-					"compute_bandwidth": 10
-				},
-				"cat0_m6": {
-					"flops": 84,
-					"compute_bandwidth": 10
-				},
-				"cat0_m7": {
-					"flops": 84,
-					"compute_bandwidth": 10
-				},
-				"cat0_m8": {
-					"flops": 84,
-					"compute_bandwidth": 10
-				},
-				"cat0_m9": {
-					"flops": 84,
-					"compute_bandwidth": 10
-				}
-			},
-			"system_bandwidth": 1.0
-		}
-	},
-	"buffer": {
-		"hot": {
-			"capacity": 500000000000.0,
-			"max_ingest_rate": 83333333.33333333
-		},
-		"cold": {
-			"capacity": 250000000000.0,
-			"max_data_rate": 33333333.333333333
-		}
-	},
-	"planning": "heft",
-	"scheduling": "fifo",
-	"timestep": "minutes"
+  "instrument": {
+    "telescope": {
+      "total_arrays": 36,
+      "max_ingest_resources": 5,
+      "pipelines": {
+        "emu": {
+          "workflow": "longtask/workflow_config_minutes_longtask.json",
+          "ingest_demand": 5
+        },
+        "dingo": {
+          "workflow": "longtask/workflow_config_minutes_longtask.json",
+          "ingest_demand": 5
+        }
+      },
+      "observations": [
+        {
+          "name": "emu",
+          "start": 0,
+          "duration": 600,
+          "instrument_demand": 36,
+          "data_product_rate": 66666666.66666666
+        },
+        {
+          "name": "dingo",
+          "start": 900,
+          "duration": 1200,
+          "instrument_demand": 18,
+          "data_product_rate": 83333333.33333
+        }
+      ]
+    }
+  },
+  "cluster": {
+    "header": {
+      "time": "false",
+      "gen_specs": {}
+    },
+    "system": {
+      "resources": {
+        "cat0": {
+          "compute_bandwidth": 10,
+          "flops": 84,
+          "count": 10
+        }
+      },
+      "system_bandwidth": 1.0
+    }
+  },
+  "buffer": {
+    "hot": {
+      "capacity": 500000000000.0,
+      "max_ingest_rate": 83333333.33333333
+    },
+    "cold": {
+      "capacity": 250000000000.0,
+      "max_data_rate": 33333333.333333332
+    }
+  },
+  "planning": "heft",
+  "scheduling": "fifo",
+  "timestep": "minutes"
 }

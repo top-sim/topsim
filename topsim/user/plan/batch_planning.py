@@ -124,7 +124,7 @@ class BatchPlanning(Planning):
         """
         with open(workflow, 'r') as infile:
             config = json.load(infile)
-        graph = nx.readwrite.node_link_graph(config['graph'])
+        graph = nx.readwrite.node_link_graph(config['graph'], edges="links")
         return graph
 
     def to_df(self):
