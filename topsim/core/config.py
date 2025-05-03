@@ -110,9 +110,7 @@ class Config:
         else:  # Seconds
             timestep_multiplier = timestep_multiplier
 
-        # Test
-        # name, spec = next(machines_types.items())
-        if not self._check_cluster():
+        if not self._get_machine_count():
             self._update_config()
 
         machines_types = self.cluster['system']['resources']
@@ -131,9 +129,13 @@ class Config:
         bandwidth = self.cluster['system']["system_bandwidth"] * timestep_multiplier
         return machine_list, bandwidth
 
-    def _check_cluster(self):
+    def _get_machine_count(self):
         """
+        Utility function that tries and fetches the count from the initial
+        system-resources sub-dictionary.
 
+        If there is no count, it will return None, and this is used to trigger
+        the re-creation of the existing configuration file into the new format.
         """
 
         machines_types = self.cluster['system']['resources']
@@ -143,8 +145,16 @@ class Config:
 
     def _update_config(self):
         """
+        Convert the deprecated "cluster" dictionary to the new more concise
+        approach.
 
-        :return:
+        Here, we make note of each unique machine 'spec'
+        (flops, bandwidth, memory, and disk), count how many of them there are,
+        and overwrite the existing "cluster" dictionary with the new format.
+
+        We also over-write the existing configuration file so we do not have to
+        perform this everytime we load an older configuration.
+
         """
         resources = self.cluster["system"]["resources"]
         grouped_specs = defaultdict(list)
@@ -165,10 +175,10 @@ class Config:
         self.cluster["system"]["resources"] = updated_resources
 
         with open(self.path, 'r') as fp:
-            dict = json.load(fp)
+            d = json.load(fp)
         with open(self.path, 'w') as fp:
-            dict["cluster"]["system"]["resources"] = updated_resources
-            json.dump(dict, fp, indent=2)
+            d["cluster"]["system"]["resources"] = updated_resources
+            json.dump(d, fp, indent=2)
 
     def parse_instrument_config(self, instrument_name):
         timestep_multiplier = 1
@@ -244,42 +254,3 @@ class Config:
     def get_max_ingest(self, instrument_name):
 
         return self.instrument[instrument_name]['max_ingest_resources']
-    
-    
-    
-    """
-    	"cluster": {
-		"header": {
-		},
-		"system": {
-			"resources": {
-				"cat0_m0": {
-					"flops": 1.0,
-					"compute_bandwidth": 7000.0
-				},
-				"cat1_m1": {
-					"flops": 1.0,
-					"compute_bandwidth": 6000.0
-				},
-				"cat2_m2": {
-					"flops": 1.0,
-					"compute_bandwidth": 11000.0
-				}
-			},
-			"system_bandwidth": 1.0
-		}
-	},
-
-    to: 
-    "system": {
-        "resources": {
-            "m0": {count: ...} 
-            "m1": {count: ...}
-            "m2": {count: ...}
-        }
-    """
-    def _process_cluster(self):
-
-        return machine_list
-
-

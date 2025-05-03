@@ -71,10 +71,10 @@ class TestClusterConfig(unittest.TestCase):
 
     def testReplaceOldConfigHetergeneous(self):
         """
+        Confirm that heterogeneous machine specs are accurately separated.
 
-        Returns
-        -------
-
+        For the example path, we would expect to go from 3 machine entries to
+        3 machine entries, as there are 3 different machines in the config.
         """
         tmp = Path(OLD_CONFIG_HETEROGENEOUS)
         self.cfg_path = tmp.parent.joinpath("tmp.json")
@@ -89,9 +89,11 @@ class TestClusterConfig(unittest.TestCase):
 
     def testReplaceOldConfigHomogeneous(self):
         """
+        Confirm that heterogeneous machine specs are accurately separated.
 
-        Returns
-        -------
+        For the example path, we would expect to go from 10 machine entries to
+        1 machine entry in the JSON, as there is only one machine type in the config.
+
 
         """
         tmp = Path(OLD_CONFIG_HOMOGENEOUS)
