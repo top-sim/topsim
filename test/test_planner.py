@@ -72,9 +72,9 @@ class TestPlannerConfig(unittest.TestCase):
             self.cluster, self.observation)
         # Bandwidth set at 1gb/s = 60gb/min.
         self.assertEqual(60.0, available_resources['system']["system_bandwidth"])
-        machine = available_resources['system']['resources']['cat0_m0']
+        machine = available_resources['system']['resources']['cat0_0']
         self.assertEqual(
-            5040, available_resources['system']['resources']['cat0_m0']['flops']
+            5040, available_resources['system']['resources']['cat0_0']['flops']
         )
 
 

@@ -213,7 +213,7 @@ class BatchProcessing(Scheduling):
             if self.use_workflow_dop:
                 with open(observation.workflow, 'r') as infile:
                     wfconfig = json.load(infile)
-                graph = nx.readwrite.json_graph.node_link_graph(wfconfig['graph'])
+                graph = nx.readwrite.json_graph.node_link_graph(wfconfig['graph'], edges="links")
 
                 graph_dop = (max(graph.out_degree(list(graph.nodes)),
                              key=lambda x: x[1]))[1] / 2

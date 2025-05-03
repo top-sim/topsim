@@ -16,10 +16,13 @@
 """
 Unit tests for the Config class. Test configuration for all
 """
-
+import shutil
 import unittest
 import json
 
+from pathlib import Path
+
+from scipy.linalg import bandwidth
 from topsim.core.config import Config
 from topsim.user.telescope import Telescope
 
@@ -30,6 +33,8 @@ NOT_JSON = "test/data/config/NotJSONFileTest.txt"
 MISSING_KEYS = "test/data/config/config_missing_keys.json"
 CONFIG_CUSTOM_TIMESTEP = "test/data/config/custom_timestep.json"
 
+OLD_CONFIG_HETEROGENEOUS = "test/data/config/deprecated_config/deprecated_heterogeneous_config.json"
+OLD_CONFIG_HOMOGENEOUS = "test/data/config/deprecated_config/deprecated_homogeneous_config.json"
 
 class TestGeneralConfig(unittest.TestCase):
 
@@ -60,6 +65,47 @@ class TestActorConfigIncorrectJSON(unittest.TestCase):
 
     def test_buffer_config_incorrect_json(self):
         self.assertRaises(KeyError, self.config.parse_buffer_config)
+
+
+class TestClusterConfig(unittest.TestCase):
+
+    def testReplaceOldConfigHetergeneous(self):
+        """
+        Confirm that heterogeneous machine specs are accurately separated.
+
+        For the example path, we would expect to go from 3 machine entries to
+        3 machine entries, as there are 3 different machines in the config.
+        """
+        tmp = Path(OLD_CONFIG_HETEROGENEOUS)
+        self.cfg_path = tmp.parent.joinpath("tmp.json")
+        shutil.copy(tmp, self.cfg_path)
+        config = Config(str(self.cfg_path))
+        machine_list, bandwidth = config.parse_cluster_config()
+        self.assertEqual(3, len(machine_list))
+        with open(self.cfg_path) as fp:
+            dict = json.load(fp)
+            self.assertEqual(3, len(dict["cluster"]["system"]["resources"]))
+        self.cfg_path.unlink()
+
+    def testReplaceOldConfigHomogeneous(self):
+        """
+        Confirm that heterogeneous machine specs are accurately separated.
+
+        For the example path, we would expect to go from 10 machine entries to
+        1 machine entry in the JSON, as there is only one machine type in the config.
+
+
+        """
+        tmp = Path(OLD_CONFIG_HOMOGENEOUS)
+        self.cfg_path = tmp.parent.joinpath("tmp.json")
+        shutil.copy(tmp, self.cfg_path)
+        config = Config(str(self.cfg_path))
+        machine_list, bandwidth = config.parse_cluster_config()
+        self.assertEqual(10, len(machine_list))
+        with open(self.cfg_path) as fp:
+            dict = json.load(fp)
+            self.assertEqual(1, len(dict["cluster"]["system"]["resources"]))
+        self.cfg_path.unlink()
 
 
 class TestActorConfigurationReturnsCorrectDictionary(unittest.TestCase):

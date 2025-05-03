@@ -15,6 +15,7 @@
 
 
 import json
+from collections import defaultdict
 from pathlib import Path
 from topsim.core.instrument import Observation
 from topsim.core.machine import Machine
@@ -86,6 +87,7 @@ class Config:
         else:
             self.timestep_unit = 'seconds'
 
+
     def parse_cluster_config(self):
         try:
             (self.cluster['system'] and self.cluster['system']['resources'] and
@@ -96,7 +98,6 @@ class Config:
                 self.cluster)
             raise
 
-        machines = self.cluster['system']['resources']
         machine_list = []
         timestep_multiplier = 1
         if self.timestep_unit == 'minutes':
@@ -109,16 +110,75 @@ class Config:
         else:  # Seconds
             timestep_multiplier = timestep_multiplier
 
-        for machine in machines:
-            cpu = machines[machine]['flops'] * timestep_multiplier
-            machine_list.append(
-                Machine(id=machine, cpu=cpu, memory=1,  # * timestep_multiplier,
-                        disk=1,  # * timestep_multiplier,
-                        bandwidth=machines[machine][
-                                      "compute_bandwidth"] * timestep_multiplier))
+        if not self._get_machine_count():
+            self._update_config()
 
+        machines_types = self.cluster['system']['resources']
+        for name, spec in machines_types.items():
+            num_machines = spec.get("count")
+            for i in range(num_machines):
+                cpu = spec["flops"] * timestep_multiplier
+                machine_list.append(
+                    Machine(id=f"{name}_{i}", cpu=cpu,
+                            memory=1,  # * timestep_multiplier,
+                            disk=1,  # * timestep_multiplier,
+                            bandwidth=(machines_types[name]["compute_bandwidth"]
+                                       * timestep_multiplier)
+                            )
+                )
         bandwidth = self.cluster['system']["system_bandwidth"] * timestep_multiplier
         return machine_list, bandwidth
+
+    def _get_machine_count(self):
+        """
+        Utility function that tries and fetches the count from the initial
+        system-resources sub-dictionary.
+
+        If there is no count, it will return None, and this is used to trigger
+        the re-creation of the existing configuration file into the new format.
+        """
+
+        machines_types = self.cluster['system']['resources']
+        example_key = list(machines_types.keys())[0]
+        return machines_types[example_key].get("count")
+
+
+    def _update_config(self):
+        """
+        Convert the deprecated "cluster" dictionary to the new more concise
+        approach.
+
+        Here, we make note of each unique machine 'spec'
+        (flops, bandwidth, memory, and disk), count how many of them there are,
+        and overwrite the existing "cluster" dictionary with the new format.
+
+        We also over-write the existing configuration file so we do not have to
+        perform this everytime we load an older configuration.
+
+        """
+        resources = self.cluster["system"]["resources"]
+        grouped_specs = defaultdict(list)
+        for name, spec in resources.items():
+            # Use dictionary data as key to determine unique entries:
+            spec["name"] = name.split("_")[0]
+            spec_key = json.dumps(spec, sort_keys=True)
+            grouped_specs[spec_key].append(spec)
+
+        updated_resources = {}
+        for spec_string, spec_list in grouped_specs.items():
+            spec = json.loads(spec_string)
+            name = spec["name"]
+            del spec["name"]
+
+            spec["count"] = len(spec_list)
+            updated_resources[name] = spec
+        self.cluster["system"]["resources"] = updated_resources
+
+        with open(self.path, 'r') as fp:
+            d = json.load(fp)
+        with open(self.path, 'w') as fp:
+            d["cluster"]["system"]["resources"] = updated_resources
+            json.dump(d, fp, indent=2)
 
     def parse_instrument_config(self, instrument_name):
         timestep_multiplier = 1

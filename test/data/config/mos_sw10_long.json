@@ -1,213 +1,57 @@
 {
-	"instrument": {
-		"telescope": {
-			"total_arrays": 36,
-			"max_ingest_resources": 5,
-			"pipelines": {
-				"dingo": {
-					"workflow": "longconfig/shadow_Continuum_ChannelSplit_10_long.json",
-					"ingest_demand": 5
-				}
-			},
-			"observations": [
-				{
-					"name": "dingo",
-					"start": 0,
-					"duration": 150,
-					"instrument_demand": 36,
-					"data_product_rate": 5
-				}
-			]
-		}
-	},
-	"cluster": {
-		"header": {
-			"time": "false",
-			"gen_specs": {
-				"file": "system_spec_40_200-400_1.0",
-				"seed": 20,
-				"range": "[(200, 400)]",
-				"heterogeneity": 1.0,
-				"multiplier": 1
-			}
-		},
-		"system": {
-			"resources": {
-					"cat0_m0": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m1": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m2": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m3": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m4": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m5": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m6": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m7": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m8": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m9": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m10": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m11": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m12": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m13": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m14": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m15": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m16": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m17": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m18": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m19": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m20": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m21": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m22": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m23": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m24": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m25": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m26": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m27": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m28": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m29": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m30": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m31": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m32": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m33": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m34": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m35": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m36": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m37": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m38": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					},
-					"cat0_m39": {
-						"flops": 35000,
-						"compute_bandwidth": 10
-					}
-
-			},
-			"system_bandwidth": 1.0
-		}
-	},
-	"buffer": {
-		"hot": {
-			"capacity": 2000,
-			"max_ingest_rate": 5
-		},
-		"cold": {
-			"capacity": 5000,
-			"max_data_rate": 5
-		}
-	},
-	"planning": "heft",
-	"scheduling": "fifo"
+  "instrument": {
+    "telescope": {
+      "total_arrays": 36,
+      "max_ingest_resources": 5,
+      "pipelines": {
+        "dingo": {
+          "workflow": "longconfig/shadow_Continuum_ChannelSplit_10_long.json",
+          "ingest_demand": 5
+        }
+      },
+      "observations": [
+        {
+          "name": "dingo",
+          "start": 0,
+          "duration": 150,
+          "instrument_demand": 36,
+          "data_product_rate": 5
+        }
+      ]
+    }
+  },
+  "cluster": {
+    "header": {
+      "time": "false",
+      "gen_specs": {
+        "file": "system_spec_40_200-400_1.0",
+        "seed": 20,
+        "range": "[(200, 400)]",
+        "heterogeneity": 1.0,
+        "multiplier": 1
+      }
+    },
+    "system": {
+      "resources": {
+        "cat0": {
+          "compute_bandwidth": 10,
+          "flops": 35000,
+          "count": 40
+        }
+      },
+      "system_bandwidth": 1.0
+    }
+  },
+  "buffer": {
+    "hot": {
+      "capacity": 2000,
+      "max_ingest_rate": 5
+    },
+    "cold": {
+      "capacity": 5000,
+      "max_data_rate": 5
+    }
+  },
+  "planning": "heft",
+  "scheduling": "fifo"
 }
