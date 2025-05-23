@@ -272,9 +272,8 @@ class Simulation:
         if self.to_file and self._hdf5_store is not None:
             global_df = self.monitor.df
             summary_df = self.monitor.events
-            task_df = self._generate_final_task_data()
             self._hdf5_store.open()
-            self._compose_hdf5_output(global_df, task_df, summary_df)
+            self._compose_hdf5_output(global_df, summary_df)
             self._hdf5_store.close()
 
         else:
@@ -348,8 +347,6 @@ class Simulation:
         finish = max(events['timestep'],0)
 
 
-
-
     @staticmethod
     def _split_monolithic_config(self, json):
         return json
@@ -372,7 +369,7 @@ class Simulation:
         df['config'] = [str(self._cfg_path) for x in range(size)]
         return df.infer_objects()
 
-    def _compose_hdf5_output(self, global_df, tasks_df, summary_df):
+    def _compose_hdf5_output(self, global_df, summary_df):
         """
         Given a :py:obj:`pandas.HDFStore()` object, put global simulation,
         task specific, and configuration data into HDF5 storage files.
@@ -380,8 +377,8 @@ class Simulation:
         ----------
         global_df : :py:obj:pandas.DataFrame
             The global, per-timestep overview of the simulation
-        tasks_df : :py:obj:pandas.DataFrame
-            Information on each tasks' execution throughout the simulation.
+        summary_df : :py:obj:pandas.DataFrame
+            Information on the major events in each actor
         Returns
         -------
 
@@ -397,8 +394,6 @@ class Simulation:
         final_key = f'{ts}/{self._delimiters}/{sanitised_path}'
         global_df = global_df.fillna(0)
         self._hdf5_store.put(key=f"{final_key}/sim", value=global_df)
-        self._hdf5_store.put(key=f'{final_key}/tasks',
-                             value=tasks_df)
         self._hdf5_store.put(key=f'{final_key}/summary',
                              value=summary_df)
 

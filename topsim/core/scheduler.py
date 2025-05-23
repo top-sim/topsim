@@ -275,7 +275,6 @@ class Scheduler:
         _tqdm = True
         pbar_setup = False
         pbar = None
-        self._add_event(observation, "allocation", "started")
         while True:
             if current_plan:
                 current_plan.tasks = self._update_current_plan(current_plan)
@@ -290,6 +289,9 @@ class Scheduler:
             if not current_plan:
                 yield self.env.timeout(TIMESTEP)
                 continue
+            else:
+                # We have a plan, which means we are no longer waiting around for resources
+                self._add_event(observation, "allocation", "started")
             if _tqdm and not pbar_setup:
                 _total_tasks = len(current_plan.tasks)
                 _curr_tasks = len(current_plan.tasks)
@@ -497,10 +499,6 @@ class Scheduler:
         df['scheduler_observation_queue'] = [int(len(self.observation_queue))]
         df['schedule_status'] = [str(self.schedule_status.value)]
         df['delay_offset'] = [self.delay_offset]
-        tmp = f'alg'
-        if self.algtime:
-            for key, value in self.algtime.items():
-                df[key] = value
         return df
 
     def to_summary(self):
@@ -509,8 +507,6 @@ class Scheduler:
         current timestep
 
         The scheduler has the following key events that can happen each timestep
-
-        *
 
         Returns
         -------
