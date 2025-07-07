@@ -6,5 +6,5 @@ User-defined Classes
 
 	instrument
 	planning
-	algorithm
+	scheduling
 

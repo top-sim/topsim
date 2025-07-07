@@ -747,29 +747,12 @@ class HotBuffer:
 
 class ColdBuffer:
     """
-    Parameters
-    ----------
-
-    Methods
-    --------
-    has_capacity(observation_size)
-        Checks that the buffer has storage capacity of observation_size
-
-    receive_observation(observation, residual_data)
-        Performs a 'per-timeste' ingest of data into the ColdBuffer.
-
-    has_stored_observations()
-        Checks if there are observations stored within the ColdBuffer
-
-    remove(observation)
-        Deletes the specified observation from observations['stored'] list
+    The ColdBuffer takes data from the hot buffer for use in workflow
+    processing
     """
 
     def __init__(self, capacity, max_data_rate):
-        """
-        The ColdBuffer takes data from the hot buffer for use in workflow
-        processing
-        """
+
         self.total_capacity = capacity
         self.current_capacity = self.total_capacity
         self.max_data_rate = max_data_rate

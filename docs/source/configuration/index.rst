@@ -16,7 +16,7 @@ What needs configuring?
 
 The following actors require configuration, which is parsed by the :py:class:`~config.Config` module when a simulation is initiated.
 
-We use the configuration that supported the :ref:`model-overview <model-overview>` discussion in :ref:`getting-started <getting-started>`.
+We use the configuration that supported the :ref:`model_overview` discussion in :ref:`getting_started`.
 
 * Instrument (which also includes the observation plan)
 * Cluster

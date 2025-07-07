@@ -20,7 +20,7 @@ import sphinx
 # -- Project information -----------------------------------------------------
 
 project = 'TopSim'
-copyright = '2019-2021, RW Bunney'
+copyright = '2019-2025, RW Bunney'
 author = 'RW Bunney'
 
 master_doc = 'index'
@@ -31,7 +31,7 @@ master_doc = 'index'
 # ones.
 extensions = [
     'sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'sphinx.ext.autosummary',
-    'sphinx.ext.viewcode'
+    'sphinx.ext.viewcode', 'sphinx_rtd_theme'
 ]
 
 # Add any paths that contain templates here, relative to this sdirectory.
@@ -50,8 +50,8 @@ autosummary_generate = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'pydata_sphinx_theme'
-
+# html_theme = 'pydata_sphinx_theme'
+html_theme = 'sphinx_rtd_theme'
 # html_theme_options = {"full_logo":"true"}
 html_theme_options = {
     # "show_toc_level": True,

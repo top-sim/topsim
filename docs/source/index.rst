@@ -9,6 +9,7 @@ operations, such as the Square Kilometre Array (SKA).
 
 Overview
 ---------
+
 TopSim follows a discrete event simulation model, using the
 `SimPy <https://simpy.readthedocs.io/en/latest/>`_ module as
 the foundation for the simulations. 
@@ -33,6 +34,7 @@ sections.
 
 Installation
 -------------
+
 .. toctree::
     :maxdepth: 3
 

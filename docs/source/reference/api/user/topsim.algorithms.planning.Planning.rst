@@ -20,5 +20,6 @@
       ~Planning.__init__
       ~Planning.generate_plan
       ~Planning.to_df
+      ~Planning.to_string
    
    
