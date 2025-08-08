@@ -10,7 +10,8 @@ setup(
         'simpy>=3.0',
         'pandas>=0.20',
         'tables',
-        'shadow @ git+https://github.com/myxie/shadow.git'
+        'shadow @ git+https://github.com/myxie/shadow.git',
+        "tqdm"
     ],
     # package_dir={'': 'shadow'},
     url='https://github.com/top-sim/topsim',
