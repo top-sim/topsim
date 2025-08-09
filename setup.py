@@ -5,12 +5,15 @@ setup(
     version='0.3.0',
     packages=find_packages(exclude=["tests"]),
     install_requires=[
+        'h5py', 
         'networkx>=2.0',
         'matplotlib>=3.0',
         'simpy>=3.0',
         'pandas>=0.20',
+        "tables", 
         'tables',
-        'shadow @ git+https://github.com/myxie/shadow.git'
+        'shadow @ git+https://github.com/myxie/shadow.git',
+        'tqdm', 
     ],
     # package_dir={'': 'shadow'},
     url='https://github.com/top-sim/topsim',
