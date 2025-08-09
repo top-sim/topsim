@@ -13,7 +13,7 @@ setup(
         "tables", 
         'tables',
         'shadow @ git+https://github.com/myxie/shadow.git',
-        "tqdm", 
+        'tqdm', 
     ],
     # package_dir={'': 'shadow'},
     url='https://github.com/top-sim/topsim',
