@@ -7,16 +7,14 @@ assignees: ''
 
 ---
 
-Note: This is intended for 'nice to have' or quality of life improvements, rather than things identified as necessary or valuable that will pay off quickly moving forward. 
-
 **Is your feature request related to a problem? Please describe.**
-A clear and concise description of what is wanted.
+<!--- A clear and concise description of what is wanted. --->
 
 **Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+<!---  A clear and concise description of what you want to happen. --->
 
 **Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features. 
+<!--- A clear and concise description of any alternative solutions or features. --->
 
 **Additional context**
-Add any other context about the enhancement.
+<!--- Add any other context about the enhancement. --->

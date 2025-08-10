@@ -22,7 +22,6 @@ import json
 
 from pathlib import Path
 
-from scipy.linalg import bandwidth
 from topsim.core.config import Config
 from topsim.user.telescope import Telescope
 
