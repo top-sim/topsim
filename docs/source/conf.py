@@ -53,15 +53,16 @@ autosummary_generate = True
 # html_theme = 'pydata_sphinx_theme'
 html_theme = 'sphinx_rtd_theme'
 # html_theme_options = {"full_logo":"true"}
-html_theme_options = {
-    # "show_toc_level": True,
-    # "collapse_navigation": False,
-    # "navigation_depth": 2
-}
+# html_theme_options = {
+#     # "show_toc_level": True,
+#     # "collapse_navigation": False,
+#     # "navigation_depth": 2
+# }
 html_logo = 'new_logo.svg'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
-
-html_title = 'TopSim'
+html_css_files = ["css/custom.css"]
+html_style = "css/custom.css"
+html_theme_options = {"logo_only": True}
