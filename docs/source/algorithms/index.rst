@@ -20,6 +20,5 @@ a defining feature of the simulation framework.
 
 TopSim separates allocation policies into two categories:
 
-* Reservation-based allocation, such as SLURM or typical batch-processing models
-* Free allocation, which is the model that popular heuristics such as HEFT
-are built upon.
+    * Reservation-based allocation, such as SLURM or typical batch-processing models
+    * Free allocation, which is the model that popular heuristics such as HEFT are built upon.
