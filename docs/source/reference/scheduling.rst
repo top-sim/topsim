@@ -10,4 +10,4 @@ Scheduling
 	:recursive:
 	:toctree: api/user
 
-	Algorithm
+	Scheduling
