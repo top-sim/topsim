@@ -28,8 +28,12 @@ dependencies = [
     "nbserverproxy",
     "tables >= 3.7",
     "tqdm",
-    "h5py"
+    "h5py",
+    "click"
 ]
+
+[project.scripts]
+topsim = "topsim.cli:cli"
 
 [project.urls]
 Homepage = "https://github.com/top-sim/topsim"
