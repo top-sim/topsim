@@ -1,5 +1,13 @@
 # Changelog
 
+# v0.10.0
+
+This starts up our next set of versions, as the previous version system has not been used or updated properly. v0.10.0 is functionally our 'return' to v0.1.0.
+
+- [Changed] CHANGELOG.md to new format 
+- [Changed] README.md to include updated badges. 
+
+
 # Before v0.10.0
 
 - Merge pull request #49 from top-sim/48_ci_actions ([`0d28f68`](https://github.com/top-sim/topsim/commit/0d28f6844ac52dfa883abc9077800e2c45d99742))
