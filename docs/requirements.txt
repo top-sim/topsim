@@ -1,1 +1,1 @@
-sphinx_book_theme >=0.0.30
+sphinx_rtd_theme
