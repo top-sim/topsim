@@ -1,4 +1,4 @@
-git+https://github.com/myxie/shadow
+shadow @ git+https://github.com/myxie/shadow
 alabaster>=0.7.12
 networkx>=2.6
 numpy<2.0.0
@@ -13,3 +13,4 @@ nbserverproxy
 tables >= 3.7
 tqdm
 h5py
+click
