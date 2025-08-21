@@ -33,7 +33,9 @@ class TestTelescopeConfig(unittest.TestCase):
         self.env = simpy.Environment()
         self.config = Config(CONFIG)
         cluster = Cluster(env=self.env, config=self.config)
-        planner = Planner(self.env, cluster, SHADOWPlanning('heft'))
+        planner = Planner(self.env, cluster, SHADOWPlanning('heft'),
+                          use_task_data=False, use_edge_data=True
+                          )
         buffer = Buffer(env=self.env, cluster=cluster, planner=planner, config=self.config)
         self.scheduler = Scheduler(
             env=self.env, buffer=buffer, cluster=cluster, planner=planner, algorithm=None
@@ -58,7 +60,9 @@ class TestTelescopeIngest(unittest.TestCase):
 
         self.cluster = Cluster(env=self.env, config=self.config)
         self.planner = Planner(self.env, self.cluster,
-                               SHADOWPlanning('heft'))
+                               SHADOWPlanning('heft'),
+                               use_task_data=False, use_edge_data=True
+                               )
         self.buffer = Buffer(env=self.env, cluster=self.cluster, planner=self.planner,
                              config=self.config)
         self.scheduler = Scheduler(

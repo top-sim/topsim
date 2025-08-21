@@ -46,7 +46,8 @@ class TestBufferConfig(unittest.TestCase):
         self.config = Config(CONFIG)
         self.cluster = Cluster(env=self.env, config=self.config)
         self.planner = Planner(
-            self.env, self.cluster, SHADOWPlanning('heft')
+            self.env, self.cluster, SHADOWPlanning('heft'),
+            use_task_data = False, use_edge_data = True
         )
 
     def testHotBufferConfig(self):
@@ -90,7 +91,8 @@ class TestBufferIngestDataStream(unittest.TestCase):
         self.config = Config(CONFIG)
         self.cluster = Cluster(env=self.env, config=self.config)
         self.planner = Planner(
-            self.env, self.cluster, SHADOWPlanning('heft')
+            self.env, self.cluster, SHADOWPlanning('heft'),
+            use_task_data = False, use_edge_data = True
         )
         self.buffer = Buffer(self.env, self.cluster, self.planner, self.config)
         self.observation = Observation(
@@ -212,7 +214,8 @@ class TestBufferRequests(unittest.TestCase):
         self.config = Config(CONFIG)
         self.cluster = Cluster(env=self.env, config=self.config)
         self.planner = Planner(
-            self.env, self.cluster, SHADOWPlanning('heft')
+            self.env, self.cluster, SHADOWPlanning('heft'),
+            use_task_data = False, use_edge_data = True
         )
         self.buffer = Buffer(
             env=self.env, cluster=self.cluster, planner=self.planner, config=self.config

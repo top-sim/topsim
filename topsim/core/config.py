@@ -32,7 +32,7 @@ class Config:
 
     Parameters
     ----------
-    config : str
+    config : path
         File path to the JSON config file
 
     Attributes
@@ -123,7 +123,8 @@ class Config:
                             memory=1,  # * timestep_multiplier,
                             disk=1,  # * timestep_multiplier,
                             bandwidth=(machines_types[name]["compute_bandwidth"]
-                                       * timestep_multiplier)
+                                       * timestep_multiplier),
+                            ethernet=self.cluster['system']["system_bandwidth"] * timestep_multiplier
                             )
                 )
         bandwidth = self.cluster['system']["system_bandwidth"] * timestep_multiplier
