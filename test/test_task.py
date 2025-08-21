@@ -39,8 +39,25 @@ class TaskInit(unittest.TestCase):
             eft=self.eft,
             machine_id=self.allocated_machine_id,
             predecessors=None,
-            flops=0, task_data=0, io=0,
+            flops=0, task_data=0, edge_data=0,
             delay=self.dm)
+
+
+class TestTaskRuntime(unittest.TestCase):
+    def setUp(self):
+        self.env = simpy.Environment()
+
+    # TODO Implement this when refactoring and improving
+    # Task predecessor and edge data information
+    def test_task_runtime(self):
+        t1 = Task(
+            tid="t4",
+            est=20,
+            eft=26,
+            machine_id="m1",
+            predecessors=["t2", "t3"],
+            flops=10, task_data=4, edge_data={"t2": 4, "t3": 12,},
+            use_task_data=False, use_edge_data=True)
 
 
 class TestTaskDelay(unittest.TestCase):
@@ -67,7 +84,7 @@ class TestTaskDelay(unittest.TestCase):
             eft=11,
             machine_id=None,
             predecessors=None,
-            flops=0, task_data=0, io=0,
+            flops=0, task_data=0, edge_data=0,
             delay=dm)
         # t.est = 0
         # t.eft = 11
@@ -84,7 +101,7 @@ class TestTaskDelay(unittest.TestCase):
             eft=11,
             machine_id=None,
             predecessors=None,
-            flops=0, task_data=0, io=0,
+            flops=0, task_data=0, edge_data=0,
             delay=dm)
 
         # t.est = 0
@@ -102,7 +119,7 @@ class TestTaskDelay(unittest.TestCase):
             eft=11,
             machine_id=None,
             predecessors=None,
-            flops=0, task_data=0, io=0,
+            flops=0, task_data=0, edge_data=0,
             delay=dm)
         # t.ast = 0
         t.duration = t.eft - t.est
@@ -119,7 +136,7 @@ class TestTaskDelay(unittest.TestCase):
             eft=11,
             machine_id = None,
             predecessors=None,
-            flops=0, task_data=0, io=0,
+            flops=0, task_data=0, edge_data=0,
             delay=dm)
         self.env.process(t.do_work(self.env, None))
         self.env.run()

@@ -46,18 +46,21 @@ class Planner:
 
     """
 
-    def __init__(self, env, cluster, model, delay_model=None):
+    def __init__(self, env, cluster, model, use_task_data, use_edge_data, delay_model=None):
         self.env = env  #: :py:object:~`simpy.Environment` object for the
         # simulation
         self.cluster = cluster
         # self.envconfig = envconfig
         self.model = model  # algorithm, cluster, delay_model)
         self.delay_model = delay_model
+        self.use_task_data = use_task_data
+        self.use_edge_data = use_edge_data
 
     def run(self, observation, buffer, max_ingest):
         """
         Parameters
         ----------
+        max_ingest
         observation :
             The observation for which we are generating a plan (by forming a
             schedule using the predefined static scheduling algorithm).
@@ -68,7 +71,7 @@ class Planner:
         core.topsim.planner.WorkflowPlan
         """
         return self.model.generate_plan(self.env.now, self.cluster, buffer,
-                                        observation, max_ingest)
+                                        observation, max_ingest, self.use_task_data, self.use_edge_data)
 
         # yield self.env.timeout(0,plan)
 
@@ -92,9 +95,9 @@ class WorkflowPlan:
         self.est = est
         self.eft = eft
         self.tasks = tasks
+        self.finished_tasks = []
         self.exec_order = exec_order
         self.status = status
-        self.max_ingest = max_ingest
         self.graph = graph
         self.min_resources = None
         self.max_resources = None

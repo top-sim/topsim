@@ -72,7 +72,8 @@ class TestSchedulerIngest(unittest.TestCase):
         config = Config(CONFIG)
         self.cluster = Cluster(self.env, config)
         self.planner = Planner(self.env,
-                               self.cluster, SHADOWPlanning('heft'))
+                               self.cluster, SHADOWPlanning('heft'),
+                               use_task_data=False,use_edge_data=True)
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
         self.scheduler = Scheduler(
             self.env, self.buffer, self.cluster, self.planner, DynamicSchedulingFromPlan
@@ -160,7 +161,7 @@ class TestSchedulerDynamicPlanAllocation(unittest.TestCase):
         config = Config(HEFT_CONFIG)
         self.cluster = Cluster(self.env, config)
         self.planner = Planner(self.env,
-                               self.cluster, SHADOWPlanning('heft'))
+                               self.cluster, SHADOWPlanning('heft'), use_task_data=False, use_edge_data=True)
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
         self.scheduler = Scheduler(self.env, self.buffer,
                                    self.cluster, self.planner, sched_algorithm)
@@ -217,10 +218,11 @@ class TestSchedulerDynamicPlanAllocation(unittest.TestCase):
         self.env.run(1)
         self.assertListEqual(
             exec_ord,
-            curr_obs.plan.exec_order
+            [t.id for t in curr_obs.plan.tasks]
         )
         self.buffer.hot[0].observations['scheduled'].append(curr_obs)
         self.env.run(until=99)
+        self.assertEqual(97, curr_obs.plan.finished_tasks[-1].aft)
         self.assertEqual(10, len(self.cluster._tasks['finished']))
         self.assertEqual(0, len(self.cluster._tasks['running']))
         self.assertEqual(0, len(self.scheduler.observation_queue))
@@ -234,7 +236,7 @@ class TestSchedulerDynamicPlanWithIO(unittest.TestCase):
         config = Config(HEFT_CONFIG_IO)
         self.cluster = Cluster(self.env, config)
         self.planner = Planner(self.env,
-                               self.cluster, SHADOWPlanning('heft'))
+                               self.cluster, SHADOWPlanning('heft'), use_task_data=True, use_edge_data=True)
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
         self.scheduler = Scheduler(self.env, self.buffer,
                                    self.cluster, self.planner, sched_algorithm)
@@ -268,14 +270,66 @@ class TestSchedulerDynamicPlanWithIO(unittest.TestCase):
         self.env.run(1)
         self.assertListEqual(
             exec_ord,
-            curr_obs.plan.exec_order
+            [t.id for t in curr_obs.plan.tasks]
         )
         self.buffer.hot[0].observations['scheduled'].append(curr_obs)
         self.env.run(until=99)
+        self.assertEqual(97, curr_obs.plan.finished_tasks[-1].aft)
+        # TODO need to check the aft of the final task is 98
+        # Otherwise, we aren't actually checking the tasks are finishing when we expect
         self.assertEqual(10, len(self.cluster._tasks['finished']))
         self.assertEqual(0, len(self.cluster._tasks['running']))
         self.assertEqual(0, len(self.scheduler.observation_queue))
 
+class TestSchedulerDynamicPlanWithIOWithoutIO(unittest.TestCase):
+    """
+    This is a bit of overkill + a hack: here we are testing the `use_task_data`
+    flag by ensuring that we don't use the task data, which will give us a much lower
+    runtime value.
+
+    This is taking advantage of the HEFT_CONFIG_IO file not having any task data, so
+    we can confirm our 'switch' works.
+
+    """
+
+    def setUp(self):
+        self.env = simpy.Environment()
+        sched_algorithm = DynamicSchedulingFromPlan()
+        config = Config(HEFT_CONFIG_IO)
+        self.cluster = Cluster(self.env, config)
+        self.planner = Planner(self.env,
+                               self.cluster, SHADOWPlanning('heft'), use_task_data=False, use_edge_data=True)
+        self.buffer = Buffer(self.env, self.cluster, self.planner, config)
+        self.scheduler = Scheduler(self.env, self.buffer,
+                                   self.cluster, self.planner, sched_algorithm)
+        self.telescope = Telescope(
+            self.env, config, self.planner, self.scheduler
+        )
+
+    def tearDown(self) -> None:
+        pass
+
+    def testAllocationWithIODuration(self):
+        """
+        Use
+        Returns
+        -------
+
+        """
+        curr_obs = self.telescope.observations[0]
+        gen = self.scheduler.allocate_tasks(curr_obs)
+        self.scheduler.observation_queue.append(curr_obs)
+        curr_obs.ast = self.env.now
+        # curr_obs.plan = self.planner.run(
+        #     curr_obs, self.buffer, self.telescope.max_ingest)
+        self.env.process(self.scheduler.allocate_tasks(curr_obs))
+        self.env.run(1)
+        self.buffer.hot[0].observations['scheduled'].append(curr_obs)
+        self.env.run(until=99)
+        self.assertEqual(51, curr_obs.plan.finished_tasks[-1].aft)
+        self.assertEqual(10, len(self.cluster._tasks['finished']))
+        self.assertEqual(0, len(self.cluster._tasks['running']))
+        self.assertEqual(0, len(self.scheduler.observation_queue))
 
 
 class TestSchedulerEdgeCases(unittest.TestCase):
@@ -300,7 +354,8 @@ class TestSchedulerEdgeCases(unittest.TestCase):
             self.env, config, planner=None, scheduler=None
         )
         self.planner = Planner(self.env,
-                               self.cluster, SHADOWPlanning('heft'))
+                               self.cluster, SHADOWPlanning('heft'),
+                               use_task_data=False, use_edge_data=True)
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
 
         self.scheduler = Scheduler(self.env, self.buffer,
@@ -338,7 +393,8 @@ class TestSchedulerLongWorkflow(unittest.TestCase):
         self.cluster = Cluster(self.env, config)
         planning_model = SHADOWPlanning(algorithm='heft')
         self.planner = Planner(self.env,
-                               self.cluster, planning_model)
+                               self.cluster, planning_model,
+                               use_task_data=False, use_edge_data=True)
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
         self.scheduler = Scheduler(self.env, self.buffer,
                                    self.cluster, self.planner, sched_algorithm)
@@ -366,7 +422,8 @@ class TestSchedulerDynamicReAllocation(unittest.TestCase):
         config = Config(LONG_CONFIG)
         self.cluster = Cluster(self.env, config)
         self.planner = Planner(self.env,
-                               self.cluster, SHADOWPlanning('heft'))
+                               self.cluster, SHADOWPlanning('heft'),
+                               use_task_data=False, use_edge_data=True)
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
         self.scheduler = Scheduler(self.env, self.buffer,
                                    self.cluster, self.planner, sched_algorithm)
@@ -392,7 +449,8 @@ class TestSchedulerIntegration(unittest.TestCase):
         config = Config(INTEGRATION)
         self.cluster = Cluster(self.env, config)
         self.planner = Planner(self.env,
-                               self.cluster, SHADOWPlanning('heft'))
+                               self.cluster, SHADOWPlanning('heft'),
+                               use_task_data=False, use_edge_data=True)
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
 
         self.scheduler = Scheduler(
@@ -452,7 +510,8 @@ class TestSchedulerDelayHelpers(unittest.TestCase):
         self.planner = Planner(
             self.env,
             self.cluster, SHADOWPlanning('heft'),
-            delay_model=DelayModel(0.3, "normal")
+            delay_model=DelayModel(0.3, "normal"),
+            use_task_data=False, use_edge_data=True
         )
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
 

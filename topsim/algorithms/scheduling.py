@@ -35,6 +35,7 @@ class Scheduling(ABC):
     """
 
     # The below constants have been derived from the SDP parametric model.
+    # TODO these should be set up in the simulation configuration
     LOW_REALTIME_RESOURCES = 164
     MID_REALTIME_RESOURCES = 281
 

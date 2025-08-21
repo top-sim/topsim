@@ -65,7 +65,8 @@ class TestPlannerConfig(unittest.TestCase):
         planner = Planner(
             env=self.env,
             cluster=self.cluster,
-            model=self.model
+            model=self.model,
+            use_task_data=False, use_edge_data=True
         )
         self.cluster.provision_batch_resources(10, self.observation.name)
         available_resources = planner.model._cluster_to_shadow_format(
@@ -87,6 +88,7 @@ class TestWorkflowPlan(unittest.TestCase):
         self.cluster = Cluster(self.env, config=config)
         self.planner = Planner(
             self.env, self.cluster, self.model,
+            use_task_data=False, use_edge_data=True
         )
         self.buffer = Buffer(env=self.env, cluster=self.cluster, planner=self.planner, config=config)
         self.observation = Observation(
@@ -151,7 +153,9 @@ class TestPlannerDelay(unittest.TestCase):
         self.model = SHADOWPlanning('heft', dm)
         self.cluster = Cluster(self.env, config=config)
         self.planner = Planner(self.env, self.cluster,
-                               self.model, delay_model=dm)
+                               self.model, delay_model=dm,
+                               use_task_data=False, use_edge_data=True
+                               )
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
         self.observation = Observation(
             'planner_observation',
@@ -206,6 +210,7 @@ class TestBatchProcessingPlan(unittest.TestCase):
         self.cluster = Cluster(self.env, config=config)
         self.planner = Planner(
             self.env, self.cluster, self.model,
+            use_task_data=False, use_edge_data=True
         )
         self.buffer = Buffer(env=self.env, cluster=self.cluster, planner=self.planner, config=config)
         self.telescope = Telescope(

@@ -34,20 +34,17 @@ class TaskStatus(Enum):
 class Task(object):
     """
     Tasks have priorities inheritted from the workflows from which they are
-    arrived; once
-    they arrive on the cluster queue, they are workflow agnositc, and are
-    processed according to
-    their priority.
+    arrived; once they arrive at the cluster queue, they are workflow , and
+    are processed according to their priority.
     """
 
     # NB I don't want tasks to have null defaults; should we improve on this
     # by initialising everything in a task at once?
     def __init__(self, tid, est, eft, machine_id, predecessors, flops=0, task_data=0,
-                 io=None, delay=None, gid=None):
+                 edge_data: dict=None, delay=None, gid=None, use_task_data=False, use_edge_data=True):
         """
         :param tid: ID of the Task object
-        :param env: Simulation environment to which the task will be added,
-        and where it will run as a process
+
         """
 
         self.id = tid
@@ -56,7 +53,7 @@ class Task(object):
         self.ast = -1
         self.aft = -1
         self.allocated_machine_id = machine_id
-        self.duration = eft - est # TODO investigate making this a class property
+        self.duration = eft - est  # TODO investigate making this a class property
         self.est_duration = eft - est
         self.delay_flag = False
         self.task_status = TaskStatus.UNSCHEDULED
@@ -66,11 +63,15 @@ class Task(object):
         self.workflow_offset = 0
         self.graph_id = gid
 
-        # Machine information that is less important
-        # currently (will update this in future versions)
+
+        # Used to calculate actual runtime on the system
         self.flops = flops
         self.task_data = task_data
-        self.io = io
+        self.edge_data = edge_data  # Input/edge data
+
+        self.use_edge_data = use_edge_data
+        self.use_task_data = use_task_data
+
 
     def __repr__(self):
         return str(self.id)
@@ -87,6 +88,8 @@ class Task(object):
         returns after a given duration.
         Parameters
         ----------
+        predecessor_allocations
+        machine
         env
         alt = True if the machine is different to the predecessors machine.
         This affects data transfer between tasks.
@@ -127,19 +130,22 @@ class Task(object):
     def calculate_runtime(self, machine):
         """
         Calculate the runtime of the task
-        Task duration is a function of either compute-time (FLOPs) or data-time (bandwidth)
+
+        The duration is a function of either compute-time (FLOPs) or data-time (bandwidth);
+        we use whichever is greater.
 
         Parameters
         ----------
-        machine: The machine we are allocated to (passed in during do_work())
+        machine: The machine to which we are allocated (passed in during do_work())
 
         Returns
         -------
-        Maximum integer of either compute- or data-time
+        Maximum integer time of either compute- or data-time
         """
+
         compute_time = int(self.flops / machine.cpu)
-        data_time = int(self.task_data / machine.bandwidth)
-        return  max(compute_time, data_time)
+        data_time = int(self.task_data / machine.bandwidth) if self.use_task_data else 0
+        return max(compute_time, data_time)
 
     def update_allocation(self, machine):
         """
@@ -184,10 +190,12 @@ class Task(object):
         """
 
         mx = 0
+        if not self.use_edge_data:
+            return mx
         # Calculate the difference between the latest start time of the
         # predecessor and the current time.
         for task in predecessor_allocations:
-            transfer_time = self.io[task.id] / machine.bandwidth
+            transfer_time = self.edge_data[task.id] / machine.ethernet
             if task.aft + transfer_time - env.now > mx:
                 mx = task.aft + transfer_time - env.now
         return mx

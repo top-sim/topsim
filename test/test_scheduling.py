@@ -61,6 +61,7 @@ class TestBatchSchedulerAllocation(unittest.TestCase):
         self.model = BatchPlanning('batch')
         self.planner = Planner(
             self.env, self.cluster, self.model,
+            use_task_data=False, use_edge_data=True
         )
         self.buffer = Buffer(self.env, self.cluster, self.planner, config)
         self.scheduler = Scheduler(

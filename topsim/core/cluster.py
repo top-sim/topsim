@@ -67,7 +67,6 @@ class Cluster:
         self.system_bandwidth = system_bandwidth
         #: System bandwidth across the cluster
 
-        # TODO dmachine is a hack, we should improve this
         self.machine_ids = {machine.id: machine for machine in self.machines}
         self.cl = ['default']
 
@@ -82,11 +81,11 @@ class Cluster:
                         'completed': 0,
                         'demand': 0}  # Dictionary of current ingest information
 
+        # create output data frame
         self._usage_data = {'occupied': 0, 'ingest': 0,
                             'available': len(self._resources['available']),
                             'running_tasks': 0,
-                            'finished_tasks': 0}  # Data to more easily
-        # create output data frame
+                            'finished_tasks': 0}
 
         self.num_provisioned_obs = 0
         self.events = []
@@ -265,10 +264,10 @@ class Cluster:
                 # THIS CHECK DOESN"T WORK FIX IT SOMEHOW
                 if (machine not in self._clusters[c]['resources'][
                     'available'] and (machine not in
-                        self._clusters[c]['resources'][
-                            'ingest'] and machine not in
-                        self.get_idle_resources(
-                            observation))):
+                                      self._clusters[c]['resources'][
+                                          'ingest'] and machine not in
+                                      self.get_idle_resources(
+                                          observation))):
                     raise RuntimeError
                 if ingest:
                     # Ingest resources allocated separately from scheduler
@@ -420,7 +419,6 @@ class Cluster:
         :py:obj:`~topsim.core.machine.Machine`
         """
         return self.machine_ids[id]
-
 
     def _update_available_resources(self, observation, c='default'):
         """
@@ -631,7 +629,6 @@ class Cluster:
 
         """
         self._clusters[c]['resources']['available'].remove(machine)
-
 
     def _add_event(self, observation, resource, event):
         self.events.append(

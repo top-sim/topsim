@@ -14,12 +14,13 @@ class Status(Enum):
 
 
 class Machine(object):
-    def __init__(self, id, cpu, memory, disk, bandwidth):
+    def __init__(self, id, cpu, memory, disk, bandwidth, ethernet):
         self.id = id
         self.cpu = cpu
         self.memory = memory
         self.disk = disk
         self.bandwidth = bandwidth
+        self.ethernet = ethernet
         self.status = Status.IDLE
         self.transfer_flag = False
         self.current_task = None
@@ -37,7 +38,7 @@ class Machine(object):
     def run_task(self, task_instance):
         self.cpu -= task_instance.flops
         self.memory -= task_instance.task_data
-        self.disk -= task_instance.io
+        self.disk -= task_instance.edge_data
         self.current_task = task_instance
         # self.task_instances.append(task_instance)
         self.status = Status.IN_USE
@@ -45,7 +46,7 @@ class Machine(object):
     def stop_task(self, task_instance):
         self.cpu += task_instance.flops
         self.memory += task_instance.task_data
-        self.disk += task_instance.io
+        self.disk += task_instance.edge_data
         self.status = Status.IDLE
         self.current_task = None
 
