@@ -275,6 +275,7 @@ class Scheduler:
         _tqdm = True
         pbar_setup = False
         pbar = None
+        _event_added = False
         while True:
             if current_plan:
                 current_plan.tasks = self._update_current_plan(current_plan)
@@ -290,8 +291,10 @@ class Scheduler:
                 yield self.env.timeout(TIMESTEP)
                 continue
             else:
+                if not _event_added:
                 # We have a plan, which means we are no longer waiting around for resources
-                self._add_event(observation, "allocation", "started")
+                    self._add_event(observation, "allocation", "started")
+                    _event_added = True
             if _tqdm and not pbar_setup:
                 _total_tasks = len(current_plan.tasks)
                 _curr_tasks = len(current_plan.tasks)
