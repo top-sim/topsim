@@ -130,31 +130,26 @@ class Simulation:
             timestamp=None,
             to_file=False,
             hdf5_path=None,
+            use_task_data=False,
+            use_edge_data=True,
             **kwargs
     ):
 
         #: :py:obj:`simpy.Environment` object
         self.env = env
 
-        # if timestamp:
-        #     #: :py:obj:`~topsim.core.monitor.Monitor` instance
-        #     self.monitor = Monitor(self, timestamp)
-        #     self._timestamp = timestamp
-        # else:
-        #     sim_start_time = f'{time.time()}'.split('.')[0]
-        #     self._timestamp = sim_start_time
-        #     self.monitor = Monitor(self, sim_start_time)
+        #: :py:obj:`~topsim.core.monitor.Monitor` instance
         if timestamp is not None:
             self.monitor = Monitor(self, timestamp)
             self._timestamp = datetime.datetime.fromtimestamp(timestamp)
         else:
             self._timestamp = datetime.datetime.now()
             self.monitor = Monitor(self, self._timestamp)
+
         # Process necessary config files
 
         self._cfg_path = Path(config) #: Configuration path
-
-        # Initiaise Actor and Resource objects
+        # Initialise Actor and Resource objects
         self._cfg = Config(config)
         #: :py:obj:`~topsim.core.cluster.Cluster` instance
         self.cluster = Cluster(env, self._cfg)
@@ -167,7 +162,7 @@ class Simulation:
             #  model outside the simulation.
             delay = DelayModel(0.0, "normal", DelayModel.DelayDegree.NONE)
         self.planner = Planner(
-            env, self.cluster, planning_model, delay
+            env, self.cluster, planning_model, use_task_data, use_edge_data, delay
         )
         self.buffer = Buffer(env, self.cluster, self.planner, self._cfg)
         scheduling_algorithm = scheduling
@@ -211,6 +206,8 @@ class Simulation:
             self._delimiters = kwargs['delimiters']
         else:
             self._delimiters = ''
+
+        self.params = {"use_task_data": [use_task_data], "use_edge_data":[use_edge_data]}
 
         self.running = False
 
@@ -396,6 +393,7 @@ class Simulation:
         self._hdf5_store.put(key=f"{final_key}/sim", value=global_df)
         self._hdf5_store.put(key=f'{final_key}/summary',
                              value=summary_df)
+        self._hdf5_store.put(key=f'{final_key}/params', value=pd.DataFrame(self.params))
 
         return self._hdf5_store
 

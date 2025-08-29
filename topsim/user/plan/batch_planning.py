@@ -22,6 +22,23 @@ from topsim.algorithms.planning import Planning
 from topsim.core.planner import WorkflowStatus, WorkflowPlan
 
 
+def _workflow_to_nx(workflow):
+    """
+    Read workflow file into networkx graph
+    Parameters
+    ----------
+    workflow
+
+    Returns
+    -------
+    graph : networkx.DiGraph object
+    """
+    with open(workflow, 'r') as infile:
+        config = json.load(infile)
+    graph = nx.readwrite.node_link_graph(config['graph'], edges="links")
+    return graph
+
+
 class BatchPlanning(Planning):
     """
     Create a placeholder, topologically sorted plan for the batch-scheduler
@@ -39,19 +56,23 @@ class BatchPlanning(Planning):
     def to_string(self):
         return self.__str__()
 
-    def generate_plan(self, clock, cluster, buffer, observation, max_ingest):
+    def generate_plan(self, clock, cluster, buffer, observation, max_ingest, task_data=False, edge_data=True):
         """
 
         Parameters
         ----------
-        cluster
         clock
+        cluster
         buffer
         observation
+        max_ingest
+        task_data
+        edge_data
         """
+
         plan = None
         if self.algorithm is 'batch':
-            graph = self._workflow_to_nx(observation.workflow)
+            graph = _workflow_to_nx(observation.workflow)
             est = clock # self._calc_workflow_est(observation, buffer)
             # new_graph = nx.DiGraph()
             mapping = {}
@@ -68,22 +89,15 @@ class BatchPlanning(Planning):
                         x, observation, clock
                     ) for x in pred
                 ]
-                succ = list(graph.successors(task))
-                successors = [
-                    self._create_observation_task_id(
-                        x, observation, clock
-                    ) for x in pred
-                ]
 
                 # Get the data transfer costs
                 edge_costs = {}
                 data = dict(graph.pred[task])
                 for element in data:
-                    nm = self._create_observation_task_id(
+                    pred_tid = self._create_observation_task_id(
                         element, observation, clock
                     )
-                    val = data[element]["transfer_data"]
-                    edge_costs[nm] = val
+                    edge_costs[pred_tid] = data[element]["transfer_data"]
 
                 est, eft = 0, 0
                 machine_id = None
@@ -109,23 +123,6 @@ class BatchPlanning(Planning):
             raise RuntimeError(
                 f'{self.algorithm} is not supported by {str(self)}'
             )
-
-
-    def _workflow_to_nx(self, workflow):
-        """
-        Read workflow file into networkx graph
-        Parameters
-        ----------
-        workflow
-
-        Returns
-        -------
-        graph : networkx.DiGraph object
-        """
-        with open(workflow, 'r') as infile:
-            config = json.load(infile)
-        graph = nx.readwrite.node_link_graph(config['graph'], edges="links")
-        return graph
 
     def to_df(self):
         pass

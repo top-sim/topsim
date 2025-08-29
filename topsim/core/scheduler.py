@@ -277,7 +277,7 @@ class Scheduler:
         pbar = None
         while True:
             if current_plan:
-                current_plan.tasks = self._update_current_plan(current_plan)
+                current_plan.tasks, current_plan.finished_tasks = self._update_current_plan(current_plan)
             (current_plan,
              schedule,
              task_pool,
@@ -447,6 +447,7 @@ class Scheduler:
         """
 
         remaining_tasks = []
+        finished_tasks = current_plan.finished_tasks
         # if not current_plan:
         #     return remaining_tasks
         for t in current_plan.tasks:
@@ -456,7 +457,8 @@ class Scheduler:
                 if t.delay_flag:
                     self.schedule_status = ScheduleStatus.DELAYED
                     self.delay_offset += t.delay_offset
-        return remaining_tasks
+                finished_tasks.append(t)
+        return (remaining_tasks, finished_tasks)
 
     def _find_pred_allocations(self, task, machine, allocations):
         """
@@ -481,7 +483,7 @@ class Scheduler:
             pred_task, pred_machine = allocations[pred]
             if pred_machine != machine:
                 alt = True
-                pred_allocations.append(pred_task)
+                pred_allocations.append(pred_task) # Consider instead modifying the task.predecessor dictionary
         return pred_allocations
 
     def to_df(self):

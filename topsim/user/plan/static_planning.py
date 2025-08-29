@@ -51,13 +51,15 @@ class SHADOWPlanning(Planning):
     def to_string(self):
         return self.__str__()
 
-    def generate_plan(self, clock, cluster, buffer, observation, max_ingest):
+    def generate_plan(self, clock, cluster, buffer, observation, max_ingest, task_data=False, edge_data=True):
         """
         For this StaticPlanning example, we are using the SHADOW static
         scheduling library to produce static plans.
 
         Parameters
         ----------
+        edge_data
+        task_data
         observation
         buffer
         cluster
@@ -109,7 +111,7 @@ class SHADOWPlanning(Planning):
                 allocation.machine.id,
                 predecessors,
                 task.flops_demand, task.io_demand, edge_costs,
-                dm
+                dm, use_task_data=task_data, use_edge_data=edge_data
             )
             mapping[task] = taskobj
             tasks.append(taskobj)
@@ -123,7 +125,7 @@ class SHADOWPlanning(Planning):
 
         return WorkflowPlan(
             observation.name, est, eft, tasks, exec_order,
-            WorkflowStatus.SCHEDULED, max_ingest, new_graph
+            WorkflowStatus.SCHEDULED, max_ingest, new_graph,
         )
 
     def to_df(self):

@@ -20,13 +20,10 @@ standard simulation setup.
 This provides an example implementation and sits alongside the
 user.* modules implemented in this codebase.
 """
-import gc
-import os
-import sys
-import time
 
+import time
+import itertools
 import logging
-from builtins import enumerate
 
 import simpy
 from datetime import date
@@ -37,7 +34,6 @@ LOGGER = logging.getLogger(__name__)
 
 # Framework defined models
 from topsim.core.simulation import Simulation
-from topsim.core.delay import DelayModel
 
 # User defined models
 from topsim.user.telescope import Telescope  # Instrument
@@ -62,11 +58,14 @@ class Experiment:
             self,
             configuration: list = None,
             alloc_combinations: list[tuple] = None,
+            data_combinations: list[tuple] = None,
             output=None,
             delay: bool = False,
             **kwargs):
+
         self._configurations = configuration
-        self._combinations = alloc_combinations
+        self._combinations = list(itertools.product(alloc_combinations,
+                                                    data_combinations))
         self._delay = delay
         self._output = Path(output)
         self._sims = []
@@ -80,8 +79,10 @@ class Experiment:
             except OSError as e:
                 LOGGER.critical("Failed to make output directory: %s", e)
         for c in self._configurations:
-           for ac in self._combinations:
+           for combination in self._combinations:
+                ac, dc = combination
                 plan, sched = ac
+                use_task_data, use_edge_data = dc
                 if plan == "batch":
                     plan = BatchPlanning("batch")
                 elif plan == "static":
@@ -97,9 +98,10 @@ class Experiment:
                 instrument = Telescope
                 result_path_hash = _generate_truncated_hash(c, hash_length=6)
                 yield Simulation(env=env, config=c, instrument=instrument,
-                                        planning_model=plan, scheduling=sched, delay=self._delay, timestamp=None,
-                                        to_file=True,
-                                        hdf5_path=f"{self._output}/results_f{date.today().isoformat()}_{result_path_hash}.h5")
+                                 planning_model=plan, scheduling=sched, delay=self._delay, timestamp=None,
+                                 to_file=True,
+                                 hdf5_path=f"{self._output}/results_f{date.today().isoformat()}_{result_path_hash}.h5",
+                                 use_task_data=use_task_data, use_edge_data=use_edge_data)
 
     def _run_batch(self):
         """
@@ -124,7 +126,7 @@ class Experiment:
         yield Simulation(env=env, config=c, instrument=instrument,
                             planning_model=plan, scheduling=sched, delay=self._delay, timestamp=None,
                             to_file=True,
-                            hdf5_path=f"{self._output}/results_f{date.today().isoformat()}_{path_hash}.h5")
+                            hdf5_path=f"{self._output}/results_f{date.today().isoformat()}_{result_path_hash}.h5")
 
 
 

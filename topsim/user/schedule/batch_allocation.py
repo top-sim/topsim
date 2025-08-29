@@ -223,6 +223,8 @@ class BatchProcessing(Scheduling):
                     min_resources = int(graph_dop/2)
                 if available >= min_resources:
                     return min_resources
+                else:
+                    return 0
             else:
                 # TODO consider removing the concept of the max_resources_split
                 max_allowed = int(
