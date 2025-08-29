@@ -19,8 +19,8 @@ Command-line interface for the TopSim project
 import click
 import sys
 
-from importlib import import_module
-from topsim import __version__
+from importlib.metadata import version as vs
+
 
 @click.group()
 def cli():
@@ -37,7 +37,7 @@ def version(module=''):
     """
     Print the current version of TOpSim
     """
-    click.echo(f"TOpSim: {__version__}") # using the {module} module.")
+    click.echo(f"TOpSim: {vs('topsim')}") # using the {module} module.")
 
 
 if __name__ == '__main__':

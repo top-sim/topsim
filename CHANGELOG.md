@@ -1,4 +1,7 @@
 # Changelog
+# v0.11.0
+
+- [Changed] Add use_task_data and use_edge_data parameters for simulation: https://github.com/top-sim/topsim/pull/54
 
 # v0.10.0
 
