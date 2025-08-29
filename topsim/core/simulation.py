@@ -207,6 +207,8 @@ class Simulation:
         else:
             self._delimiters = ''
 
+        self.params = {"use_task_data": [use_task_data], "use_edge_data":[use_edge_data]}
+
         self.running = False
 
     def start(self, runtime=-1):
@@ -391,6 +393,7 @@ class Simulation:
         self._hdf5_store.put(key=f"{final_key}/sim", value=global_df)
         self._hdf5_store.put(key=f'{final_key}/summary',
                              value=summary_df)
+        self._hdf5_store.put(key=f'{final_key}/params', value=pd.DataFrame(self.params))
 
         return self._hdf5_store
 
