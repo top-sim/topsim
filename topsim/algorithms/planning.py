@@ -53,7 +53,7 @@ class Planning(ABC):
         """
 
     @abstractmethod
-    def generate_plan(self, clock, cluser, buffer, observation, max_ingest, task_data=False, edge_data=True):
+    def generate_plan(self, clock, cluser, buffer, observation, max_ingest, use_task_data=False, use_edge_data=True):
         """
         Build a WorkflowPlan object storing
         Returns

@@ -98,6 +98,7 @@ class Task(object):
         -------
 
         """
+        logger.debug("%s: use_task_data=%s, use_edge_data=%s", self.id, self.use_task_data, self.use_edge_data)
         if predecessor_allocations:
             yield env.timeout(
                 self._wait_for_transfer(env, machine, predecessor_allocations))

@@ -56,7 +56,7 @@ class BatchPlanning(Planning):
     def to_string(self):
         return self.__str__()
 
-    def generate_plan(self, clock, cluster, buffer, observation, max_ingest, task_data=False, edge_data=True):
+    def generate_plan(self, clock, cluster, buffer, observation, max_ingest, use_task_data=False, use_edge_data=True):
         """
 
         Parameters
@@ -102,13 +102,13 @@ class BatchPlanning(Planning):
                 est, eft = 0, 0
                 machine_id = None
                 task_compute =  graph.nodes[task]['comp']
-                task_data = 0
+                task_io = 0
                 if 'task_data' in  graph.nodes[task]:
-                    task_data = graph.nodes[task]['task_data']
+                    task_io = graph.nodes[task]['task_data']
 
                 taskobj = Task(
                     tid, est, eft, machine_id, predecessors, task_compute,
-                    task_data, edge_costs, dm, gid=task
+                    task_io, edge_costs, dm, gid=task, use_task_data=use_task_data, use_edge_data=use_edge_data
                 )
                 mapping[task] = taskobj
                 tasks.append(taskobj)

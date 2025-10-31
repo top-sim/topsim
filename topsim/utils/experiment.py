@@ -83,6 +83,7 @@ class Experiment:
                 ac, dc = combination
                 plan, sched = ac
                 use_task_data, use_edge_data = dc
+                print(f"{plan=}{sched=}{use_task_data=}{use_edge_data=}")
                 if plan == "batch":
                     plan = BatchPlanning("batch")
                 elif plan == "static":
@@ -169,8 +170,12 @@ class Experiment:
                             i+1, len(self._combinations) * len(self._configurations))
                 LOGGER.info("Simulation is using %s to plan and %s to schedule",
                             s.planner.model.algorithm, s.scheduler.algorithm)
+                LOGGER.info("Simulation: use_task_data=%s and use_edge_data %s",
+                            s.params['use_task_data'], s.params['use_edge_data'])
+
                 print(s.planner.model.algorithm, s.scheduler.algorithm)
                 st = time.time()
+                # continue
                 try:
                     s.start()
                 except ValueError as exp:
