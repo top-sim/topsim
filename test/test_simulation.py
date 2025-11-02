@@ -50,10 +50,6 @@ class TestSimulationFileOptions(unittest.TestCase):
         self.env = simpy.Environment()
         self.output = f'test/data/output/hdf5.h5'
 
-    def tearDown(self):
-        if os.path.exists(self.output):
-            os.remove(self.output)
-
     def test_simulation_produces_file(self):
         simulation = Simulation(
             self.env,
@@ -73,7 +69,6 @@ class TestSimulationFileOptions(unittest.TestCase):
         store = pd.HDFStore(self.output)
         store.close()
         os.remove(self.output)
-
 
     def test_simulation_nofile_exception(self):
         self.assertRaises(ValueError, Simulation,
