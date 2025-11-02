@@ -51,10 +51,8 @@ class TestSimulationFileOptions(unittest.TestCase):
         self.output = f'test/data/output/hdf5.h5'
 
     def tearDown(self):
-        output = f'test/data/output/hdf5.h5'
-        os.remove(output)
-        # os.remove(f'{output}')
-        # os.remove(f'{output}-tasks.pkl')
+        if os.path.exists(self.output):
+            os.remove(self.output)
 
     def test_simulation_produces_file(self):
         simulation = Simulation(
@@ -74,6 +72,20 @@ class TestSimulationFileOptions(unittest.TestCase):
 
         store = pd.HDFStore(self.output)
         store.close()
+        os.remove(self.output)
+
+
+    def test_simulation_nofile_exception(self):
+        self.assertRaises(ValueError, Simulation,
+            self.env,
+            CONFIG,
+            Telescope,
+            planning_model=SHADOWPlanning('heft'),
+            scheduling=DynamicSchedulingFromPlan(),
+            delay=None,
+            timestamp=0,
+            to_file=True,
+        )
 
 
 class TestSimulationBatchProcessing(unittest.TestCase):
