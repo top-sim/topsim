@@ -71,7 +71,7 @@ class BatchPlanning(Planning):
         """
 
         plan = None
-        if self.algorithm is 'batch':
+        if self.algorithm == 'batch':
             graph = _workflow_to_nx(observation.workflow)
             est = clock # self._calc_workflow_est(observation, buffer)
             # new_graph = nx.DiGraph()
