@@ -193,6 +193,8 @@ class Simulation:
                 self._hdf5_store.close()
             except Exception as e:
                 LOGGER.error('%s', e)
+                self._hdf5_store = None
+
         elif self.to_file and hdf5_path is None:
             raise ValueError(
                 'Attempted to initialise Simulation object that outputs'

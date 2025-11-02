@@ -25,9 +25,12 @@ import time
 import itertools
 import logging
 
+import pandas as pd
 import simpy
 from datetime import date
 from pathlib import Path
+
+from dlg.deploy.dlg_proxy import delay
 
 logging.basicConfig(level="INFO")
 LOGGER = logging.getLogger(__name__)
@@ -42,6 +45,10 @@ from topsim.user.plan.batch_planning import BatchPlanning  # Planning
 from topsim.user.plan.static_planning import SHADOWPlanning
 from topsim.user.schedule.dynamic_plan import DynamicSchedulingFromPlan
 
+pretty_print_map = {
+    "configuration": "Simulation Configuration",
+
+}
 
 class Experiment:
     """
@@ -56,21 +63,36 @@ class Experiment:
 
     def __init__(
             self,
-            configuration: list = None,
+            configuration: str = None,
             alloc_combinations: list[tuple] = None,
-            data_combinations: list[tuple] = None,
+            data_combinations: list[dict] = None,
             output=None,
-            delay: bool = False,
+            delay=None,
             **kwargs):
 
-        self._configurations = configuration
+        self._configuration = configuration
         self._combinations = list(itertools.product(alloc_combinations,
                                                     data_combinations))
         self._delay = delay
         self._output = Path(output)
         self._sims = []
-        self.sched_args = kwargs['sched_args']
+        self.sched_args = kwargs.get('sched_args', {})
         self._batch = kwargs['slurm'] if 'batch' in kwargs else False
+        self._experiments = {
+            "Planning model":[],
+            "Scheduling model":[],
+            "Use task data":[],
+            "Use edge data":[]}
+
+        self._built_simulations = False
+
+    def _update_experiments(self, planning, scheduling, use_task_data, use_edge_data):
+        # self._experiments['Simulation configuration'].append(self._configuration)
+        self._experiments['Planning model'].append(planning)
+        self._experiments['Scheduling model'].append(scheduling)
+        self._experiments['Use task data'].append(use_task_data)
+        self._experiments['Use edge data'].append(use_edge_data)
+        # self._experiments['Output directory'].append(self.output)
 
     def _build_simulations(self):
         if not self._output.exists():
@@ -78,60 +100,30 @@ class Experiment:
                 self._output.mkdir(parents=True)
             except OSError as e:
                 LOGGER.critical("Failed to make output directory: %s", e)
-        for c in self._configurations:
-           for combination in self._combinations:
-                ac, dc = combination
-                plan, sched = ac
-                use_task_data, use_edge_data = dc
-                if plan == "batch":
-                    plan = BatchPlanning("batch")
-                elif plan == "static":
-                    plan = SHADOWPlanning("heft")
-                else:
-                    raise RuntimeError("Planning '%s' is not supported", plan)
+        for combination in self._combinations:
+            ac, dc = combination
+            plan, sched = ac
+            # TODO introduce delay models to experiment construction
+            planning_model = plan()
+            scheduling_model = sched(**self.sched_args)
 
-                if sched == "dynamic_plan":
-                    sched = DynamicSchedulingFromPlan(**self.sched_args)
-                else:
-                    sched = BatchProcessing(**self.sched_args)
-                env = simpy.Environment()
-                instrument = Telescope
-                result_path_hash = _generate_truncated_hash(c, hash_length=6)
-                yield Simulation(env=env, config=c, instrument=instrument,
-                                 planning_model=plan, scheduling=sched, delay=self._delay, timestamp=None,
-                                 to_file=True,
-                                 hdf5_path=f"{self._output}/results_f{date.today().isoformat()}_{result_path_hash}.h5",
-                                 use_task_data=use_task_data, use_edge_data=use_edge_data)
+            use_task_data = dc.get("use_task_data", False)
+            use_edge_data = dc.get("use_edge_data", True)
 
-    def _run_batch(self):
-        """
-        Batch experiments are single-run experiments, which means we don't run combinations
-        """ 
-        c= self._configurations[0]
-        plan, sched = self._combinations[0]
-        if plan == "batch":
-            plan = BatchPlanning("batch")
-        elif plan == "static":
-            plan = SHADOWPlanning("heft")
-        else:
-            raise RuntimeError("Planning '%s' is not supported", plan)
+            self._update_experiments(planning_model, scheduling_model,
+                                     use_task_data, use_edge_data)
 
-        if sched == "dynamic_plan":
-            sched = DynamicSchedulingFromPlan(**self.sched_args)
-        else:
-            sched = BatchProcessing(**self.sched_args)
-        env = simpy.Environment()
-        instrument = Telescope
-        result_path_hash = _generate_truncated_hash(c, hash_length=6)
-        yield Simulation(env=env, config=c, instrument=instrument,
-                            planning_model=plan, scheduling=sched, delay=self._delay, timestamp=None,
-                            to_file=True,
-                            hdf5_path=f"{self._output}/results_f{date.today().isoformat()}_{result_path_hash}.h5")
+            env = simpy.Environment()
+            instrument = Telescope
+            result_path_hash = _generate_truncated_hash(self._configuration, hash_length=6)
+            yield Simulation(env=env, config=self._configuration, instrument=instrument,
+                             planning_model=planning_model, scheduling=scheduling_model, delay=self._delay, timestamp=None,
+                             to_file=True,
+                             hdf5_path=f"{self._output}/results_f{date.today().isoformat()}_{result_path_hash}.h5",
+                             use_task_data=use_task_data, use_edge_data=use_edge_data)
 
+        self._built_simulations = True
 
-
-    def _review_experiment_combinations(self):
-        pass
 
     def run(self, review=False, threading=False):
         """
@@ -166,7 +158,7 @@ class Experiment:
             i = 0
             for s in self._build_simulations():
                 LOGGER.info("Simulation %s/%s running...",
-                            i+1, len(self._combinations) * len(self._configurations))
+                            i + 1, len(self._combinations))
                 LOGGER.info("Simulation is using %s to plan and %s to schedule",
                             s.planner.model.algorithm, s.scheduler.algorithm)
                 print(s.planner.model.algorithm, s.scheduler.algorithm)
@@ -182,6 +174,19 @@ class Experiment:
                 i += 1
                 LOGGER.info("Runtime: %s.", ft - st)
         LOGGER.info("Experiment complete.")
+
+    def describe(self):
+        """
+        Produce a tabulated list of the experiments that are to be run within this experiment.
+
+        Used for checking prior to running a suit of experiments.
+        """
+        for s in self._build_simulations():
+            continue
+        print("Experiment combinations\n")
+        print(f"Input: {self._configuration}\nOutput dir: {self._output}\n\n")
+        df = pd.DataFrame(self._experiments)
+        print(df.to_markdown())
 
 def _generate_truncated_hash(path: Path, hash_length: int ) -> str:
     """

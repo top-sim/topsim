@@ -47,7 +47,7 @@ class BatchPlanning(Planning):
 
     """
 
-    def __init__(self, algorithm, delay_model=None):
+    def __init__(self, algorithm="batch", delay_model=None):
         super().__init__(algorithm, delay_model)
 
     def __str__(self):

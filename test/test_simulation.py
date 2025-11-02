@@ -75,10 +75,6 @@ class TestSimulationFileOptions(unittest.TestCase):
         store = pd.HDFStore(self.output)
         store.close()
 
-        # store[f'{s}/standard_simulation/sim']
-
-    # def
-
 
 class TestSimulationBatchProcessing(unittest.TestCase):
     def setUp(self) -> None:

@@ -29,11 +29,12 @@ dependencies = [
     "tables >= 3.7",
     "tqdm",
     "h5py",
-    "click"
+    "click",
+    "tabulate"
 ]
 
 [project.scripts]
-topsim = "topsim.cli:cli"
+topsim = "topsim.runtime.commands:cli"
 
 [project.urls]
 Homepage = "https://github.com/top-sim/topsim"
