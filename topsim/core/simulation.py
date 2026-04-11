@@ -16,7 +16,7 @@ from topsim.core.planner import Planner
 from topsim.core.delay import DelayModel
 
 LOGGER = logging.getLogger(__name__)
-
+HEARTBEAT_INT_SECONDS = 10*60 # Seconds
 
 class Simulation:
     """
@@ -259,12 +259,21 @@ class Simulation:
         self.env.process(self.scheduler.run())
         self.env.process(self.buffer.run())
 
+        heartbeat = time.monotonic() # use monotonic to avoid going backward
+        
         if runtime > 0:
             self.env.run(until=runtime)
         else:
+
             while not self.is_finished():
                 self.env.run(self.env.now + 1)
-            # self.env.run(self.env.now + 1)
+
+                now = time.monotonic()
+                if now - heartbeat > HEARTBEAT_INT_SECONDS:
+                    wall_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    LOGGER.info("Wall time: %s / sim_time: %d", wall_time, self.env.now)
+
+                    heartbeat = now            # self.env.run(self.env.now + 1)
 
         LOGGER.info("Simulation Finished @ %s", self.env.now)
         self.monitor.collate_events()

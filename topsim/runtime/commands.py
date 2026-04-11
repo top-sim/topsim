@@ -118,7 +118,7 @@ def experiment(params, input_config, planning, scheduling, data: DataUse,
 )
 @click.option(
     "--use_workflow_dop",
-    "--use_workflow_dop",
+    "use_workflow_dop",
     default=True
 )
 def scheduler_options(params, **kwargs):
