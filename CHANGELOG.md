@@ -1,4 +1,9 @@
 # Changelog
+
+# v0.11.1
+
+- [Patched] Patch: Only add 1 event when allocated to scheduler: https://github.com/top-sim/topsim/pull/47
+
 # v0.11.0
 
 - [Changed] Add use_task_data and use_edge_data parameters for simulation: https://github.com/top-sim/topsim/pull/54
