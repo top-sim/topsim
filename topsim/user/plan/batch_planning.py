@@ -47,7 +47,7 @@ class BatchPlanning(Planning):
 
     """
 
-    def __init__(self, algorithm, delay_model=None):
+    def __init__(self, algorithm="batch", delay_model=None):
         super().__init__(algorithm, delay_model)
 
     def __str__(self):
@@ -71,7 +71,7 @@ class BatchPlanning(Planning):
         """
 
         plan = None
-        if self.algorithm is 'batch':
+        if self.algorithm == 'batch':
             graph = _workflow_to_nx(observation.workflow)
             est = clock # self._calc_workflow_est(observation, buffer)
             # new_graph = nx.DiGraph()

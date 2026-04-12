@@ -272,7 +272,7 @@ class Scheduler:
         task_pool = set()
         _total_tasks = 0 # len(current_plan.tasks)
         _curr_tasks = 0 # len(current_plan.tasks)
-        _tqdm = True
+        _tqdm = False
         pbar_setup = False
         pbar = None
         _event_added = False
