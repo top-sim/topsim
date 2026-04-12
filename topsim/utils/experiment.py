@@ -30,7 +30,6 @@ import simpy
 from datetime import date
 from pathlib import Path
 
-from dlg.deploy.dlg_proxy import delay
 
 logging.basicConfig(level="INFO")
 LOGGER = logging.getLogger(__name__)
@@ -40,14 +39,9 @@ from topsim.core.simulation import Simulation
 
 # User defined models
 from topsim.user.telescope import Telescope  # Instrument
-from topsim.user.schedule.batch_allocation import BatchProcessing
-from topsim.user.plan.batch_planning import BatchPlanning  # Planning
-from topsim.user.plan.static_planning import SHADOWPlanning
-from topsim.user.schedule.dynamic_plan import DynamicSchedulingFromPlan
 
 pretty_print_map = {
     "configuration": "Simulation Configuration",
-
 }
 
 class Experiment:
