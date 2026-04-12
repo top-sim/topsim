@@ -1,5 +1,9 @@
 # Changelog
 
+# v0.12.0
+
+- [Feature] Add command line support for running simulations: https://github.com/top-sim/topsim/pull/58
+
 # v0.11.1
 
 - [Patched] Patch: Only add 1 event when allocated to scheduler: https://github.com/top-sim/topsim/pull/47
