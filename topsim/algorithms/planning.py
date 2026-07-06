@@ -24,54 +24,73 @@ from topsim.core.planner import Planner, WorkflowPlan
 
 class Planning(ABC):
     """
-    Base class for all planning models, used by the planner actor
+    Abstract base class for planning models.
+
+    A planning model generates a :py:class:`~topsim.core.planner.WorkflowPlan`
+    for an observation, producing a static schedule or task ordering that
+    the Scheduler will later execute dynamically.
 
     Parameters
     ----------
-    observation : ~topsim.core.instrument.Observation
-        Contains workflow associated with the observation processing.
     algorithm : str
-         Name of the algorithm used in the model; some models allow for
-         multiple algorithms in addition to the model
-
-    delay_model:
+        Name of the algorithm used by this model (e.g. ``'heft'``,
+        ``'batch'``).
+    delay_model : ~topsim.core.delay.DelayModel, optional
+        Delay model to attach to generated tasks.
 
     Attributes
     ----------
-
+    algorithm : str
+    delay_model : DelayModel or None
     """
 
     def __init__(self, algorithm: str, delay_model=None):
-        # self.observation = observation
         self.algorithm = algorithm
         self.delay_model = delay_model
 
     @abstractmethod
     def to_string(self):
         """
-        Return the string name of the implemenation of this class
+        Return the string name of this planning implementation.
         """
 
     @abstractmethod
-    def generate_plan(self, clock, cluser, buffer, observation, max_ingest, task_data=False, edge_data=True):
+    def generate_plan(self, clock, cluster, buffer, observation, max_ingest,
+                      task_data=False, edge_data=True):
         """
-        Build a WorkflowPlan object storing
+        Build a WorkflowPlan for the given observation.
+
+        Parameters
+        ----------
+        clock : int
+            Current simulation time.
+        cluster : topsim.core.cluster.Cluster
+            The Cluster actor (for resource information).
+        buffer : topsim.core.buffer.Buffer
+            The Buffer actor (for storage state).
+        observation : topsim.core.instrument.Observation
+            The observation to plan for.
+        max_ingest : int
+            Maximum ingest resources.
+        task_data : bool, optional
+            Whether to include per-task data in planning.
+        edge_data : bool, optional
+            Whether to include edge data transfer costs.
+
         Returns
         -------
-            plan : core.topsim.planner.WorkflowPlan
-            WorkflowPlan object
+        WorkflowPlan
+            The generated workflow plan.
         """
-
 
     @abstractmethod
     def to_df(self):
         """
-        Generate output to be amalgamated into the global simulation data
-        frame produced by the Monitor
+        Generate output for the Monitor.
 
         Returns
         -------
-        df : pandas.DataFrame
+        pandas.DataFrame
         """
         
 

@@ -1,65 +1,41 @@
 .. _installation:
 
-Getting started
-===================
+Installation
+============
 
-.. toctree::
-    :maxdepth: 2
-    :hidden:
+Requirements
+------------
 
-    model_overview
+TopSim uses **SimPy** for discrete-event simulation, **NetworkX** for
+workflow graph representation, **pandas** for data storage, and
+**NumPy**/**Matplotlib** for numerical and visualisation support.
 
+The SHADOW scheduling library (required for HEFT/PHEFT planning) is
+installed automatically as a dependency.
 
-Installation Requirements
--------------------------
+Installing TopSim
+-----------------
 
-TopSim builds it's discrete event model on the **SimPy** library, and incorporates the **networkx** library for its backend model. The internal data storage uses **pandas**, and numerical and visualisation . In addition, it makes use of common mathematics and visualisation libraries such as **numpy** and **matplotlib**.
+.. code-block:: bash
 
-Optional
-^^^^^^^^
+    pip install topsim
 
-In order to run the :ref:`user-defined <user-defined>` planning and scheduling algorithms in the ``topsim/user``, the Scheduling Algorithms for DAG Workflows (SHADOW) scheduling library is also required.
+For a local development installation:
 
+.. code-block:: bash
 
-Installing in Anaconda
------------------------
+    cd /path/to/topsim
+    pip install -e .
 
-The above dependencies (apart from SHADOW) are likely already present if you have an Anaconda installation. To create a ``conda`` environment::
-
-	conda create -n venv python
-	source activate venv
-
-It is then possible to run the following to install TopSim locally::
-
-	cd /path/to/topsim
-	pip install -e .
-
-Installing in `virtualenv`
+Verifying the installation
 --------------------------
 
-Since Python 3.3, is has been possible to create a `virtual environment https://docs.python.org/3/library/venv.html` without installing additional dependencies Python. Once a virtual environment is created::
+.. code-block:: bash
 
-	cd /path/to/topsim
-	pip install -r requirements.txt
-	pip install -e.
+    topsim version
 
-Installing optional libraries
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-As described above, in order to run the provided user-defined planning and scheduling heuristics, it is necessary to use the SHADOW scheduling library. This can be installed using the provided requirements.txt file::
+Or run the test suite:
 
-	pip install -r requirements.txt
-
-It is also possible to clone the SHADOW library locally and install it locally, too::
-
-	git clone https://github.com/myxie/shadow
-	cd shadow/
-	pip install -e .
-
-Verifying installation
-----------------------
-
-In the main source directory, it is useful to verify that installation has worked correctly, and libraries are up to date, by using the tests::
+.. code-block:: bash
 
     python -m unittest discover
-
-**Note:** In order to pass the unittests, it is necessary to follow `Installing optional libraries`_ first.

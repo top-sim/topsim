@@ -14,18 +14,17 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-buffer.py contains three main class that encapsulate the behaviour of the
+buffer.py contains three classes that encapsulate the behaviour of the
 Buffer actor in a simulation.
 
-* Buffer : This is the high-level buffer that other actors interact with. It
-is the one that is initalised at the beginning of a simulation, and who's
-process is invoked with simpy.env.process.
+* :py:class:`Buffer` : The high-level buffer that other actors interact
+  with. Initialised at simulation start.
 
-* HotBuffer : This is the streaming buffer in which instrument ingest occurs,
-and from which ingest processing pipelines may be run.
+* :py:class:`HotBuffer` : The streaming buffer in which instrument ingest
+  occurs, and from which incoming data is processed.
 
-* ColdBuffer : This is the main storage buffer, where post-ingest data is
-moved and from where post-processing pipelines access workflow data.
+* :py:class:`ColdBuffer` : The main storage buffer where post-ingest data
+  is moved and from where workflow processing pipelines access data.
 """
 
 import logging
@@ -44,16 +43,24 @@ LOGGER = logging.getLogger(__name__)
 
 class Buffer:
     """
+    The Buffer actor manages data flow between the instrument (via ingest),
+    the cluster (via workflow task processing), and long-term storage.
+
+    The Buffer wraps a :py:class:`HotBuffer` (for streaming ingest) and
+    a :py:class:`ColdBuffer` (for post-ingest storage). Observations flow
+    from instrument → HotBuffer → ColdBuffer, and are then made available
+    for workflow processing.
+
     Parameters
     ----------
-    env : core.Simpy.Environment object
+    env : simpy.Environment
         The simulation environment
-
-    Attributes
-    ---------
-
-    Methods
-    -------
+    cluster : topsim.core.cluster.Cluster
+        The Cluster actor for the simulation
+    planner : topsim.core.planner.Planner
+        The Planner actor for the simulation
+    config : topsim.core.config.Config
+        Parsed simulation configuration
     """
 
     def __init__(self, env, cluster, planner, config):
@@ -61,11 +68,13 @@ class Buffer:
         Parameters
         ----------
         env : simpy.Environment
-            The environment object for the Simulation
+            The simulation environment
         cluster : topsim.core.cluster.Cluster
-            Cluster (Actor) object for the simulation
+            The Cluster actor for the simulation
+        planner : topsim.core.planner.Planner
+            The Planner actor for the simulation
         config : topsim.core.config.Config
-            Config object
+            Parsed simulation configuration
         """
         self.env = env
         self.cluster = cluster
@@ -537,13 +546,19 @@ class Buffer:
 
 class HotBuffer:
     """
-    HotBuffer represents the ingest-facing part of the Buffer. Observation
-    data is intended to stay in the HotBuffer only temporarily, and ideally
-    is moved to the ColdBuffer as soon as possible.
+    The ingest-facing part of the Buffer.
 
-    Transition to the ColBuffer is not instantaneous; rather it depends on
-    the data rate supported by the ColdBuffer, which may be defined
-    differently to the HotBuffer based on the Buffer config JSON.
+    Observation data stays in the HotBuffer temporarily during observation
+    ingest, and is then transferred to the :py:class:`ColdBuffer` for
+    longer-term storage. The transfer rate is determined by the ColdBuffer's
+    ``max_data_rate``.
+
+    Parameters
+    ----------
+    capacity : int
+        Total storage capacity of this hot buffer
+    max_ingest_data_rate : int
+        Maximum data ingestion rate per timestep
     """
 
     def __init__(self, capacity, max_ingest_data_rate):
@@ -747,8 +762,16 @@ class HotBuffer:
 
 class ColdBuffer:
     """
-    The ColdBuffer takes data from the hot buffer for use in workflow
-    processing
+    The ColdBuffer stores observation data after it has been transferred
+    from the :py:class:`HotBuffer`. Workflow processing tasks read data
+    from this buffer.
+
+    Parameters
+    ----------
+    capacity : int
+        Total storage capacity
+    max_data_rate : int
+        Maximum data transfer rate per timestep
     """
 
     def __init__(self, capacity, max_data_rate):

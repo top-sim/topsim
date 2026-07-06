@@ -29,12 +29,21 @@ LOGGER = logging.getLogger(__name__)
 
 class SHADOWPlanning(Planning):
     """
+    Planning model that uses the SHADOW static scheduling library.
+
+    Supports HEFT, PHEFT, and FCFS algorithms for generating static
+    workflow plans. The SHADOW library is used to schedule workflow
+    tasks onto available cluster resources, producing a
+    :py:class:`~topsim.core.planner.WorkflowPlan` with task allocations
+    and execution order.
+
     Parameters
     ----------
-    observation
-    algorithm
-    buffer
-    delay_model
+    algorithm : str, optional
+        Static scheduling algorithm (``'heft'``, ``'pheft'``, or
+        ``'fcfs'``). Default ``'heft'``.
+    delay_model : ~topsim.core.delay.DelayModel, optional
+        Delay model to attach to generated tasks.
     """
 
     def __init__(self, algorithm='heft', delay_model=None):

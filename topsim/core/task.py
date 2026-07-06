@@ -33,18 +33,62 @@ class TaskStatus(Enum):
 
 class Task(object):
     """
-    Tasks have priorities inheritted from the workflows from which they are
-    arrived; once they arrive at the cluster queue, they are workflow , and
-    are processed according to their priority.
+    Represents a single computational task within a workflow.
+
+    Tasks are the atomic unit of work in a TopSim simulation. Each task
+    has an estimated start time, estimated finish time, computational
+    requirements (FLOPs), data requirements, predecessor dependencies,
+    and an optional delay model.
+
+    Parameters
+    ----------
+    tid : str
+        Unique task identifier.
+    est : int
+        Earliest start time (from static planning).
+    eft : int
+        Earliest finish time (from static planning).
+    machine_id : str or None
+        Allocated machine identifier from the static plan.
+    predecessors : list of str
+        List of predecessor task IDs.
+    flops : int, optional
+        Computational requirement in FLOPs.
+    task_data : int, optional
+        Data size for this task.
+    edge_data : dict, optional
+        Mapping of predecessor task IDs to data transfer sizes.
+    delay : DelayModel, optional
+        Delay model for runtime variability.
+    gid : str, optional
+        Original graph node ID from the workflow DAG.
+    use_task_data : bool, optional
+        Whether to use task_data in runtime calculation.
+    use_edge_data : bool, optional
+        Whether to use edge data transfer times.
+
+    Attributes
+    ----------
+    id : str
+    ast : int
+        Actual start time (set during simulation).
+    aft : int
+        Actual finish time (set during simulation).
+    duration : int
+        Actual runtime duration.
+    task_status : TaskStatus
+        Current status (UNSCHEDULED, SCHEDULED, RUNNING, FINISHED).
+    delay_flag : bool
+        Whether this task experienced a delay.
     """
 
-    # NB I don't want tasks to have null defaults; should we improve on this
-    # by initialising everything in a task at once?
     def __init__(self, tid, est, eft, machine_id, predecessors, flops=0, task_data=0,
                  edge_data: dict=None, delay=None, gid=None, use_task_data=False, use_edge_data=True):
         """
-        :param tid: ID of the Task object
-
+        Parameters
+        ----------
+        tid : str
+            ID of the Task object
         """
 
         self.id = tid

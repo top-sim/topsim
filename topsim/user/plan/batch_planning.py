@@ -41,10 +41,20 @@ def _workflow_to_nx(workflow):
 
 class BatchPlanning(Planning):
     """
-    Create a placeholder, topologically sorted plan for the batch-scheduler
-    and call cluster.provision_batch_resources, updating the state of
-    the cluster.
+    Planning model that produces a topologically sorted workflow plan
+    suitable for batch-scheduling.
 
+    Reads the workflow DAG from a JSON file (node-link format), creates
+    :py:class:`~topsim.core.task.Task` objects with predecessor
+    relationships, and returns a :py:class:`~topsim.core.planner.WorkflowPlan`
+    with the topological execution order.
+
+    Parameters
+    ----------
+    algorithm : str, optional
+        Algorithm name (default ``'batch'``).
+    delay_model : ~topsim.core.delay.DelayModel, optional
+        Delay model to attach to generated tasks.
     """
 
     def __init__(self, algorithm="batch", delay_model=None):

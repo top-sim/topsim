@@ -9,49 +9,29 @@ logger = logging.getLogger(__name__)
 
 class Cluster:
     """
-    A class used to represent the Cluster, the abstract representation
-    of computing resources in the Science Data Processor
+    The Cluster represents the collection of computing resources (machines)
+    in the Science Data Processor.
 
-    The Cluster runs on a per-timestep capacity through its `run()` function
-    in the same way other actors do; however, it's runtime work is minimal.
-
-    The main purpose of the Cluster is to provide access methods for
-    requesting machine data (either aggregate or individual), and for
-    requesting allocations to schedule. The majority of the Cluster is
-    therefore 'read-only' from a user perspective. The only situations in
-    which a user will change the system on the cluster is by using a
-    non-default resource provisioning policy (see Notes below).
-
-
+    The Cluster runs a per-timestep process loop through its :py:meth:`run`
+    method, managing machine state (available, occupied, ingest, idle) and
+    task allocation. It is the primary interface through which the Scheduler
+    allocates tasks to machines.
 
     Parameters
     ----------
-    env : :py:obj:`simpy.Environment`
-        The environment for the current simulation.
-
-    config : :py:obj:`~topsim.core.config.Config`
-        The configuration object for the simulation. See
-        :py:obj:`~topsim.core.simulation.Simulation` for more details.
+    env : simpy.Environment
+        The simulation environment.
+    config : ~topsim.core.config.Config
+        The parsed simulation configuration.
 
     Notes
     -----
-    TopSim defaults to a 'free-for-all' style of resource allocation; unless
-    otherwise stated, a resource that is marked as 'available' may be used
-    for any task (provided capacity restrictions are met etc.).
-
-    If a SLURM-type resource provisioning approach is wanted, where a portion
-    of resources are allocated to a specific workflow for the duration of
-    that workflow, it is possible to use the
-    :py:meth:`~topsim.core.cluster.Cluster.provision_batch_resources`
-    class method in your (online) Scheduling
-    algorithm. This associates a set of machines for your workflow based
-    on a provisioning scheme of your design.
-
-    The clean-up of resources is completed by the Scheduler once all
-    :py:obj:`~topsim.core.task.Task` objects in the
-    :py:obj:`~topsim.core.planner.WorkflowPlan` have finished running,
-    and requires no additional code on behalf of the user.
-
+    All scheduling algorithms use early-binding: resources are pre-allocated
+    to a workflow via
+    :py:meth:`~topsim.core.cluster.Cluster.provision_batch_resources` before
+    tasks execute. Resource cleanup is handled automatically by the Scheduler
+    once all tasks in a :py:class:`~topsim.core.planner.WorkflowPlan` have
+    finished.
     """
 
     def __init__(self, env, config):
@@ -123,7 +103,7 @@ class Cluster:
         Observation objects have an observation type - this corresponds to
         an ingest pipeline that is set out in the Telescope. This pipeline type
         determines the number of machines in the cluster, and the duration,
-        which must be reserved for the observation.
+        which must be allocated to the observation.
 
         The cluster also has a maximum number of ingest
 
@@ -341,8 +321,8 @@ class Cluster:
 
         observation : topsim.core.Observation
             (option) The observation that is associated with the current
-            check. This is useful for ensuring machines are not reserved for
-            a batch-processing
+            check. This is useful for ensuring machines are not tied to
+            a batch-processing observation
 
         c : object
             The identifier for the cluster that is being accessed (in the
@@ -422,7 +402,7 @@ class Cluster:
 
     def _update_available_resources(self, observation, c='default'):
         """
-        De-allacote resources to a given observation (batch-reservation) and
+        Release resources allocated to a given observation (early-binding) and
         add them to the 'available' pool of resources.
 
         Parameters

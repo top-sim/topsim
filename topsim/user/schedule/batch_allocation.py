@@ -27,22 +27,34 @@ logger = logging.getLogger(__name__)
 
 class BatchProcessing(Scheduling):
     """
-    Dynamic schedule for a workflowplan that is using a batch-processing
-    resource reservation approach without generating a static schedule.
+    A batch-processing scheduling algorithm.
+
+    This algorithm uses early-binding: it earmarks a partition of cluster
+    resources for each workflow observation and dynamically allocates tasks
+    from the workflow's ready pool to those exclusively allocated resources.
+    It supports
+    configurable resource splits, ingest awareness, and workflow-based
+    degree-of-parallelism provisioning.
+
+    Parameters
+    ----------
+    max_resource_partitions : int, optional
+        Maximum number of workflows that can be provisioned simultaneously
+        (default 1).
+    min_resources_per_workflow : int, optional
+        Minimum resources required per workflow (default 2).
+    resource_split : dict, optional
+        Per-observation resource limits as ``{observation_name: (min, max)}``.
+    ignore_ingest : bool, optional
+        If True, ignore ingest resource requirements when provisioning.
+    use_workflow_dop : bool, optional
+        If True, derive resource count from workflow degree-of-parallelism.
 
     Attributes
     ----------
-    max_resource_partitions : int
-        The number of provisions that can be made on the cluster.
-        By default, this is 2 - that is, only two workflows may run on the
-        cluster at any given point in time, provided they also do not overlap
-        with the number of ingest pipelines, too.
-
-    min_resources_per_workflow: int
-        The
-
-    resource_split: dict
-
+    max_resources_split : int
+    min_resource_per_workflow : int
+    resource_split : dict or None
     """
 
     def __init__(

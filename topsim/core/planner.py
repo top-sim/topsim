@@ -22,28 +22,26 @@ class WorkflowStatus(int, Enum):
 
 class Planner:
     """
+    The Planner actor generates workflow plans for observations.
 
-    The Planner is our interface with static scheduling algorithms. It provides
-    an interface to other libraries and selects the library based on the
-    provided algorithms based to the _init_. Currently, the SHADOW library is
-    the only library that the Planner is aligned with; this may change in the
-    future.
+    It delegates plan generation to a user-specified planning model
+    (an implementation of :py:class:`~topsim.algorithms.planning.Planning`),
+    which may rely on static scheduling libraries such as SHADOW.
 
     Parameters
     ----------
     env : simpy.Environment
-        Simulation environment object
-
+        Simulation environment.
     cluster : ~topsim.core.cluster.Cluster
-        The cluster of the simulation; necessary to pass to static scheduling
-        algorithms
-
-    model : topsim.algorithm.planner.Planner
-        The implemented planning model that is run by this actor
-
-    delay_model: topsim.core.delay.DelayModel
-        The delaymodel object, to assign to each Workflow Plan task.
-
+        The Cluster actor (needed for resource information during planning).
+    model : ~topsim.algorithms.planning.Planning
+        The planning model instance.
+    use_task_data : bool
+        Whether to include per-task data in runtime calculations.
+    use_edge_data : bool
+        Whether to include edge data transfer times.
+    delay_model : ~topsim.core.delay.DelayModel, optional
+        Delay model to assign to each task in the workflow plan.
     """
 
     def __init__(self, env, cluster, model, use_task_data, use_edge_data, delay_model=None):
@@ -78,15 +76,39 @@ class Planner:
 
 class WorkflowPlan:
     """
-    WorkflowPlans are used within the Planner, Scheduler, and Cluster. 
-    They are higher-level than the shadow library representation,
-    as they are a storage component of scheduled tasks, rather than directly
-    representing the DAG nature of the workflow. This is why the tasks are
-    stored in queues.
+    Stores the plan for a single observation's workflow.
+
+    A WorkflowPlan contains the tasks, execution order, and graph
+    representation of a workflow that has been planned (static schedule)
+    for an observation. It is used by the Scheduler and Cluster during
+    dynamic task allocation.
 
     Parameters
     ----------
+    id : str
+        Observation/workflow identifier.
+    est : int
+        Earliest start time for the workflow.
+    eft : int
+        Earliest finish time for the workflow.
+    tasks : list of Task
+        All tasks in the workflow.
+    exec_order : list
+        Topological execution order of tasks.
+    status : WorkflowStatus
+        Current status (UNSCHEDULED, SCHEDULED, FINISHED, etc.).
+    max_ingest : int
+        Maximum ingest resources allowed.
+    graph : networkx.DiGraph, optional
+        The workflow DAG with Task objects as nodes.
 
+    Attributes
+    ----------
+    id : str
+    tasks : list of Task
+    finished_tasks : list of Task
+    status : WorkflowStatus
+    graph : networkx.DiGraph or None
     """
 
     def __init__(self, id, est, eft, tasks, exec_order, status, max_ingest,

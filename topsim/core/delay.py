@@ -23,30 +23,30 @@ LOGGER = logging.getLogger(__name__)
 
 class DelayModel:
     """
-    The delay model is the delay or failure model for tasks in a workflow.
-    If we have a possibility for delay, then the timeout triggered by a process
-    will be increased by a certain portion.
+    Delay model for task runtime variability.
 
-    A delay model object may be passed to any of the actors within the
-    simulation that yield a timeout to the environment. Each actor will store
-    their expected (current) timeouts and, if present, the actual timeout
-    if a delay has been triggered.
+    If a task has a delay model attached, its actual runtime may exceed
+    the estimated runtime based on a configurable probability and
+    distribution.
+
+    Parameters
+    ----------
+    prob : float
+        Probability that a delay occurs (0.0 to 1.0).
+    dist : str
+        Distribution name for delay sampling. One of ``'normal'``,
+        ``'poisson'``, or ``'uniform'``.
+    degree : DelayModel.DelayDegree
+        Severity of the delay (LOW, MID, HIGH, NONE).
+    seed : int, optional
+        Random seed for reproducibility.
 
     Attributes
     ----------
     prob : float
-        The probabilty a delay will occur
-
     dist : str
-        String name of the distribution from which values will be picked to
-        create a delay.
-
-        Currently normal, poisson, and uniform distributions from numpy are
-        supported. If
-
-    degree : enumerate.Enum (float)
-        The 'degree' to which we will be generating the delay. The higher
-        degree, the larger the final delay.
+    degree : DelayDegree
+    seed : int
     """
 
     class DelayDegree(Enum):

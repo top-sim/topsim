@@ -1,4 +1,3 @@
-
 Planning and Scheduling
 =======================
 
@@ -9,16 +8,14 @@ Planning and Scheduling
     planning
     scheduling
 
+TopSim's development is motivated by evaluating workflow scheduling
+procedures proposed for the Square Kilometre Array Science Data
+Processor. The framework uses early-binding: resources are pre-allocated
+to a workflow before its tasks execute (e.g. SLURM-style batch processing).
 
-User-defined operations in TOpSim
-----------------------------------
+The :doc:`planning` model generates a static workflow plan from an
+observation's workflow DAG. The :doc:`scheduling` algorithm dynamically
+allocates tasks from that plan to cluster machines at each timestep.
 
-TopSims development is motivated by the evaluation of the workflow scheduling
-procedures that are proposed for the Square Kilometre Array Science Data
-Processor. For this reason the evaluation of different scheduling policies is
-a defining feature of the simulation framework.
-
-TopSim separates allocation policies into two categories:
-
-    * Reservation-based allocation, such as SLURM or typical batch-processing models
-    * Free allocation, which is the model that popular heuristics such as HEFT are built upon.
+For step-by-step guidance on implementing custom planning and scheduling
+algorithms, see :ref:`user-defined`.

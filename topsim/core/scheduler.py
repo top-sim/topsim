@@ -29,9 +29,32 @@ LOGGER = logging.getLogger(__name__)
 
 class Scheduler:
     """
+    The Scheduler actor coordinates task allocation across the system.
+
+    It manages the observation queue, checks ingest capacity, allocates
+    ingest pipelines, and dynamically schedules workflow tasks to cluster
+    machines using a user-defined scheduling algorithm.
+
+    Parameters
+    ----------
+    env : simpy.Environment
+        The simulation environment.
+    buffer : topsim.core.buffer.Buffer
+        The Buffer actor.
+    cluster : topsim.core.cluster.Cluster
+        The Cluster actor.
+    planner : topsim.core.planner.Planner
+        The Planner actor.
+    algorithm : topsim.algorithms.scheduling.Scheduling
+        The scheduling algorithm instance.
 
     Attributes
     ----------
+    algorithm : Scheduling
+    observation_queue : list
+        Observations currently being processed.
+    schedule_status : ScheduleStatus
+    events : list
     """
 
     def __init__(self, env, buffer, cluster, planner, algorithm):

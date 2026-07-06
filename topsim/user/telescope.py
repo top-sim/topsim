@@ -30,30 +30,51 @@ class TelescopeQueue:
 
 class Telescope(Instrument):
     """
-    The Telescope is a high-level abstraction of the Telescope and Telesopce
-    Operations Centre/Monitor. It coordinates between the Scheduler to
-    determine if the Cluster and the Buffer have capacity.
+    A reference implementation of the Instrument actor for a radio telescope.
+
+    The Telescope manages observations by checking instrument capacity
+    (antenna arrays), coordinating with the Scheduler for ingest capacity,
+    generating workflow plans via the Planner, and finalising observations
+    once complete.
+
+    This is the default Instrument implementation used in TopSim examples
+    and experiments.
 
     Parameters
     ----------
-    env : Simpy.Environment object
-        The simulation environment
-
-    config : core.config.Config object
-        Config object with stored simulation configuration
-
-    planner :  core.planner.Planner object
-        The Planner actor for the current simulation
-
-    scheduler : core.scheduler.Scheduler object
-        The Scheduler actor for the current simulation
+    env : simpy.Environment
+        The simulation environment.
+    config : topsim.core.config.Config
+        Parsed simulation configuration.
+    planner : topsim.core.planner.Planner
+        The Planner actor.
+    scheduler : topsim.core.scheduler.Scheduler
+        The Scheduler actor.
 
     Raises
     ------
     OSError
-        This will be raised if we cannot read the Telescope config file.
-    JSONDecodeError
-        This will be raised if the config is not parseable JSON
+        If the instrument configuration cannot be read.
+    json.JSONDecodeError
+        If the configuration is not valid JSON.
+
+    Attributes
+    ----------
+    name : str
+        Instrument name (``'telescope'``).
+    total_arrays : int
+        Total number of antenna arrays.
+    pipelines : dict
+        Mapping of observation types to pipeline configurations.
+    observations : list of Observation
+        List of observations to process.
+    max_ingest : int
+        Maximum resources for ingest pipelines.
+    telescope_status : bool
+        Whether the telescope is currently active.
+    telescope_use : int
+        Number of arrays currently in use.
+    events : list
     """
 
     name = 'telescope'

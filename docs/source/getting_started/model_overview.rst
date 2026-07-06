@@ -1,62 +1,87 @@
 .. _model_overview:
 
 What is a TopSim simulation?
-====================================
+============================
 
-A TopSim simulation involves the interactions of _actors_ that participate in the management of workflows that 'process' the data ingested from a user-defined Instrument.
+A TopSim simulation models an end-to-end run-through of a mid-term
+observation plan for a (radio) telescope. The simulation involves the
+interaction of *actors* that participate in the management of workflows
+that process the data ingested from an instrument.
 
-As the motivation is a Telescope, a minimum viable simulation problem may be described as meeting the following requirements:
+The minimum viable simulation problem meets these requirements:
 
-1. I have an observation that runs for a period of time on a Telescope
-2. The observation generates data at a certain (fixed) rate.
-3. There is a computing infrastructure that supports data ingest and real-time computing during this process.
-4. There is a workflow that describeds tasks for data processing post-observation
-5. There is a scheduling infrastructre that allows for tasks to be mapped to the computing infrastructure in a way that may be specified by the user.
+1. An observation runs for a period of time on a telescope.
+2. The observation generates data at a fixed rate.
+3. There is a computing infrastructure that supports data ingest and
+   real-time computing.
+4. There is a workflow describing tasks for post-observation data
+   processing.
+5. There is a scheduling infrastructure that maps tasks to computing
+   resources.
 
+Actors
+=======
 
+The following actors are modelled within TopSim:
 
-The following actors are modelled within TopSim, each participating in some way in the execution of workflows:
+* :py:class:`~topsim.user.telescope.Telescope` (or a custom
+  :py:class:`~topsim.core.instrument.Instrument` implementation)
+* :py:class:`~topsim.core.scheduler.Scheduler`
+* :py:class:`~topsim.core.cluster.Cluster`
+* :py:class:`~topsim.core.buffer.Buffer`
+* :py:class:`~topsim.core.planner.Planner`
+* :py:class:`~topsim.core.monitor.Monitor`
 
-* :py:class:`~instrument.Instrument`
-* :py:class:`~scheduler.Scheduler`
-* :py:class:`~cluster.Cluster`
-* :py:class:`~buffer.Buffer`
-* :py:class:`~monitor.Monitor`
-
-
-Runtime Design
+Runtime design
 --------------
 
-Each actor within TOpSim has a `run()` function. These are generators
-themselves, yielding a timeout per-timestep, and run at the beginning of the
-simulation using an env.process() call. The point of the 'run()' method for
-actors is to set up a continual call-back loop, where each actor processes
-the current simulation state at each timestep to see if the state has changed
-and they need to act.
+Each actor has a ``run()`` method that yields a ``simpy.Timeout`` per
+timestep. These are started at the beginning of the simulation using
+``env.process()``. The ``run()`` method sets up a continual callback
+loop where each actor checks the current simulation state and acts
+accordingly.
 
-******
-Actors
-******
+Data flow
+---------
+
+::
+
+    Instrument ──► Scheduler ──► Buffer ──► Cluster
+        │              │            │           │
+        │              │            │           ▼
+        │              │            │        Tasks
+        │              │            │
+        ▼              ▼            ▼
+     Observations   WorkflowPlans  Hot/Cold storage
+
+1. The **Instrument** manages observations and checks instrument
+   capacity (antenna arrays).
+2. When ready, the **Scheduler** checks ingest capacity (buffer and
+   cluster availability).
+3. The **Planner** generates a :py:class:`~topsim.core.planner.WorkflowPlan`
+   for the observation's workflow DAG.
+4. The **Buffer** manages data flow: observations ingest into the
+   HotBuffer, then data is transferred to the ColdBuffer.
+5. The **Scheduler** dynamically allocates tasks from the plan to
+   machines in the **Cluster**.
+6. The **Monitor** records per-timestep state and events from all
+   actors.
 
 Buffer
-======
+------
 
-The buffer is a core-component of the Operations Simlator model. In this
-scenario, we split the buffer into two components, the Hot and Cold buffer,
-as this mirrors the use case for the SKA. Additionally, it makes sense to
-separate the real-time streaming timeline from the
-post-observation/instrumentation workflow processing.
+The Buffer is split into two components: the **HotBuffer** (streaming
+ingest) and **ColdBuffer** (post-observation storage). This mirrors
+the SKA use case, where real-time streaming data is separated from
+post-processing workflow data.
 
-The Buffer operates within it's own process loop, like the Telescope,
-Scheduler, and Cluster. The pseudo-code for this is as follows:
+The Buffer runs its own process loop. Key interactions:
 
-Interacting with the Buffer
-----------------------------
-Buffer interaction happen primarily through the Scheduler and Cluster.
+* The Instrument writes observation data to the HotBuffer during ingest.
+* Data is transferred from HotBuffer to ColdBuffer at the ColdBuffer's
+  ``max_data_rate``.
+* The Scheduler retrieves observations from the Buffer for workflow
+  processing.
+* The Cluster processes tasks that read data from processed observations.
 
-The cluster and scheduler both have access to the Buffer object, and are able
-to invoke processes on it.
-
-
-
-
+For more detail on each actor, see the :ref:`reference/index` section.

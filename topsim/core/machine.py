@@ -14,6 +14,29 @@ class Status(Enum):
 
 
 class Machine(object):
+    """
+    Represents a single compute resource (machine) in the cluster.
+
+    Each machine has computational capacity (CPU in FLOPs/timestep),
+    memory, disk, and network bandwidth attributes. Tasks are allocated
+    to machines during scheduling and their runtime is determined by the
+    machine's capabilities.
+
+    Parameters
+    ----------
+    id : str
+        Unique machine identifier.
+    cpu : float
+        Computational capacity (FLOPs per timestep).
+    memory : int
+        Memory capacity.
+    disk : int
+        Disk capacity.
+    bandwidth : float
+        Compute bandwidth for local data access.
+    ethernet : float
+        Network bandwidth for inter-machine data transfer.
+    """
     def __init__(self, id, cpu, memory, disk, bandwidth, ethernet):
         self.id = id
         self.cpu = cpu

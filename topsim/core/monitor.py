@@ -9,15 +9,22 @@ logger = logging.getLogger(__name__)
 
 class Monitor(object):
     """
-    The Monitor actor for a TopSim simulation
+    The Monitor actor collects per-timestep state from all other actors
+    and collates events for simulation output.
 
     Parameters
     ----------
-    simulation : topsim.core.Simulation
-        The simulation object
+    simulation : topsim.core.simulation.Simulation
+        The simulation object to monitor.
+    start_time : datetime.datetime
+        Timestamp for the simulation start (used for output labelling).
 
     Attributes
     ----------
+    df : pandas.DataFrame
+        Per-timestep state data from all actors.
+    events : pandas.DataFrame
+        Collated event log from instrument, scheduler, and buffer actors.
     """
     def __init__(self, simulation, start_time):
         self.simulation = simulation

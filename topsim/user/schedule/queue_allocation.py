@@ -26,22 +26,20 @@ logger = logging.getLogger(__name__)
 
 class QueueProcessing(Scheduling):
     """
-    Dynamic schedule for a workflowplan that is using a queue-model without
-    the use of a static schedule.
+    Queue-model scheduling without a static plan.
 
-    Attributes
+    Tasks are allocated to the first available machine as they become
+    ready. This algorithm does not use a pre-computed static schedule;
+    it dynamically picks machines from the available resource pool.
+
+    Parameters
     ----------
-    max_resource_partitions : int
-        The number of provisions that can be made on the cluster.
-        By default, this is 2 - that is, only two workflows may run on the
-        cluster at any given point in time, provided they also do not overlap
-        with the number of ingest pipelines, too.
-
-    min_resources_per_workflow: int
-        The
-
-    resource_split: dict
-
+    max_resource_partitions : int, optional
+        Maximum simultaneous workflow provisions (default 1).
+    min_resources_per_workflow : int, optional
+        Minimum resources per workflow (default 3).
+    resource_split : dict, optional
+        Per-observation resource limits.
     """
 
     def __init__(
